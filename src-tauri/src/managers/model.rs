@@ -329,20 +329,34 @@ pub struct DownloadProgress {
 /// Uses hf-hub's stock location (HF_HOME or ~/.cache/huggingface/hub) so
 /// downloads are shared with other tools.
 ///
-/// hf-hub resolves purely through `refs/<revision>`. Pinned downloads write
-/// `refs/<commit-sha>`, but caches populated before pinning — or by other
-/// tools, which download via `main` — only have `refs/main`, so lookup falls
-/// back to it. Grandfathered `main` copies may predate the pin; per policy a
+/// The Python HF client omits refs for downloads by commit SHA. Resolve that
+/// immutable snapshot directly before using hf-hub's ref-only lookup. Older
+/// downloads may only have `refs/main`, so lookup still falls back to it.
+/// Grandfathered `main` copies may predate the pin; per policy a
 /// working local model is never invalidated by routine catalog regeneration.
 fn hf_cached_path(repo_id: &str, revision: &str, filename: &str) -> Option<PathBuf> {
+    hf_cached_path_in(&Cache::from_env(), repo_id, revision, filename)
+}
+
+fn hf_cached_path_in(
+    cache: &Cache,
+    repo_id: &str,
+    revision: &str,
+    filename: &str,
+) -> Option<PathBuf> {
     let get = |rev: &str| {
-        Cache::from_env()
-            .repo(Repo::with_revision(
-                repo_id.to_string(),
-                RepoType::Model,
-                rev.to_string(),
-            ))
-            .get(filename)
+        let repo = cache.repo(Repo::with_revision(
+            repo_id.to_string(),
+            RepoType::Model,
+            rev.to_string(),
+        ));
+        if rev.len() == 40 && rev.bytes().all(|b| b.is_ascii_hexdigit()) {
+            let snapshot = repo.pointer_path(rev).join(filename);
+            if snapshot.is_file() {
+                return Some(snapshot);
+            }
+        }
+        repo.get(filename).filter(|path| path.is_file())
     };
     get(revision).or_else(|| (revision != "main").then(|| get("main")).flatten())
 }
@@ -3036,6 +3050,61 @@ mod tests {
             push_gguf_str(&mut out, l);
         }
         fs::write(path, out).unwrap();
+    }
+
+    #[test]
+    fn hf_cached_path_resolves_python_pinned_download_without_refs() {
+        let tmp = TempDir::new().unwrap();
+        let cache = Cache::new(tmp.path().to_path_buf());
+        let commit = "6d44e540bc31b0de1dbe174a3cea87f53a7f22fb";
+        let snapshot = tmp.path().join("models--org--model/snapshots").join(commit);
+        fs::create_dir_all(&snapshot).unwrap();
+        let file = snapshot.join("model.gguf");
+        fs::write(&file, b"model").unwrap();
+        assert_eq!(
+            hf_cached_path_in(&cache, "org/model", commit, "model.gguf"),
+            Some(file)
+        );
+        assert!(!tmp.path().join("models--org--model/refs").exists());
+    }
+
+    #[test]
+    fn hf_cached_path_prefers_pinned_snapshot_and_preserves_main_fallback() {
+        let tmp = TempDir::new().unwrap();
+        let cache = Cache::new(tmp.path().to_path_buf());
+        let commit = "6d44e540bc31b0de1dbe174a3cea87f53a7f22fb";
+        let repo = tmp.path().join("models--org--model");
+        let pinned = repo.join("snapshots").join(commit).join("model.gguf");
+        let legacy = repo.join("snapshots/old/model.gguf");
+        fs::create_dir_all(pinned.parent().unwrap()).unwrap();
+        fs::create_dir_all(legacy.parent().unwrap()).unwrap();
+        fs::create_dir_all(repo.join("refs")).unwrap();
+        fs::write(repo.join("refs/main"), "old").unwrap();
+        fs::write(&legacy, b"old").unwrap();
+        assert_eq!(
+            hf_cached_path_in(&cache, "org/model", commit, "model.gguf"),
+            Some(legacy)
+        );
+        fs::write(&pinned, b"pinned").unwrap();
+        assert_eq!(
+            hf_cached_path_in(&cache, "org/model", commit, "model.gguf"),
+            Some(pinned)
+        );
+    }
+
+    #[test]
+    fn hf_cached_path_does_not_treat_a_directory_as_downloaded() {
+        let tmp = TempDir::new().unwrap();
+        let cache = Cache::new(tmp.path().to_path_buf());
+        let commit = "6d44e540bc31b0de1dbe174a3cea87f53a7f22fb";
+        let repo = tmp.path().join("models--org--model");
+        fs::create_dir_all(repo.join("snapshots").join(commit).join("model.gguf")).unwrap();
+        fs::create_dir_all(repo.join("refs")).unwrap();
+        fs::write(repo.join("refs").join(commit), commit).unwrap();
+        assert_eq!(
+            hf_cached_path_in(&cache, "org/model", commit, "model.gguf"),
+            None
+        );
     }
 
     #[test]

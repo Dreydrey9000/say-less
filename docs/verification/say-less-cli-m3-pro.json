@@ -1,0 +1,12 @@
+{
+  "audio_secs": 11.0,
+  "best_ms": 1053,
+  "bound_backend": "MTL0",
+  "load_ms": 1386,
+  "model": "handy-computer/nemotron-3.5-asr-streaming-0.6b-gguf/nemotron-3.5-asr-streaming-0.6b-Q8_0.gguf",
+  "requested_device": "settings",
+  "rtf": 10.446343779677113,
+  "text": "And so my fellow Americans ask not what your country can do for you ask what you can do for your country.",
+  "transcribe_ms": [2261, 1053],
+  "scope": "Packaged Say Less CLI, app ModelManager and TranscriptionManager, public JFK sample. After pinned-cache fix."
+}

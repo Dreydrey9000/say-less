@@ -1,0 +1,25 @@
+flowchart TD
+    subgraph Network[Network only when needed]
+        HF[Hugging Face pinned GGUF]
+        Mirror[Catalog mirror fallback]
+        Cloud[Optional configured text provider]
+    end
+    subgraph Local[User computer]
+        Picker[React model picker] --> Manager[Rust ModelManager]
+        HF --> Check[Size and SHA-256 verification]
+        Mirror --> Check
+        Check --> Cache[Local model cache]
+        Manager --> Cache
+        Mic[Shortcut and microphone] --> Audio[16 kHz audio frames]
+        Audio --> Runtime[transcribe-cpp Nemotron session]
+        Cache --> Runtime
+        Runtime --> Preview[Live partial text overlay]
+        Runtime --> Finalize[Release shortcut and finalize]
+        Finalize -->|Empty or failed stream where safe| Batch[Same-model batch transcription]
+        Batch --> Text[Final text]
+        Finalize --> Text
+        Text --> Cleanup[Local cleanup and custom words]
+        Cleanup --> Paste[Clipboard and paste into active app]
+    end
+    Cleanup -. Explicitly enabled cloud post-processing .-> Cloud
+    Cloud -. Processed text .-> Paste

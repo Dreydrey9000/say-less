@@ -1,0 +1,37 @@
+{
+  "audio_seconds": 11.0,
+  "auto_language_text": "And so my fellow Americans ask not what your country can do for you ask what you can do for your country.",
+  "backend": "MTL0",
+  "batch_ms": 1227.580334,
+  "batch_text": "And so my fellow Americans ask not what your country can do for you ask what you can do for your country.",
+  "cancel_then_retry": "passed",
+  "load_ms": 16470.026042,
+  "model_revision": "6d44e540bc31b0de1dbe174a3cea87f53a7f22fb",
+  "model_variant": "nemotron-3.5-asr-streaming-0.6b",
+  "runtime": "0.2.3",
+  "runtime_commit": "unknown",
+  "sha256": "b94545b313b3223fda7b2857a52681da813935c2127643d1e9ff0c23d988089c",
+  "stream_runs": [
+    {
+      "compute_ms": 1271.169,
+      "finalize_ms": 102.86087500000001,
+      "first_text_after_audio_ms": 1100.0,
+      "text": "And so my fellow Americans ask not what your country can do for you ask what you can do for your country.",
+      "text_updates": 9
+    },
+    {
+      "compute_ms": 995.089833,
+      "finalize_ms": 89.767875,
+      "first_text_after_audio_ms": 1100.0,
+      "text": "And so my fellow Americans ask not what your country can do for you ask what you can do for your country.",
+      "text_updates": 9
+    }
+  ],
+  "timing_note": "Unpaced file replay: compute timings are not microphone-to-paste latency.",
+  "hardware": {
+    "chip": "Apple M3 Pro",
+    "memory_gib": 36
+  },
+  "verification_date": "2026-09-22",
+  "scope": "Public 11-second JFK sample; local Metal inference. Native microphone/paste, Windows, 8GB hardware, and battery not measured."
+}
