@@ -623,7 +623,7 @@
         "button": "View on GitHub"
       },
       "supportDevelopment": {
-        "title": "Support Development",
+        "title": "Support Development · Handy",
         "description": "Help us continue building Handy",
         "button": "Donate"
       },
@@ -713,5 +713,8 @@
     "learnMore": "How to fix",
     "recorderBlocked": "Can't record shortcuts right now — macOS Secure Input is blocking key events. Resolve the Secure Input warning first.",
     "dismiss": "Dismiss"
+  },
+  "brand": {
+    "name": "Say Less"
   }
 }

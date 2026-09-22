@@ -1,5 +1,9 @@
 # Say Less
 
+![Say Less emblem](public/brand/say-less-emblem.png)
+
+[Brand assets and coaching-portal usage](docs/brand.md)
+
 Free, offline push-to-talk dictation for Mac and Windows. Hold a key, talk, and your words get typed into whatever app you're in.
 
 - **Free.** No subscription, no account.

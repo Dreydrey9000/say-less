@@ -1,7 +1,7 @@
 [package]
 name = "handy"
-version = "0.9.7"
-description = "Handy"
+version = "0.9.8"
+description = "Say Less local voice dictation"
 authors = ["cjpais"]
 edition = "2021"
 license = "MIT"

@@ -3,6 +3,6 @@
 <plist version="1.0">
 <dict>
   <key>NSMicrophoneUsageDescription</key>
-  <string>Request microphone access to transcribe audio locally</string>
+  <string>Say Less uses your microphone to transcribe your voice locally on this computer.</string>
 </dict>
 </plist>
