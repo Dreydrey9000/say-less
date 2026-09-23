@@ -108,7 +108,8 @@
       },
       "accessibility": {
         "title": "Erişilebilirlik Erişimi",
-        "description": "Transkribe edilen metni uygulamalarınıza yazabilmek için gereklidir."
+        "description": "Transkribe edilen metni uygulamalarınıza yazabilmek için gereklidir.",
+        "recovery": "Already switched on? In System Settings → Privacy & Security → Accessibility, remove only Say Less with the minus button, then use + to add /Applications/Say Less.app and enable it again. Return here and choose Check again."
       },
       "grant": "İzin Ver",
       "granted": "Verildi",
@@ -117,7 +118,8 @@
       "errors": {
         "checkFailed": "İzinler kontrol edilemedi. Lütfen tekrar deneyin.",
         "requestFailed": "İzin isteği başarısız oldu. Lütfen tekrar deneyin."
-      }
+      },
+      "checkAgain": "Check again"
     }
   },
   "modelSelector": {

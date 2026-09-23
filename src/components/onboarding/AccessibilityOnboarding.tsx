@@ -48,6 +48,9 @@ const AccessibilityOnboarding: React.FC<AccessibilityOnboardingProps> = ({
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const errorCountRef = useRef<number>(0);
+  const [checkRevision, setCheckRevision] = useState(0);
+  const pollStartedAt = useRef(0);
+  const completionStarted = useRef(false);
   const MAX_POLLING_ERRORS = 3;
 
   const isMacOS = permissionPlatform === "macos";
@@ -63,6 +66,8 @@ const AccessibilityOnboarding: React.FC<AccessibilityOnboardingProps> = ({
       : true;
 
   const completeOnboarding = useCallback(async () => {
+    if (completionStarted.current) return;
+    completionStarted.current = true;
     await Promise.all([refreshAudioDevices(), refreshOutputDevices()]);
     timeoutRef.current = setTimeout(() => onComplete(), 300);
   }, [onComplete, refreshAudioDevices, refreshOutputDevices]);
@@ -169,14 +174,37 @@ const AccessibilityOnboarding: React.FC<AccessibilityOnboardingProps> = ({
       }
     };
 
-    checkInitial();
-  }, [completeOnboarding, hasWindowsMicrophoneAccess, onComplete, preview, t]);
+    void checkInitial();
+    const recheck = () => void checkInitial();
+    window.addEventListener("focus", recheck);
+    return () => window.removeEventListener("focus", recheck);
+  }, [
+    checkRevision,
+    completeOnboarding,
+    hasWindowsMicrophoneAccess,
+    onComplete,
+    preview,
+    t,
+  ]);
 
   // Polling for permissions after user clicks a button
   const startPolling = useCallback(() => {
     if (pollingRef.current || permissionPlatform === null) return;
+    pollStartedAt.current = Date.now();
+    errorCountRef.current = 0;
 
     pollingRef.current = setInterval(async () => {
+      if (Date.now() - pollStartedAt.current >= 15000) {
+        if (pollingRef.current) clearInterval(pollingRef.current);
+        pollingRef.current = null;
+        setPermissions((prev) => ({
+          accessibility:
+            prev.accessibility === "waiting" ? "needed" : prev.accessibility,
+          microphone:
+            prev.microphone === "waiting" ? "needed" : prev.microphone,
+        }));
+        return;
+      }
       try {
         if (permissionPlatform === "windows") {
           const microphoneGranted = await hasWindowsMicrophoneAccess();
@@ -244,6 +272,12 @@ const AccessibilityOnboarding: React.FC<AccessibilityOnboardingProps> = ({
             pollingRef.current = null;
           }
           toast.error(t("onboarding.permissions.errors.checkFailed"));
+          setPermissions((prev) => ({
+            accessibility:
+              prev.accessibility === "waiting" ? "needed" : prev.accessibility,
+            microphone:
+              prev.microphone === "waiting" ? "needed" : prev.microphone,
+          }));
         }
       }
     }, 1000);
@@ -409,6 +443,20 @@ const AccessibilityOnboarding: React.FC<AccessibilityOnboardingProps> = ({
                   >
                     {t("onboarding.permissions.grant")}
                   </button>
+                )}
+                {permissions.accessibility !== "granted" && (
+                  <div className="mt-3 flex flex-col gap-3">
+                    <p className="text-sm text-text/70">
+                      {t("onboarding.permissions.accessibility.recovery")}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setCheckRevision((value) => value + 1)}
+                      className="brand-action self-start px-4 py-2 rounded-lg text-sm font-medium"
+                    >
+                      {t("onboarding.permissions.checkAgain")}
+                    </button>
+                  </div>
                 )}
               </div>
             </div>

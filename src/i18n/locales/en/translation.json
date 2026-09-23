@@ -108,7 +108,8 @@
       },
       "accessibility": {
         "title": "Accessibility Access",
-        "description": "Required to type transcribed text into your applications."
+        "description": "Required to type transcribed text into your applications.",
+        "recovery": "Already switched on? In System Settings → Privacy & Security → Accessibility, remove only Say Less with the minus button, then use + to add /Applications/Say Less.app and enable it again. Return here and choose Check again."
       },
       "grant": "Grant Permission",
       "granted": "Granted",
@@ -117,7 +118,8 @@
       "errors": {
         "checkFailed": "Failed to check permissions. Please try again.",
         "requestFailed": "Failed to request permission. Please try again."
-      }
+      },
+      "checkAgain": "Check again"
     }
   },
   "modelSelector": {

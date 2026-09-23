@@ -108,7 +108,8 @@
       },
       "accessibility": {
         "title": "辅助功能访问",
-        "description": "需要将转录文本输入到您的应用程序中。"
+        "description": "需要将转录文本输入到您的应用程序中。",
+        "recovery": "Already switched on? In System Settings → Privacy & Security → Accessibility, remove only Say Less with the minus button, then use + to add /Applications/Say Less.app and enable it again. Return here and choose Check again."
       },
       "grant": "授予权限",
       "granted": "已授予",
@@ -117,7 +118,8 @@
       "errors": {
         "checkFailed": "检查权限失败。请重试。",
         "requestFailed": "请求权限失败。请重试。"
-      }
+      },
+      "checkAgain": "Check again"
     }
   },
   "modelSelector": {

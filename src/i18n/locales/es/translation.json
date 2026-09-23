@@ -108,7 +108,8 @@
       },
       "accessibility": {
         "title": "Acceso de accesibilidad",
-        "description": "Necesario para escribir el texto transcrito en tus aplicaciones."
+        "description": "Necesario para escribir el texto transcrito en tus aplicaciones.",
+        "recovery": "Already switched on? In System Settings → Privacy & Security → Accessibility, remove only Say Less with the minus button, then use + to add /Applications/Say Less.app and enable it again. Return here and choose Check again."
       },
       "grant": "Conceder permiso",
       "granted": "Concedido",
@@ -117,7 +118,8 @@
       "errors": {
         "checkFailed": "Error al verificar permisos. Por favor, inténtalo de nuevo.",
         "requestFailed": "Error al solicitar permiso. Por favor, inténtalo de nuevo."
-      }
+      },
+      "checkAgain": "Check again"
     }
   },
   "modelSelector": {

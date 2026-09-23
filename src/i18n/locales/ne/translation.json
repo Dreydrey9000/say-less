@@ -108,7 +108,8 @@
       },
       "accessibility": {
         "title": "एक्सेसिबिलिटी पहुँच",
-        "description": "ट्रान्सक्राइब गरिएको टेक्स्ट तपाईंका एपहरूमा टाइप गर्न आवश्यक छ।"
+        "description": "ट्रान्सक्राइब गरिएको टेक्स्ट तपाईंका एपहरूमा टाइप गर्न आवश्यक छ।",
+        "recovery": "Already switched on? In System Settings → Privacy & Security → Accessibility, remove only Say Less with the minus button, then use + to add /Applications/Say Less.app and enable it again. Return here and choose Check again."
       },
       "grant": "अनुमति दिनुहोस्",
       "granted": "अनुमति दिइयो",
@@ -117,7 +118,8 @@
       "errors": {
         "checkFailed": "अनुमतिहरू जाँच गर्न सकिएन। कृपया फेरि प्रयास गर्नुहोस्।",
         "requestFailed": "अनुमति अनुरोध गर्न सकिएन। कृपया फेरि प्रयास गर्नुहोस्।"
-      }
+      },
+      "checkAgain": "Check again"
     }
   },
   "modelSelector": {

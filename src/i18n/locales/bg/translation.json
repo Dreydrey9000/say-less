@@ -108,7 +108,8 @@
       },
       "accessibility": {
         "title": "Достъп за достъпност",
-        "description": "Необходим е, за да въвежда транскрибирания текст във вашите приложения."
+        "description": "Необходим е, за да въвежда транскрибирания текст във вашите приложения.",
+        "recovery": "Already switched on? In System Settings → Privacy & Security → Accessibility, remove only Say Less with the minus button, then use + to add /Applications/Say Less.app and enable it again. Return here and choose Check again."
       },
       "grant": "Даване на разрешение",
       "granted": "Разрешено",
@@ -117,7 +118,8 @@
       "errors": {
         "checkFailed": "Проверката на разрешенията не бе успешна. Опитайте отново.",
         "requestFailed": "Заявката за разрешение не бе успешна. Опитайте отново."
-      }
+      },
+      "checkAgain": "Check again"
     }
   },
   "modelSelector": {

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.1
+
+- Recover from stalled macOS permission setup with bounded waiting, focus rechecks, and explicit retry instructions.
+
 ## 0.10.0
 
 - Custom accent palettes and a nonactivating floating dock.

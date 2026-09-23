@@ -31,6 +31,10 @@ The default and app-specific rules operate locally: keep original, sentence case
 
 You can also choose a Wispr-format JSON array of `{ "name": "cue", "text": "expansion" }` objects or CSV with vocabulary in one column, or incorrect/correct phrases in two columns. Files are limited to 3 MB and 1,000 entries. Quoted commas, escaped quotes, and multiline CSV fields are supported. This follows [Wispr's documented import formats](https://docs.wisprflow.ai/articles/8955301725-How-Do-I-Bulk-Import-Dictionary-Items-and-Snippets); it does not assume Wispr offers a one-click export of all account data.
 
+## Recover Accessibility after an update
+
+If Say Less reports missing Accessibility even though its macOS switch is on, remove only Say Less from **System Settings → Privacy & Security → Accessibility**, then add `/Applications/Say Less.app` again and enable it. Return to Say Less and select **Check again**. The app also checks when its window regains focus. Waiting ends after 15 seconds so a denied or stale grant never leaves the button permanently unavailable. Only macOS can grant this permission; the app never treats a timeout as permission.
+
 ## Build and distribution
 
 The local Mac has an Apple Development signing identity. Use a consistent local identity for successive builds to avoid ad-hoc code-hash permission churn. Transitioning from ad-hoc to certificate signing may require reauthorization once. Do not copy identities/private keys into this repo. Developer ID distribution signing, notarization, installer testing, and update signing remain release work.

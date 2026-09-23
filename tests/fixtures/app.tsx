@@ -128,7 +128,10 @@ mockIPC((cmd, payload) => {
     cmd.includes("check_accessibility_permission") ||
     cmd.includes("check_microphone_permission")
   )
-    return !query.has("noPermissions");
+    return (
+      !query.has("noPermissions") ||
+      sessionStorage.getItem("test-permissions") === "granted"
+    );
   if (cmd === "get_app_settings" || cmd === "get_default_settings")
     return settings;
   if (cmd === "get_current_model") return "test-model";

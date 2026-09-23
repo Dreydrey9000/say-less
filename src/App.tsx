@@ -3,6 +3,7 @@ import {
   useLayoutEffect,
   useState,
   useRef,
+  useCallback,
   type ReactNode,
 } from "react";
 import { toast, Toaster } from "sonner";
@@ -317,12 +318,12 @@ function App() {
     }
   };
 
-  const handleAccessibilityComplete = () => {
+  const handleAccessibilityComplete = useCallback(() => {
     setSettingsOnly(false);
     // Returning users already have models, skip to main app
     // New users need to select a model
     setOnboardingStep(isReturningUser ? "done" : "model");
-  };
+  }, [isReturningUser]);
 
   const handleModelSelected = () => {
     // Transition to main app - user has started a download

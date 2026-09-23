@@ -108,7 +108,8 @@
       },
       "accessibility": {
         "title": "Доступ до доступності",
-        "description": "Потрібен для введення транскрибованого тексту у ваші додатки."
+        "description": "Потрібен для введення транскрибованого тексту у ваші додатки.",
+        "recovery": "Already switched on? In System Settings → Privacy & Security → Accessibility, remove only Say Less with the minus button, then use + to add /Applications/Say Less.app and enable it again. Return here and choose Check again."
       },
       "grant": "Надати дозвіл",
       "granted": "Надано",
@@ -117,7 +118,8 @@
       "errors": {
         "checkFailed": "Не вдалося перевірити дозволи. Будь ласка, спробуйте ще раз.",
         "requestFailed": "Не вдалося запросити дозвіл. Будь ласка, спробуйте ще раз."
-      }
+      },
+      "checkAgain": "Check again"
     }
   },
   "modelSelector": {
