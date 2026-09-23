@@ -21,8 +21,8 @@ pub fn set_visible(app: &AppHandle, visible: bool) -> Result<(), String> {
                     .url(tauri::WebviewUrl::App("src/dock/index.html".into()))
                     .title("Say Less — Floating dock")
                     .size(tauri::Size::Logical(tauri::LogicalSize {
-                        width: 360.0,
-                        height: 96.0,
+                        width: 400.0,
+                        height: 132.0,
                     }))
                     .position(tauri::Position::Logical(tauri::LogicalPosition {
                         x: 120.0,
@@ -59,7 +59,7 @@ pub fn set_visible(app: &AppHandle, visible: bool) -> Result<(), String> {
                     tauri::WebviewUrl::App("src/dock/index.html".into()),
                 )
                 .title("Say Less — Floating dock")
-                .inner_size(360.0, 96.0)
+                .inner_size(400.0, 132.0)
                 .decorations(false)
                 .always_on_top(true)
                 .skip_taskbar(true)
@@ -74,7 +74,8 @@ pub fn set_visible(app: &AppHandle, visible: bool) -> Result<(), String> {
         if let Some(window) = handle.get_webview_window("say_less_dock") {
             // Use Tauri's show/resize path, as the recording overlay does, so
             // WebKit is laid out and resumed along with the native panel.
-            let _ = window.set_size(tauri::LogicalSize::new(360.0, 96.0));
+            let _ = window.set_size(tauri::LogicalSize::new(400.0, 132.0));
+            let _ = snap_to_edge(&handle);
             let _ = window.show();
         }
     })
@@ -95,4 +96,48 @@ pub fn dock_toggle_recording(app: AppHandle) -> Result<(), String> {
     }
     crate::signal_handle::send_transcription_input(&app, "transcribe", "floating-dock");
     Ok(())
+}
+
+/// Place inside the current monitor work area, respecting Retina scale.
+pub fn snap_to_edge(app: &AppHandle) -> Result<(), String> {
+    let settings = crate::studio::get_studio_settings(app.clone())?;
+    if settings.dock_edge == "free" {
+        return Ok(());
+    }
+    let window = app
+        .get_webview_window("say_less_dock")
+        .ok_or("dock_missing")?;
+    let monitor = window
+        .current_monitor()
+        .map_err(|_| "monitor")?
+        .ok_or("monitor")?;
+    let area = monitor.work_area();
+    let size = window.outer_size().map_err(|_| "size")?;
+    let margin = (12.0 * monitor.scale_factor()) as i32;
+    let left = area.position.x + margin;
+    let right = area.position.x + area.size.width as i32 - size.width as i32 - margin;
+    let x = if settings.dock_edge == "left" {
+        left
+    } else {
+        right.max(left)
+    };
+    let y = area.position.y + ((area.size.height as i32 - size.height as i32) / 2).max(0);
+    window
+        .set_position(tauri::PhysicalPosition::new(x, y))
+        .map_err(|_| "position".into())
+}
+
+static ACTIVITY: std::sync::atomic::AtomicU8 = std::sync::atomic::AtomicU8::new(0);
+pub fn remember_state(state: u8) {
+    ACTIVITY.store(state, std::sync::atomic::Ordering::Relaxed);
+}
+#[tauri::command]
+#[specta::specta]
+pub fn get_dock_state() -> String {
+    match ACTIVITY.load(std::sync::atomic::Ordering::Relaxed) {
+        1 => "recording",
+        2 => "transcribing",
+        _ => "idle",
+    }
+    .into()
 }

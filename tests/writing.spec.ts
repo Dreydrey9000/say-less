@@ -127,6 +127,7 @@ for (const theme of ["dark", "light"]) {
         colorScheme: theme as "dark" | "light",
       });
       await page.goto(`/tests/fixtures/app.html?theme=${theme}`);
+      await page.getByRole("button", { name: "General", exact: true }).click();
       await expect(
         page.getByRole("heading", { name: "Dictation", exact: true }),
       ).toBeVisible();
@@ -162,6 +163,7 @@ test("stalled audio enumeration falls back to the system device", async ({
   page,
 }) => {
   await page.goto("/tests/fixtures/app.html?stallDevices=1");
+  await page.getByRole("button", { name: "General", exact: true }).click();
   const microphone = page.getByRole("combobox", {
     name: "Microphone",
     exact: true,

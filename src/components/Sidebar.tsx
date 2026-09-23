@@ -12,7 +12,9 @@ import {
   Palette,
   WandSparkles,
   Download,
+  House,
 } from "lucide-react";
+import { Home } from "./Home";
 import { StudioSettings } from "./settings/StudioSettings";
 import { VoiceActions } from "./settings/VoiceActions";
 import { WisprImport } from "./settings/WisprImport";
@@ -47,6 +49,12 @@ interface SectionConfig {
 }
 
 export const SECTIONS_CONFIG = {
+  home: {
+    labelKey: "home.title",
+    icon: House,
+    component: Home,
+    enabled: () => true,
+  },
   general: {
     labelKey: "sidebar.general",
     icon: AudioLines,

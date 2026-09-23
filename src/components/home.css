@@ -1,0 +1,183 @@
+.say-home {
+  width: 100%;
+  max-width: 1080px;
+  padding: 24px 18px;
+}
+.home-kicker {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  opacity: 0.7;
+}
+.home-stage {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 24px;
+  align-items: center;
+  padding: 44px 0 32px;
+}
+.home-intro h1 {
+  font-size: 54px;
+  line-height: 1.04;
+  font-weight: 750;
+  letter-spacing: -0.055em;
+}
+.home-intro h1 em {
+  color: var(--studio-on-accent);
+  background: var(--studio-accent);
+  font-style: normal;
+  padding: 0 8px 4px;
+  border-radius: 8px;
+}
+.home-intro > p {
+  max-width: 32ch;
+  margin: 20px 0;
+  color: var(--color-text);
+  opacity: 0.75;
+}
+.home-intro > button {
+  gap: 12px;
+  min-height: 48px;
+}
+.home-shortcut {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+}
+.home-shortcut kbd {
+  padding: 4px 8px;
+  border: 1px solid #80808060;
+  border-radius: 6px;
+}
+.home-shortcut span {
+  max-width: 26ch;
+  opacity: 0.7;
+  line-height: 1.5;
+}
+.home-companion {
+  max-width: 320px;
+  width: 100%;
+  justify-self: center;
+}
+.home-companion-caption {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 12px;
+}
+.home-companion-caption button {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.home-tools {
+  display: flex;
+  border-block: 1px solid #80808040;
+}
+.home-tools button {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 12px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.home-tools button + button {
+  border-inline-start: 1px solid #80808040;
+}
+.home-tools button:hover {
+  background: color-mix(in srgb, var(--studio-accent), transparent 93%);
+}
+.home-history {
+  padding-top: 28px;
+}
+.home-history header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+.home-history h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+.home-history header button {
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+  min-height: 44px;
+}
+.home-empty {
+  padding: 22px 0;
+  opacity: 0.65;
+  font-size: 14px;
+}
+.home-history li {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 0;
+  border-bottom: 1px solid #80808030;
+}
+.home-history li p {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  max-height: 120px;
+  overflow: auto;
+  font-size: 14px;
+  user-select: text;
+}
+.home-history li button {
+  min-width: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.say-home button:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 3px;
+}
+@container (max-width:580px) {
+  .say-home {
+    padding: 12px 0;
+  }
+  .home-stage {
+    grid-template-columns: 1fr;
+    padding: 28px 0;
+    gap: 12px;
+  }
+  .home-intro h1 {
+    font-size: 42px;
+  }
+  .home-companion {
+    width: 180px;
+  }
+  .home-tools {
+    flex-direction: column;
+  }
+  .home-tools button + button {
+    border-inline-start: 0;
+    border-top: 1px solid #80808040;
+  }
+  .home-kicker {
+    flex-wrap: wrap;
+  }
+}
+.home-intro > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}

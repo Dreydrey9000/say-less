@@ -13,6 +13,12 @@ const defaultStudio = {
   actions: [],
   default_style: "original",
   app_styles: [],
+  cleanup_on_dictation: false,
+  dock_animation: "orbit",
+  dock_motion: true,
+  dock_cycle: false,
+  dock_edge: "free",
+  corrections: [],
 };
 let studio = JSON.parse(
   localStorage.getItem("test-studio") || JSON.stringify(defaultStudio),
@@ -46,7 +52,7 @@ const settings = {
       },
     ]),
   ),
-  shortcut_activation: "auto",
+  shortcut_activation: "hold_or_toggle",
   hold_threshold_ms: 200,
   selected_language: "auto",
   audio_feedback: true,
@@ -83,6 +89,7 @@ mockIPC((cmd, payload) => {
     window as unknown as { testCommands: string[] }
   ).testCommands ??= []);
   calls.push(cmd);
+  if (cmd === "get_dock_state") return "idle";
   if (cmd === "get_studio_settings") return studio;
   if (cmd === "save_studio_settings") {
     if (query.has("failStudio")) throw "storage";
@@ -123,7 +130,7 @@ mockIPC((cmd, payload) => {
       : [];
   if (cmd.startsWith("plugin:event|")) return 1;
   if (cmd === "plugin:os|locale") return "en-US";
-  if (cmd === "plugin:app|version") return "0.10.0";
+  if (cmd === "plugin:app|version") return "0.11.0";
   if (
     cmd.includes("check_accessibility_permission") ||
     cmd.includes("check_microphone_permission")
@@ -191,7 +198,11 @@ mockIPC((cmd, payload) => {
     settings.custom_words = payload?.words as never[];
     return null;
   }
-  if (cmd === "get_history_entries") return { entries: [], has_more: false };
+  if (cmd === "get_history_entries") {
+    if (query.has("failHistory") && !sessionStorage.getItem("historyRecovered"))
+      throw "history_unavailable";
+    return { entries: [], has_more: false };
+  }
   return null;
 });
 const { default: App } = await import("../../src/App");

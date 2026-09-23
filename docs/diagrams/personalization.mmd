@@ -1,12 +1,16 @@
 flowchart LR
     Studio[Appearance settings] --> Store[Local studio.json]
     Store --> Theme[Main window + overlay + floating dock]
+    Store --> Companion[4 local CSS formations / pause / 20-second cycle]
+    Store --> Edge[Free placement or left/right work-area edge]
+    Home[Home / shortcuts / last 3 history entries] --> Dock
     Dock[Nonactivating floating dock] --> Coordinator[Existing transcription coordinator]
     Coordinator --> ASR[Local speech recognition]
     ASR --> Raw[Original recognized utterance]
     Raw --> Match[Exact opt-in action cue]
     Match -->|Matched and validated| Open[macOS open: app or http/https URL]
-    Match -->|No match| Output[Snippet / optional AI cleanup / local style output]
+    Match -->|No match| Output[Snippet or optional AI cleanup / local style / spelling corrections]
+    Output -->|AI unavailable| Notice[Visible fallback notice / local formatting]
     Output --> Paste[Existing clipboard and paste]
     Wispr[Wispr local SQLite read-only] --> Preview[Library preview + fingerprint]
     Files[User-selected CSV or JSON] --> Preview

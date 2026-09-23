@@ -18,6 +18,7 @@ import { ModelStateEvent, RecordingErrorEvent } from "./lib/types/events";
 import "./App.css";
 import AccessibilityPermissions from "./components/AccessibilityPermissions";
 import SecureInputWarning from "./components/SecureInputWarning";
+import { Home } from "./components/Home";
 import Footer from "./components/footer";
 import Onboarding, { AccessibilityOnboarding } from "./components/onboarding";
 import {
@@ -40,7 +41,9 @@ const NOOP = () => {};
 const renderSettingsContent = (
   section: SidebarSection,
   onPreviewOnboarding: (step: OnboardingPreviewStep) => void,
+  onNavigate: (section: SidebarSection) => void,
 ) => {
+  if (section === "home") return <Home onNavigate={onNavigate} />;
   if (section === "debug") {
     return <DebugSettings onPreviewOnboarding={onPreviewOnboarding} />;
   }
@@ -61,8 +64,7 @@ function App() {
   // Track if this is a returning user who just needs to grant permissions
   // (vs a new user who needs full onboarding including model selection)
   const [isReturningUser, setIsReturningUser] = useState(false);
-  const [currentSection, setCurrentSection] =
-    useState<SidebarSection>("general");
+  const [currentSection, setCurrentSection] = useState<SidebarSection>("home");
   const { settings, updateSetting } = useSettings();
   const direction = getLanguageDirection(i18n.language);
   const refreshAudioDevices = useSettingsStore(
@@ -148,6 +150,15 @@ function App() {
     });
     return () => {
       void pending.then((unlisten) => unlisten());
+    };
+  }, [t]);
+
+  useEffect(() => {
+    const pending = listen("cleanup-fallback", () =>
+      toast.error(t("corrections.cleanupFallback")),
+    );
+    return () => {
+      void pending.then((fn) => fn());
     };
   }, [t]);
 
@@ -430,7 +441,11 @@ function App() {
                   <AccessibilityPermissions />
                 )}
                 <SecureInputWarning />
-                {renderSettingsContent(currentSection, setOnboardingPreview)}
+                {renderSettingsContent(
+                  currentSection,
+                  setOnboardingPreview,
+                  setCurrentSection,
+                )}
               </div>
             </div>
           </div>

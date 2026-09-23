@@ -4,7 +4,11 @@
 
 Open **Appearance**. Choose a preset or enter a six-digit hex color, then Apply color. Accent fills choose black or white foreground text for contrast; normal text keeps the light/dark theme palette. The recording overlay and floating dock receive live color changes.
 
-Show dock creates a separate always-on-top window. On macOS it is a nonactivating NSPanel, so Record does not become the paste destination. Drag its grip; X hides it and saves that preference. Dock visibility survives restart; its position currently resets to the initial location. Recording status follows backend events. OS microphone and Accessibility permissions are still required.
+Show dock creates a separate always-on-top window. On macOS it is a nonactivating NSPanel, so Record does not become the paste destination. Drag its grip; X hides it and saves that preference. Choose Left or Right in Appearance to place it inside the current screen's work area; dragging returns to Free placement. Edge preference survives restart, but arbitrary dragged coordinates do not. Recording status follows backend events. OS microphone and Accessibility permissions are still required.
+
+Choose Orbit, Helix, Wave, or Chrome S, click the companion in the dock to switch, or cycle every 20 seconds. Pause is available in Home, Appearance and the dock. Reduced Motion and hidden windows stop decorative animation. The 48 CSS particles use no camera, remote code, or WebGL. These original formations were inspired by [Casberry Particles](https://particles.casberry.in/); custom animation imports are not implemented.
+
+Home shows the configured shortcut, opens the dock, and displays the latest three local history entries with Copy controls. In General, Auto (hold or toggle) supports hold/release, single-tap hands-free, and double-tap within 400 ms to lock hands-free recording. Press again to finish. The floating Record button toggles recording.
 
 ## Voice actions
 
@@ -14,7 +18,9 @@ Only an exact, whole-utterance match against the original recognized transcript 
 
 ## Writing styles
 
-The default and app-specific rules operate locally: keep original, sentence case plus final punctuation, remove trailing periods, or lowercase. App rules match the foreground macOS app name when output is processed (for example, Mail or Slack). Browser websites share their browser's app rule. This is deterministic formatting, not Flow's contextual tone model, backtracking, or selected-text Command Mode. Saved snippet formatting is protected.
+The default and app-specific rules operate locally: keep original, sentence capitalization plus final punctuation and spoken new-line/new-paragraph cues, remove trailing periods, or lowercase. App rules match the foreground macOS app name when output is processed (for example, Mail or Slack). Browser websites share their browser's app rule. Add case-insensitive whole-word spelling corrections in Writing; corrections preserve surrounding punctuation and do not change longer words. Saved snippet formatting is protected.
+
+Writing's opt-in AI cleanup for normal dictation uses the selected Post Process provider when post-processing is enabled. Apple Intelligence is local; cloud providers receive the dictated text. A built-in cleanup prompt is used when no custom prompt is selected. Failed or unavailable cleanup falls back to local formatting with a visible notice. This does not implement Flow's contextual tone model, backtracking, or selected-text Command Mode.
 
 ## Wispr import
 

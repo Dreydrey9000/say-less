@@ -33,6 +33,12 @@ pub struct StudioSettings {
     pub actions: Vec<VoiceAction>,
     pub default_style: WritingStyle,
     pub app_styles: Vec<AppStyle>,
+    pub cleanup_on_dictation: bool,
+    pub dock_animation: String,
+    pub dock_motion: bool,
+    pub dock_cycle: bool,
+    pub dock_edge: String,
+    pub corrections: Vec<crate::snippets::VoiceSnippet>,
 }
 impl Default for StudioSettings {
     fn default() -> Self {
@@ -43,6 +49,12 @@ impl Default for StudioSettings {
             actions: vec![],
             default_style: WritingStyle::Original,
             app_styles: vec![],
+            cleanup_on_dictation: false,
+            dock_animation: "orbit".into(),
+            dock_motion: true,
+            dock_cycle: false,
+            dock_edge: "free".into(),
+            corrections: vec![],
         }
     }
 }
@@ -63,6 +75,12 @@ fn validate(settings: &StudioSettings) -> Result<(), String> {
     if settings.actions.len() > 100 || settings.app_styles.len() > 100 {
         return Err("too_many".into());
     }
+    if !["orbit", "helix", "wave", "emblem"].contains(&settings.dock_animation.as_str())
+        || !["free", "left", "right"].contains(&settings.dock_edge.as_str())
+    {
+        return Err("invalid_dock".into());
+    }
+    crate::snippets::validate(&settings.corrections)?;
     let mut seen = std::collections::HashSet::new();
     for action in &settings.actions {
         let key = cue_key(&action.cue);
@@ -232,12 +250,44 @@ pub fn test_voice_action(app: AppHandle, cue: String) -> Result<(), String> {
         .ok_or("not_found")?;
     launch(action)
 }
+
+/// Explicit spoken layout markers, without guessing paragraph boundaries.
+fn spoken_layout(text: &str) -> String {
+    use once_cell::sync::Lazy;
+    static BREAKS: Lazy<regex::Regex> = Lazy::new(|| {
+        regex::Regex::new(r"(?i)\b(new paragraph|new line)\b[.,]?[ \t]*")
+            .expect("static layout regex")
+    });
+    let text = BREAKS.replace_all(text, |c: &regex::Captures<'_>| {
+        if c[1].eq_ignore_ascii_case("new paragraph") {
+            "\n\n"
+        } else {
+            "\n"
+        }
+    });
+    let mut result = String::new();
+    let mut capitalize = true;
+    for ch in text.trim().chars() {
+        if capitalize && ch.is_alphabetic() {
+            result.extend(ch.to_uppercase());
+            capitalize = false;
+        } else {
+            result.push(ch);
+        }
+        if ['.', '!', '?', '\n'].contains(&ch) {
+            capitalize = true;
+        }
+    }
+    result
+}
+
 pub fn format_text(text: &str, style: &WritingStyle) -> String {
     match style {
         WritingStyle::Original => text.into(),
         WritingStyle::Lowercase => text.to_lowercase(),
         WritingStyle::Casual => text.trim_end_matches('.').to_string(),
         WritingStyle::Formal => {
+            let text = spoken_layout(text);
             let mut chars = text.chars();
             let Some(first) = chars.next() else {
                 return String::new();
@@ -289,6 +339,44 @@ mod tests {
         assert!(validate(&s).is_err());
     }
     #[test]
+    fn layout_and_corrections_preserve_names_and_punctuation() {
+        assert_eq!(
+            format_text(
+                "hello. how are you new paragraph talk to louis",
+                &WritingStyle::Formal
+            ),
+            "Hello. How are you \n\nTalk to louis."
+        );
+        let rules = vec![crate::snippets::VoiceSnippet {
+            trigger: "louis".into(),
+            expansion: "Louise".into(),
+        }];
+        assert_eq!(crate::snippets::replace_words("Louis!", &rules), "Louise!");
+        assert_eq!(
+            crate::snippets::replace_words("Talk to LOUIS, not louisville.", &rules),
+            "Talk to Louise, not louisville."
+        );
+        assert_eq!(
+            format_text("hello new paragraph there", &WritingStyle::Original),
+            "hello new paragraph there"
+        );
+    }
+    #[test]
+    fn rejects_unknown_companion_and_duplicate_corrections() {
+        let mut s = StudioSettings::default();
+        s.dock_animation = "remote-code".into();
+        assert!(validate(&s).is_err());
+        s.dock_animation = "orbit".into();
+        s.corrections = vec![
+            crate::snippets::VoiceSnippet {
+                trigger: "name".into(),
+                expansion: "Name".into()
+            };
+            2
+        ];
+        assert!(validate(&s).is_err());
+    }
+    #[test]
     fn styles_are_deterministic() {
         assert_eq!(
             format_text("hello there", &WritingStyle::Formal),
@@ -326,5 +414,6 @@ pub async fn apply_writing_style(app: &AppHandle, text: &str) -> String {
         .find(|r| r.app.eq_ignore_ascii_case(&name))
         .map(|r| &r.style)
         .unwrap_or(&settings.default_style);
-    format_text(text, style)
+    let formatted = format_text(text, style);
+    crate::snippets::replace_words(&formatted, &settings.corrections)
 }

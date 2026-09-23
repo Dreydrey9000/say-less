@@ -47,3 +47,9 @@ To pull upstream fixes: `git fetch upstream && git merge upstream/main`.
 ## Personalize and migrate
 
 See [appearance, floating dock, voice actions, and Wispr import](docs/personalization.md). The [editable architecture diagram](docs/diagrams/personalization.mmd) shows local storage and action boundaries ([rendered version](docs/diagrams/personalization.svg)).
+
+### Companion and dictation controls
+
+See [personalization](docs/personalization.md) and the [editable companion workflow](docs/diagrams/companion.mmd) for animations, screen-edge placement, hold/tap gestures, and formatting with spelling corrections.
+
+![Companion and dictation workflow](docs/diagrams/companion.svg)

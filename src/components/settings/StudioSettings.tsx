@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useStudio, type WritingStyle } from "@/lib/studio";
+import { CompanionSettings } from "./CompanionSettings";
+import { WordCorrections } from "./WordCorrections";
 import { ThemeSelector } from "./ThemeSelector";
 import { Button } from "../ui/Button";
 import { WorkingStatus } from "../ui/WorkingStatus";
@@ -94,6 +96,7 @@ export function StudioSettings() {
           </Button>
         </div>
         <ThemeSelector descriptionMode="inline" />
+        <CompanionSettings />
         <div className="studio-dock-setting">
           <div>
             <h2 className="font-semibold">{t("studio.floating")}</h2>
@@ -198,6 +201,31 @@ export function WritingStyles() {
           {t("studio.saveRule")}
         </Button>
       </form>
+      <div className="studio-dock-setting">
+        <div>
+          <h3>{t("corrections.cleanupTitle")}</h3>
+          <p className="text-sm text-text/70">
+            {t("corrections.cleanupDescription")}
+          </p>
+        </div>
+        <Button
+          disabled={!loaded || busy}
+          aria-pressed={settings.cleanup_on_dictation}
+          onClick={() =>
+            void save({
+              ...settings,
+              cleanup_on_dictation: !settings.cleanup_on_dictation,
+            })
+          }
+        >
+          {t(
+            settings.cleanup_on_dictation
+              ? "corrections.cleanupOff"
+              : "corrections.cleanupOn",
+          )}
+        </Button>
+      </div>
+      <WordCorrections />
       <ul className="space-y-2">
         {settings.app_styles.map((r) => (
           <li

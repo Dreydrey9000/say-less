@@ -802,11 +802,11 @@
     "hideDock": "Hide dock",
     "showDock": "Show dock",
     "styles": "Writing styles",
-    "stylesDescription": "Local formatting for each desktop app. These rules adjust casing and punctuation; they do not rewrite meaning. Saved snippets always keep their exact formatting.",
+    "stylesDescription": "Local formatting applies to normal dictation. Sentence formatting capitalizes sentences and supports “new paragraph” and “new line”. For AI rewriting, use the separate cleanup shortcut in General; its selected provider may use the cloud.",
     "defaultStyle": "Default writing style",
     "stylesList": {
       "original": "Keep original",
-      "formal": "Sentence case + punctuation",
+      "formal": "Sentence formatting",
       "casual": "Less punctuation",
       "lowercase": "All lowercase"
     },
@@ -882,5 +882,66 @@
     "recording": "Recording — click Stop when finished",
     "transcribing": "Turning your voice into text…",
     "arming": "Starting microphone…"
+  },
+  "home": {
+    "title": "Home",
+    "eyebrow": "SAY LESS / YOUR VOICE, UNLOCKED",
+    "local": "Speech recognition on your computer",
+    "headline": "Big thoughts.",
+    "headlineAccent": "Less typing.",
+    "description": "Make room for what you mean. Speak naturally and let your words take shape.",
+    "openDock": "Open floating dock",
+    "dockOpened": "Your dock is ready. Click into your destination app, then use Record or your shortcut.",
+    "shortcut": "Hold to talk. Tap or double-tap for hands-free. Press again to finish.",
+    "aiShortcut": "AI cleanup shortcut · uses your selected provider",
+    "tools": "Make it yours",
+    "look": "Change your look",
+    "words": "Teach it your words",
+    "actions": "Create a voice action",
+    "recent": "Your recent words",
+    "allHistory": "View history",
+    "loading": "Loading recent dictations",
+    "historyError": "Recent dictations could not be loaded.",
+    "empty": "Your next thought goes here. Start with a short sentence in any text field.",
+    "copy": "Copy dictation",
+    "copied": "Copied to clipboard.",
+    "copyError": "Could not copy. Open History to try again.",
+    "holdShortcut": "Hold to talk. Release to finish.",
+    "toggleShortcut": "Press to start. Press again to finish."
+  },
+  "companion": {
+    "title": "Pick your companion",
+    "description": "A little motion, a little personality. Click the companion in your dock to switch it.",
+    "pause": "Pause animations",
+    "play": "Play animations",
+    "next": "Switch companion",
+    "cycle": "Cycle companions",
+    "motionNote": "Cycles every 20 seconds while motion is enabled. Respects Reduce Motion and pauses when hidden.",
+    "edge": "Dock placement",
+    "edges": {
+      "free": "Free · drag anywhere",
+      "left": "Snap to left edge",
+      "right": "Snap to right edge"
+    },
+    "formations": {
+      "orbit": "Orbit",
+      "helix": "Helix",
+      "wave": "Wave",
+      "emblem": "Chrome S"
+    }
+  },
+  "corrections": {
+    "title": "Names & corrections",
+    "description": "Keep your spelling. Whole-word corrections run after formatting and AI cleanup. They do not change your saved snippets.",
+    "heard": "When it hears",
+    "wanted": "Use this spelling",
+    "save": "Save correction",
+    "remove": "Remove correction for {{word}}",
+    "duplicate": "That phrase already has a correction. Remove it first to change its spelling.",
+    "cleanupTitle": "AI cleanup on every dictation",
+    "cleanupDescription": "Uses your selected Post Process provider when AI post-processing is enabled. Apple Intelligence stays on-device; cloud providers receive your dictation. If unavailable, local formatting is used.",
+    "cleanupOn": "Use AI cleanup for normal dictation",
+    "cleanupOff": "Use local formatting only",
+    "cleanupFallback": "AI cleanup was unavailable. Used local formatting instead. Check the provider in Post Process."
   }
 }

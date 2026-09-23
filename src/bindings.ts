@@ -56,6 +56,9 @@ async dockToggleRecording() : Promise<Result<null, string>> {
     else return { status: "error", error: e  as any };
 }
 },
+async getDockState() : Promise<string> {
+    return await TAURI_INVOKE("get_dock_state");
+},
 async previewWisprImport(content: string | null) : Promise<Result<ImportPreview, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("preview_wispr_import", { content }) };
@@ -1250,7 +1253,7 @@ export type StreamTextEvent = { committed: string; tentative: string }
  * Semantic kind of "working" phase, used to localize the spinner label.
  */
 export type StreamWorkKind = "transcribing" | "polishing"
-export type StudioSettings = { accent: string; floating: boolean; actions_enabled: boolean; actions: VoiceAction[]; default_style: WritingStyle; app_styles: AppStyle[] }
+export type StudioSettings = { accent: string; floating: boolean; actions_enabled: boolean; actions: VoiceAction[]; default_style: WritingStyle; app_styles: AppStyle[]; cleanup_on_dictation: boolean; dock_animation: string; dock_motion: boolean; dock_cycle: boolean; dock_edge: string; corrections: VoiceSnippet[] }
 /**
  * UI appearance mode. `System` follows the OS `prefers-color-scheme`; `Light`
  * and `Dark` force one of the two palettes Handy already ships.

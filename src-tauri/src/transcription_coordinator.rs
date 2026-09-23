@@ -73,6 +73,7 @@ enum Remembered {
 /// Bookkeeping for the key press that started the current recording.
 struct Hold {
     pressed_at: Instant,
+    double_tap_confirmed: bool,
     /// Recording outlives the key: the next press stops it, releases are
     /// ignored. Always set for toggle; set for hold-or-toggle once a release
     /// has been classified as a tap.
@@ -267,6 +268,22 @@ impl CoordinatorState {
             held_binding,
         ) {
             PttAction::CancelRelease => {
+                if input.mode == ShortcutActivation::HoldOrToggle && !input.external {
+                    let deliberate = self
+                        .pending_release
+                        .as_ref()
+                        .is_some_and(|r| now.saturating_duration_since(r.released_at) >= DEBOUNCE);
+                    if deliberate {
+                        if let Some(hold) = self.hold.as_mut() {
+                            if now.saturating_duration_since(hold.pressed_at)
+                                <= Duration::from_millis(400)
+                            {
+                                hold.locked = true;
+                                hold.double_tap_confirmed = true;
+                            }
+                        }
+                    }
+                }
                 self.pending_release = None;
                 return None;
             }
@@ -358,6 +375,18 @@ impl CoordinatorState {
                     // every press ends it, even if the recording began under a
                     // hold mode (the setting changed mid-recording) — otherwise
                     // nothing but Escape could stop it.
+                    if input.mode == ShortcutActivation::HoldOrToggle && !input.external {
+                        if let Some(hold) = self.hold.as_mut() {
+                            if hold.locked
+                                && !hold.double_tap_confirmed
+                                && now.saturating_duration_since(hold.pressed_at)
+                                    <= Duration::from_millis(400)
+                            {
+                                hold.double_tap_confirmed = true;
+                                return None;
+                            }
+                        }
+                    }
                     if self.is_locked() || input.mode == ShortcutActivation::Toggle {
                         return Some(self.begin_processing(input.binding_id, input.hotkey_string));
                     }
@@ -508,7 +537,11 @@ impl CoordinatorState {
         locked: bool,
     ) -> Effect {
         self.stage = Stage::Recording(binding_id.clone());
-        self.hold = Some(Hold { pressed_at, locked });
+        self.hold = Some(Hold {
+            pressed_at,
+            locked,
+            double_tap_confirmed: false,
+        });
         Effect::Start {
             binding_id,
             hotkey_string,
@@ -1226,6 +1259,30 @@ mod tests {
 
     fn ms(n: u64) -> Duration {
         Duration::from_millis(n)
+    }
+
+    #[test]
+    fn double_tap_confirms_hands_free_and_third_press_stops() {
+        for second_at in [120, 220] {
+            let mode = ShortcutActivation::HoldOrToggle;
+            let mut state = CoordinatorState::new();
+            let t0 = Instant::now();
+            state.on_input(input(mode, true), t0);
+            state.on_input(input(mode, false), t0 + ms(80));
+            if second_at > 130 {
+                state.on_grace_expired();
+            }
+            assert!(state
+                .on_input(input(mode, true), t0 + ms(second_at))
+                .is_none());
+            state.on_input(input(mode, false), t0 + ms(second_at + 40));
+            assert!(state.is_locked());
+            assert_eq!(state.stage, Stage::Recording(BINDING.to_string()));
+            assert!(matches!(
+                state.on_input(input(mode, true), t0 + ms(second_at + 100)),
+                Some(Effect::Stop { .. })
+            ));
+        }
     }
 
     /// Hold-or-toggle: a key held past the threshold is push-to-talk — the

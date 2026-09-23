@@ -97,7 +97,15 @@ pub fn expand(text: &str, snippets: &[VoiceSnippet]) -> String {
     expand_with_match(text, snippets).0
 }
 
+pub fn replace_words(text: &str, corrections: &[VoiceSnippet]) -> String {
+    expand_matches(text, corrections, false).0
+}
+
 pub fn expand_with_match(text: &str, snippets: &[VoiceSnippet]) -> (String, bool) {
+    expand_matches(text, snippets, true)
+}
+
+fn expand_matches(text: &str, snippets: &[VoiceSnippet], whole_utterance: bool) -> (String, bool) {
     let input = tokens(text);
     let mut candidates: Vec<_> = snippets
         .iter()
@@ -107,7 +115,7 @@ pub fn expand_with_match(text: &str, snippets: &[VoiceSnippet]) -> (String, bool
     candidates.sort_by_key(|(k, _)| std::cmp::Reverse(k.len()));
     if let Some((_, expansion)) = candidates
         .iter()
-        .find(|(k, _)| k.iter().eq(input.iter().map(|t| &t.2)))
+        .find(|(k, _)| whole_utterance && k.iter().eq(input.iter().map(|t| &t.2)))
     {
         return ((*expansion).clone(), true);
     }

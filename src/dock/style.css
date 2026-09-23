@@ -82,3 +82,54 @@ button:disabled {
     filter: brightness(0.9);
   }
 }
+
+.floating-bar {
+  padding: 5px 8px;
+  gap: 4px;
+  background: color-mix(in srgb, var(--color-background), transparent 8%);
+  backdrop-filter: blur(18px);
+}
+.floating-bar .dock-companion {
+  width: 62px;
+  height: 62px;
+  padding: 0;
+  border-radius: 50%;
+}
+.dock-companion .companion {
+  width: 62px;
+}
+.floating-bar .dock-record {
+  min-height: 44px;
+  padding: 0 8px;
+}
+.floating-bar button {
+  min-width: 30px;
+}
+.dock-transcript {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: var(--color-background);
+  color: var(--color-text);
+  border-radius: 8px;
+  margin-top: 2px;
+  padding: 2px 10px;
+  font-size: 11px;
+  line-height: 18px;
+}
+@media (max-width: 370px) {
+  .floating-bar .dock-companion {
+    width: 46px;
+    height: 46px;
+  }
+  .dock-companion .companion {
+    width: 46px;
+  }
+  .floating-bar button {
+    min-width: 28px;
+  }
+  .floating-bar {
+    gap: 2px;
+    padding: 5px;
+  }
+}

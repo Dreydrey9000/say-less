@@ -659,6 +659,7 @@ pub fn run(cli_args: CliArgs) {
             studio::list_launchable_apps,
             studio::test_voice_action,
             floating::dock_toggle_recording,
+            floating::get_dock_state,
             wispr_import::preview_wispr_import,
             wispr_import::apply_wispr_import,
             wispr_import::list_imported_history,

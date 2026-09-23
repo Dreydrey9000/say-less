@@ -1,0 +1,17 @@
+flowchart TD
+    Settings[Appearance and Writing settings] --> Store[Local studio.json]
+    Store --> Motion[Orbit / Helix / Wave / Chrome S]
+    Motion --> Guards[Pause / Reduce Motion / hidden-window guard]
+    Store --> Edge[Free / left / right screen placement]
+    Keys[Hold / tap / double-tap] --> Coordinator[Transcription coordinator]
+    Dock[Floating Record button] --> Coordinator
+    Coordinator --> ASR[Local speech recognition]
+    ASR --> Actions[Exact opt-in action cue]
+    Actions -->|No action| Snippet[Exact saved snippet]
+    Snippet -->|No snippet| AI[Optional configured cleanup provider]
+    AI -->|Success or visible failure fallback| Format[Local style and spelling corrections]
+    Format --> Paste[Paste into destination / local history]
+    Snippet -->|Matched| Paste
+    Coordinator --> Events[Real recording / mic / streaming events]
+    Events --> Home[Home and floating companion]
+    Paste --> Recent[Home recent history]

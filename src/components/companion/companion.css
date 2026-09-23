@@ -1,0 +1,99 @@
+.companion {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  color: var(--studio-accent, #b8ff65);
+  isolation: isolate;
+}
+.particle-world {
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  transform: scale(var(--voice-scale, 1));
+  transition: transform 0.16s ease-out;
+}
+.particle-world i {
+  position: absolute;
+  width: var(--dot-size);
+  height: var(--dot-size);
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+  opacity: 0.8;
+}
+.companion-emblem {
+  position: absolute;
+  width: 35%;
+  height: 35%;
+  left: 32.5%;
+  top: 32.5%;
+  border-radius: 28%;
+  box-shadow: 0 12px 26px #0004;
+}
+.formation-helix .companion-emblem,
+.formation-wave .companion-emblem {
+  width: 25%;
+  height: 25%;
+  left: 37.5%;
+  top: 37.5%;
+}
+.formation-emblem .particle-world {
+  opacity: 0.18;
+}
+.formation-emblem > img {
+  width: 65%;
+  height: 65%;
+  left: 17.5%;
+  top: 17.5%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .is-moving .particle-world {
+    animation: particle-turn 30s linear infinite;
+  }
+  .is-moving .particle-world i {
+    animation: particle-breathe 4s ease-in-out var(--delay) infinite alternate;
+  }
+  .is-moving.formation-wave .particle-world {
+    animation: particle-sway 7s ease-in-out infinite alternate;
+  }
+  .is-moving.formation-helix .particle-world {
+    animation: particle-sway 12s ease-in-out infinite alternate;
+  }
+}
+@keyframes particle-turn {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+  }
+}
+@keyframes particle-breathe {
+  from {
+    opacity: 0.35;
+    translate: 0 -2px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 2px;
+  }
+}
+@keyframes particle-sway {
+  from {
+    rotate: -8deg;
+  }
+  to {
+    rotate: 8deg;
+  }
+}
+.is-paused *,
+.is-paused {
+  animation-play-state: paused !important;
+  transition: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .companion * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

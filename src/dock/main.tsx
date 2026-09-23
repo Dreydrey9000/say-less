@@ -9,7 +9,17 @@ import {
 } from "tauri-plugin-macos-permissions-api";
 import { platform } from "@tauri-apps/plugin-os";
 import { useTranslation } from "react-i18next";
-import { Mic, Square, Settings, GripVertical, X } from "lucide-react";
+import {
+  Mic,
+  Square,
+  Settings,
+  GripVertical,
+  X,
+  Pause,
+  Play,
+} from "lucide-react";
+import { Companion, formations } from "@/components/companion/Companion";
+import { useVoiceActivity } from "@/hooks/useVoiceActivity";
 import { startStudioSync, useStudio } from "@/lib/studio";
 import {
   applyTheme,
@@ -23,21 +33,16 @@ void syncThemeFromSettings();
 void startStudioSync();
 function Dock() {
   const { t } = useTranslation();
-  const [state, setState] = useState("idle");
-  const [ready, setReady] = useState(false);
+  const { state, ready, level, text } = useVoiceActivity();
+  const { settings, save, busy, loaded } = useStudio();
   const [error, setError] = useState(false);
   const [pending, setPending] = useState(false);
   useEffect(() => {
     let disposed = false;
     const unlisteners: Array<() => void> = [];
     void Promise.all([
-      listen<string>("dock-state", (e) => {
-        setState(e.payload);
-        if (e.payload === "recording") setReady(false);
-        setPending(false);
-      }),
-      listen("recording-ready", () => setReady(true)),
       listen<boolean>("voice-action-result", (e) => setError(!e.payload)),
+      listen("recording-error", () => setError(true)),
     ]).then((list) => {
       if (disposed) list.forEach((fn) => fn());
       else unlisteners.push(...list);
@@ -67,19 +72,48 @@ function Dock() {
     }
   }
   return (
-    <main className="floating-shell">
+    <main className="floating-shell" data-state={state}>
       <div className="floating-bar">
         <button
           className="dock-grip"
           aria-label={t("dock.drag")}
           title={t("dock.drag")}
           onPointerDown={(e) => {
-            if (e.button === 0) void getCurrentWindow().startDragging();
+            if (e.button === 0)
+              void (async () => {
+                if (
+                  settings.dock_edge !== "free" &&
+                  !(await save({ ...settings, dock_edge: "free" }))
+                )
+                  return;
+                await getCurrentWindow().startDragging();
+              })().catch(() => setError(true));
           }}
         >
           <GripVertical size={18} />
         </button>
-        <img src="/brand/say-less-emblem.png" alt="" />
+        <button
+          className="dock-companion"
+          disabled={!loaded || busy}
+          aria-label={t("companion.next")}
+          title={t("companion.next")}
+          onClick={() => {
+            const index = formations.indexOf(
+              settings.dock_animation as (typeof formations)[number],
+            );
+            void save({
+              ...settings,
+              dock_animation: formations[(index + 1) % formations.length],
+              dock_cycle: false,
+            });
+          }}
+        >
+          <Companion
+            level={level}
+            active={state === "recording"}
+            paused={!settings.floating}
+          />
+        </button>
         <button
           className="dock-record"
           disabled={pending || state === "transcribing"}
@@ -104,6 +138,17 @@ function Dock() {
           <Settings size={19} />
         </button>
         <button
+          disabled={!loaded || busy}
+          aria-label={t(
+            settings.dock_motion ? "companion.pause" : "companion.play",
+          )}
+          onClick={() =>
+            void save({ ...settings, dock_motion: !settings.dock_motion })
+          }
+        >
+          {settings.dock_motion ? <Pause size={16} /> : <Play size={16} />}
+        </button>
+        <button
           aria-label={t("dock.hide")}
           onClick={() =>
             void useStudio
@@ -121,6 +166,11 @@ function Dock() {
               state === "recording" && !ready ? "dock.arming" : `dock.${state}`,
             )}
       </p>
+      {state === "recording" && text && (
+        <div className="dock-transcript" title={text}>
+          {text}
+        </div>
+      )}
     </main>
   );
 }

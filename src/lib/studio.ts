@@ -10,6 +10,12 @@ export const defaultStudio: StudioSettings = {
   actions: [],
   default_style: "original",
   app_styles: [],
+  cleanup_on_dictation: false,
+  dock_animation: "orbit",
+  dock_motion: true,
+  dock_cycle: false,
+  dock_edge: "free",
+  corrections: [],
 };
 export function applyAccent(accent: string) {
   if (!/^#[0-9a-f]{6}$/i.test(accent)) return;

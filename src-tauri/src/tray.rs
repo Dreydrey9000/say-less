@@ -216,6 +216,11 @@ pub fn get_icon_path(theme: AppTheme, state: TrayIconState, warning: bool) -> &'
 
 /// Sets the recording state shown by the tray (icon + Cancel/model menu).
 pub fn set_tray_state(app: &AppHandle, state: TrayIconState) {
+    crate::floating::remember_state(match state {
+        TrayIconState::Idle => 0,
+        TrayIconState::Recording => 1,
+        TrayIconState::Transcribing => 2,
+    });
     let _ = app.emit(
         "dock-state",
         match state {
