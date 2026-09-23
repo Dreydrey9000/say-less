@@ -1,3 +1,4 @@
+import { CorrectionLearning } from "./CorrectionLearning";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useStudio, type WritingStyle } from "@/lib/studio";
@@ -226,6 +227,7 @@ export function WritingStyles() {
         </Button>
       </div>
       <WordCorrections />
+      <CorrectionLearning />
       <ul className="space-y-2">
         {settings.app_styles.map((r) => (
           <li

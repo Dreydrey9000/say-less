@@ -34,6 +34,32 @@ export function CompanionSettings() {
           </button>
         ))}
       </div>
+      <label className="block text-sm">
+        {t("companion.character")}
+        <select
+          className="studio-select mt-1"
+          value={settings.dock_character}
+          disabled={busy || !loaded}
+          onChange={(e) =>
+            void save({ ...settings, dock_character: e.target.value })
+          }
+        >
+          {["orb", "emblem", "buddy", "both"].map((value) => (
+            <option key={value} value={value}>
+              {t(`companion.characters.${value}`)}
+            </option>
+          ))}
+        </select>
+      </label>
+      <Button
+        variant="secondary"
+        disabled={busy || !loaded}
+        onClick={() =>
+          void save({ ...settings, dock_compact: !settings.dock_compact })
+        }
+      >
+        {t(settings.dock_compact ? "dock.expand" : "dock.collapse")}
+      </Button>
       <div className="flex gap-3 flex-wrap">
         <Button
           variant="secondary"

@@ -1,0 +1,18 @@
+flowchart TD
+    Shortcut[Hold / tap / double-tap] --> Audio[Local microphone and speech model]
+    Companion[Compact companion / expanded dock] --> Audio
+    Audio --> Match{Explicit action or snippet?}
+    Match -->|Action| Launch[Approved app or website]
+    Match -->|Snippet| Paste[Destination text field]
+    Match -->|Normal dictation| Cleanup[Optional selected AI provider]
+    Cleanup --> Format[Local formatting / learned pairs / explicit corrections]
+    Format --> Paste
+    Paste --> Gate{Local learning enabled / supported Mac field?}
+    Gate -->|Yes| Watch[Observe only this field / 90 sec maximum]
+    Watch -->|Focus changed or new dictation| Stop[Discard transient field text]
+    Watch -->|Stable single-word spelling edit| Pair[Store only old/new word locally]
+    Pair --> Review[Writing / Keep now or remove]
+    Pair -->|Same edit in two dictations| Active[Active personal correction]
+    Review -->|Keep| Active
+    Active --> Format
+    Gate -->|No| Stop

@@ -15,6 +15,9 @@ export const defaultStudio: StudioSettings = {
   dock_motion: true,
   dock_cycle: false,
   dock_edge: "free",
+  dock_compact: true,
+  dock_character: "orb",
+  learn_corrections: false,
   corrections: [],
 };
 export function applyAccent(accent: string) {

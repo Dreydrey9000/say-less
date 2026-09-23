@@ -8,6 +8,8 @@ Show dock creates a separate always-on-top window. On macOS it is a nonactivatin
 
 Choose Orbit, Helix, Wave, or Chrome S, click the companion in the dock to switch, or cycle every 20 seconds. Pause is available in Home, Appearance and the dock. Reduced Motion and hidden windows stop decorative animation. The 48 CSS particles use no camera, remote code, or WebGL. These original formations were inspired by [Casberry Particles](https://particles.casberry.in/); custom animation imports are not implemented.
 
+**Companion style** selects an orb, emblem, animated character, or character with particles. The expanded dock has a **Collapse to companion** button; the small companion expands on click, without starting a recording. Your keyboard shortcut works in either size. Compact mode retains a Stop button during recording and a status indicator during processing. Appearance can expand or collapse it too. The compact window is 104×104 logical pixels; expanded controls use 360×112.
+
 Home shows the configured shortcut, opens the dock, and displays the latest three local history entries with Copy controls. In General, Auto (hold or toggle) supports hold/release, single-tap hands-free, and double-tap within 400 ms to lock hands-free recording. Press again to finish. The floating Record button toggles recording.
 
 ## Voice actions
@@ -21,6 +23,16 @@ Only an exact, whole-utterance match against the original recognized transcript 
 The default and app-specific rules operate locally: keep original, sentence capitalization plus final punctuation and spoken new-line/new-paragraph cues, remove trailing periods, or lowercase. App rules match the foreground macOS app name when output is processed (for example, Mail or Slack). Browser websites share their browser's app rule. Add case-insensitive whole-word spelling corrections in Writing; corrections preserve surrounding punctuation and do not change longer words. Saved snippet formatting is protected.
 
 Writing's opt-in AI cleanup for normal dictation uses the selected Post Process provider when post-processing is enabled. Apple Intelligence is local; cloud providers receive the dictated text. A built-in cleanup prompt is used when no custom prompt is selected. Failed or unavailable cleanup falls back to local formatting with a visible notice. This does not implement Flow's contextual tone model, backtracking, or selected-text Command Mode.
+
+## Learning from edits on Mac
+
+Enable **Writing → Learn from my corrections**. After an ordinary paste, Say Less watches only the exact accessible text field receiving that paste, for at most 90 seconds and only while it remains focused. It stops on a new observed dictation, focus change, or disabling learning. Password fields, Say Less's own fields, unsupported fields, auto-submit, reliable-paste mode, external scripts and clipboard-only output are skipped. Unsupported apps may not expose usable accessibility text.
+
+Correct one misspelled word and keep the field focused for four seconds. Only a single similar alphabetic word replacement, with the other words preserved, qualifies. Numbers, inserted/deleted words, broad rewrites and surrounding-document changes are rejected. Transient field contents are bounded to 16,384 UTF-16 code units and never saved by the learning system. It stores at most 200 spelling pairs, observation counts and active flags locally in `learned-corrections.json`.
+
+The first observation is reviewable under Writing. **Keep now** activates it immediately. Repeating the same edit in a separate dictation activates it automatically. Existing explicit corrections take priority; a conflicting observation cannot overwrite an active learned rule. **Remove** deletes a rule; disabling observation keeps existing rules until removed. This improves personal spelling consistency; it does not train speech or language model weights. Recognition remains dependent on the selected model and recording quality.
+
+Dictionary fuzzy matching now caps raw edit distance before applying phonetic bonuses. In particular, a short ordinary word such as “like” cannot be rewritten to a loosely matching name such as “Luis”. Explicit spelling pairs remain available for larger differences.
 
 ## Wispr import
 

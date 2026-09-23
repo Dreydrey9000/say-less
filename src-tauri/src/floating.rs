@@ -74,7 +74,15 @@ pub fn set_visible(app: &AppHandle, visible: bool) -> Result<(), String> {
         if let Some(window) = handle.get_webview_window("say_less_dock") {
             // Use Tauri's show/resize path, as the recording overlay does, so
             // WebKit is laid out and resumed along with the native panel.
-            let _ = window.set_size(tauri::LogicalSize::new(400.0, 132.0));
+            let compact = crate::studio::get_studio_settings(handle.clone())
+                .map(|s| s.dock_compact)
+                .unwrap_or(true);
+            let (width, height) = if compact {
+                (104.0, 104.0)
+            } else {
+                (360.0, 112.0)
+            };
+            let _ = window.set_size(tauri::LogicalSize::new(width, height));
             let _ = snap_to_edge(&handle);
             let _ = window.show();
         }

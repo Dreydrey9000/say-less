@@ -881,7 +881,9 @@
     "idle": "Click Record, or use your dictation shortcut",
     "recording": "Recording — click Stop when finished",
     "transcribing": "Turning your voice into text…",
-    "arming": "Starting microphone…"
+    "arming": "Starting microphone…",
+    "expand": "Expand dock",
+    "collapse": "Collapse to companion"
   },
   "home": {
     "title": "Home",
@@ -928,6 +930,13 @@
       "helix": "Helix",
       "wave": "Wave",
       "emblem": "Chrome S"
+    },
+    "character": "Companion style",
+    "characters": {
+      "orb": "Animated orb",
+      "emblem": "Chrome emblem",
+      "buddy": "Animated character",
+      "both": "Character + particles"
     }
   },
   "corrections": {
@@ -943,5 +952,21 @@
     "cleanupOn": "Use AI cleanup for normal dictation",
     "cleanupOff": "Use local formatting only",
     "cleanupFallback": "AI cleanup was unavailable. Used local formatting instead. Check the provider in Post Process."
+  },
+  "learning": {
+    "title": "Learn from my corrections",
+    "description": "On Mac, watch only the text field where Say Less just pasted, for up to 90 seconds while it stays focused. Save spelling pairs locally—not the surrounding text. One observation appears below; the same correction in two dictations starts applying automatically, or choose Keep now.",
+    "enable": "Enable local correction learning",
+    "disable": "Stop watching corrections",
+    "limits": "Works in accessible plain-text fields. Skips password fields, auto-submit, reliable-paste mode, and script/clipboard-only output. Leave the corrected field focused for four seconds. Existing learned rules remain until removed. This is a personal spelling dictionary, not model training.",
+    "empty": "No corrections observed yet. Dictate, then fix one misspelled word in the same field.",
+    "observed": "Observed once · waiting for another dictation",
+    "active": "Applied to future dictation",
+    "keep": "Keep now",
+    "remove": "Remove",
+    "removeName": "Remove learned correction for {{word}}",
+    "error": "Could not load or save learned corrections.",
+    "loading": "Loading observed corrections…",
+    "saving": "Saving your correction…"
   }
 }

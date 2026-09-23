@@ -38,6 +38,9 @@ pub struct StudioSettings {
     pub dock_motion: bool,
     pub dock_cycle: bool,
     pub dock_edge: String,
+    pub dock_compact: bool,
+    pub dock_character: String,
+    pub learn_corrections: bool,
     pub corrections: Vec<crate::snippets::VoiceSnippet>,
 }
 impl Default for StudioSettings {
@@ -54,6 +57,9 @@ impl Default for StudioSettings {
             dock_motion: true,
             dock_cycle: false,
             dock_edge: "free".into(),
+            dock_compact: true,
+            dock_character: "orb".into(),
+            learn_corrections: false,
             corrections: vec![],
         }
     }
@@ -77,6 +83,7 @@ fn validate(settings: &StudioSettings) -> Result<(), String> {
     }
     if !["orbit", "helix", "wave", "emblem"].contains(&settings.dock_animation.as_str())
         || !["free", "left", "right"].contains(&settings.dock_edge.as_str())
+        || !["emblem", "orb", "buddy", "both"].contains(&settings.dock_character.as_str())
     {
         return Err("invalid_dock".into());
     }
@@ -415,5 +422,6 @@ pub async fn apply_writing_style(app: &AppHandle, text: &str) -> String {
         .map(|r| &r.style)
         .unwrap_or(&settings.default_style);
     let formatted = format_text(text, style);
-    crate::snippets::replace_words(&formatted, &settings.corrections)
+    let learned = crate::correction_learning::apply(app, &formatted, &settings.corrections);
+    crate::snippets::replace_words(&learned, &settings.corrections)
 }

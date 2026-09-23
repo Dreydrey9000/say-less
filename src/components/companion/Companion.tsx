@@ -48,7 +48,7 @@ export function Companion({
   return (
     <div
       aria-hidden="true"
-      className={`companion formation-${selected} ${moving ? "is-moving" : "is-paused"} ${active ? "is-listening" : ""}`}
+      className={`companion character-${settings.dock_character} formation-${selected} ${moving ? "is-moving" : "is-paused"} ${active ? "is-listening" : ""}`}
       style={
         {
           "--voice-scale": 1 + (active && moving ? level * 0.28 : 0),
@@ -86,11 +86,40 @@ export function Companion({
           );
         })}
       </div>
-      <img
-        className="companion-emblem"
-        src="/brand/say-less-emblem.png"
-        alt=""
-      />
+      {settings.dock_character === "buddy" ||
+      settings.dock_character === "both" ? (
+        <svg
+          className="companion-buddy"
+          viewBox="0 0 100 100"
+          focusable="false"
+        >
+          <path
+            className="buddy-body"
+            d="M20 58C13 26 31 13 50 13S87 26 80 58L87 81Q78 87 69 78Q50 92 31 78Q22 87 13 81Z"
+            fill="currentColor"
+          />
+          <rect x="25" y="31" width="50" height="31" rx="14" fill="#15181e" />
+          <g className="buddy-eyes" fill="#fff">
+            <ellipse cx="38" cy="46" rx="5" ry="8" />
+            <ellipse cx="62" cy="46" rx="5" ry="8" />
+          </g>
+          <path
+            d="M43 71Q50 77 57 71"
+            fill="none"
+            stroke="#15181e"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+        </svg>
+      ) : settings.dock_character === "orb" ? (
+        <div className="companion-orb" />
+      ) : (
+        <img
+          className="companion-emblem"
+          src="/brand/say-less-emblem.png"
+          alt=""
+        />
+      )}
     </div>
   );
 }

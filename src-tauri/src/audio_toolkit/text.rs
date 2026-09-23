@@ -110,6 +110,13 @@ fn find_best_match<'a>(
             1.0
         };
 
+        // A shared Soundex code is not enough to rewrite ordinary words into
+        // names (e.g. "like" -> "Luis" / "Louise"). Explicit correction rules
+        // remain available for unusual spellings beyond this conservative bound.
+        if (candidate_len <= 4 && levenshtein_dist > 1) || levenshtein_score > 0.4 {
+            continue;
+        }
+
         // Soundex is an English/ASCII phonetic algorithm. Numeric terms can
         // still use edit distance, but must not receive a phonetic boost.
         let phonetic_match = supports_soundex(candidate)
@@ -448,6 +455,24 @@ mod tests {
         let language = OutputLanguageEvidence::UserSelected(language.to_string());
         let filtered = remove_filler_words(text, &language, custom_filler_words, true);
         normalize_transcription_output(&filtered)
+    }
+
+    #[test]
+    fn names_do_not_replace_ordinary_short_words() {
+        let names = vec![
+            "Luis".into(),
+            "Louise".into(),
+            "Abliterated".into(),
+            "Doucette".into(),
+        ];
+        assert_eq!(
+            apply_custom_words("I like to be able to use the dock", &names, 0.18),
+            "I like to be able to use the dock"
+        );
+        assert_eq!(
+            apply_custom_words("send it to luis", &names, 0.18),
+            "send it to Luis"
+        );
     }
 
     #[test]

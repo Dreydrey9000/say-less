@@ -1144,7 +1144,12 @@ impl TranscriptionManager {
             &finalized.supported_languages,
         );
 
-        self.maybe_unload_immediately("streaming transcription");
+        // Empty streaming output triggers batch fallback in TranscribeAction.
+        // Keep the returned engine alive for that fallback; batch transcription
+        // applies the unload policy after it completes.
+        if !filtered.trim().is_empty() {
+            self.maybe_unload_immediately("streaming transcription");
+        }
         Ok(Some(filtered))
     }
 

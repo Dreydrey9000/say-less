@@ -776,6 +776,17 @@ pub fn paste(text: String, app_handle: AppHandle) -> Result<(), String> {
     let paste_method = settings.paste_method;
     let paste_delay_ms = settings.paste_delay_ms;
     let paste_delay_after_ms = settings.paste_delay_after_ms;
+    #[cfg(target_os = "macos")]
+    let correction_observer = if !settings.auto_submit
+        && !settings.reliable_paste
+        && !matches!(
+            paste_method,
+            PasteMethod::None | PasteMethod::ExternalScript
+        ) {
+        crate::correction_learning::prepare(&app_handle)
+    } else {
+        None
+    };
 
     // Append trailing space if setting is enabled
     let text = if settings.append_trailing_space {
@@ -844,6 +855,11 @@ pub fn paste(text: String, app_handle: AppHandle) -> Result<(), String> {
                 .ok_or("External script path is not configured")?;
             paste_via_external_script(&text, script_path)?;
         }
+    }
+
+    #[cfg(target_os = "macos")]
+    if let Some(observer) = correction_observer {
+        let _ = observer.send(text.clone());
     }
 
     if should_send_auto_submit(settings.auto_submit, paste_method) {

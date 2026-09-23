@@ -1,20 +1,42 @@
 # Say Less
 
-![Say Less emblem](public/brand/say-less-emblem.png)
+<img src="public/brand/say-less-emblem.png" width="96" alt="Say Less emblem" />
+
+## See it first
+
+![Say Less home screen](public/release-notes/home-0.11.0.png)
+
+| Expanded controls                                                                                                       | Collapsed companion                                                                                | Animated character                                                                                                     |
+| ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| <img src="public/release-notes/dock-expanded-0.12.0.png" width="360" alt="Recording controls with a collapse button" /> | <img src="public/release-notes/dock-compact-0.12.0.png" width="104" alt="Small floating emblem" /> | <img src="public/release-notes/dock-character-0.12.0.png" width="104" alt="Small animated character with particles" /> |
+
+These are actual application screens rendered with safe sample state. The still images show the controls; motion is enabled in the app unless paused or Reduce Motion is on.
+
+**Three things to try:**
+
+1. **Home → Open floating dock.** The shortcut shown on Home works while the dock is collapsed. Click the little companion to expand, then use the down arrow to collapse.
+2. **Appearance → Companion style.** Choose an orb, chrome emblem, character, or character with particles. Set Left/Right placement, color, pause, or cycle.
+3. **Writing → Learn from my corrections.** Enable on Mac, dictate into a supported text field, fix one spelling and keep focus there for four seconds. Review the observed pair, choose Keep now, or repeat it in another dictation to activate it automatically. Remove a learned rule anytime.
+
+### How the words move
+
+![Say Less workflow](docs/diagrams/learning.svg)
+
+[Editable diagram](docs/diagrams/learning.mmd) · [Detailed behavior and limits](docs/personalization.md) · [Local verification](docs/verification/compact-0.12.0.md)
 
 [Brand assets and coaching-portal usage](docs/brand.md)
 
 Open **Writing** for personal vocabulary, filler cleanup, and local voice snippets. Save a cue such as “my booking link,” then use the preview to check its exact expansion. [Wispr Flow capability comparison and remaining gaps](docs/wispr-comparison.md) · [UI verification standard](docs/UI-STANDARD.md).
 
-Free, offline push-to-talk dictation for Mac and Windows. Hold a key, talk, and your words get typed into whatever app you're in.
+Local voice dictation built on Handy. The current custom build is verified on Apple Silicon macOS. Windows support is inherited from Handy; this version has not yet been packaged or verified on Windows.
 
 - **Free.** No subscription, no account.
 - **Private dictation.** Speech recognition runs on your computer. Optional cloud post-processing sends the transcript to the provider you configure; leave it off for fully local dictation.
-- **Light.** Built to run on laptops with 8GB of RAM.
+- **Model choice.** Memory use depends on the speech model you select.
 
 ## Install
 
-Installer releases are not published yet (checked September 22, 2026). Build locally using the instructions below. When installers are available, they will appear in [Releases](https://github.com/Dreydrey9000/say-less/releases):
+Installer releases are not published yet (checked September 23, 2026). Build locally using the instructions below. When installers are available, they will appear in [Releases](https://github.com/Dreydrey9000/say-less/releases):
 
 - **Mac:** the `.dmg` (`aarch64` = Apple Silicon M1/M2/M3/M4, `x64` = older Intel Macs)
 - **Windows:** the `x64-setup.exe`

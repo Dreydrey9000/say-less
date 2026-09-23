@@ -59,6 +59,22 @@ async dockToggleRecording() : Promise<Result<null, string>> {
 async getDockState() : Promise<string> {
     return await TAURI_INVOKE("get_dock_state");
 },
+async listLearnedCorrections() : Promise<Result<LearnedCorrection[], string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("list_learned_corrections") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async reviewLearnedCorrection(trigger: string, keep: boolean) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("review_learned_correction", { trigger, keep }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
 async previewWisprImport(content: string | null) : Promise<Result<ImportPreview, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("preview_wispr_import", { content }) };
@@ -1126,6 +1142,7 @@ export type KeyboardDiagnosticReport = { secure_input_enabled: boolean; culprit_
 key_down: number; key_up: number; flags_changed: number; mouse: number; duration_ms: number }
 export type KeyboardImplementation = "tauri" | "handy_keys"
 export type LLMPrompt = { id: string; name: string; prompt: string }
+export type LearnedCorrection = { trigger: string; expansion: string; observations: number; active: boolean }
 export type LogLevel = "trace" | "debug" | "info" | "warn" | "error"
 export type ModelInfo = { id: string; name: string; description: string; filename: string; source: ModelSource; size_mb: number; is_downloaded: boolean; is_downloading: boolean; partial_size: number; is_directory: boolean; engine_type: EngineType; accuracy_score: number; speed_score: number; supports_translation: boolean; is_recommended: boolean; supported_languages: string[]; supports_language_selection: boolean; is_custom: boolean; supports_streaming: boolean; supports_language_detection: boolean }
 export type ModelLoadStatus = { is_loaded: boolean; current_model: string | null }
@@ -1253,7 +1270,7 @@ export type StreamTextEvent = { committed: string; tentative: string }
  * Semantic kind of "working" phase, used to localize the spinner label.
  */
 export type StreamWorkKind = "transcribing" | "polishing"
-export type StudioSettings = { accent: string; floating: boolean; actions_enabled: boolean; actions: VoiceAction[]; default_style: WritingStyle; app_styles: AppStyle[]; cleanup_on_dictation: boolean; dock_animation: string; dock_motion: boolean; dock_cycle: boolean; dock_edge: string; corrections: VoiceSnippet[] }
+export type StudioSettings = { accent: string; floating: boolean; actions_enabled: boolean; actions: VoiceAction[]; default_style: WritingStyle; app_styles: AppStyle[]; cleanup_on_dictation: boolean; dock_animation: string; dock_motion: boolean; dock_cycle: boolean; dock_edge: string; dock_compact: boolean; dock_character: string; learn_corrections: boolean; corrections: VoiceSnippet[] }
 /**
  * UI appearance mode. `System` follows the OS `prefers-color-scheme`; `Light`
  * and `Dark` force one of the two palettes Handy already ships.

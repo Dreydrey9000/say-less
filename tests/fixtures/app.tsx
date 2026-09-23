@@ -18,12 +18,18 @@ const defaultStudio = {
   dock_motion: true,
   dock_cycle: false,
   dock_edge: "free",
+  dock_compact: false,
+  dock_character: "emblem",
+  learn_corrections: false,
   corrections: [],
 };
 let studio = JSON.parse(
   localStorage.getItem("test-studio") || JSON.stringify(defaultStudio),
 );
 let imported = false;
+let learned = query.has("learned")
+  ? [{ trigger: "Louise", expansion: "Luis", observations: 1, active: false }]
+  : [];
 Object.assign(window, {
   __TAURI_OS_PLUGIN_INTERNALS__: {
     platform: "macos",
@@ -90,6 +96,14 @@ mockIPC((cmd, payload) => {
   ).testCommands ??= []);
   calls.push(cmd);
   if (cmd === "get_dock_state") return "idle";
+  if (cmd === "list_learned_corrections") return learned;
+  if (cmd === "review_learned_correction") {
+    if (query.has("failLearning")) throw "storage";
+    if (payload?.keep)
+      learned = learned.map((row) => ({ ...row, active: true }));
+    else learned = [];
+    return null;
+  }
   if (cmd === "get_studio_settings") return studio;
   if (cmd === "save_studio_settings") {
     if (query.has("failStudio")) throw "storage";
@@ -130,7 +144,7 @@ mockIPC((cmd, payload) => {
       : [];
   if (cmd.startsWith("plugin:event|")) return 1;
   if (cmd === "plugin:os|locale") return "en-US";
-  if (cmd === "plugin:app|version") return "0.11.0";
+  if (cmd === "plugin:app|version") return "0.12.0";
   if (
     cmd.includes("check_accessibility_permission") ||
     cmd.includes("check_microphone_permission")
