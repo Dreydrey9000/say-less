@@ -6,7 +6,7 @@ use tauri::AppHandle;
 use tauri_plugin_store::StoreExt;
 
 const STORE: &str = "voice_snippets.json";
-const MAX_SNIPPETS: usize = 100;
+const MAX_SNIPPETS: usize = 1000;
 
 #[derive(Clone, Debug, Deserialize, Serialize, Type, PartialEq)]
 pub struct VoiceSnippet {
@@ -34,7 +34,7 @@ fn key(text: &str) -> Vec<String> {
     tokens(text).into_iter().map(|(_, _, word)| word).collect()
 }
 
-fn validate(snippets: &[VoiceSnippet]) -> Result<(), String> {
+pub(crate) fn validate(snippets: &[VoiceSnippet]) -> Result<(), String> {
     if snippets.len() > MAX_SNIPPETS {
         return Err("too_many".into());
     }
@@ -211,7 +211,7 @@ mod tests {
         );
         assert!(validate(&[snippet("!!!", "x")]).is_err());
         assert!(validate(&[snippet("link", "  ")]).is_err());
-        assert!(validate(&vec![snippet("link", "x"); 101]).is_err());
+        assert!(validate(&vec![snippet("link", "x"); 1001]).is_err());
     }
     #[test]
     fn empty_library_preserves_transcript() {

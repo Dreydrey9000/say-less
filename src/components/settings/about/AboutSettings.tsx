@@ -9,6 +9,8 @@ import { AppDataDirectory } from "../AppDataDirectory";
 import { AppLanguageSelector } from "../AppLanguageSelector";
 import { ShowWhatsNewOnUpdate } from "../ShowWhatsNewOnUpdate";
 import { ThemeSelector } from "../ThemeSelector";
+import { listReleaseNotes } from "../../whats-new/releaseNotes";
+import { MarkdownContent } from "../../whats-new/MarkdownContent";
 import { LogDirectory } from "../debug";
 
 export const AboutSettings: React.FC = () => {
@@ -80,6 +82,23 @@ export const AboutSettings: React.FC = () => {
         <AppDataDirectory descriptionMode="tooltip" grouped={true} />
         <LogDirectory grouped={true} />
       </SettingsGroup>
+
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold">{t("studio.updates")}</h2>
+        {listReleaseNotes(version).map((note) => (
+          <details
+            key={note.version}
+            className="border border-mid-gray/20 rounded-xl p-4"
+          >
+            <summary className="cursor-pointer font-medium">
+              {t("studio.version", { version: note.version })}
+            </summary>
+            <div className="mt-4">
+              <MarkdownContent markdown={note.markdown} />
+            </div>
+          </details>
+        ))}
+      </section>
 
       <SettingsGroup title={t("settings.about.acknowledgments.title")}>
         <SettingContainer

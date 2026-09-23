@@ -91,3 +91,8 @@ export const findLatestReleaseNote = (): ReleaseNote | null => {
 
   return candidate;
 };
+
+export const listReleaseNotes = (currentVersion: string): ReleaseNote[] =>
+  Array.from(releaseNotesByVersion.values())
+    .filter((note) => compareVersions(note.version, currentVersion) <= 0)
+    .sort((a, b) => compareVersions(b.version, a.version));

@@ -119,6 +119,37 @@ function App() {
     }
   }, [onboardingStep, refreshAudioDevices, refreshOutputDevices]);
 
+  // Returning from System Settings can satisfy permissions without another grant.
+  useEffect(() => {
+    if (!settingsOnly || platform() !== "macos") return;
+    const recheck = async () => {
+      try {
+        const [accessibility, microphone] = await Promise.all([
+          checkAccessibilityPermission(),
+          checkMicrophonePermission(),
+        ]);
+        if (accessibility && microphone) {
+          setSettingsOnly(false);
+          setOnboardingStep("done");
+        }
+      } catch {
+        /* Keep setup visible when the OS cannot confirm access. */
+      }
+    };
+    window.addEventListener("focus", recheck);
+    return () => window.removeEventListener("focus", recheck);
+  }, [settingsOnly]);
+
+  useEffect(() => {
+    const pending = listen<boolean>("voice-action-result", (event) => {
+      if (event.payload) toast.success(t("controls.actionOpened"));
+      else toast.error(t("controls.actionFailed"));
+    });
+    return () => {
+      void pending.then((unlisten) => unlisten());
+    };
+  }, [t]);
+
   // Handle keyboard shortcuts for debug mode toggle
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {

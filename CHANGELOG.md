@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.10.0
+
+- Custom accent palettes and a nonactivating floating dock.
+- Exact, opt-in voice cues for installed Mac apps and http/https links.
+- Local per-app casing/punctuation styles.
+- Read-only Wispr library preview/import, CSV/JSON support, optional text history archive, deduplication and pre-import backup.
+- Recheck existing permissions when returning from System Settings.
+
 ## Unreleased
 
 - Added local voice snippets with durable save, edit/remove, duplicate validation, whole-cue and in-sentence matching, and a preview using the same Rust matcher. Matching snippets bypass optional AI cleanup to preserve their saved text.

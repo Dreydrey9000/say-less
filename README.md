@@ -43,3 +43,7 @@ bun run tauri build    # make an installer for this OS
 
 Say Less is a rebranded fork of [Handy](https://github.com/cjpais/Handy) by CJ Pais, used under the MIT License (see `LICENSE`). Upstream docs: `UPSTREAM-HANDY-README.md`.
 To pull upstream fixes: `git fetch upstream && git merge upstream/main`.
+
+## Personalize and migrate
+
+See [appearance, floating dock, voice actions, and Wispr import](docs/personalization.md). The [editable architecture diagram](docs/diagrams/personalization.mmd) shows local storage and action boundaries ([rendered version](docs/diagrams/personalization.svg)).

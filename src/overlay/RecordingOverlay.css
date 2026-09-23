@@ -466,3 +466,8 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.srecording-dot,
+.swave i {
+  background: var(--studio-accent, var(--color-logo-primary));
+}

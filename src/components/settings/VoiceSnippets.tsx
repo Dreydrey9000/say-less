@@ -176,7 +176,7 @@ export function VoiceSnippets() {
                   busy ||
                   !trigger.trim() ||
                   !expansion.trim() ||
-                  (editing === null && snippets.length >= 100)
+                  (editing === null && snippets.length >= 1000)
                 }
               >
                 {t("snippets.save")}

@@ -6,6 +6,18 @@ import { mockIPC, mockWindows } from "@tauri-apps/api/mocks";
 import "../../src/App.css";
 
 const query = new URLSearchParams(location.search);
+const defaultStudio = {
+  accent: "#b8ff65",
+  floating: false,
+  actions_enabled: false,
+  actions: [],
+  default_style: "original",
+  app_styles: [],
+};
+let studio = JSON.parse(
+  localStorage.getItem("test-studio") || JSON.stringify(defaultStudio),
+);
+let imported = false;
 Object.assign(window, {
   __TAURI_OS_PLUGIN_INTERNALS__: {
     platform: "macos",
@@ -71,9 +83,47 @@ mockIPC((cmd, payload) => {
     window as unknown as { testCommands: string[] }
   ).testCommands ??= []);
   calls.push(cmd);
+  if (cmd === "get_studio_settings") return studio;
+  if (cmd === "save_studio_settings") {
+    if (query.has("failStudio")) throw "storage";
+    studio = payload?.settings;
+    localStorage.setItem("test-studio", JSON.stringify(studio));
+    return null;
+  }
+  if (cmd === "list_launchable_apps")
+    return ["/System/Applications/Notes.app", "/Applications/Safari.app"];
+  if (cmd === "test_voice_action") {
+    if (query.has("failAction")) throw "launch_failed";
+    return null;
+  }
+  if (cmd === "preview_wispr_import") {
+    if (query.has("failImport")) throw "unsupported_schema";
+    return {
+      words: imported ? [] : ["ExampleName"],
+      snippets: imported
+        ? []
+        : [{ trigger: "my example", expansion: "Example saved text" }],
+      skipped: imported ? 2 : 1,
+      history_count: 2,
+      fingerprint: "test",
+    };
+  }
+  if (cmd === "apply_wispr_import") {
+    imported = true;
+    return {
+      words_added: 1,
+      snippets_added: 1,
+      history_added: payload?.includeHistory ? 2 : 0,
+      history_error: false,
+    };
+  }
+  if (cmd === "list_imported_history")
+    return imported
+      ? [{ id: "test", text: "Imported example only", timestamp: "2026-09-22" }]
+      : [];
   if (cmd.startsWith("plugin:event|")) return 1;
   if (cmd === "plugin:os|locale") return "en-US";
-  if (cmd === "plugin:app|version") return "0.9.9";
+  if (cmd === "plugin:app|version") return "0.10.0";
   if (
     cmd.includes("check_accessibility_permission") ||
     cmd.includes("check_microphone_permission")
@@ -143,4 +193,10 @@ mockIPC((cmd, payload) => {
 });
 const { default: App } = await import("../../src/App");
 await import("../../src/i18n");
-ReactDOM.createRoot(document.getElementById("root")!).render(<App />);
+const { applyTheme } = await import("../../src/lib/utils/theme");
+applyTheme(settings.theme as "dark" | "light");
+if (query.has("dock")) {
+  await import("../../src/dock/main");
+} else {
+  ReactDOM.createRoot(document.getElementById("root")!).render(<App />);
+}

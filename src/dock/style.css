@@ -1,0 +1,84 @@
+@import "../styles/theme.css";
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  background: transparent !important;
+  font-family: system-ui, sans-serif;
+}
+button {
+  font: inherit;
+  cursor: pointer;
+}
+button:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+}
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.floating-shell {
+  padding: 6px;
+  color: var(--color-text);
+}
+.floating-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  background: var(--color-background);
+  border: 1px solid
+    color-mix(in srgb, var(--studio-accent, #b8ff65), transparent 35%);
+  border-radius: 24px;
+  box-shadow: 0 3px 10px #0003;
+}
+.floating-bar > img {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+}
+.floating-bar button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 40px;
+  min-width: 32px;
+  border: 0;
+  border-radius: 14px;
+  color: var(--color-text);
+  background: transparent;
+}
+.floating-bar .dock-record {
+  flex: 1;
+  gap: 6px;
+  background: var(--studio-accent, #b8ff65);
+  color: var(--studio-on-accent, #000);
+  font-weight: 650;
+  font-size: 13px;
+  padding: 0 10px;
+}
+.floating-bar .dock-grip {
+  cursor: grab;
+  min-width: 18px;
+}
+.floating-shell > p {
+  margin: 3px 0 0;
+  font-size: 11px;
+  text-align: center;
+  color: var(--color-text);
+  background: var(--color-background);
+  border-radius: 8px;
+  line-height: 18px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  button {
+    transition: filter 0.15s;
+  }
+  button:hover {
+    filter: brightness(0.9);
+  }
+}

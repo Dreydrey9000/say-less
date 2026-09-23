@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { SettingsGroup } from "../ui/SettingsGroup";
 import { CustomWords } from "./CustomWords";
 import { FillerWordRemoval } from "./FillerWordRemoval";
+import { WritingStyles } from "./StudioSettings";
 import { VoiceSnippets } from "./VoiceSnippets";
 
 export function WritingSettings() {
@@ -20,6 +21,7 @@ export function WritingSettings() {
       <SettingsGroup title={t("writing.cleanup")}>
         <FillerWordRemoval descriptionMode="inline" grouped />
       </SettingsGroup>
+      <WritingStyles />
       <VoiceSnippets />
     </div>
   );

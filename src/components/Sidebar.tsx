@@ -9,7 +9,13 @@ import {
   Cpu,
   AudioLines,
   BookOpen,
+  Palette,
+  WandSparkles,
+  Download,
 } from "lucide-react";
+import { StudioSettings } from "./settings/StudioSettings";
+import { VoiceActions } from "./settings/VoiceActions";
+import { WisprImport } from "./settings/WisprImport";
 import SayLessLogo from "./icons/SayLessLogo";
 import { WritingSettings } from "./settings/WritingSettings";
 import { useSettings } from "../hooks/useSettings";
@@ -57,6 +63,24 @@ export const SECTIONS_CONFIG = {
     labelKey: "writing.title",
     icon: BookOpen,
     component: WritingSettings,
+    enabled: () => true,
+  },
+  studio: {
+    labelKey: "studio.title",
+    icon: Palette,
+    component: StudioSettings,
+    enabled: () => true,
+  },
+  actions: {
+    labelKey: "actions.title",
+    icon: WandSparkles,
+    component: VoiceActions,
+    enabled: () => true,
+  },
+  import: {
+    labelKey: "import.title",
+    icon: Download,
+    component: WisprImport,
     enabled: () => true,
   },
   models: {

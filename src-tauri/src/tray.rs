@@ -33,7 +33,7 @@ use std::time::Instant;
 use tauri::image::Image;
 use tauri::menu::{CheckMenuItem, Menu, MenuItem, PredefinedMenuItem, Submenu};
 use tauri::tray::TrayIcon;
-use tauri::{AppHandle, Manager, Theme};
+use tauri::{AppHandle, Emitter, Manager, Theme};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -216,6 +216,14 @@ pub fn get_icon_path(theme: AppTheme, state: TrayIconState, warning: bool) -> &'
 
 /// Sets the recording state shown by the tray (icon + Cancel/model menu).
 pub fn set_tray_state(app: &AppHandle, state: TrayIconState) {
+    let _ = app.emit(
+        "dock-state",
+        match state {
+            TrayIconState::Idle => "idle",
+            TrayIconState::Recording => "recording",
+            TrayIconState::Transcribing => "transcribing",
+        },
+    );
     sync_tray_with(app, |inner| inner.icon_state = state);
 }
 

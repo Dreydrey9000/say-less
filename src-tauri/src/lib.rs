@@ -8,6 +8,7 @@ mod catalog;
 pub mod cli;
 mod clipboard;
 mod commands;
+mod floating;
 mod helpers;
 mod input;
 mod llm_client;
@@ -21,10 +22,12 @@ mod settings;
 mod shortcut;
 mod signal_handle;
 mod snippets;
+mod studio;
 mod transcription_coordinator;
 mod tray;
 mod tray_i18n;
 mod utils;
+mod wispr_import;
 
 pub use cli::CliArgs;
 #[cfg(debug_assertions)]
@@ -651,6 +654,14 @@ pub fn run(cli_args: CliArgs) {
         .commands(collect_commands![
             snippets::list_voice_snippets,
             snippets::save_voice_snippets,
+            studio::get_studio_settings,
+            studio::save_studio_settings,
+            studio::list_launchable_apps,
+            studio::test_voice_action,
+            floating::dock_toggle_recording,
+            wispr_import::preview_wispr_import,
+            wispr_import::apply_wispr_import,
+            wispr_import::list_imported_history,
             snippets::preview_voice_snippets,
             shortcut::change_binding,
             shortcut::reset_binding,
@@ -1016,6 +1027,9 @@ pub fn run(cli_args: CliArgs) {
             app.manage(TranscriptionCoordinator::new(app_handle.clone()));
 
             initialize_core_logic(&app_handle);
+            if studio::get_studio_settings(app_handle.clone()).map(|s|s.floating).unwrap_or(false) {
+                let _=floating::set_visible(&app_handle,true);
+            }
 
             // Secure Input monitor (macOS): detects stuck secure input that
             // silently blocks keyed shortcuts, warns the user, and activates

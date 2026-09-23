@@ -21,6 +21,65 @@ async saveVoiceSnippets(snippets: VoiceSnippet[]) : Promise<Result<null, string>
     else return { status: "error", error: e  as any };
 }
 },
+async getStudioSettings() : Promise<Result<StudioSettings, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_studio_settings") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async saveStudioSettings(settings: StudioSettings) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("save_studio_settings", { settings }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async listLaunchableApps() : Promise<string[]> {
+    return await TAURI_INVOKE("list_launchable_apps");
+},
+async testVoiceAction(cue: string) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("test_voice_action", { cue }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async dockToggleRecording() : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("dock_toggle_recording") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async previewWisprImport(content: string | null) : Promise<Result<ImportPreview, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("preview_wispr_import", { content }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async applyWisprImport(content: string | null, includeHistory: boolean, expectedFingerprint: string) : Promise<Result<ImportReport, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("apply_wispr_import", { content, includeHistory, expectedFingerprint }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async listImportedHistory(offset: number) : Promise<Result<ImportedHistory[], string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("list_imported_history", { offset }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
 async previewVoiceSnippets(text: string, snippets: VoiceSnippet[]) : Promise<Result<string, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("preview_voice_snippets", { text, snippets }) };
@@ -1029,6 +1088,7 @@ vad_backend?: VadBackend;
  * `overlay_position` (position `none` → style `None`).
  */
 overlay_style?: OverlayStyle }
+export type AppStyle = { app: string; style: WritingStyle }
 export type AudioDevice = { index: string; name: string; is_default: boolean }
 export type AutoSubmitKey = "enter" | "ctrl_enter" | "cmd_enter"
 export type AvailableAccelerators = { transcribe: string[]; ort: string[]; gpu_devices: GpuDeviceOption[] }
@@ -1053,6 +1113,9 @@ export type ImplementationChangeResult = { success: boolean;
  * List of binding IDs that were reset to defaults due to incompatibility
  */
 reset_bindings: string[] }
+export type ImportPreview = { words: string[]; snippets: VoiceSnippet[]; skipped: number; history_count: number; fingerprint: string }
+export type ImportReport = { words_added: number; snippets_added: number; history_added: number; history_error: boolean }
+export type ImportedHistory = { id: string; text: string; timestamp: string }
 export type KeyboardDiagnosticReport = { secure_input_enabled: boolean; culprit_pid: number | null; culprit_name: string | null; 
 /**
  * Counts only — key identity is deliberately never captured.
@@ -1187,6 +1250,7 @@ export type StreamTextEvent = { committed: string; tentative: string }
  * Semantic kind of "working" phase, used to localize the spinner label.
  */
 export type StreamWorkKind = "transcribing" | "polishing"
+export type StudioSettings = { accent: string; floating: boolean; actions_enabled: boolean; actions: VoiceAction[]; default_style: WritingStyle; app_styles: AppStyle[] }
 /**
  * UI appearance mode. `System` follows the OS `prefers-color-scheme`; `Light`
  * and `Dark` force one of the two palettes Handy already ships.
@@ -1195,8 +1259,10 @@ export type Theme = "system" | "light" | "dark"
 export type TranscribeAcceleratorSetting = "auto" | "cpu" | "gpu"
 export type TypingTool = "auto" | "wtype" | "kwtype" | "dotool" | "ydotool" | "xdotool"
 export type VadBackend = "silero" | "earshot"
+export type VoiceAction = { cue: string; kind: string; target: string }
 export type VoiceSnippet = { trigger: string; expansion: string }
 export type WindowsMicrophonePermissionStatus = { supported: boolean; overall_access: PermissionAccess; device_access: PermissionAccess; app_access: PermissionAccess; desktop_app_access: PermissionAccess }
+export type WritingStyle = "original" | "formal" | "casual" | "lowercase"
 
 /** tauri-specta globals **/
 

@@ -424,6 +424,17 @@ pub(crate) async fn process_transcription_output(
     transcription: &str,
     post_process: bool,
 ) -> ProcessedTranscription {
+    // Recognized action cues never pass through snippet expansion or a text provider.
+    if crate::studio::get_studio_settings(app.clone())
+        .map(|settings| crate::studio::matching_action(transcription, &settings).is_some())
+        .unwrap_or(false)
+    {
+        return ProcessedTranscription {
+            final_text: transcription.to_owned(),
+            post_processed_text: None,
+            post_process_prompt: None,
+        };
+    }
     let settings = get_settings(app);
     let mut final_text = transcription.to_string();
     let mut post_processed_text: Option<String> = None;
@@ -465,6 +476,13 @@ pub(crate) async fn process_transcription_output(
         }
     } else if final_text != transcription {
         post_processed_text = Some(final_text.clone());
+    }
+
+    if !snippet_matched {
+        final_text = crate::studio::apply_writing_style(app, &final_text).await;
+        if final_text != transcription {
+            post_processed_text = Some(final_text.clone());
+        }
     }
 
     ProcessedTranscription {
@@ -802,6 +820,7 @@ impl ShortcutAction for TranscribeAction {
                                 return;
                             }
 
+                            let spoken_action_text = transcription.clone();
                             // Save to history if WAV was saved
                             if wav_saved {
                                 if let Err(err) = hm.save_entry(
@@ -831,6 +850,23 @@ impl ShortcutAction for TranscribeAction {
                                         return;
                                     }
 
+                                    match crate::studio::execute_spoken_action(
+                                        &ah_clone,
+                                        &spoken_action_text,
+                                    ) {
+                                        Ok(true) => {
+                                            utils::hide_recording_overlay(&ah_clone);
+                                            set_tray_state(&ah_clone, TrayIconState::Idle);
+                                            return;
+                                        }
+                                        Err(_) => {
+                                            let _ = ah_clone.emit("voice-action-result", false);
+                                            utils::hide_recording_overlay(&ah_clone);
+                                            set_tray_state(&ah_clone, TrayIconState::Idle);
+                                            return;
+                                        }
+                                        Ok(false) => {}
+                                    }
                                     match utils::paste(final_text, ah_clone.clone()) {
                                         Ok(()) => debug!(
                                             "Text pasted successfully in {:?}",
