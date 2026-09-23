@@ -439,7 +439,16 @@ pub(crate) async fn process_transcription_output(
         final_text = converted_text;
     }
 
-    if post_process {
+    // Expand before optional AI cleanup. Saved snippets must stay exact and local:
+    // a matching utterance bypasses the provider rather than sending saved text out.
+    let snippets = crate::snippets::list_voice_snippets(app.clone()).unwrap_or_else(|_| {
+        log::warn!("Voice snippets unavailable; keeping the original transcript");
+        Vec::new()
+    });
+    let (expanded, snippet_matched) = crate::snippets::expand_with_match(&final_text, &snippets);
+    final_text = expanded;
+
+    if post_process && !snippet_matched {
         if let Some(processed_text) = post_process_transcription(&settings, &final_text).await {
             post_processed_text = Some(processed_text.clone());
             final_text = processed_text;

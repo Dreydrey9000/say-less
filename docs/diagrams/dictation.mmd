@@ -19,7 +19,10 @@ flowchart TD
         Batch --> Text[Final text]
         Finalize --> Text
         Text --> Cleanup[Local cleanup and custom words]
-        Cleanup --> Paste[Clipboard and paste into active app]
+        Cleanup --> Snippets[Local voice snippet matcher]
+        Library[Local saved snippets] --> Snippets
+        Snippets -->|Matched: exact saved text| Paste[Clipboard and paste into active app]
+        Snippets -->|No match, provider disabled| Paste
     end
-    Cleanup -. Explicitly enabled cloud post-processing .-> Cloud
+    Snippets -. No match and cloud post-processing enabled .-> Cloud
     Cloud -. Processed text .-> Paste

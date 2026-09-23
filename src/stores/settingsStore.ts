@@ -11,6 +11,25 @@ import type {
 } from "@/bindings";
 import { commands } from "@/bindings";
 import { toast } from "sonner";
+import i18n from "../i18n";
+
+// CoreAudio enumeration can stall when an audio driver is unavailable.
+async function withDeviceTimeout<T>(request: Promise<T>): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      request,
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(
+          () => reject(new Error("Audio device enumeration timed out")),
+          5000,
+        );
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 interface SettingsStore {
   settings: Settings | null;
@@ -252,7 +271,9 @@ export const useSettingsStore = create<SettingsStore>()(
     // Load audio devices
     refreshAudioDevices: async () => {
       try {
-        const result = await commands.getAvailableMicrophones();
+        const result = await withDeviceTimeout(
+          commands.getAvailableMicrophones(),
+        );
         if (result.status === "ok") {
           const devicesWithDefault = [
             DEFAULT_AUDIO_DEVICE,
@@ -273,7 +294,9 @@ export const useSettingsStore = create<SettingsStore>()(
     // Load output devices
     refreshOutputDevices: async () => {
       try {
-        const result = await commands.getAvailableOutputDevices();
+        const result = await withDeviceTimeout(
+          commands.getAvailableOutputDevices(),
+        );
         if (result.status === "ok") {
           const devicesWithDefault = [
             DEFAULT_AUDIO_DEVICE,
@@ -327,15 +350,28 @@ export const useSettingsStore = create<SettingsStore>()(
 
         const updater = settingUpdaters[key];
         if (updater) {
-          await updater(value);
+          const result = await updater(value);
+          if (
+            result &&
+            typeof result === "object" &&
+            "status" in result &&
+            result.status === "error"
+          ) {
+            throw new Error("The backend rejected this setting change");
+          }
         } else if (key !== "bindings" && key !== "selected_model") {
-          console.warn(`No handler for setting: ${String(key)}`);
+          throw new Error(`No handler for setting: ${String(key)}`);
         }
       } catch (error) {
         console.error(`Failed to update setting ${String(key)}:`, error);
         if (settings) {
-          set({ settings: { ...settings, [key]: originalValue } });
+          set((state) => ({
+            settings: state.settings
+              ? { ...state.settings, [key]: originalValue }
+              : null,
+          }));
         }
+        toast.error(i18n.t("controls.saveFailed"));
       } finally {
         setUpdating(updateKey, false);
       }

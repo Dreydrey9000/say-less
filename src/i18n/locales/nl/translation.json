@@ -716,5 +716,60 @@
   },
   "brand": {
     "name": "Say Less"
+  },
+  "controls": {
+    "choose": "Choose an option",
+    "details": "Details",
+    "navigation": "Settings navigation",
+    "explore": "Browse settings first",
+    "setupNotice": "You are browsing settings. Finish permission setup before dictating.",
+    "finishSetup": "Finish setup",
+    "saveFailed": "Could not save this change. Your previous setting was restored. Please try again.",
+    "reset": "Reset {{setting}}"
+  },
+  "writing": {
+    "title": "Writing",
+    "description": "Make dictation your own. Your words and snippets stay on this computer.",
+    "dictionary": "Personal dictionary",
+    "cleanup": "Clean up your words"
+  },
+  "dictation": {
+    "title": "Dictation",
+    "description": "Set your shortcut, choose a microphone, and start writing with your voice.",
+    "local": "On-device transcription",
+    "optional": "Optional AI cleanup uses your configured provider.",
+    "private": "Cloud post-processing is off."
+  },
+  "snippets": {
+    "title": "Voice snippets",
+    "description": "Say a memorable phrase to insert a saved reply, link, or signature. Up to 100 snippets, stored locally.",
+    "privacy": "Use a cue on its own for the exact saved text, including line breaks. Cues also work inside sentences. When a snippet matches, AI post-processing is skipped so the saved text stays exact and local.",
+    "add": "Add a snippet",
+    "edit": "Edit",
+    "trigger": "When I say",
+    "expansion": "Insert this text",
+    "triggerExample": "my booking link",
+    "expansionExample": "Paste your link or write a reusable reply here.",
+    "save": "Save snippet",
+    "cancel": "Cancel",
+    "remove": "Remove",
+    "retry": "Try again",
+    "working": "Working…",
+    "saved": "Snippets saved on this computer.",
+    "editNamed": "Edit {{trigger}}",
+    "removeNamed": "Remove {{trigger}}",
+    "empty": "No snippets yet. Add one above, then try its cue below.",
+    "tryTitle": "Try a saved cue",
+    "tryDescription": "Type what you would say. This preview uses the same local matcher as dictation and does not paste into another app.",
+    "preview": "Preview result",
+    "errors": {
+      "duplicate": "That cue already exists. Choose a different phrase.",
+      "invalid_trigger": "Use a cue with letters or numbers, up to 80 characters.",
+      "invalid_expansion": "Add some text, up to 4,000 characters.",
+      "too_many": "You can save up to 100 snippets. Remove one before adding another.",
+      "storage": "Could not read or save your snippets. Your draft is still here. Check disk space and try again.",
+      "preview": "Could not preview this cue. Try a shorter phrase."
+    },
+    "undo": "Undo removal"
   }
 }

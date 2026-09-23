@@ -15,6 +15,7 @@ import { Keyboard, Mic, Check, Loader2 } from "lucide-react";
 
 interface AccessibilityOnboardingProps {
   onComplete: () => void;
+  onExplore?: () => void;
   preview?: boolean;
 }
 
@@ -28,6 +29,7 @@ interface PermissionsState {
 
 const AccessibilityOnboarding: React.FC<AccessibilityOnboardingProps> = ({
   onComplete,
+  onExplore,
   preview = false,
 }) => {
   const { t } = useTranslation();
@@ -413,6 +415,15 @@ const AccessibilityOnboarding: React.FC<AccessibilityOnboardingProps> = ({
           </div>
         )}
       </div>
+      {onExplore && (
+        <button
+          type="button"
+          onClick={onExplore}
+          className="rounded-lg px-4 py-2 text-sm text-text/75 underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-text"
+        >
+          {t("controls.explore")}
+        </button>
+      )}
     </div>
   );
 };

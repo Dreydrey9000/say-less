@@ -34,17 +34,24 @@ export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
       tooltipPosition={tooltipPosition}
     >
       <label
-        className={`flex items-center ${disabled || isUpdating ? "cursor-not-allowed" : "cursor-pointer"}`}
+        className={`relative inline-flex min-h-11 min-w-11 items-center ${disabled || isUpdating ? "cursor-not-allowed" : "cursor-pointer"}`}
       >
         <input
           type="checkbox"
+          role="switch"
+          aria-label={label}
+          aria-busy={isUpdating}
           value=""
-          className="sr-only peer"
+          className="absolute inset-0 w-full h-full opacity-0 cursor-inherit peer"
           checked={checked}
           disabled={disabled || isUpdating}
           onChange={(e) => onChange(e.target.checked)}
         />
-        <div className="relative w-11 h-6 bg-mid-gray/20 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-logo-primary rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-background-ui peer-disabled:opacity-50"></div>
+        <div
+          aria-hidden="true"
+          style={{ pointerEvents: "none" }}
+          className="relative w-11 h-6 border border-mid-gray/50 bg-mid-gray/30 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-text rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:content-[''] after:absolute after:top-[1px] after:start-[1px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 motion-safe:after:transition-transform peer-checked:bg-background-ui peer-disabled:opacity-50"
+        />
       </label>
       {isUpdating && (
         <div className="absolute inset-0 flex items-center justify-center">

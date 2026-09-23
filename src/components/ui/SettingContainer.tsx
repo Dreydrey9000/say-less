@@ -1,10 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Tooltip } from "./Tooltip";
+import { useId, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
+import { SettingLabelContext } from "./SettingLabelContext";
 
 interface SettingContainerProps {
   title: string;
   description: string;
-  children: React.ReactNode;
+  children: ReactNode;
   descriptionMode?: "inline" | "tooltip";
   grouped?: boolean;
   layout?: "horizontal" | "stacked";
@@ -12,7 +13,7 @@ interface SettingContainerProps {
   tooltipPosition?: "top" | "bottom";
 }
 
-export const SettingContainer: React.FC<SettingContainerProps> = ({
+export function SettingContainer({
   title,
   description,
   children,
@@ -20,175 +21,36 @@ export const SettingContainer: React.FC<SettingContainerProps> = ({
   grouped = false,
   layout = "horizontal",
   disabled = false,
-  tooltipPosition = "top",
-}) => {
-  const [showTooltip, setShowTooltip] = useState(false);
-  const tooltipRef = useRef<HTMLDivElement>(null);
-
-  // Handle click outside to close tooltip
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        tooltipRef.current &&
-        !tooltipRef.current.contains(event.target as Node)
-      ) {
-        setShowTooltip(false);
-      }
-    };
-
-    if (showTooltip) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () =>
-        document.removeEventListener("mousedown", handleClickOutside);
-    }
-  }, [showTooltip]);
-
-  const toggleTooltip = () => {
-    setShowTooltip(!showTooltip);
-  };
-
-  const containerClasses = grouped
-    ? "px-4 p-2"
-    : "px-4 p-2 rounded-lg border border-mid-gray/20";
-
-  if (layout === "stacked") {
-    if (descriptionMode === "tooltip") {
-      return (
-        <div className={containerClasses}>
-          <div className="flex items-center gap-2 mb-2">
-            <h3
-              className={`text-sm font-medium ${disabled ? "opacity-50" : ""}`}
-            >
-              {title}
-            </h3>
-            <div
-              ref={tooltipRef}
-              className="relative"
-              onMouseEnter={() => setShowTooltip(true)}
-              onMouseLeave={() => setShowTooltip(false)}
-              onClick={toggleTooltip}
-            >
-              <svg
-                className="w-4 h-4 text-mid-gray cursor-help hover:text-logo-primary transition-colors duration-200 select-none"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-label="More information"
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    toggleTooltip();
-                  }
-                }}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              {showTooltip && (
-                <Tooltip targetRef={tooltipRef} position="top">
-                  <p className="text-sm text-center leading-relaxed">
-                    {description}
-                  </p>
-                </Tooltip>
-              )}
-            </div>
-          </div>
-          <div className="w-full">{children}</div>
-        </div>
-      );
-    }
-
-    return (
-      <div className={containerClasses}>
-        <div className="mb-2">
-          <h3 className={`text-sm font-medium ${disabled ? "opacity-50" : ""}`}>
+}: SettingContainerProps) {
+  const { t } = useTranslation();
+  const titleId = useId();
+  return (
+    <SettingLabelContext.Provider value={title}>
+      <div
+        role="group"
+        aria-labelledby={titleId}
+        className={`setting-row ${layout === "stacked" ? "setting-row-stacked" : ""} ${grouped ? "" : "rounded-xl border border-mid-gray/20"}`}
+      >
+        <div className={`min-w-0 ${disabled ? "opacity-60" : ""}`}>
+          <h3 id={titleId} className="text-sm font-medium text-text">
             {title}
           </h3>
-          <p className={`text-sm ${disabled ? "opacity-50" : ""}`}>
-            {description}
-          </p>
+          {description &&
+            (descriptionMode === "inline" ? (
+              <p className="text-sm text-text/70 mt-1">{description}</p>
+            ) : (
+              <details className="mt-1 text-xs text-text/70">
+                <summary className="cursor-pointer w-fit rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text">
+                  {t("controls.details")}
+                </summary>
+                <p className="mt-2 max-w-prose leading-relaxed">
+                  {description}
+                </p>
+              </details>
+            ))}
         </div>
-        <div className="w-full">{children}</div>
+        <div className="relative min-w-0 max-w-full">{children}</div>
       </div>
-    );
-  }
-
-  // Horizontal layout (default)
-  const horizontalContainerClasses = grouped
-    ? "flex items-center justify-between min-h-12 px-4 p-2"
-    : "flex items-center justify-between min-h-12 px-4 p-2 rounded-lg border border-mid-gray/20";
-
-  if (descriptionMode === "tooltip") {
-    return (
-      <div className={horizontalContainerClasses}>
-        <div className="max-w-2/3">
-          <div className="flex items-center gap-2">
-            <h3
-              className={`text-sm font-medium ${disabled ? "opacity-50" : ""}`}
-            >
-              {title}
-            </h3>
-            <div
-              ref={tooltipRef}
-              className="relative"
-              onMouseEnter={() => setShowTooltip(true)}
-              onMouseLeave={() => setShowTooltip(false)}
-              onClick={toggleTooltip}
-            >
-              <svg
-                className="w-4 h-4 text-mid-gray cursor-help hover:text-logo-primary transition-colors duration-200 select-none"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-label="More information"
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    toggleTooltip();
-                  }
-                }}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              {showTooltip && (
-                <Tooltip targetRef={tooltipRef} position={tooltipPosition}>
-                  <p className="text-sm text-center leading-relaxed">
-                    {description}
-                  </p>
-                </Tooltip>
-              )}
-            </div>
-          </div>
-        </div>
-        <div className="relative">{children}</div>
-      </div>
-    );
-  }
-
-  return (
-    <div className={horizontalContainerClasses}>
-      <div className="max-w-2/3">
-        <h3 className={`text-sm font-medium ${disabled ? "opacity-50" : ""}`}>
-          {title}
-        </h3>
-        <p className={`text-sm ${disabled ? "opacity-50" : ""}`}>
-          {description}
-        </p>
-      </div>
-      <div className="relative">{children}</div>
-    </div>
+    </SettingLabelContext.Provider>
   );
-};
+}

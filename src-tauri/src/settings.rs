@@ -394,7 +394,7 @@ pub struct AppSettings {
     #[serde(default = "default_show_whats_new_on_update")]
     pub show_whats_new_on_update: bool,
     /// The app version whose What's New the user has already seen. Fresh installs
-    /// default to the current version (nothing is "new" to them). Existing users
+    /// start empty so the newest useful introduction appears once. Existing users
     /// upgrading from before this key existed are blanked by the migration so they
     /// see the current release's notes — see `apply_settings_migrations`.
     #[serde(default = "default_whats_new_last_seen_version")]
@@ -555,7 +555,7 @@ fn default_show_whats_new_on_update() -> bool {
 }
 
 fn default_whats_new_last_seen_version() -> String {
-    env!("CARGO_PKG_VERSION").to_string()
+    String::new()
 }
 
 fn default_selected_language() -> String {
@@ -1111,8 +1111,7 @@ fn apply_settings_migrations(
         updated = true;
     }
 
-    // One-time What's New migration: migrations only run on an existing store
-    // (fresh installs stamp the current version via get_default_settings). A
+    // One-time What's New migration: migrations only run on an existing store. A
     // missing key here means a user upgrading from before it existed — blank it
     // so they see the current release's What's New, mirroring the onboarding
     // migration's explicit first-run-vs-upgrade decision.

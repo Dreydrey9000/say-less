@@ -50,6 +50,7 @@ const renderSettingsContent = (
 };
 
 function App() {
+  const [settingsOnly, setSettingsOnly] = useState(false);
   const { t, i18n } = useTranslation();
   const [onboardingStep, setOnboardingStep] = useState<OnboardingStep | null>(
     null,
@@ -93,9 +94,13 @@ function App() {
     initializeRTL(i18n.language);
   }, [i18n.language]);
 
-  // Initialize Enigo, shortcuts, and refresh audio devices when main app loads
+  // Initialize input automation only after permission setup completes.
   useEffect(() => {
-    if (onboardingStep === "done" && !hasCompletedPostOnboardingInit.current) {
+    if (
+      onboardingStep === "done" &&
+      !settingsOnly &&
+      !hasCompletedPostOnboardingInit.current
+    ) {
       hasCompletedPostOnboardingInit.current = true;
       Promise.all([
         commands.initializeEnigo(),
@@ -103,8 +108,14 @@ function App() {
       ]).catch((e) => {
         console.warn("Failed to initialize:", e);
       });
-      refreshAudioDevices();
-      refreshOutputDevices();
+    }
+  }, [onboardingStep, settingsOnly]);
+
+  // Device enumeration is read-only and also works while browsing settings.
+  useEffect(() => {
+    if (onboardingStep === "done") {
+      void refreshAudioDevices();
+      void refreshOutputDevices();
     }
   }, [onboardingStep, refreshAudioDevices, refreshOutputDevices]);
 
@@ -276,6 +287,7 @@ function App() {
   };
 
   const handleAccessibilityComplete = () => {
+    setSettingsOnly(false);
     // Returning users already have models, skip to main app
     // New users need to select a model
     setOnboardingStep(isReturningUser ? "done" : "model");
@@ -339,7 +351,13 @@ function App() {
     );
   } else if (onboardingStep === "accessibility") {
     content = (
-      <AccessibilityOnboarding onComplete={handleAccessibilityComplete} />
+      <AccessibilityOnboarding
+        onComplete={handleAccessibilityComplete}
+        onExplore={() => {
+          setSettingsOnly(true);
+          setOnboardingStep("done");
+        }}
+      />
     );
   } else if (onboardingStep === "model") {
     content = <Onboarding onModelSelected={handleModelSelected} />;
@@ -353,16 +371,32 @@ function App() {
           <WhatsNewGate />
         </ErrorBoundary>
         {/* Main content area that takes remaining space */}
-        <div className="flex-1 flex overflow-hidden">
+        <div className="app-workspace flex-1 flex overflow-hidden">
           <Sidebar
             activeSection={currentSection}
             onSectionChange={setCurrentSection}
           />
           {/* Scrollable content area */}
-          <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="settings-content flex-1 min-w-0 flex flex-col overflow-hidden">
             <div className="flex-1 overflow-y-auto">
               <div className="flex flex-col items-center p-4 gap-4">
-                <AccessibilityPermissions />
+                {settingsOnly ? (
+                  <div
+                    role="status"
+                    className="w-full max-w-3xl rounded-xl border border-mid-gray/30 p-3 text-sm flex flex-wrap items-center gap-3"
+                  >
+                    <p className="flex-1">{t("controls.setupNotice")}</p>
+                    <button
+                      type="button"
+                      className="brand-action rounded-lg px-3 py-2"
+                      onClick={() => setOnboardingStep("accessibility")}
+                    >
+                      {t("controls.finishSetup")}
+                    </button>
+                  </div>
+                ) : (
+                  <AccessibilityPermissions />
+                )}
                 <SecureInputWarning />
                 {renderSettingsContent(currentSection, setOnboardingPreview)}
               </div>

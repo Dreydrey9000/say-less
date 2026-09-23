@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useContext } from "react";
+import { SettingLabelContext } from "./SettingLabelContext";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   variant?: "default" | "compact";
@@ -10,6 +11,7 @@ export const Input: React.FC<InputProps> = ({
   disabled,
   ...props
 }) => {
+  const settingLabel = useContext(SettingLabelContext);
   const baseClasses =
     "px-2 py-1 text-sm font-semibold bg-mid-gray/10 border border-mid-gray/80 rounded-md text-start transition-all duration-150";
 
@@ -24,6 +26,7 @@ export const Input: React.FC<InputProps> = ({
 
   return (
     <input
+      aria-label={settingLabel || undefined}
       className={`${baseClasses} ${variantClasses[variant]} ${interactiveClasses} ${className}`}
       disabled={disabled}
       {...props}

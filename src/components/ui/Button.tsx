@@ -17,14 +17,14 @@ export const Button: React.FC<ButtonProps> = ({
   className = "",
   variant = "primary",
   size = "md",
+  type = "button",
   ...props
 }) => {
   const baseClasses =
-    "font-medium rounded-lg border focus:outline-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer";
+    "font-medium rounded-lg border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer";
 
   const variantClasses = {
-    primary:
-      "text-white bg-background-ui border-background-ui hover:bg-background-ui/80 hover:border-background-ui/80 focus:ring-1 focus:ring-background-ui",
+    primary: "brand-action",
     "primary-soft":
       "text-text bg-logo-primary/20 border-transparent hover:bg-logo-primary/30 focus:ring-1 focus:ring-logo-primary",
     secondary:
@@ -43,13 +43,14 @@ export const Button: React.FC<ButtonProps> = ({
   };
 
   const sizeClasses = {
-    sm: "px-2 py-1 text-xs",
-    md: "px-4 py-[5px] text-sm",
-    lg: "px-4 py-2 text-base",
+    sm: "px-3 py-1.5 text-xs min-h-8",
+    md: "px-4 py-2 text-sm min-h-10",
+    lg: "px-4 py-2 text-base min-h-11",
   };
 
   return (
     <button
+      type={type}
       className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
       {...props}
     >

@@ -15,10 +15,26 @@ import { ModelSettingsCard } from "./ModelSettingsCard";
 
 export const GeneralSettings: React.FC = () => {
   const { t } = useTranslation();
-  const { audioFeedbackEnabled } = useSettings();
+  const { audioFeedbackEnabled, settings } = useSettings();
   const isLinux = type() === "linux";
   return (
     <div className="max-w-3xl w-full mx-auto space-y-6">
+      <header className="space-y-2">
+        <p className="text-xs font-medium tracking-wide text-text/65">
+          {t("dictation.local")}
+        </p>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          {t("dictation.title")}
+        </h1>
+        <p className="text-sm text-text/75">{t("dictation.description")}</p>
+        <p className="text-xs text-text/65">
+          {t(
+            settings?.post_process_enabled
+              ? "dictation.optional"
+              : "dictation.private",
+          )}
+        </p>
+      </header>
       <SettingsGroup title={t("settings.general.title")}>
         <ShortcutInput shortcutId="transcribe" grouped={true} />
         <ShortcutActivationSetting descriptionMode="tooltip" grouped={true} />

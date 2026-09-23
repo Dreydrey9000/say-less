@@ -137,3 +137,69 @@
   opacity: 0.55;
   cursor: not-allowed;
 }
+
+.setting-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+.setting-row-stacked {
+  grid-template-columns: minmax(0, 1fr);
+}
+.settings-content {
+  container-type: inline-size;
+}
+@container (max-width: 440px) {
+  .setting-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.thinking-orb {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 25%,
+    #fff,
+    #a7b4c4 45%,
+    #46566a 80%
+  );
+}
+@media (prefers-reduced-motion: no-preference) {
+  .thinking-orb {
+    animation: thinking-breathe 1.6s ease-in-out infinite alternate;
+  }
+}
+@keyframes thinking-breathe {
+  to {
+    opacity: 0.55;
+    transform: scale(0.8);
+  }
+}
+@media (max-width: 540px) {
+  .app-sidebar {
+    width: 100%;
+    height: auto;
+    border-inline-end: 0;
+    border-bottom: 1px solid #80808033;
+    align-items: flex-start;
+  }
+  .app-sidebar > :first-child {
+    margin: 0.5rem;
+  }
+  .app-sidebar-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 0.5rem;
+  }
+  .app-sidebar-nav > button {
+    width: auto;
+    flex-shrink: 0;
+  }
+  .app-workspace {
+    flex-direction: column;
+  }
+}

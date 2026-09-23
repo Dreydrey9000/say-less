@@ -20,6 +20,7 @@ mod secure_input;
 mod settings;
 mod shortcut;
 mod signal_handle;
+mod snippets;
 mod transcription_coordinator;
 mod tray;
 mod tray_i18n;
@@ -648,6 +649,9 @@ pub fn run(cli_args: CliArgs) {
 
     let specta_builder = Builder::<tauri::Wry>::new()
         .commands(collect_commands![
+            snippets::list_voice_snippets,
+            snippets::save_voice_snippets,
+            snippets::preview_voice_snippets,
             shortcut::change_binding,
             shortcut::reset_binding,
             shortcut::change_shortcut_activation_setting,

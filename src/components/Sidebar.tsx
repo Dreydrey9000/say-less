@@ -8,8 +8,10 @@ import {
   Sparkles,
   Cpu,
   AudioLines,
+  BookOpen,
 } from "lucide-react";
 import SayLessLogo from "./icons/SayLessLogo";
+import { WritingSettings } from "./settings/WritingSettings";
 import { useSettings } from "../hooks/useSettings";
 import {
   GeneralSettings,
@@ -49,6 +51,12 @@ export const SECTIONS_CONFIG = {
     labelKey: "sidebar.history",
     icon: History,
     component: HistorySettings,
+    enabled: () => true,
+  },
+  writing: {
+    labelKey: "writing.title",
+    icon: BookOpen,
+    component: WritingSettings,
     enabled: () => true,
   },
   models: {
@@ -100,9 +108,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
     .map(([id, config]) => ({ id: id as SidebarSection, ...config }));
 
   return (
-    <div className="flex flex-col w-40 h-full border-e border-mid-gray/20 items-center px-2">
+    <nav
+      aria-label={t("controls.navigation")}
+      className="app-sidebar flex flex-col w-40 shrink-0 h-full border-e border-mid-gray/20 items-center px-2"
+    >
       <SayLessLogo width={120} className="m-4" />
-      <div className="flex flex-col w-full items-center gap-1 pt-2 border-t border-mid-gray/20">
+      <div className="app-sidebar-nav flex flex-col w-full items-center gap-1 pt-2 border-t border-mid-gray/20">
         {availableSections.map((section) => {
           const Icon = section.icon;
           const isActive = activeSection === section.id;
@@ -130,6 +141,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           );
         })}
       </div>
-    </div>
+    </nav>
   );
 };

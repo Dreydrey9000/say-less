@@ -4,6 +4,8 @@
 
 [Brand assets and coaching-portal usage](docs/brand.md)
 
+Open **Writing** for personal vocabulary, filler cleanup, and local voice snippets. Save a cue such as “my booking link,” then use the preview to check its exact expansion. [Wispr Flow capability comparison and remaining gaps](docs/wispr-comparison.md) · [UI verification standard](docs/UI-STANDARD.md).
+
 Free, offline push-to-talk dictation for Mac and Windows. Hold a key, talk, and your words get typed into whatever app you're in.
 
 - **Free.** No subscription, no account.

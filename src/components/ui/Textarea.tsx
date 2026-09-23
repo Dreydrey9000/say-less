@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useContext } from "react";
+import { SettingLabelContext } from "./SettingLabelContext";
 
 interface TextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -10,6 +11,7 @@ export const Textarea: React.FC<TextareaProps> = ({
   variant = "default",
   ...props
 }) => {
+  const settingLabel = useContext(SettingLabelContext);
   const baseClasses =
     "px-2 py-1 text-sm font-semibold bg-mid-gray/10 border border-mid-gray/80 rounded-md text-start transition-[background-color,border-color] duration-150 hover:bg-logo-primary/10 hover:border-logo-primary focus:outline-none focus:bg-logo-primary/10 focus:border-logo-primary resize-y";
 
@@ -20,6 +22,7 @@ export const Textarea: React.FC<TextareaProps> = ({
 
   return (
     <textarea
+      aria-label={settingLabel || undefined}
       className={`${baseClasses} ${variantClasses[variant]} ${className}`}
       {...props}
     />

@@ -5,6 +5,7 @@ import { useSettings } from "../../hooks/useSettings";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
 import { SettingContainer } from "../ui/SettingContainer";
+import { commands } from "@/bindings";
 
 interface CustomWordsProps {
   descriptionMode?: "inline" | "tooltip";
@@ -20,12 +21,29 @@ const normalizeCustomWord = (word: string) =>
 export const CustomWords: React.FC<CustomWordsProps> = React.memo(
   ({ descriptionMode = "tooltip", grouped = false }) => {
     const { t } = useTranslation();
-    const { getSetting, updateSetting, isUpdating } = useSettings();
+    const { getSetting, refreshSettings } = useSettings();
+    const [saving, setSaving] = useState(false);
     const [newWord, setNewWord] = useState("");
     const customWords = getSetting("custom_words") || [];
     const normalizedWord = normalizeCustomWord(newWord);
 
-    const handleAddWord = () => {
+    const persist = async (words: string[]) => {
+      setSaving(true);
+      try {
+        const result = await commands.updateCustomWords(words);
+        if (result.status === "error")
+          throw new Error("Could not save custom words");
+        await refreshSettings();
+        return true;
+      } catch {
+        toast.error(t("controls.saveFailed"));
+        return false;
+      } finally {
+        setSaving(false);
+      }
+    };
+
+    const handleAddWord = async () => {
       if (normalizedWord && normalizedWord.length <= 50) {
         if (customWords.includes(normalizedWord)) {
           toast.error(
@@ -35,16 +53,12 @@ export const CustomWords: React.FC<CustomWordsProps> = React.memo(
           );
           return;
         }
-        updateSetting("custom_words", [...customWords, normalizedWord]);
-        setNewWord("");
+        if (await persist([...customWords, normalizedWord])) setNewWord("");
       }
     };
 
     const handleRemoveWord = (wordToRemove: string) => {
-      updateSetting(
-        "custom_words",
-        customWords.filter((word) => word !== wordToRemove),
-      );
+      void persist(customWords.filter((word) => word !== wordToRemove));
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -71,15 +85,11 @@ export const CustomWords: React.FC<CustomWordsProps> = React.memo(
               onKeyDown={handleKeyPress}
               placeholder={t("settings.advanced.customWords.placeholder")}
               variant="compact"
-              disabled={isUpdating("custom_words")}
+              disabled={saving}
             />
             <Button
               onClick={handleAddWord}
-              disabled={
-                !normalizedWord ||
-                normalizedWord.length > 50 ||
-                isUpdating("custom_words")
-              }
+              disabled={!normalizedWord || normalizedWord.length > 50 || saving}
               variant="primary"
               size="md"
             >
@@ -95,7 +105,7 @@ export const CustomWords: React.FC<CustomWordsProps> = React.memo(
               <Button
                 key={word}
                 onClick={() => handleRemoveWord(word)}
-                disabled={isUpdating("custom_words")}
+                disabled={saving}
                 variant="secondary"
                 size="sm"
                 className="inline-flex items-center gap-1 cursor-pointer"
