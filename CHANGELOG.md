@@ -7,6 +7,7 @@
 - Our own auto-update signing key. Private key lives in GitHub secrets; the old Handy public key could never verify our updates.
 
 ### Fixed
+- Regenerated the updater signing key with a real password; the first key was created without one, which let anyone holding the file sign updates and made CI fail with a password mismatch.
 - macOS CI builds no longer fail when no Apple Developer ID certificate is uploaded; they build unsigned (ad-hoc) instead.
 - Tauri treated a blank APPLE_CERTIFICATE as a real one; macOS now builds through a separate unsigned step with no Apple variables until a cert is uploaded.
 

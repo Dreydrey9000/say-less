@@ -77,7 +77,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDNEODBGQTEyRTUzRkQ0RDkKUldUWjFEL2xFdnFBUFdQRzdwczNGMjh6UWJja0xUczROZk0xb2lJQUN3WWdTaVZWOFpZNW1xNHoK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDgxNEFFRDBDREJBN0YxNTIKUldSUzhhZmJETzFLZ2VBZFVBd3JqSTJzL1BxOGR0WlNGVGRwUVd2K0xwQ1hSd0RwZzY4dUcwR04K",
       "endpoints": [
         "https://github.com/Dreydrey9000/say-less/releases/latest/download/latest.json"
       ]
