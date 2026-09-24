@@ -1,0 +1,202 @@
+.insight-privacy {
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--studio-accent) 45%, transparent);
+  background: color-mix(in srgb, var(--studio-accent) 10%, transparent);
+}
+.insight-windows {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--color-mid-gray) 30%, transparent);
+}
+.insight-windows button {
+  min-height: 2.25rem;
+  padding: 0 0.9rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.insight-windows button:hover {
+  background: color-mix(in srgb, var(--color-mid-gray) 15%, transparent);
+}
+.insight-windows button[aria-pressed="true"] {
+  background: var(--studio-accent);
+  color: var(--studio-on-accent);
+  font-weight: 600;
+}
+.insight-windows button:focus-visible,
+.insight-topic summary:focus-visible,
+.insight-copy pre:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+}
+.insight-panel,
+.insight-fix-first,
+.insight-empty {
+  border: 1px solid color-mix(in srgb, var(--color-mid-gray) 25%, transparent);
+  border-radius: 1rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+}
+.insight-fix-first {
+  border-color: var(--studio-accent);
+  box-shadow: 0 0 0 1px var(--studio-accent) inset;
+}
+.insight-empty p {
+  font-size: 0.875rem;
+  opacity: 0.8;
+}
+.insight-panel-title {
+  font-weight: 600;
+}
+.insight-topic-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.insight-topic {
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--color-mid-gray) 8%, transparent);
+}
+.insight-topic summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  border-radius: 0.75rem;
+}
+.insight-topic summary:hover {
+  background: color-mix(in srgb, var(--color-mid-gray) 15%, transparent);
+}
+.insight-topic-label {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.insight-topic-label::first-letter {
+  text-transform: uppercase;
+}
+.insight-topic.is-highlight .insight-topic-label {
+  font-size: 1.15rem;
+}
+.insight-topic-count {
+  margin-inline-start: auto;
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+.insight-topic-body {
+  padding: 0 0.75rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.insight-topic-meta,
+.insight-fineprint {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+.insight-quotes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.insight-quotes li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+.insight-quotes time {
+  font-size: 0.72rem;
+  opacity: 0.7;
+}
+.insight-quotes blockquote,
+.insight-quotes p {
+  font-size: 0.875rem;
+  border-inline-start: 3px solid var(--studio-accent);
+  padding-inline-start: 0.6rem;
+  overflow-wrap: anywhere;
+}
+.insight-search-results {
+  max-height: 22rem;
+  overflow-y: auto;
+}
+.insight-digest-text {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+.insight-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.insight-error {
+  font-size: 0.85rem;
+  color: var(--color-error);
+}
+.insight-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.75rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.insight-check input {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--studio-accent);
+}
+.insight-folder {
+  font-size: 0.8rem;
+  min-width: 0;
+}
+.insight-folder code,
+.insight-copy pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.75rem;
+  overflow-wrap: anywhere;
+}
+.insight-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+.insight-copy-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+}
+.insight-copy pre {
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.6rem;
+  background: color-mix(in srgb, var(--color-mid-gray) 12%, transparent);
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+.insight-chevron {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+.insight-topic[open] .insight-chevron {
+  transform: rotate(180deg);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .insight-chevron {
+    transition: transform 150ms ease;
+  }
+}
