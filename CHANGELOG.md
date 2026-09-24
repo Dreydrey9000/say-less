@@ -1,5 +1,17 @@
 # Changelog
 
+## [2026-09-24]
+
+### Added
+- Download site in `site/` (live at say-less-dhi.pages.dev), with "coming soon" buttons until the first signed release exists.
+- Our own auto-update signing key. Private key lives in GitHub secrets; the old Handy public key could never verify our updates.
+
+### Fixed
+- macOS CI builds no longer fail when no Apple Developer ID certificate is uploaded; they build unsigned (ad-hoc) instead.
+
+### Changed
+- Release asset prefix renamed from `handy` to `say-less`.
+
 ## 0.10.1
 
 - Recover from stalled macOS permission setup with bounded waiting, focus rechecks, and explicit retry instructions.

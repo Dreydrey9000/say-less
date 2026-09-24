@@ -225,6 +225,8 @@ jobs:
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
         run: |
+          # ponytail: no Developer ID cert uploaded yet -> build unsigned instead of failing. Upload APPLE_CERTIFICATE to sign.
+          if [ -z "$APPLE_CERTIFICATE" ]; then echo "::warning::APPLE_CERTIFICATE not set; building unsigned macOS app"; exit 0; fi
           echo $APPLE_CERTIFICATE | base64 --decode > certificate.p12
           security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
           security default-keychain -s build.keychain
@@ -237,6 +239,7 @@ jobs:
       - name: verify certificate
         if: contains(inputs.platform, 'macos') && inputs.sign-binaries
         run: |
+          if ! security list-keychains | grep -q build.keychain; then echo "No signing keychain; skipping"; exit 0; fi
           CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep "Developer ID Application")
           CERT_ID=$(echo "$CERT_INFO" | awk -F'"' '{print $2}')
           echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
