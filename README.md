@@ -94,3 +94,9 @@ See [appearance, floating dock, voice actions, and Wispr import](docs/personaliz
 See [personalization](docs/personalization.md) and the [editable companion workflow](docs/diagrams/companion.mmd) for animations, screen-edge placement, hold/tap gestures, and formatting with spelling corrections.
 
 ![Companion and dictation workflow](docs/diagrams/companion.svg)
+
+### Voice visuals
+
+In **Appearance → Voice visuals**, switch the recording overlay between Bars (default), a Squiggle line, or a talking Avatar, and build the avatar (stick figure, person, cat or dog; colors; cap, beanie, crown, headphones or sunglasses). The mouth follows voice volume, not words. Pause and Reduce Motion hold it still. See [personalization](docs/personalization.md#voice-visuals) and the [editable voice visuals diagram](docs/diagrams/voice-visuals.mmd).
+
+![Voice visuals workflow](docs/diagrams/voice-visuals.svg)

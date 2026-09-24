@@ -1,5 +1,7 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import { useStudio } from "@/lib/studio";
+import { useMotionAllowed } from "@/hooks/useMotionAllowed";
+import { Avatar } from "./Avatar";
 import "./companion.css";
 
 export const formations = ["orbit", "helix", "wave", "emblem"] as const;
@@ -15,23 +17,8 @@ export function Companion({
   paused?: boolean;
 }) {
   const settings = useStudio((s) => s.settings);
-  const [visible, setVisible] = useState(!document.hidden);
-  const [reduced, setReduced] = useState(
-    matchMedia("(prefers-reduced-motion: reduce)").matches,
-  );
   const [cycle, setCycle] = useState(0);
-  useEffect(() => {
-    const media = matchMedia("(prefers-reduced-motion: reduce)");
-    const visibility = () => setVisible(!document.hidden);
-    const motion = () => setReduced(media.matches);
-    document.addEventListener("visibilitychange", visibility);
-    media.addEventListener("change", motion);
-    return () => {
-      document.removeEventListener("visibilitychange", visibility);
-      media.removeEventListener("change", motion);
-    };
-  }, []);
-  const moving = settings.dock_motion && visible && !reduced && !paused;
+  const moving = useMotionAllowed(paused);
   useEffect(() => {
     if (!moving || !settings.dock_cycle || formation) return;
     const timer = setInterval(
@@ -86,8 +73,16 @@ export function Companion({
           );
         })}
       </div>
-      {settings.dock_character === "buddy" ||
-      settings.dock_character === "both" ? (
+      {settings.dock_character === "avatar" ? (
+        <div className="companion-avatar">
+          <Avatar
+            avatar={settings.avatar}
+            level={active ? level : 0}
+            moving={moving}
+          />
+        </div>
+      ) : settings.dock_character === "buddy" ||
+        settings.dock_character === "both" ? (
         <svg
           className="companion-buddy"
           viewBox="0 0 100 100"

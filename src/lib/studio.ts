@@ -1,8 +1,30 @@
 import { create } from "zustand";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import type { StudioSettings } from "@/bindings";
-export type { StudioSettings, VoiceAction, WritingStyle } from "@/bindings";
+import type { AvatarSettings, StudioSettings } from "@/bindings";
+export type {
+  AvatarSettings,
+  StudioSettings,
+  VoiceAction,
+  WritingStyle,
+} from "@/bindings";
+export const defaultAvatar: AvatarSettings = {
+  kind: "person",
+  body: "#e2b48f",
+  accent: "#8796ab",
+  background: "#22262e",
+  accessory: "none",
+};
+export const avatarKinds = ["stick", "person", "cat", "dog"] as const;
+export const avatarAccessories = [
+  "none",
+  "cap",
+  "beanie",
+  "crown",
+  "headphones",
+  "sunglasses",
+] as const;
+export const overlayVisuals = ["bars", "squiggle", "avatar"] as const;
 export const defaultStudio: StudioSettings = {
   accent: "#b8ff65",
   floating: false,
@@ -19,19 +41,33 @@ export const defaultStudio: StudioSettings = {
   dock_character: "orb",
   learn_corrections: false,
   corrections: [],
+  overlay_visual: "bars",
+  avatar: defaultAvatar,
 };
-export function applyAccent(accent: string) {
-  if (!/^#[0-9a-f]{6}$/i.test(accent)) return;
+/** True when black text/ink reads better than white on this hex color. */
+export function prefersDarkInk(hex: string) {
   const channels = [1, 3, 5]
-    .map((i) => parseInt(accent.slice(i, i + 2), 16) / 255)
+    .map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
     .map((v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
   const luminance =
     channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+  return luminance > 0.179;
+}
+export function applyAccent(accent: string) {
+  if (!/^#[0-9a-f]{6}$/i.test(accent)) return;
   document.documentElement.style.setProperty("--studio-accent", accent);
   document.documentElement.style.setProperty(
     "--studio-on-accent",
-    luminance > 0.179 ? "#000000" : "#ffffff",
+    prefersDarkInk(accent) ? "#000000" : "#ffffff",
   );
+}
+/** Fill fields a payload may lack (older saves, older test fixtures). */
+function withDefaults(settings: StudioSettings): StudioSettings {
+  return {
+    ...defaultStudio,
+    ...settings,
+    avatar: { ...defaultAvatar, ...settings.avatar },
+  };
 }
 interface StudioStore {
   settings: StudioSettings;
@@ -48,7 +84,9 @@ export const useStudio = create<StudioStore>((set) => ({
   error: false,
   load: async () => {
     try {
-      const settings = await invoke<StudioSettings>("get_studio_settings");
+      const settings = withDefaults(
+        await invoke<StudioSettings>("get_studio_settings"),
+      );
       applyAccent(settings.accent);
       set({ settings, loaded: true, error: false });
     } catch {
@@ -73,7 +111,7 @@ export const useStudio = create<StudioStore>((set) => ({
 export async function startStudioSync() {
   const unlisten = await listen<StudioSettings>("studio-changed", (e) => {
     applyAccent(e.payload.accent);
-    useStudio.setState({ settings: e.payload, loaded: true });
+    useStudio.setState({ settings: withDefaults(e.payload), loaded: true });
   });
   await useStudio.getState().load();
   return unlisten;

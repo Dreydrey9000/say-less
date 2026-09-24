@@ -22,6 +22,14 @@ const defaultStudio = {
   dock_character: "emblem",
   learn_corrections: false,
   corrections: [],
+  overlay_visual: "bars",
+  avatar: {
+    kind: "person",
+    body: "#e2b48f",
+    accent: "#8796ab",
+    background: "#22262e",
+    accessory: "none",
+  },
 };
 let studio = JSON.parse(
   localStorage.getItem("test-studio") || JSON.stringify(defaultStudio),
@@ -90,7 +98,7 @@ const settings = {
 };
 let snippets = JSON.parse(localStorage.getItem("test-snippets") || "[]");
 mockWindows("main");
-mockIPC((cmd, payload) => {
+const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
   const calls = ((
     window as unknown as { testCommands: string[] }
   ).testCommands ??= []);
@@ -218,13 +226,19 @@ mockIPC((cmd, payload) => {
     return { entries: [], has_more: false };
   }
   return null;
-});
+};
+// The overlay listens for backend events; tests drive it with `testEmit`.
+mockIPC(ipc, { shouldMockEvents: query.has("overlay") });
 const { default: App } = await import("../../src/App");
 await import("../../src/i18n");
 const { applyTheme } = await import("../../src/lib/utils/theme");
 applyTheme(settings.theme as "dark" | "light");
 if (query.has("dock")) {
   await import("../../src/dock/main");
+} else if (query.has("overlay")) {
+  const { emit } = await import("@tauri-apps/api/event");
+  Object.assign(window, { testEmit: emit });
+  await import("../../src/overlay/main");
 } else {
   ReactDOM.createRoot(document.getElementById("root")!).render(<App />);
 }

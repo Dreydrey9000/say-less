@@ -10,6 +10,10 @@ import type {
   StreamWorkKind,
 } from "@/bindings";
 import i18n, { syncLanguageFromSettings } from "@/i18n";
+import { useStudio } from "@/lib/studio";
+import { useMotionAllowed } from "@/hooks/useMotionAllowed";
+import { VoiceSquiggle } from "@/components/companion/VoiceSquiggle";
+import { Avatar } from "@/components/companion/Avatar";
 import { getLanguageDirection } from "@/lib/utils/rtl";
 
 type OverlayState = "recording" | "streaming" | "transcribing" | "processing";
@@ -51,6 +55,9 @@ const RecordingOverlay: React.FC = () => {
   const capRef = useRef<HTMLDivElement>(null);
   const pinnedRef = useRef(true);
   const direction = getLanguageDirection(i18n.language);
+  const overlayVisual = useStudio((s) => s.settings.overlay_visual);
+  const avatar = useStudio((s) => s.settings.avatar);
+  const moving = useMotionAllowed();
 
   useEffect(() => {
     const setupEventListeners = async () => {
@@ -170,18 +177,30 @@ const RecordingOverlay: React.FC = () => {
     `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 
   // ---- Shared building blocks (one visual language for every overlay form) ----
-  const waveform = (
-    <div className={`swave ${captureReady ? "ready" : "arming"}`}>
-      {levels.map((v, i) => (
-        <i
-          key={i}
-          style={{
-            height: `${Math.max(3, Math.min(18, 3 + Math.pow(v, 0.7) * 15))}px`,
-          }}
+  // Voice visual chosen in Appearance: bars (default), squiggle, or avatar.
+  const waveform =
+    overlayVisual === "squiggle" ? (
+      <VoiceSquiggle levels={levels} ready={captureReady} moving={moving} />
+    ) : overlayVisual === "avatar" ? (
+      <span className="savatar">
+        <Avatar
+          avatar={avatar}
+          level={captureReady ? Math.max(0, ...levels) : 0}
+          moving={moving}
         />
-      ))}
-    </div>
-  );
+      </span>
+    ) : (
+      <div className={`swave ${captureReady ? "ready" : "arming"}`}>
+        {levels.map((v, i) => (
+          <i
+            key={i}
+            style={{
+              height: `${Math.max(3, Math.min(18, 3 + Math.pow(v, 0.7) * 15))}px`,
+            }}
+          />
+        ))}
+      </div>
+    );
 
   const cancelBtn = (
     <button

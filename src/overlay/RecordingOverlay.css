@@ -375,6 +375,28 @@
     background-color 180ms ease,
     opacity 180ms ease;
 }
+/* Squiggle and avatar take the same center slot as the bars, so the pill keeps
+   its size whichever voice visual is chosen. */
+.ssquiggle {
+  display: block;
+  flex: none;
+  margin-right: 8px;
+  color: var(--s-accent);
+  transition:
+    color 180ms ease,
+    opacity 180ms ease;
+}
+.ssquiggle.arming {
+  color: var(--s-muted);
+  opacity: 0.45;
+}
+.savatar {
+  display: block;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  margin-right: 8px;
+}
 .swave.arming i {
   height: 6px !important;
   background: var(--s-muted);

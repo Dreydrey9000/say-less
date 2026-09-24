@@ -1111,6 +1111,10 @@ export type AppStyle = { app: string; style: WritingStyle }
 export type AudioDevice = { index: string; name: string; is_default: boolean }
 export type AutoSubmitKey = "enter" | "ctrl_enter" | "cmd_enter"
 export type AvailableAccelerators = { transcribe: string[]; ort: string[]; gpu_devices: GpuDeviceOption[] }
+/**
+ * Flat SVG avatar used by the companion and the recording overlay.
+ */
+export type AvatarSettings = { kind: string; body: string; accent: string; background: string; accessory: string }
 export type BindingResponse = { success: boolean; binding: ShortcutBinding | null; error: string | null }
 export type ClipboardHandling = "dont_modify" | "copy_to_clipboard"
 export type CustomSounds = { start: boolean; stop: boolean }
@@ -1270,7 +1274,7 @@ export type StreamTextEvent = { committed: string; tentative: string }
  * Semantic kind of "working" phase, used to localize the spinner label.
  */
 export type StreamWorkKind = "transcribing" | "polishing"
-export type StudioSettings = { accent: string; floating: boolean; actions_enabled: boolean; actions: VoiceAction[]; default_style: WritingStyle; app_styles: AppStyle[]; cleanup_on_dictation: boolean; dock_animation: string; dock_motion: boolean; dock_cycle: boolean; dock_edge: string; dock_compact: boolean; dock_character: string; learn_corrections: boolean; corrections: VoiceSnippet[] }
+export type StudioSettings = { accent: string; floating: boolean; actions_enabled: boolean; actions: VoiceAction[]; default_style: WritingStyle; app_styles: AppStyle[]; cleanup_on_dictation: boolean; dock_animation: string; dock_motion: boolean; dock_cycle: boolean; dock_edge: string; dock_compact: boolean; dock_character: string; learn_corrections: boolean; corrections: VoiceSnippet[]; overlay_visual: string; avatar: AvatarSettings }
 /**
  * UI appearance mode. `System` follows the OS `prefers-color-scheme`; `Light`
  * and `Dark` force one of the two palettes Handy already ships.

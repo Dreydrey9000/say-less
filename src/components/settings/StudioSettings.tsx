@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useStudio, type WritingStyle } from "@/lib/studio";
 import { CompanionSettings } from "./CompanionSettings";
+import { VoiceVisualSettings } from "./VoiceVisualSettings";
 import { WordCorrections } from "./WordCorrections";
 import { ThemeSelector } from "./ThemeSelector";
 import { Button } from "../ui/Button";
@@ -98,6 +99,7 @@ export function StudioSettings() {
         </div>
         <ThemeSelector descriptionMode="inline" />
         <CompanionSettings />
+        <VoiceVisualSettings />
         <div className="studio-dock-setting">
           <div>
             <h2 className="font-semibold">{t("studio.floating")}</h2>
