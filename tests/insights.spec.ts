@@ -13,7 +13,7 @@ test("insights shows the top problem, its quotes, and stays local by default", a
   const fixFirst = page.getByRole("region", { name: "Fix this first" });
   await expect(fixFirst).toContainText("video export audio");
   await expect(fixFirst).toContainText("mentioned 27 times");
-  await fixFirst.getByText("video export audio").click();
+  await fixFirst.getByText("video export audio", { exact: true }).click();
   await expect(fixFirst).toContainText(
     "The video export audio is broken again",
   );
