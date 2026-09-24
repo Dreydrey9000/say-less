@@ -26,8 +26,9 @@ echo "Step 3 of 4: notarization login (Apple scans the app so Macs trust it)"
 echo "  Make an app-specific password at https://account.apple.com > Sign-In and Security > App-Specific Passwords."
 read -r -p "Apple ID email: " APPLE_ID
 read -r -s -p "App-specific password: " APPLE_APP_PW; echo
-echo "  Team ID is the 10-character code at https://developer.apple.com/account (Membership details)."
-read -r -p "Team ID: " TEAM_ID
+echo "  Team ID is the 10-character code in your certificate name (Developer ID Application: NAME (TEAMID))."
+read -r -p "Team ID [NBPGY9GJFW]: " TEAM_ID
+TEAM_ID=${TEAM_ID:-NBPGY9GJFW}
 
 echo
 echo "Step 4 of 4: uploading to GitHub secrets for $REPO"
