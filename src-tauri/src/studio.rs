@@ -24,6 +24,31 @@ pub struct VoiceAction {
     pub kind: String,
     pub target: String,
 }
+/// Flat SVG avatar used by the companion and the recording overlay.
+#[derive(Clone, Debug, Serialize, Deserialize, Type, PartialEq)]
+#[serde(default)]
+pub struct AvatarSettings {
+    pub kind: String,
+    pub body: String,
+    pub accent: String,
+    pub background: String,
+    pub accessory: String,
+}
+impl Default for AvatarSettings {
+    fn default() -> Self {
+        Self {
+            kind: "person".into(),
+            body: "#e2b48f".into(),
+            accent: "#8796ab".into(),
+            background: "#22262e".into(),
+            accessory: "none".into(),
+        }
+    }
+}
+const AVATAR_KINDS: [&str; 4] = ["stick", "person", "cat", "dog"];
+const AVATAR_ACCESSORIES: [&str; 6] =
+    ["none", "cap", "beanie", "crown", "headphones", "sunglasses"];
+const OVERLAY_VISUALS: [&str; 3] = ["bars", "squiggle", "avatar"];
 #[derive(Clone, Debug, Serialize, Deserialize, Type)]
 #[serde(default)]
 pub struct StudioSettings {
@@ -42,6 +67,8 @@ pub struct StudioSettings {
     pub dock_character: String,
     pub learn_corrections: bool,
     pub corrections: Vec<crate::snippets::VoiceSnippet>,
+    pub overlay_visual: String,
+    pub avatar: AvatarSettings,
 }
 impl Default for StudioSettings {
     fn default() -> Self {
@@ -61,6 +88,8 @@ impl Default for StudioSettings {
             dock_character: "orb".into(),
             learn_corrections: false,
             corrections: vec![],
+            overlay_visual: "bars".into(),
+            avatar: AvatarSettings::default(),
         }
     }
 }
@@ -71,19 +100,34 @@ pub fn cue_key(text: &str) -> String {
         .collect::<Vec<_>>()
         .join(" ")
 }
+fn is_hex_color(value: &str) -> bool {
+    value.len() == 7 && value.starts_with('#') && value[1..].bytes().all(|b| b.is_ascii_hexdigit())
+}
 fn validate(settings: &StudioSettings) -> Result<(), String> {
-    if settings.accent.len() != 7
-        || !settings.accent.starts_with('#')
-        || !settings.accent[1..].bytes().all(|b| b.is_ascii_hexdigit())
+    let avatar = &settings.avatar;
+    if ![
+        &settings.accent,
+        &avatar.body,
+        &avatar.accent,
+        &avatar.background,
+    ]
+    .iter()
+    .all(|c| is_hex_color(c))
     {
         return Err("invalid_color".into());
+    }
+    if !AVATAR_KINDS.contains(&avatar.kind.as_str())
+        || !AVATAR_ACCESSORIES.contains(&avatar.accessory.as_str())
+        || !OVERLAY_VISUALS.contains(&settings.overlay_visual.as_str())
+    {
+        return Err("invalid_avatar".into());
     }
     if settings.actions.len() > 100 || settings.app_styles.len() > 100 {
         return Err("too_many".into());
     }
     if !["orbit", "helix", "wave", "emblem"].contains(&settings.dock_animation.as_str())
         || !["free", "left", "right"].contains(&settings.dock_edge.as_str())
-        || !["emblem", "orb", "buddy", "both"].contains(&settings.dock_character.as_str())
+        || !["emblem", "orb", "buddy", "both", "avatar"].contains(&settings.dock_character.as_str())
     {
         return Err("invalid_dock".into());
     }
@@ -382,6 +426,55 @@ mod tests {
             2
         ];
         assert!(validate(&s).is_err());
+    }
+    #[test]
+    fn voice_visuals_default_to_bars_and_load_from_old_settings() {
+        let old: StudioSettings = serde_json::from_value(serde_json::json!({
+            "accent": "#c7cdd5",
+            "dock_character": "buddy"
+        }))
+        .unwrap();
+        assert_eq!(old.overlay_visual, "bars");
+        assert_eq!(old.avatar, AvatarSettings::default());
+        assert_eq!(old.dock_character, "buddy");
+        assert!(validate(&old).is_ok());
+        let partial: StudioSettings =
+            serde_json::from_value(serde_json::json!({ "avatar": { "kind": "cat" } })).unwrap();
+        assert_eq!(partial.avatar.kind, "cat");
+        assert_eq!(partial.avatar.accessory, "none");
+    }
+    #[test]
+    fn avatar_choices_are_validated() {
+        let s = StudioSettings {
+            dock_character: "avatar".into(),
+            overlay_visual: "squiggle".into(),
+            avatar: AvatarSettings {
+                kind: "dog".into(),
+                accessory: "headphones".into(),
+                ..AvatarSettings::default()
+            },
+            ..StudioSettings::default()
+        };
+        assert!(validate(&s).is_ok());
+        for bad in [
+            ("kind", "dragon"),
+            ("accessory", "<script>"),
+            ("overlay", "webgl"),
+            ("body", "red"),
+            ("background", "#12345"),
+            ("accent", "url(x)"),
+        ] {
+            let mut s = StudioSettings::default();
+            match bad.0 {
+                "kind" => s.avatar.kind = bad.1.into(),
+                "accessory" => s.avatar.accessory = bad.1.into(),
+                "overlay" => s.overlay_visual = bad.1.into(),
+                "body" => s.avatar.body = bad.1.into(),
+                "background" => s.avatar.background = bad.1.into(),
+                _ => s.avatar.accent = bad.1.into(),
+            }
+            assert!(validate(&s).is_err(), "{bad:?} should be rejected");
+        }
     }
     #[test]
     fn styles_are_deterministic() {
