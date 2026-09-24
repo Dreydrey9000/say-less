@@ -8,9 +8,11 @@
 
 ### Fixed
 - macOS CI builds no longer fail when no Apple Developer ID certificate is uploaded; they build unsigned (ad-hoc) instead.
+- Tauri treated a blank APPLE_CERTIFICATE as a real one; macOS now builds through a separate unsigned step with no Apple variables until a cert is uploaded.
 
 ### Changed
 - Release asset prefix renamed from `handy` to `say-less`.
+- `scripts/setup-apple-signing.sh` walks through uploading the Developer ID certificate and notarization login to GitHub secrets.
 
 ## 0.10.1
 
