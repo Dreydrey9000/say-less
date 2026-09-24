@@ -4,6 +4,12 @@
 
 ### Added
 
+- Voice visuals: choose Bars, Squiggle, or Avatar for the recording overlay in Appearance, so the overlay can match your style; Bars stays the default so nothing changes until you pick.
+- Talking avatar (stick figure, person, cat, dog; three colors; cap, beanie, crown, headphones, sunglasses) whose mouth follows voice volume, usable as the dock companion and the overlay; volume-driven because real lip-sync needs a second live model.
+- Avatar builder with a live preview and a Test button that plays a short speaking rhythm, so you can check the look without recording.
+- `overlay_visual` and `avatar` settings in `studio.json`, validated in Rust (known styles/accessories, hex colors only) so a bad value can't reach the SVG.
+- Playwright coverage for the builder, reduced motion, overlay squiggle/avatar, and the 104px compact dock; the test fixture can now render the recording overlay with mocked events.
+- Voice visuals diagram (`docs/diagrams/voice-visuals.mmd` + `.svg`) and a Voice visuals section in `docs/personalization.md`.
 - Download site in `site/` (live at say-less-dhi.pages.dev), with "coming soon" buttons until the first signed release exists.
 - Our own auto-update signing key. Private key lives in GitHub secrets; the old Handy public key could never verify our updates.
 
@@ -28,6 +34,7 @@
 - Site: live on saylessvoice.com; replaced unverified claims (8GB auto-model picking, Windows availability) with accurate copy; FAQ says models download once from Handy's model server.
 - Release asset prefix renamed from `handy` to `say-less`.
 - `scripts/setup-apple-signing.sh` walks through uploading the Developer ID certificate and notarization login to GitHub secrets.
+- Companion motion checks (Pause, Reduce Motion, hidden window) moved into a shared `useMotionAllowed` hook so the dock, overlay, and Appearance preview all stop decorative motion the same way.
 
 ## 0.10.1
 

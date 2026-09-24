@@ -105,8 +105,15 @@
   height: 70%;
   filter: drop-shadow(0 4px 4px #0004);
 }
-.character-buddy .particle-world {
+.character-buddy .particle-world,
+.character-avatar .particle-world {
   display: none;
+}
+/* Nearly edge to edge so the face still reads in the 104px compact dock. */
+.companion-avatar {
+  position: absolute;
+  inset: 9%;
+  filter: drop-shadow(0 4px 6px #0005);
 }
 .companion-orb {
   position: absolute;

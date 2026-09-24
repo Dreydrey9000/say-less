@@ -8,9 +8,24 @@ Show dock creates a separate always-on-top window. On macOS it is a nonactivatin
 
 Choose Orbit, Helix, Wave, or Chrome S, click the companion in the dock to switch, or cycle every 20 seconds. Pause is available in Home, Appearance and the dock. Reduced Motion and hidden windows stop decorative animation. The 48 CSS particles use no camera, remote code, or WebGL. These original formations were inspired by [Casberry Particles](https://particles.casberry.in/); custom animation imports are not implemented.
 
-**Companion style** selects an orb, emblem, animated character, or character with particles. The expanded dock has a **Collapse to companion** button; the small companion expands on click, without starting a recording. Your keyboard shortcut works in either size. Compact mode retains a Stop button during recording and a status indicator during processing. Appearance can expand or collapse it too. The compact window is 104×104 logical pixels; expanded controls use 360×112.
+**Companion style** selects an orb, emblem, animated character, character with particles, or talking avatar (see Voice visuals). The expanded dock has a **Collapse to companion** button; the small companion expands on click, without starting a recording. Your keyboard shortcut works in either size. Compact mode retains a Stop button during recording and a status indicator during processing. Appearance can expand or collapse it too. The compact window is 104×104 logical pixels; expanded controls use 360×112.
 
 Home shows the configured shortcut, opens the dock, and displays the latest three local history entries with Copy controls. In General, Auto (hold or toggle) supports hold/release, single-tap hands-free, and double-tap within 400 ms to lock hands-free recording. Press again to finish. The floating Record button toggles recording.
+
+## Voice visuals
+
+Open **Appearance → Voice visuals**.
+
+- **Recording overlay style** picks what moves in the recording pill: **Bars** (the default, unchanged for existing users), **Squiggle** (a smooth wavy line that grows with your voice and bends with the level buckets), or **Avatar** (your avatar's face).
+- **Build your avatar** picks a style (stick figure, person, cat, or dog), three colors (body or skin, accent, background), and an accessory (none, cap, beanie, crown, headphones, or sunglasses). Eyes and mouth switch between dark and light ink automatically so they stay visible on light or dark skin/fur colors. Changes save about a third of a second after you stop adjusting.
+- **Test the voice** plays a short made-up speaking rhythm so you can watch the mouth move. While you are recording, the preview follows your real voice.
+- To put the avatar in the floating dock, set **Companion style → Talking avatar**. It is sized to read in the 104×104 compact dock.
+
+The mouth follows how loud you are, not the words. It opens quickly on a syllable, closes more slowly, ignores very quiet room noise, and rests with a closed smile and an occasional blink. True word-level lip-sync would need a second live model and is not implemented.
+
+**Pause animations**, the system **Reduce Motion** setting, and hidden windows stop the squiggle and the avatar in a still pose (closed mouth, fixed curve). Choose Bars if you want live level feedback while motion is off. Level events come from the recording overlay, so if the overlay is turned off in General, the dock avatar also holds still. Everything is flat SVG and CSS: no WebGL, camera, or remote code. Settings live in the local `studio.json` as `overlay_visual` and `avatar`, and the app rejects unknown styles, accessories, and non-hex colors.
+
+[Voice visuals diagram](diagrams/voice-visuals.mmd) ([rendered](diagrams/voice-visuals.svg))
 
 ## Voice actions
 

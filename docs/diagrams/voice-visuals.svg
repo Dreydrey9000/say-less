@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="560" viewBox="0 0 820 560" role="img" aria-label="Say Less voice visuals: how the mic level reaches the overlay, dock and avatar">
+  <rect width="820" height="560" fill="#111317"/>
+  <g font-family="system-ui,sans-serif">
+    <text x="40" y="40" fill="#b8ff65" font-size="24">Say Less · voice visuals (v0.13)</text>
+    <rect x="40" y="62" width="740" height="64" rx="10" fill="#20242a" stroke="#626c78"/>
+    <text x="60" y="88" fill="white" font-size="18">Microphone → overlay::emit_levels</text>
+    <text x="60" y="112" fill="#d3d7df" font-size="14">16 level buckets, up to 30 per second, sent as the mic-level event only while the overlay is enabled</text>
+    <path d="M160 126V160M410 126V160M660 126V160" stroke="#8796ab" stroke-width="2"/>
+    <rect x="40" y="160" width="240" height="92" rx="10" fill="#20242a" stroke="#626c78"/>
+    <text x="56" y="186" fill="white" font-size="17">Recording overlay</text>
+    <text x="56" y="210" fill="#d3d7df" font-size="14">Bars (default)</text>
+    <text x="56" y="230" fill="#d3d7df" font-size="14">Squiggle · Avatar</text>
+    <rect x="290" y="160" width="240" height="92" rx="10" fill="#20242a" stroke="#626c78"/>
+    <text x="306" y="186" fill="white" font-size="17">Floating dock companion</text>
+    <text x="306" y="210" fill="#d3d7df" font-size="14">Loudest bucket drives scale</text>
+    <text x="306" y="230" fill="#d3d7df" font-size="14">or the Talking avatar mouth</text>
+    <rect x="540" y="160" width="240" height="92" rx="10" fill="#20242a" stroke="#626c78"/>
+    <text x="556" y="186" fill="white" font-size="17">Appearance preview</text>
+    <text x="556" y="210" fill="#d3d7df" font-size="14">Live while recording,</text>
+    <text x="556" y="230" fill="#d3d7df" font-size="14">or the Test button's rhythm</text>
+    <path d="M160 252V290M410 252V290M660 252V290" stroke="#8796ab" stroke-width="2"/>
+    <rect x="40" y="290" width="740" height="84" rx="10" fill="#20242a" stroke="#b8ff65"/>
+    <text x="60" y="318" fill="white" font-size="18">Flat SVG, no WebGL</text>
+    <text x="60" y="342" fill="#d3d7df" font-size="14">Squiggle: path redrawn each animation frame. Avatar: mouth follows volume (fast open, slow close),</text>
+    <text x="60" y="362" fill="#d3d7df" font-size="14">closed-mouth idle, CSS blink. Stick figure, person, cat, dog + 5 accessories.</text>
+    <rect x="40" y="394" width="360" height="76" rx="10" fill="#20242a" stroke="#626c78"/>
+    <text x="56" y="420" fill="white" font-size="17">Appearance → studio.json</text>
+    <text x="56" y="444" fill="#d3d7df" font-size="14">overlay_visual + avatar (validated in Rust)</text>
+    <text x="56" y="462" fill="#d3d7df" font-size="14">studio-changed updates overlay and dock</text>
+    <rect x="420" y="394" width="360" height="76" rx="10" fill="#20242a" stroke="#ffb86b"/>
+    <text x="436" y="420" fill="white" font-size="17">Motion guard</text>
+    <text x="436" y="444" fill="#d3d7df" font-size="14">Pause / Reduce Motion / hidden window</text>
+    <text x="436" y="462" fill="#d3d7df" font-size="14">→ static pose (closed mouth, fixed curve)</text>
+    <text x="40" y="510" fill="#9aa3ae" font-size="13">Not implemented: word-level lip-sync (needs a second live model), custom avatar uploads.</text>
+    <text x="40" y="530" fill="#9aa3ae" font-size="13">If the overlay is turned off, no mic-level events are sent, so the dock avatar holds still too.</text>
+  </g>
+</svg>
