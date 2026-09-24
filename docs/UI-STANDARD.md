@@ -1,6 +1,6 @@
 # Say Less interface checks
 
-Inherits `/Users/andrethomas/.claude/UI-STANDARD.md`. Keep the silver emblem and controls, semantic light/dark colors, native form semantics, visible focus, readable labels, and reduced-motion support.
+Keep the silver emblem and controls, semantic light/dark colors, native form semantics, visible focus, readable labels, and reduced-motion support.
 
 Run `bun run build`, `bun run lint`, `bun run check:translations`, `bun run test:playwright`, and formatting checks for interface changes. The existing Playwright workflow runs these UI tests on relevant pull requests. `tests/writing.spec.ts` is the minimum regression baseline for the new Writing page and shared controls; do not weaken it to admit new regressions.
 

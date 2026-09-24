@@ -45,3 +45,15 @@ result
 
 # Python bytecode (scripts/)
 __pycache__/
+
+# Secrets and signing material (never commit)
+.env
+.env.*
+*.p12
+*.p8
+*.pem
+*.key
+certificate.p12
+
+# Cloudflare wrangler local state
+.wrangler/

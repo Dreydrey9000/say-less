@@ -2,7 +2,7 @@
 name = "handy"
 version = "0.12.0"
 description = "Say Less local voice dictation"
-authors = ["cjpais"]
+authors = ["Drey Thomas"]
 edition = "2021"
 license = "MIT"
 default-run = "handy"

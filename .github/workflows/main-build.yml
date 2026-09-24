@@ -48,5 +48,6 @@ jobs:
       target: ${{ matrix.target }}
       build-args: ${{ matrix.args }}
       upload-artifacts: true
+      asset-prefix: "say-less"
       sign-binaries: true
     secrets: inherit

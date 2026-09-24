@@ -43,12 +43,12 @@ jobs:
       platform: ${{ matrix.platform }}
       target: ${{ matrix.target }}
       build-args: ${{ matrix.args }}
-      sign-binaries: true
-      asset-prefix: "handy-pr-${{ inputs.pr_number }}"
+      # Never sign PR code: it runs with whatever secrets it is given.
+      sign-binaries: false
+      asset-prefix: "say-less-pr-${{ inputs.pr_number }}"
       upload-artifacts: true
       is-debug-build: ${{ contains(matrix.args, '--debug') }}
       ref: ${{ format('refs/pull/{0}/merge', inputs.pr_number) }}
-    secrets: inherit
 
   comment-on-pr:
     needs: build-test

@@ -11,7 +11,17 @@
 - macOS CI builds no longer fail when no Apple Developer ID certificate is uploaded; they build unsigned (ad-hoc) instead.
 - Tauri treated a blank APPLE_CERTIFICATE as a real one; macOS now builds through a separate unsigned step with no Apple variables until a cert is uploaded.
 
+### Security
+- PR Test Build and Build Test no longer receive signing secrets; only main and release builds sign.
+- `.gitignore` now blocks `.env*`, certificates/keys, and wrangler state.
+- Added `SECURITY.md` with a private reporting link.
+- Removed a local home-folder path and personal dictionary/library details from docs before the repo went public.
+
 ### Changed
+- Release builds are Mac + Windows only; Linux packages still carried Handy's install path and maintainer.
+- Installers now include the MIT license file (required by Handy's license) and list Drey Thomas as publisher.
+- Issue/PR templates and CONTRIBUTING point at Say Less instead of Handy; removed Handy's donation links (FUNDING.yml).
+- Site: live on saylessvoice.com; replaced unverified claims (8GB auto-model picking, Windows availability) with accurate copy; FAQ says models download once from Handy's model server.
 - Release asset prefix renamed from `handy` to `say-less`.
 - `scripts/setup-apple-signing.sh` walks through uploading the Developer ID certificate and notarization login to GitHub secrets.
 

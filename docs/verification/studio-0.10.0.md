@@ -15,7 +15,7 @@ Verified locally September 22, 2026 (America/New_York) on the M3 Pro Mac.
 - The dock initially showed a blank native panel. Routing show/resize through the same Tauri path as the recording overlay, and disabling hide-on-deactivate, fixed it. The installed dock then displayed the emblem, blue Record button, settings gear, close button, grip, and idle status.
 - Hiding the main window left the dock available. Its gear opened the main settings window successfully. Dock visibility and color survived app restart.
 - A saved `open notes` action targeting `/System/Applications/Notes.app` reported success, and Notes was independently confirmed running. No note contents were inspected. Voice activation itself still awaits microphone-to-action acceptance.
-- The real read-only Wispr preview reported 37 words, 5 snippets/corrections, zero skips, and 8,900 history records at the time of the check. Source counts can change while Wispr is used. No personal library or history migration was applied during this test.
+- The read-only Wispr preview parsed a real library's words, snippets, and history with zero skips. No personal library or history migration was applied during this test.
 - macOS System Settings displayed both Say Less permission switches on. The old running app recognized the microphone grant but returned false for Accessibility. The development-signed replacement still recognized the microphone grant after restart; Accessibility remained unresolved. No security permissions were changed by the agent.
 
 ## Remaining acceptance and limitations
