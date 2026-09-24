@@ -61,6 +61,25 @@ bun run tauri dev      # run locally
 bun run tauri build    # make an installer for this OS
 ```
 
+## Website and releases
+
+```mermaid
+flowchart LR
+  A[Push to main] --> B[Main Branch Build<br/>7 platforms, test artifacts]
+  C[Run Release workflow<br/>manual] --> D[Draft GitHub release<br/>Mac + Windows installers<br/>+ latest.json]
+  D -->|you click Publish| E[Public release]
+  E --> F[saylessvoice.com<br/>download buttons]
+  E --> G[Installed apps<br/>auto-update via latest.json]
+  K[(GitHub secrets<br/>updater key, Apple cert)] -.signs.-> B
+  K -.signs.-> D
+```
+
+[Editable diagram](docs/diagrams/release.mmd)
+
+- **Website** lives in `site/` (one HTML file) and is hosted on Cloudflare Pages project `say-less` at [saylessvoice.com](https://saylessvoice.com). Deploy with `cd site && npx wrangler pages deploy . --project-name say-less --branch main`. When a release is published, set the installer links in the `DOWNLOADS` object at the bottom of `site/index.html`.
+- **Releases:** GitHub > Actions > Release > Run workflow. It builds a draft release named after the version in `src-tauri/tauri.conf.json`. Test the installers, then click Publish.
+- **Secrets** (GitHub > Settings > Secrets): `TAURI_SIGNING_PRIVATE_KEY` and `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` sign auto-updates. If they are lost, installed copies can never update again, so keep a backup in the password vault. Apple signing secrets are uploaded with `scripts/setup-apple-signing.sh`. Only `main` and Release builds receive secrets; pull-request builds never do.
+
 ## Credits
 
 Say Less is a rebranded fork of [Handy](https://github.com/cjpais/Handy) by CJ Pais, used under the MIT License (see `LICENSE`). Upstream docs: `UPSTREAM-HANDY-README.md`.

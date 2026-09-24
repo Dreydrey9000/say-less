@@ -1,0 +1,8 @@
+flowchart LR
+  A[Push to main] --> B[Main Branch Build<br/>7 platforms, test artifacts]
+  C[Run Release workflow<br/>manual] --> D[Draft GitHub release<br/>Mac + Windows installers<br/>+ latest.json]
+  D -->|you click Publish| E[Public release]
+  E --> F[saylessvoice.com<br/>download buttons]
+  E --> G[Installed apps<br/>auto-update via latest.json]
+  K[(GitHub secrets<br/>updater key, Apple cert)] -.signs.-> B
+  K -.signs.-> D
