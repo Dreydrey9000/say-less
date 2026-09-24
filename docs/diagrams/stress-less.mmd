@@ -1,0 +1,14 @@
+%% Say less, stress less: how local dictation history becomes insights.
+%% Everything inside "This computer" stays local. Dashed arrows are opt-in.
+flowchart LR
+    subgraph Local["This computer (default: nothing leaves)"]
+        Dictate[Dictation] --> DB[(history.db<br/>transcription_history)]
+        DB -->|read-only| Engine[Insights engine<br/>keywords + cue words<br/>no model]
+        Engine --> Screen[Insights screen<br/>Fix this first / problems / ideas / search]
+        Screen --> Voice[Read digest aloud<br/>system voices]
+        Engine -.->|opt-in: nightly or Export now| Notes[Markdown notes folder<br/>Daily/YYYY-MM-DD.md + Insights.md]
+        DB -.->|read-only, opt-in: handy --mcp| MCP[Local MCP server<br/>stdio, no GUI]
+    end
+    Notes --> Obsidian[Obsidian or any notes app]
+    MCP --> Claude[Claude Code / Claude Desktop<br/>any MCP client you add it to]
+    Screen -.->|opt-in click: Summarize with AI<br/>topic labels + counts + 2 short quotes each| Provider[Your configured AI provider<br/>BYO key or Apple Intelligence]

@@ -94,3 +94,11 @@ See [appearance, floating dock, voice actions, and Wispr import](docs/personaliz
 See [personalization](docs/personalization.md) and the [editable companion workflow](docs/diagrams/companion.mmd) for animations, screen-edge placement, hold/tap gestures, and formatting with spelling corrections.
 
 ![Companion and dictation workflow](docs/diagrams/companion.svg)
+
+## Say less, stress less
+
+Open **Insights** to see what you keep saying: recurring problems, recurring ideas, and "Fix this first," each with dated quotes from your own dictations. It is built on this computer from your history, and nothing is uploaded. Optional extras, all off until you choose them: **Summarize with AI** (uses your Post Process provider and sends only topic labels and a few short quotes), **Read digest aloud** (system voices), nightly **Obsidian-friendly notes export**, and **Use with Claude**, a local read-only MCP server (`handy --mcp`).
+
+![Say less, stress less data flow](docs/diagrams/stress-less.svg)
+
+[How it works, privacy boundaries, and MCP setup](docs/stress-less.md) · [Editable diagram](docs/diagrams/stress-less.mmd)

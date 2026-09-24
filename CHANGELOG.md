@@ -4,6 +4,13 @@
 
 ### Added
 
+- Insights ("Say less, stress less"): recurring problems, recurring ideas, and "Fix this first," with dated quotes, computed locally from dictation history with no model, so people see what keeps coming up without anything leaving their computer.
+- Search across all dictations from the Insights screen, because finding "what did I say about X" should not mean scrolling history.
+- Opt-in "Summarize with AI" digest that reuses the Post Process provider and sends only topic labels, counts and up to two short quotes per topic; nothing runs automatically.
+- "Read digest aloud" using the system's built-in voices (no download, works offline).
+- Opt-in Obsidian-friendly notes export (daily notes + Insights.md with wikilinks), nightly or on demand; it only writes files it created and never deletes, so a notes vault stays safe.
+- `--mcp` flag: a local, read-only MCP server (search_transcripts, recent_transcripts, recurring_topics) so Claude and other MCP apps can answer questions about your own history; it never starts the app, tray, or microphone.
+- docs/stress-less.md and a data-flow diagram showing exactly what stays local and what is opt-in.
 - Download site in `site/` (live at say-less-dhi.pages.dev), with "coming soon" buttons until the first signed release exists.
 - Our own auto-update signing key. Private key lives in GitHub secrets; the old Handy public key could never verify our updates.
 
