@@ -1,397 +1,1117 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Say Less — Free dictation for Mac and Windows</title>
-<meta name="description" content="Hold a key, talk, and your words get typed into any app. Free, works offline, no account. Built for everyday laptops.">
-<meta name="theme-color" content="#0a0a0b">
-<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
-<link rel="icon" type="image/png" sizes="64x64" href="/assets/favicon-64.png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Say Less — Talk. It types.">
-<meta property="og:description" content="Free dictation for Mac and Windows. Runs on your laptop. No account.">
-<meta property="og:image" content="https://saylessvoice.com/assets/og.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:url" content="https://saylessvoice.com/">
-<link rel="canonical" href="https://saylessvoice.com/">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://saylessvoice.com/assets/og.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600;700&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#0a0a0b; --bg-2:#111215; --line:#23252b; --line-2:#30333a;
-  --text:#eceef1; --muted:#a3a9b3; --dim:#737a85;
-  --silver-hi:#f4f6f8; --silver:#c9ced6; --silver-lo:#7d848f;
-  --focus:#e6ebf2;
-  --radius:18px;
-  --shadow: 0 1px 1px rgba(0,0,0,.4), 0 4px 8px rgba(0,0,0,.35), 0 16px 32px rgba(0,0,0,.35);
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--text);font:400 17px/1.6 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-a{color:inherit}
-img{max-width:100%;display:block}
-h1,h2,h3{font-family:"Inter Tight",Inter,sans-serif;letter-spacing:-.02em;line-height:1.08;margin:0}
-.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
-.skip{position:absolute;left:-999px;top:8px;background:var(--text);color:var(--bg);padding:8px 14px;border-radius:8px;z-index:10}
-.skip:focus{left:8px}
-:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:6px}
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Say Less — Free dictation for Mac and Windows</title>
+    <meta
+      name="description"
+      content="Hold a key, talk, and your words get typed into any app. Free, works offline, no account. Built for everyday laptops."
+    />
+    <meta name="theme-color" content="#0a0a0b" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/assets/favicon-32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="64x64"
+      href="/assets/favicon-64.png"
+    />
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Say Less — Talk. It types." />
+    <meta
+      property="og:description"
+      content="Free dictation for Mac and Windows. Runs on your laptop. No account."
+    />
+    <meta
+      property="og:image"
+      content="https://saylessvoice.com/assets/og.png"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:url" content="https://saylessvoice.com/" />
+    <link rel="canonical" href="https://saylessvoice.com/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:image"
+      content="https://saylessvoice.com/assets/og.png"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0a0a0b;
+        --bg-2: #111215;
+        --line: #23252b;
+        --line-2: #30333a;
+        --text: #eceef1;
+        --muted: #a3a9b3;
+        --dim: #737a85;
+        --silver-hi: #f4f6f8;
+        --silver: #c9ced6;
+        --silver-lo: #7d848f;
+        --focus: #e6ebf2;
+        --radius: 18px;
+        --shadow:
+          0 1px 1px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.35),
+          0 16px 32px rgba(0, 0, 0, 0.35);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font:
+          400 17px/1.6 Inter,
+          system-ui,
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      a {
+        color: inherit;
+      }
+      img {
+        max-width: 100%;
+        display: block;
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: "Inter Tight", Inter, sans-serif;
+        letter-spacing: -0.02em;
+        line-height: 1.08;
+        margin: 0;
+      }
+      .wrap {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+      .skip {
+        position: absolute;
+        left: -999px;
+        top: 8px;
+        background: var(--text);
+        color: var(--bg);
+        padding: 8px 14px;
+        border-radius: 8px;
+        z-index: 10;
+      }
+      .skip:focus {
+        left: 8px;
+      }
+      :focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: 3px;
+        border-radius: 6px;
+      }
 
-/* nav */
-nav{position:sticky;top:0;z-index:5;background:rgba(10,10,11,.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-nav .wrap{display:flex;align-items:center;gap:24px;height:64px}
-.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:600;font-size:17px}
-.brand img{width:30px;height:30px;border-radius:8px}
-.navlinks{display:flex;gap:22px;margin-left:auto}
-.navlinks a{color:var(--muted);text-decoration:none;font-size:15px}
-.navlinks a:hover{color:var(--text)}
-@media (max-width:640px){.navlinks{display:none}}
+      /* nav */
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        background: rgba(10, 10, 11, 0.8);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--line);
+      }
+      nav .wrap {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        height: 64px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 17px;
+      }
+      .brand img {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+      }
+      .navlinks {
+        display: flex;
+        gap: 22px;
+        margin-left: auto;
+      }
+      .navlinks a {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 15px;
+      }
+      .navlinks a:hover {
+        color: var(--text);
+      }
+      @media (max-width: 640px) {
+        .navlinks {
+          display: none;
+        }
+      }
 
-/* buttons */
-.btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 22px;border-radius:999px;font:600 16px/1 Inter,sans-serif;text-decoration:none;border:1px solid transparent;cursor:pointer;transition:transform .15s ease, background .15s ease}
-.btn-silver{color:#0b0c0e;background:linear-gradient(180deg,var(--silver-hi),var(--silver) 55%,#aeb4bd);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 1px 2px rgba(0,0,0,.5)}
-.btn-silver:hover{transform:translateY(-1px)}
-.btn-ghost{color:var(--text);background:transparent;border-color:var(--line-2)}
-.btn-ghost:hover{background:var(--bg-2)}
-.btn[aria-disabled="true"]{cursor:default}
-.btn[aria-disabled="true"]:hover{transform:none}
-.btn small{font-weight:500;font-size:12px;opacity:.7}
-.nav-cta{min-height:40px;padding:0 16px;font-size:14px}
+      /* buttons */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 48px;
+        padding: 0 22px;
+        border-radius: 999px;
+        font:
+          600 16px/1 Inter,
+          sans-serif;
+        text-decoration: none;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition:
+          transform 0.15s ease,
+          background 0.15s ease;
+      }
+      .btn-silver {
+        color: #0b0c0e;
+        background: linear-gradient(
+          180deg,
+          var(--silver-hi),
+          var(--silver) 55%,
+          #aeb4bd
+        );
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.9),
+          0 1px 2px rgba(0, 0, 0, 0.5);
+      }
+      .btn-silver:hover {
+        transform: translateY(-1px);
+      }
+      .btn-ghost {
+        color: var(--text);
+        background: transparent;
+        border-color: var(--line-2);
+      }
+      .btn-ghost:hover {
+        background: var(--bg-2);
+      }
+      .btn[aria-disabled="true"] {
+        cursor: default;
+      }
+      .btn[aria-disabled="true"]:hover {
+        transform: none;
+      }
+      .btn small {
+        font-weight: 500;
+        font-size: 12px;
+        opacity: 0.7;
+      }
+      .nav-cta {
+        min-height: 40px;
+        padding: 0 16px;
+        font-size: 14px;
+      }
 
-/* hero */
-.hero{padding:72px 0 88px}
-.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
-.eyebrow{display:inline-block;color:var(--muted);font-size:14px;border:1px solid var(--line-2);border-radius:999px;padding:5px 12px;margin-bottom:22px}
-.hero h1{font-size:clamp(48px,7.5vw,92px)}
-.hero h1 span{background:linear-gradient(180deg,var(--silver-hi) 10%,var(--silver-lo) 95%);-webkit-background-clip:text;background-clip:text;color:transparent}
-.lede{color:var(--muted);font-size:clamp(18px,2vw,21px);max-width:34ch;margin:22px 0 32px}
-.ctas{display:flex;flex-wrap:wrap;gap:12px}
-.facts{display:flex;flex-wrap:wrap;gap:8px 20px;margin:28px 0 0;padding:0;list-style:none;color:var(--dim);font-size:14px}
-.facts li::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--silver-lo);margin-right:8px;vertical-align:middle}
-.status{color:var(--dim);font-size:14px;margin-top:14px}
-@media (max-width:880px){.hero .wrap{grid-template-columns:1fr;gap:40px}.hero{padding:48px 0 64px}}
+      /* hero */
+      .hero {
+        padding: 72px 0 88px;
+      }
+      .hero .wrap {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 56px;
+        align-items: center;
+      }
+      .eyebrow {
+        display: inline-block;
+        color: var(--muted);
+        font-size: 14px;
+        border: 1px solid var(--line-2);
+        border-radius: 999px;
+        padding: 5px 12px;
+        margin-bottom: 22px;
+      }
+      .hero h1 {
+        font-size: clamp(48px, 7.5vw, 92px);
+      }
+      .hero h1 span {
+        background: linear-gradient(
+          180deg,
+          var(--silver-hi) 10%,
+          var(--silver-lo) 95%
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .lede {
+        color: var(--muted);
+        font-size: clamp(18px, 2vw, 21px);
+        max-width: 34ch;
+        margin: 22px 0 32px;
+      }
+      .ctas {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .facts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 20px;
+        margin: 28px 0 0;
+        padding: 0;
+        list-style: none;
+        color: var(--dim);
+        font-size: 14px;
+      }
+      .facts li::before {
+        content: "";
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--silver-lo);
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+      .status {
+        color: var(--dim);
+        font-size: 14px;
+        margin-top: 14px;
+      }
+      @media (max-width: 880px) {
+        .hero .wrap {
+          grid-template-columns: 1fr;
+          gap: 40px;
+        }
+        .hero {
+          padding: 48px 0 64px;
+        }
+      }
 
-/* demo window */
-.demo{position:relative}
-.demo-emblem{position:absolute;right:-30px;top:-60px;width:260px;opacity:.95;filter:drop-shadow(0 30px 40px rgba(0,0,0,.6));pointer-events:none}
-.window{position:relative;background:var(--bg-2);border:1px solid var(--line-2);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-top:120px}
-.window-bar{display:flex;gap:7px;padding:14px 16px;border-bottom:1px solid var(--line)}
-.window-bar i{width:11px;height:11px;border-radius:50%;background:#2c2f36}
-.window-body{padding:22px 22px 26px;min-height:190px}
-.to{color:var(--dim);font-size:14px;margin-bottom:14px}
-.typed{font-size:17px;min-height:5.2em;white-space:pre-wrap}
-.caret{display:inline-block;width:2px;height:1.1em;background:var(--silver);vertical-align:-.18em;margin-left:1px;animation:blink 1s steps(1) infinite}
-@keyframes blink{50%{opacity:0}}
-.pill{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;background:#050506;border:1px solid var(--line-2);border-radius:999px;padding:8px 14px;font-size:13px;color:var(--muted);transition:opacity .3s}
-.bars{display:flex;gap:3px;align-items:center;height:14px}
-.bars b{width:3px;border-radius:2px;background:var(--silver);height:30%;animation:bar .9s ease-in-out infinite}
-.bars b:nth-child(2){animation-delay:.15s}.bars b:nth-child(3){animation-delay:.3s}.bars b:nth-child(4){animation-delay:.45s}
-@keyframes bar{50%{height:100%}}
-.pill.idle{opacity:0}
-@media (max-width:880px){.demo-emblem{width:170px;right:0;top:-40px}.window{margin-top:80px}}
+      /* demo window */
+      .demo {
+        position: relative;
+      }
+      .demo-emblem {
+        position: absolute;
+        right: -30px;
+        top: -60px;
+        width: 260px;
+        opacity: 0.95;
+        filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.6));
+        pointer-events: none;
+      }
+      .window {
+        position: relative;
+        background: var(--bg-2);
+        border: 1px solid var(--line-2);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        margin-top: 120px;
+      }
+      .window-bar {
+        display: flex;
+        gap: 7px;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+      }
+      .window-bar i {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #2c2f36;
+      }
+      .window-body {
+        padding: 22px 22px 26px;
+        min-height: 190px;
+      }
+      .to {
+        color: var(--dim);
+        font-size: 14px;
+        margin-bottom: 14px;
+      }
+      .typed {
+        font-size: 17px;
+        min-height: 5.2em;
+      }
+      .caret {
+        display: inline-block;
+        width: 2px;
+        height: 1.1em;
+        background: var(--silver);
+        vertical-align: -0.18em;
+        margin-left: 1px;
+        animation: blink 1s steps(1) infinite;
+      }
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+      .pill {
+        position: absolute;
+        left: 50%;
+        bottom: 16px;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #050506;
+        border: 1px solid var(--line-2);
+        border-radius: 999px;
+        padding: 8px 14px;
+        font-size: 13px;
+        color: var(--muted);
+        transition: opacity 0.3s;
+      }
+      .bars {
+        display: flex;
+        gap: 3px;
+        align-items: center;
+        height: 14px;
+      }
+      .bars b {
+        width: 3px;
+        border-radius: 2px;
+        background: var(--silver);
+        height: 30%;
+        animation: bar 0.9s ease-in-out infinite;
+      }
+      .bars b:nth-child(2) {
+        animation-delay: 0.15s;
+      }
+      .bars b:nth-child(3) {
+        animation-delay: 0.3s;
+      }
+      .bars b:nth-child(4) {
+        animation-delay: 0.45s;
+      }
+      @keyframes bar {
+        50% {
+          height: 100%;
+        }
+      }
+      .pill.idle {
+        opacity: 0;
+      }
+      @media (max-width: 880px) {
+        .demo-emblem {
+          width: 170px;
+          right: 0;
+          top: -40px;
+        }
+        .window {
+          margin-top: 80px;
+        }
+      }
 
-/* sections */
-section{padding:88px 0;border-top:1px solid var(--line)}
-.kicker{color:var(--silver-lo);font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px}
-h2{font-size:clamp(34px,4.6vw,56px);max-width:18ch}
-.sub{color:var(--muted);max-width:52ch;margin:18px 0 0}
+      /* sections */
+      section {
+        padding: 88px 0;
+        border-top: 1px solid var(--line);
+      }
+      .kicker {
+        color: var(--silver-lo);
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 14px;
+      }
+      h2 {
+        font-size: clamp(34px, 4.6vw, 56px);
+        max-width: 18ch;
+      }
+      .sub {
+        color: var(--muted);
+        max-width: 52ch;
+        margin: 18px 0 0;
+      }
 
-/* steps */
-.steps{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:16px;margin-top:48px;counter-reset:s}
-.step{background:var(--bg-2);border:1px solid var(--line);border-radius:var(--radius);padding:26px}
-.step:first-child{padding:32px}
-.step h3{font-size:22px;margin:18px 0 8px}
-.step p{color:var(--muted);margin:0}
-kbd{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:40px;padding:0 12px;border-radius:10px;font:600 15px Inter,sans-serif;color:var(--text);background:linear-gradient(180deg,#26282e,#1a1c20);border:1px solid var(--line-2);box-shadow:0 3px 0 #050506}
-.num{color:var(--dim);font-size:14px}
-@media (max-width:880px){.steps{grid-template-columns:1fr}}
+      /* steps */
+      .steps {
+        display: grid;
+        grid-template-columns: 1.3fr 1fr 1fr;
+        gap: 16px;
+        margin-top: 48px;
+        counter-reset: s;
+      }
+      .step {
+        background: var(--bg-2);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 26px;
+      }
+      .step:first-child {
+        padding: 32px;
+      }
+      .step h3 {
+        font-size: 22px;
+        margin: 18px 0 8px;
+      }
+      .step p {
+        color: var(--muted);
+        margin: 0;
+      }
+      kbd {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 44px;
+        height: 40px;
+        padding: 0 12px;
+        border-radius: 10px;
+        font:
+          600 15px Inter,
+          sans-serif;
+        color: var(--text);
+        background: linear-gradient(180deg, #26282e, #1a1c20);
+        border: 1px solid var(--line-2);
+        box-shadow: 0 3px 0 #050506;
+      }
+      .num {
+        color: var(--dim);
+        font-size: 14px;
+      }
+      @media (max-width: 880px) {
+        .steps {
+          grid-template-columns: 1fr;
+        }
+      }
 
-/* privacy */
-.flows{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:48px}
-.flow{border:1px solid var(--line);border-radius:var(--radius);padding:26px;background:var(--bg-2)}
-.flow.ours{border-color:var(--line-2);background:linear-gradient(180deg,#16181c,#111215)}
-.flow h3{font-size:18px;margin-bottom:22px;color:var(--muted);font-weight:600}
-.flow.ours h3{color:var(--text)}
-.chain{display:flex;align-items:center;flex-wrap:wrap;gap:10px;font-size:15px}
-.node{border:1px solid var(--line-2);border-radius:10px;padding:8px 12px;background:var(--bg)}
-.node.bad{border-style:dashed;color:var(--dim)}
-.arrow{color:var(--dim)}
-.flow p{color:var(--dim);font-size:15px;margin:20px 0 0}
-@media (max-width:880px){.flows{grid-template-columns:1fr}}
+      /* privacy */
+      .flows {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-top: 48px;
+      }
+      .flow {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 26px;
+        background: var(--bg-2);
+      }
+      .flow.ours {
+        border-color: var(--line-2);
+        background: linear-gradient(180deg, #16181c, #111215);
+      }
+      .flow h3 {
+        font-size: 18px;
+        margin-bottom: 22px;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .flow.ours h3 {
+        color: var(--text);
+      }
+      .chain {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        font-size: 15px;
+      }
+      .node {
+        border: 1px solid var(--line-2);
+        border-radius: 10px;
+        padding: 8px 12px;
+        background: var(--bg);
+      }
+      .node.bad {
+        border-style: dashed;
+        color: var(--dim);
+      }
+      .arrow {
+        color: var(--dim);
+      }
+      .flow p {
+        color: var(--dim);
+        font-size: 15px;
+        margin: 20px 0 0;
+      }
+      @media (max-width: 880px) {
+        .flows {
+          grid-template-columns: 1fr;
+        }
+      }
 
-/* features */
-.features{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;margin-top:48px}
-.feature{background:var(--bg-2);border:1px solid var(--line);border-radius:var(--radius);padding:26px;grid-column:span 2}
-.feature.wide{grid-column:span 3}
-.feature h3{font-size:20px;margin-bottom:8px}
-.feature p{color:var(--muted);margin:0}
-.example{margin-top:16px;font-size:14px;color:var(--dim);border-left:2px solid var(--line-2);padding-left:12px}
-.example strong{color:var(--silver);font-weight:500}
-@media (max-width:880px){.features{grid-template-columns:1fr}.feature,.feature.wide{grid-column:auto}}
+      /* features */
+      .features {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 16px;
+        margin-top: 48px;
+      }
+      .feature {
+        background: var(--bg-2);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 26px;
+        grid-column: span 2;
+      }
+      .feature.wide {
+        grid-column: span 3;
+      }
+      .feature h3 {
+        font-size: 20px;
+        margin-bottom: 8px;
+      }
+      .feature p {
+        color: var(--muted);
+        margin: 0;
+      }
+      .example {
+        margin-top: 16px;
+        font-size: 14px;
+        color: var(--dim);
+        border-left: 2px solid var(--line-2);
+        padding-left: 12px;
+      }
+      .example strong {
+        color: var(--silver);
+        font-weight: 500;
+      }
+      @media (max-width: 880px) {
+        .features {
+          grid-template-columns: 1fr;
+        }
+        .feature,
+        .feature.wide {
+          grid-column: auto;
+        }
+      }
 
-/* compare */
-.table-wrap{margin-top:48px;border:1px solid var(--line);border-radius:var(--radius);overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:520px}
-th,td{text-align:left;padding:16px 20px;border-bottom:1px solid var(--line);font-size:16px}
-tr:last-child td{border-bottom:0}
-thead th{color:var(--muted);font-weight:500;font-size:14px;background:var(--bg-2)}
-thead th.us{color:var(--text)}
-td.us{color:var(--text);font-weight:500}
-td.them{color:var(--dim)}
+      /* compare */
+      .table-wrap {
+        margin-top: 48px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 520px;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--line);
+        font-size: 16px;
+      }
+      tr:last-child td {
+        border-bottom: 0;
+      }
+      thead th {
+        color: var(--muted);
+        font-weight: 500;
+        font-size: 14px;
+        background: var(--bg-2);
+      }
+      thead th.us {
+        color: var(--text);
+      }
+      td.us {
+        color: var(--text);
+        font-weight: 500;
+      }
+      td.them {
+        color: var(--dim);
+      }
 
-/* faq */
-.faq{margin-top:40px;max-width:760px}
-details{border-bottom:1px solid var(--line)}
-summary{cursor:pointer;list-style:none;padding:22px 36px 22px 0;font-weight:600;font-size:18px;position:relative}
-summary::-webkit-details-marker{display:none}
-summary::after{content:"+";position:absolute;right:4px;top:18px;font-size:24px;color:var(--dim);transition:transform .2s}
-details[open] summary::after{transform:rotate(45deg)}
-details p{color:var(--muted);margin:0 0 22px;max-width:62ch}
+      /* faq */
+      .faq {
+        margin-top: 40px;
+        max-width: 760px;
+      }
+      details {
+        border-bottom: 1px solid var(--line);
+      }
+      summary {
+        cursor: pointer;
+        list-style: none;
+        padding: 22px 36px 22px 0;
+        font-weight: 600;
+        font-size: 18px;
+        position: relative;
+      }
+      summary::-webkit-details-marker {
+        display: none;
+      }
+      summary::after {
+        content: "+";
+        position: absolute;
+        right: 4px;
+        top: 18px;
+        font-size: 24px;
+        color: var(--dim);
+        transition: transform 0.2s;
+      }
+      details[open] summary::after {
+        transform: rotate(45deg);
+      }
+      details p {
+        color: var(--muted);
+        margin: 0 0 22px;
+        max-width: 62ch;
+      }
 
-/* final */
-.final{text-align:left}
-.final .wrap{display:grid;grid-template-columns:auto 1fr;gap:40px;align-items:center}
-.final img{width:180px;border-radius:32px}
-@media (max-width:640px){.final .wrap{grid-template-columns:1fr}.final img{width:120px;border-radius:24px}}
+      /* final */
+      .final {
+        text-align: left;
+      }
+      .final .wrap {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 40px;
+        align-items: center;
+      }
+      .final img {
+        width: 180px;
+        border-radius: 32px;
+      }
+      @media (max-width: 640px) {
+        .final .wrap {
+          grid-template-columns: 1fr;
+        }
+        .final img {
+          width: 120px;
+          border-radius: 24px;
+        }
+      }
 
-footer{border-top:1px solid var(--line);padding:32px 0 48px;color:var(--dim);font-size:14px}
-footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-between}
+      footer {
+        border-top: 1px solid var(--line);
+        padding: 32px 0 48px;
+        color: var(--dim);
+        font-size: 14px;
+      }
+      footer .wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px 24px;
+        justify-content: space-between;
+      }
 
-@media (prefers-reduced-motion:reduce){
-  *{animation:none!important;transition:none!important}
-  html{scroll-behavior:auto}
-}
-</style>
-</head>
-<body>
-<a class="skip" href="#main">Skip to content</a>
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
 
-<nav aria-label="Main">
-  <div class="wrap">
-    <a class="brand" href="/"><img src="/assets/favicon-64.png" alt="" width="30" height="30">Say Less</a>
-    <div class="navlinks">
-      <a href="#how">How it works</a>
-      <a href="#private">Privacy</a>
-      <a href="#faq">FAQ</a>
-    </div>
-    <a class="btn btn-silver nav-cta" href="#download">Download</a>
-  </div>
-</nav>
-
-<main id="main">
-  <header class="hero">
-    <div class="wrap">
-      <div>
-        <span class="eyebrow">Free for our coaching group, and for everyone else</span>
-        <h1>Talk.<br><span>It types.</span></h1>
-        <p class="lede">Hold a key, say what you mean, and the words show up wherever your cursor is. Email, Slack, ChatGPT, anything.</p>
-        <div class="ctas" data-downloads>
-          <a class="btn btn-silver" data-os="mac" href="#download">Download for Mac</a>
-          <a class="btn btn-ghost" data-os="windows" href="#download">Download for Windows</a>
+    <nav aria-label="Main">
+      <div class="wrap">
+        <a class="brand" href="/"
+          ><img src="/assets/favicon-64.png" alt="" width="30" height="30" />Say
+          Less</a
+        >
+        <div class="navlinks">
+          <a href="#how">How it works</a>
+          <a href="#private">Privacy</a>
+          <a href="#faq">FAQ</a>
         </div>
-        <p class="status" data-status hidden>Downloads open soon. The first public release is being built and signed right now.</p>
-        <ul class="facts">
-          <li>Free, no subscription</li>
-          <li>No account</li>
-          <li>Works offline</li>
-          <li>Made for everyday laptops</li>
-        </ul>
+        <a class="btn btn-silver nav-cta" href="#download">Download</a>
       </div>
+    </nav>
 
-      <div class="demo" aria-hidden="true">
-        <img class="demo-emblem" src="/assets/emblem-640.webp" alt="" width="260" height="260">
-        <div class="window">
-          <div class="window-bar"><i></i><i></i><i></i></div>
-          <div class="window-body">
-            <div class="to">To: team@</div>
-            <div class="typed"><span data-typed></span><span class="caret"></span></div>
+    <main id="main">
+      <header class="hero">
+        <div class="wrap">
+          <div>
+            <span class="eyebrow"
+              >Free for our coaching group, and for everyone else</span
+            >
+            <h1>Talk.<br /><span>It types.</span></h1>
+            <p class="lede">
+              Hold a key, say what you mean, and the words show up wherever your
+              cursor is. Email, Slack, ChatGPT, anything.
+            </p>
+            <div class="ctas" data-downloads>
+              <a class="btn btn-silver" data-os="mac" href="#download"
+                >Download for Mac</a
+              >
+              <a class="btn btn-ghost" data-os="windows" href="#download"
+                >Download for Windows</a
+              >
+            </div>
+            <p class="status" data-status hidden>
+              Downloads open soon. The first public release is being built and
+              signed right now.
+            </p>
+            <ul class="facts">
+              <li>Free, no subscription</li>
+              <li>No account</li>
+              <li>Works offline</li>
+              <li>Made for everyday laptops</li>
+            </ul>
           </div>
-          <div class="pill idle" data-pill><span class="bars"><b></b><b></b><b></b><b></b></span>Listening</div>
+
+          <div class="demo" aria-hidden="true">
+            <img
+              class="demo-emblem"
+              src="/assets/emblem-640.webp"
+              alt=""
+              width="260"
+              height="260"
+            />
+            <div class="window">
+              <div class="window-bar"><i></i><i></i><i></i></div>
+              <div class="window-body">
+                <div class="to">To: team@</div>
+                <div class="typed">
+                  <span data-typed></span><span class="caret"></span>
+                </div>
+              </div>
+              <div class="pill idle" data-pill>
+                <span class="bars"><b></b><b></b><b></b><b></b></span>Listening
+              </div>
+            </div>
+          </div>
         </div>
+      </header>
+
+      <section id="how">
+        <div class="wrap">
+          <p class="kicker">How it works</p>
+          <h2>Three steps. The first one is the whole trick.</h2>
+          <div class="steps">
+            <div class="step">
+              <kbd>Option</kbd> <kbd>Space</kbd>
+              <span class="num">&nbsp; Ctrl + Space on Windows</span>
+              <h3>Hold your shortcut</h3>
+              <p>
+                Click into any text box, anywhere on your computer, and hold the
+                keys down. Or tap once to keep it listening. You can change the
+                keys.
+              </p>
+            </div>
+            <div class="step">
+              <span class="num">Step 2</span>
+              <h3>Talk like normal</h3>
+              <p>No robot voice. Say "um," change your mind, keep going.</p>
+            </div>
+            <div class="step">
+              <span class="num">Step 3</span>
+              <h3>Let go</h3>
+              <p>A second later, the words are typed out for you.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="private">
+        <div class="wrap">
+          <p class="kicker">Privacy</p>
+          <h2>Your voice never leaves the room.</h2>
+          <p class="sub">
+            Most dictation apps send your audio to their servers to turn it into
+            text. Say Less does that work on your own laptop, so there's nothing
+            to send.
+          </p>
+          <div class="flows">
+            <div class="flow">
+              <h3>Typical cloud dictation</h3>
+              <div class="chain">
+                <span class="node">Your mic</span
+                ><span class="arrow">&rarr;</span
+                ><span class="node bad">Their servers</span
+                ><span class="arrow">&rarr;</span><span class="node">Text</span>
+              </div>
+              <p>
+                Needs internet. Needs an account. Your recordings sit on someone
+                else's computer.
+              </p>
+            </div>
+            <div class="flow ours">
+              <h3>Say Less</h3>
+              <div class="chain">
+                <span class="node">Your mic</span
+                ><span class="arrow">&rarr;</span
+                ><span class="node">Your laptop</span
+                ><span class="arrow">&rarr;</span><span class="node">Text</span>
+              </div>
+              <p>
+                Works on a plane. No sign-up. Nothing to leak, because nothing
+                leaves.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="features">
+        <div class="wrap">
+          <p class="kicker">What's inside</p>
+          <h2>Small app. Does the job.</h2>
+          <div class="features">
+            <div class="feature wide">
+              <h3>Voice snippets</h3>
+              <p>
+                Save text you type all the time and trigger it with a short
+                phrase.
+              </p>
+              <p class="example">
+                Say <strong>"my calendar link"</strong> and your full booking
+                link gets typed.
+              </p>
+            </div>
+            <div class="feature wide">
+              <h3>Cleaner writing</h3>
+              <p>
+                Filler words get cut, and your own vocabulary (names, brands,
+                slang) gets spelled right.
+              </p>
+              <p class="example">
+                <strong>"um so basically we should uh ship it"</strong> becomes
+                "We should ship it."
+              </p>
+            </div>
+            <div class="feature">
+              <h3>Works in every app</h3>
+              <p>If you can type there, you can talk there.</p>
+            </div>
+            <div class="feature">
+              <h3>Light on your laptop</h3>
+              <p>
+                The recommended speech models are small, about a 600 MB
+                download, so they fit on normal laptops.
+              </p>
+            </div>
+            <div class="feature">
+              <h3>Bring your old words</h3>
+              <p>
+                Coming from another dictation app? Import your saved word list.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="compare">
+        <div class="wrap">
+          <p class="kicker">The difference</p>
+          <h2>Same job. None of the bill.</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col"></th>
+                  <th scope="col" class="us">Say Less</th>
+                  <th scope="col">Typical paid dictation</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Price</th>
+                  <td class="us">Free</td>
+                  <td class="them">Monthly subscription</td>
+                </tr>
+                <tr>
+                  <th scope="row">Works without internet</th>
+                  <td class="us">Yes</td>
+                  <td class="them">Usually no</td>
+                </tr>
+                <tr>
+                  <th scope="row">Account required</th>
+                  <td class="us">No</td>
+                  <td class="them">Yes</td>
+                </tr>
+                <tr>
+                  <th scope="row">Audio leaves your computer</th>
+                  <td class="us">Never</td>
+                  <td class="them">Yes</td>
+                </tr>
+                <tr>
+                  <th scope="row">Open source</th>
+                  <td class="us">Yes</td>
+                  <td class="them">No</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq">
+        <div class="wrap">
+          <p class="kicker">FAQ</p>
+          <h2>Questions people ask.</h2>
+          <div class="faq">
+            <details>
+              <summary>Is it actually free?</summary>
+              <p>
+                Yes. No trial, no credit card, no account. It runs on your
+                computer, so there's no server bill to pass on to you.
+              </p>
+            </details>
+            <details>
+              <summary>Will it run on my laptop?</summary>
+              <p>
+                It is built for everyday laptops, including ones with 8GB of
+                RAM. The recommended speech models are small (about 600 MB) and
+                run on the processor you already have. We are testing on 8GB
+                Macs and PCs before downloads open.
+              </p>
+            </details>
+            <details>
+              <summary>Does it need internet?</summary>
+              <p>
+                Only once, to download the speech model from the open-source
+                Handy project's model server the first time you open it. After
+                that it works fully offline.
+              </p>
+            </details>
+            <details>
+              <summary>Why does my Mac ask for permissions?</summary>
+              <p>
+                Two of them. Microphone, so it can hear you. Accessibility, so
+                it can type into other apps for you. It can't do its job without
+                both.
+              </p>
+            </details>
+            <details>
+              <summary>Mac or Windows?</summary>
+              <p>
+                Both: Apple Silicon and Intel Macs, plus Windows 10 and 11. The
+                installers are being tested now, and the download buttons turn
+                on when they pass.
+              </p>
+            </details>
+            <details>
+              <summary>Can it clean up my writing with AI?</summary>
+              <p>
+                Optional. If you have your own AI key, you can turn on extra
+                cleanup. That step sends the text (never the audio) to the AI
+                provider you choose. It's off unless you turn it on.
+              </p>
+            </details>
+            <details>
+              <summary>Where did it come from?</summary>
+              <p>
+                Say Less is built on Handy, an open-source dictation project. We
+                added our own features and design on top, and the code is open
+                under the MIT license.
+              </p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section id="download" class="final">
+        <div class="wrap">
+          <img
+            src="/assets/emblem-640.webp"
+            alt="Say Less logo, a silver S shaped like a speech bubble"
+            width="180"
+            height="180"
+          />
+          <div>
+            <h2>Stop typing everything.</h2>
+            <p class="sub">Download Say Less, hold a key, and talk.</p>
+            <div class="ctas" style="margin-top: 28px" data-downloads>
+              <a class="btn btn-silver" data-os="mac" href="#download"
+                >Download for Mac</a
+              >
+              <a class="btn btn-ghost" data-os="windows" href="#download"
+                >Download for Windows</a
+              >
+            </div>
+            <p class="status" data-status hidden>
+              Downloads open soon. The first public release is being built and
+              signed right now.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <span>Say Less. Free, offline dictation.</span>
+        <span
+          >Built on the open-source
+          <a href="https://github.com/cjpais/Handy">Handy</a> project
+          (MIT).</span
+        >
       </div>
-    </div>
-  </header>
+    </footer>
 
-  <section id="how">
-    <div class="wrap">
-      <p class="kicker">How it works</p>
-      <h2>Three steps. The first one is the whole trick.</h2>
-      <div class="steps">
-        <div class="step">
-          <kbd>Option</kbd> <kbd>Space</kbd>
-          <span class="num">&nbsp; Ctrl + Space on Windows</span>
-          <h3>Hold your shortcut</h3>
-          <p>Click into any text box, anywhere on your computer, and hold the keys down. Or tap once to keep it listening. You can change the keys.</p>
-        </div>
-        <div class="step">
-          <span class="num">Step 2</span>
-          <h3>Talk like normal</h3>
-          <p>No robot voice. Say "um," change your mind, keep going.</p>
-        </div>
-        <div class="step">
-          <span class="num">Step 3</span>
-          <h3>Let go</h3>
-          <p>A second later, the words are typed out for you.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+    <script>
+      // Set these to the installer URLs once a release is published. null = "coming soon".
+      const DOWNLOADS = { mac: null, windows: null };
 
-  <section id="private">
-    <div class="wrap">
-      <p class="kicker">Privacy</p>
-      <h2>Your voice never leaves the room.</h2>
-      <p class="sub">Most dictation apps send your audio to their servers to turn it into text. Say Less does that work on your own laptop, so there's nothing to send.</p>
-      <div class="flows">
-        <div class="flow">
-          <h3>Typical cloud dictation</h3>
-          <div class="chain"><span class="node">Your mic</span><span class="arrow">&rarr;</span><span class="node bad">Their servers</span><span class="arrow">&rarr;</span><span class="node">Text</span></div>
-          <p>Needs internet. Needs an account. Your recordings sit on someone else's computer.</p>
-        </div>
-        <div class="flow ours">
-          <h3>Say Less</h3>
-          <div class="chain"><span class="node">Your mic</span><span class="arrow">&rarr;</span><span class="node">Your laptop</span><span class="arrow">&rarr;</span><span class="node">Text</span></div>
-          <p>Works on a plane. No sign-up. Nothing to leak, because nothing leaves.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+      document.querySelectorAll("[data-downloads]").forEach((group) => {
+        let missing = false;
+        group.querySelectorAll("[data-os]").forEach((a) => {
+          const url = DOWNLOADS[a.dataset.os];
+          if (url) {
+            a.href = url;
+            return;
+          }
+          missing = true;
+          a.setAttribute("aria-disabled", "true");
+          a.removeAttribute("href");
+          a.innerHTML += " <small>Soon</small>";
+        });
+        const status = group.parentElement.querySelector("[data-status]");
+        if (missing && status) status.hidden = false;
+      });
 
-  <section id="features">
-    <div class="wrap">
-      <p class="kicker">What's inside</p>
-      <h2>Small app. Does the job.</h2>
-      <div class="features">
-        <div class="feature wide">
-          <h3>Voice snippets</h3>
-          <p>Save text you type all the time and trigger it with a short phrase.</p>
-          <p class="example">Say <strong>"my calendar link"</strong> and your full booking link gets typed.</p>
-        </div>
-        <div class="feature wide">
-          <h3>Cleaner writing</h3>
-          <p>Filler words get cut, and your own vocabulary (names, brands, slang) gets spelled right.</p>
-          <p class="example"><strong>"um so basically we should uh ship it"</strong> becomes "We should ship it."</p>
-        </div>
-        <div class="feature">
-          <h3>Works in every app</h3>
-          <p>If you can type there, you can talk there.</p>
-        </div>
-        <div class="feature">
-          <h3>Light on your laptop</h3>
-          <p>The recommended speech models are small, about a 600 MB download, so they fit on normal laptops.</p>
-        </div>
-        <div class="feature">
-          <h3>Bring your old words</h3>
-          <p>Coming from another dictation app? Import your saved word list.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="compare">
-    <div class="wrap">
-      <p class="kicker">The difference</p>
-      <h2>Same job. None of the bill.</h2>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th scope="col"></th><th scope="col" class="us">Say Less</th><th scope="col">Typical paid dictation</th></tr></thead>
-          <tbody>
-            <tr><th scope="row">Price</th><td class="us">Free</td><td class="them">Monthly subscription</td></tr>
-            <tr><th scope="row">Works without internet</th><td class="us">Yes</td><td class="them">Usually no</td></tr>
-            <tr><th scope="row">Account required</th><td class="us">No</td><td class="them">Yes</td></tr>
-            <tr><th scope="row">Audio leaves your computer</th><td class="us">Never</td><td class="them">Yes</td></tr>
-            <tr><th scope="row">Open source</th><td class="us">Yes</td><td class="them">No</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <section id="faq">
-    <div class="wrap">
-      <p class="kicker">FAQ</p>
-      <h2>Questions people ask.</h2>
-      <div class="faq">
-        <details><summary>Is it actually free?</summary><p>Yes. No trial, no credit card, no account. It runs on your computer, so there's no server bill to pass on to you.</p></details>
-        <details><summary>Will it run on my laptop?</summary><p>It is built for everyday laptops, including ones with 8GB of RAM. The recommended speech models are small (about 600 MB) and run on the processor you already have. We are testing on 8GB Macs and PCs before downloads open.</p></details>
-        <details><summary>Does it need internet?</summary><p>Only once, to download the speech model from the open-source Handy project's model server the first time you open it. After that it works fully offline.</p></details>
-        <details><summary>Why does my Mac ask for permissions?</summary><p>Two of them. Microphone, so it can hear you. Accessibility, so it can type into other apps for you. It can't do its job without both.</p></details>
-        <details><summary>Mac or Windows?</summary><p>Both: Apple Silicon and Intel Macs, plus Windows 10 and 11. The installers are being tested now, and the download buttons turn on when they pass.</p></details>
-        <details><summary>Can it clean up my writing with AI?</summary><p>Optional. If you have your own AI key, you can turn on extra cleanup. That step sends the text (never the audio) to the AI provider you choose. It's off unless you turn it on.</p></details>
-        <details><summary>Where did it come from?</summary><p>Say Less is built on Handy, an open-source dictation project. We added our own features and design on top, and the code is open under the MIT license.</p></details>
-      </div>
-    </div>
-  </section>
-
-  <section id="download" class="final">
-    <div class="wrap">
-      <img src="/assets/emblem-640.webp" alt="Say Less logo, a silver S shaped like a speech bubble" width="180" height="180">
-      <div>
-        <h2>Stop typing everything.</h2>
-        <p class="sub">Download Say Less, hold a key, and talk.</p>
-        <div class="ctas" style="margin-top:28px" data-downloads>
-          <a class="btn btn-silver" data-os="mac" href="#download">Download for Mac</a>
-          <a class="btn btn-ghost" data-os="windows" href="#download">Download for Windows</a>
-        </div>
-        <p class="status" data-status hidden>Downloads open soon. The first public release is being built and signed right now.</p>
-      </div>
-    </div>
-  </section>
-</main>
-
-<footer>
-  <div class="wrap">
-    <span>Say Less. Free, offline dictation.</span>
-    <span>Built on the open-source <a href="https://github.com/cjpais/Handy">Handy</a> project (MIT).</span>
-  </div>
-</footer>
-
-<script>
-// Set these to the installer URLs once a release is published. null = "coming soon".
-const DOWNLOADS = { mac: null, windows: null };
-
-document.querySelectorAll("[data-downloads]").forEach((group) => {
-  let missing = false;
-  group.querySelectorAll("[data-os]").forEach((a) => {
-    const url = DOWNLOADS[a.dataset.os];
-    if (url) { a.href = url; return; }
-    missing = true;
-    a.setAttribute("aria-disabled", "true");
-    a.removeAttribute("href");
-    a.innerHTML += " <small>Soon</small>";
-  });
-  const status = group.parentElement.querySelector("[data-status]");
-  if (missing && status) status.hidden = false;
-});
-
-// Hero demo: fake the hold-talk-release loop.
-const lines = [
-  "Hey team, quick update. The launch is on track for Friday, and I'll send the final slides tonight.",
-  "Can we move our call to 3pm? Something came up this morning.",
-  "Loved the draft. Two small changes and it's ready to ship."
-];
-const out = document.querySelector("[data-typed]");
-const pill = document.querySelector("[data-pill]");
-const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-async function loop() {
-  if (reduced) { out.textContent = lines[0]; return; }
-  for (let i = 0; ; i = (i + 1) % lines.length) {
-    out.textContent = "";
-    pill.classList.remove("idle");
-    await wait(1800);
-    pill.classList.add("idle");
-    const words = lines[i].split(" ");
-    for (const w of words) { out.textContent += (out.textContent ? " " : "") + w; await wait(55); }
-    await wait(2600);
-  }
-}
-loop();
-</script>
-</body>
+      // Hero demo: fake the hold-talk-release loop.
+      const lines = [
+        "Hey team, quick update. The launch is on track for Friday, and I'll send the final slides tonight.",
+        "Can we move our call to 3pm? Something came up this morning.",
+        "Loved the draft. Two small changes and it's ready to ship.",
+      ];
+      const out = document.querySelector("[data-typed]");
+      const pill = document.querySelector("[data-pill]");
+      const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      async function loop() {
+        if (reduced) {
+          out.textContent = lines[0];
+          return;
+        }
+        for (let i = 0; ; i = (i + 1) % lines.length) {
+          out.textContent = "";
+          pill.classList.remove("idle");
+          await wait(1800);
+          pill.classList.add("idle");
+          const words = lines[i].split(" ");
+          for (const w of words) {
+            out.textContent += (out.textContent ? " " : "") + w;
+            await wait(55);
+          }
+          await wait(2600);
+        }
+      }
+      loop();
+    </script>
+  </body>
 </html>

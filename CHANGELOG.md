@@ -3,21 +3,25 @@
 ## [2026-09-24]
 
 ### Added
+
 - Download site in `site/` (live at say-less-dhi.pages.dev), with "coming soon" buttons until the first signed release exists.
 - Our own auto-update signing key. Private key lives in GitHub secrets; the old Handy public key could never verify our updates.
 
 ### Fixed
+
 - Regenerated the updater signing key with a real password; the first key was created without one, which let anyone holding the file sign updates and made CI fail with a password mismatch.
 - macOS CI builds no longer fail when no Apple Developer ID certificate is uploaded; they build unsigned (ad-hoc) instead.
 - Tauri treated a blank APPLE_CERTIFICATE as a real one; macOS now builds through a separate unsigned step with no Apple variables until a cert is uploaded.
 
 ### Security
+
 - PR Test Build and Build Test no longer receive signing secrets; only main and release builds sign.
 - `.gitignore` now blocks `.env*`, certificates/keys, and wrangler state.
 - Added `SECURITY.md` with a private reporting link.
 - Removed a local home-folder path and personal dictionary/library details from docs before the repo went public.
 
 ### Changed
+
 - Release builds are Mac + Windows only; Linux packages still carried Handy's install path and maintainer.
 - Installers now include the MIT license file (required by Handy's license) and list Drey Thomas as publisher.
 - Issue/PR templates and CONTRIBUTING point at Say Less instead of Handy; removed Handy's donation links (FUNDING.yml).
