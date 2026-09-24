@@ -1022,6 +1022,63 @@ async isLaptop() : Promise<Result<boolean, string>> {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
 }
+},
+async getInsights(days: number | null) : Promise<Result<InsightsReport, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_insights", { days }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async searchHistoryText(query: string, days: number | null) : Promise<Result<TranscriptHit[], string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("search_history_text", { query, days }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getInsightsSettings() : Promise<InsightsSettings> {
+    return await TAURI_INVOKE("get_insights_settings");
+},
+async saveInsightsSettings(exportEnabled: boolean, exportFolder: string | null) : Promise<Result<InsightsSettings, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("save_insights_settings", { exportEnabled, exportFolder }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getDefaultNotesFolder() : Promise<string> {
+    return await TAURI_INVOKE("get_default_notes_folder");
+},
+async exportNotesNow() : Promise<Result<ExportReport, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("export_notes_now") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getAiSummaryStatus() : Promise<AiSummaryStatus> {
+    return await TAURI_INVOKE("get_ai_summary_status");
+},
+async summarizeInsights(days: number | null) : Promise<Result<string, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("summarize_insights", { days }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getMcpSetup() : Promise<Result<McpSetup, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_mcp_setup") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
 }
 }
 
@@ -1044,6 +1101,7 @@ streamTextEvent: "stream-text-event"
 
 /** user-defined types **/
 
+export type AiSummaryStatus = { available: boolean; provider_label: string | null }
 /**
  * The container-level `serde(default)` (backed by the `Default` impl below)
  * guarantees every field — including ones added in the future — falls back to
@@ -1121,6 +1179,7 @@ export type EngineType =
  * the file, so this one variant covers the whole transcribe-cpp family.
  */
 "TranscribeCpp" | "Parakeet" | "Moonshine" | "MoonshineStreaming" | "SenseVoice" | "GigaAM" | "Canary" | "Cohere"
+export type ExportReport = { folder: string; written: number; unchanged: number; skipped: string[]; days: number }
 export type GpuDeviceOption = { id: string; name: string; total_vram_mb: number }
 export type HistoryEntry = { id: number; file_name: string; timestamp: number; saved: boolean; title: string; transcription_text: string; post_processed_text: string | null; post_process_prompt: string | null; post_process_requested: boolean }
 export type HistoryUpdatePayload = { action: "added"; entry: HistoryEntry } | { action: "updated"; entry: HistoryEntry } | { action: "deleted"; id: number } | { action: "toggled"; id: number }
@@ -1135,6 +1194,8 @@ reset_bindings: string[] }
 export type ImportPreview = { words: string[]; snippets: VoiceSnippet[]; skipped: number; history_count: number; fingerprint: string }
 export type ImportReport = { words_added: number; snippets_added: number; history_added: number; history_error: boolean }
 export type ImportedHistory = { id: string; text: string; timestamp: string }
+export type InsightsReport = { window_days: number | null; analyzed_entries: number; generated_at: number; problems: Topic[]; ideas: Topic[]; other: Topic[]; fix_first: Topic | null }
+export type InsightsSettings = { export_enabled: boolean; export_folder: string | null; last_export_at: number | null; last_export_error: string | null }
 export type KeyboardDiagnosticReport = { secure_input_enabled: boolean; culprit_pid: number | null; culprit_name: string | null; 
 /**
  * Counts only — key identity is deliberately never captured.
@@ -1144,6 +1205,7 @@ export type KeyboardImplementation = "tauri" | "handy_keys"
 export type LLMPrompt = { id: string; name: string; prompt: string }
 export type LearnedCorrection = { trigger: string; expansion: string; observations: number; active: boolean }
 export type LogLevel = "trace" | "debug" | "info" | "warn" | "error"
+export type McpSetup = { binary_path: string; config_json: string; claude_command: string }
 export type ModelInfo = { id: string; name: string; description: string; filename: string; source: ModelSource; size_mb: number; is_downloaded: boolean; is_downloading: boolean; partial_size: number; is_directory: boolean; engine_type: EngineType; accuracy_score: number; speed_score: number; supports_translation: boolean; is_recommended: boolean; supported_languages: string[]; supports_language_selection: boolean; is_custom: boolean; supports_streaming: boolean; supports_language_detection: boolean }
 export type ModelLoadStatus = { is_loaded: boolean; current_model: string | null }
 /**
@@ -1276,7 +1338,11 @@ export type StudioSettings = { accent: string; floating: boolean; actions_enable
  * and `Dark` force one of the two palettes Handy already ships.
  */
 export type Theme = "system" | "light" | "dark"
+export type Topic = { id: string; label: string; keywords: string[]; kind: TopicKind; count: number; first_seen: number; last_seen: number; examples: TopicQuote[]; entry_ids: number[] }
+export type TopicKind = "problem" | "idea" | "other"
+export type TopicQuote = { entry_id: number; timestamp: number; text: string }
 export type TranscribeAcceleratorSetting = "auto" | "cpu" | "gpu"
+export type TranscriptHit = { id: number; timestamp: number; text: string }
 export type TypingTool = "auto" | "wtype" | "kwtype" | "dotool" | "ydotool" | "xdotool"
 export type VadBackend = "silero" | "earshot"
 export type VoiceAction = { cue: string; kind: string; target: string }
