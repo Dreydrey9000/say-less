@@ -22,6 +22,14 @@ const defaultStudio = {
   dock_character: "emblem",
   learn_corrections: false,
   corrections: [],
+  overlay_visual: "bars",
+  avatar: {
+    kind: "person",
+    body: "#e2b48f",
+    accent: "#8796ab",
+    background: "#22262e",
+    accessory: "none",
+  },
 };
 let studio = JSON.parse(
   localStorage.getItem("test-studio") || JSON.stringify(defaultStudio),
@@ -90,7 +98,7 @@ const settings = {
 };
 let snippets = JSON.parse(localStorage.getItem("test-snippets") || "[]");
 mockWindows("main");
-mockIPC((cmd, payload) => {
+const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
   const calls = ((
     window as unknown as { testCommands: string[] }
   ).testCommands ??= []);
@@ -217,14 +225,106 @@ mockIPC((cmd, payload) => {
       throw "history_unavailable";
     return { entries: [], has_more: false };
   }
+  // Say less, stress less (Insights) — fixture data only.
+  if (cmd === "get_insights") {
+    const day = 86_400;
+    const now = 1_790_000_000;
+    const topic = (id: string, kind: string, count: number, quote: string) => ({
+      id,
+      label: id.replace(/-/g, " "),
+      keywords: [],
+      kind,
+      count,
+      first_seen: now - 20 * day,
+      last_seen: now - day,
+      examples: [{ entry_id: count, timestamp: now - day, text: quote }],
+      entry_ids: [],
+    });
+    if (query.has("fewHistory"))
+      return {
+        window_days: payload?.days ?? null,
+        analyzed_entries: 2,
+        generated_at: now,
+        problems: [],
+        ideas: [],
+        other: [],
+        fix_first: null,
+      };
+    const problem = topic(
+      "video-export-audio",
+      "problem",
+      27,
+      "The video export audio is broken again",
+    );
+    return {
+      window_days: payload?.days ?? null,
+      analyzed_entries: 140,
+      generated_at: now,
+      problems: [problem],
+      ideas: [
+        topic(
+          "grocery-receipt",
+          "idea",
+          3,
+          "An app that turns grocery receipts into meal plans",
+        ),
+      ],
+      other: [],
+      fix_first: problem,
+    };
+  }
+  if (cmd === "search_history_text")
+    return String(payload?.query).includes("export")
+      ? [{ id: 9, timestamp: 1_790_000_000, text: "Export audio broke again" }]
+      : [];
+  if (cmd === "get_insights_settings")
+    return {
+      export_enabled: false,
+      export_folder: null,
+      last_export_at: null,
+      last_export_error: null,
+    };
+  if (cmd === "save_insights_settings")
+    return {
+      export_enabled: Boolean(payload?.exportEnabled),
+      export_folder: payload?.exportFolder ?? null,
+      last_export_at: null,
+      last_export_error: null,
+    };
+  if (cmd === "get_default_notes_folder")
+    return "/Users/test/Documents/Say Less Notes";
+  if (cmd === "export_notes_now")
+    return {
+      folder: "/Users/test/Documents/Say Less Notes",
+      written: 4,
+      unchanged: 0,
+      skipped: [],
+      days: 3,
+    };
+  if (cmd === "get_ai_summary_status")
+    return { available: false, provider_label: null };
+  if (cmd === "get_mcp_setup")
+    return {
+      binary_path: "/Applications/Say Less.app/Contents/MacOS/handy",
+      config_json:
+        '{\n  "mcpServers": {\n    "say-less": {\n      "command": "/Applications/Say Less.app/Contents/MacOS/handy",\n      "args": ["--mcp"]\n    }\n  }\n}',
+      claude_command:
+        'claude mcp add say-less -- "/Applications/Say Less.app/Contents/MacOS/handy" --mcp',
+    };
   return null;
-});
+};
+// The overlay listens for backend events; tests drive it with `testEmit`.
+mockIPC(ipc, { shouldMockEvents: query.has("overlay") });
 const { default: App } = await import("../../src/App");
 await import("../../src/i18n");
 const { applyTheme } = await import("../../src/lib/utils/theme");
 applyTheme(settings.theme as "dark" | "light");
 if (query.has("dock")) {
   await import("../../src/dock/main");
+} else if (query.has("overlay")) {
+  const { emit } = await import("@tauri-apps/api/event");
+  Object.assign(window, { testEmit: emit });
+  await import("../../src/overlay/main");
 } else {
   ReactDOM.createRoot(document.getElementById("root")!).render(<App />);
 }

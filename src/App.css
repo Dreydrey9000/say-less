@@ -396,3 +396,129 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+/* Voice visuals: overlay style picker and avatar builder (Appearance). */
+.voice-visual-grid,
+.avatar-kind-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.avatar-kind-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.voice-visual-grid > button,
+.avatar-kind-grid > button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 10px 6px;
+  border: 1px solid #80808050;
+  border-radius: 16px;
+  cursor: pointer;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.voice-visual-grid > button[aria-pressed="true"],
+.avatar-kind-grid > button[aria-pressed="true"] {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+  background: color-mix(in srgb, var(--color-text) 6%, transparent);
+}
+.voice-visual-grid > button:focus-visible,
+.avatar-kind-grid > button:focus-visible,
+.avatar-color input:focus-visible {
+  outline: 3px solid var(--color-text);
+  outline-offset: 3px;
+}
+.voice-visual-grid > button:disabled,
+.avatar-kind-grid > button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+.voice-visual-sample {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  color: var(--color-logo-primary);
+}
+.voice-visual-bars {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 20px;
+}
+.voice-visual-bars i {
+  width: 4px;
+  border-radius: 2px;
+  background: currentColor;
+}
+.voice-visual-mini-avatar,
+.avatar-kind-thumb {
+  display: block;
+  width: 34px;
+  height: 34px;
+}
+.avatar-kind-thumb {
+  width: 44px;
+  height: 44px;
+}
+.avatar-builder {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: 18px;
+  padding: 16px;
+  border: 1px solid #80808040;
+  border-radius: 20px;
+}
+.avatar-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+.avatar-preview-stage {
+  width: 128px;
+  height: 128px;
+  filter: drop-shadow(0 8px 14px #0005);
+}
+.avatar-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.avatar-color-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.avatar-color {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.avatar-color input {
+  width: 40px;
+  height: 36px;
+  padding: 2px;
+  border: 1px solid #80808060;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+}
+@container (max-width:520px) {
+  .avatar-builder {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@container (max-width:440px) {
+  .avatar-kind-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

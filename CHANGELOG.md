@@ -4,6 +4,21 @@
 
 ### Added
 
+- Hold Fn (Globe) to talk on Mac, like Wispr Flow, alongside Option+Space; it is a second default shortcut, so existing installs get it on update and either key works.
+- Share Say Less button in About that copies saylessvoice.com, so members can pass the app on in one tap.
+- Voice visuals: choose Bars, Squiggle, or Avatar for the recording overlay in Appearance, so the overlay can match your style; Bars stays the default so nothing changes until you pick.
+- Talking avatar (stick figure, person, cat, dog; three colors; cap, beanie, crown, headphones, sunglasses) whose mouth follows voice volume, usable as the dock companion and the overlay; volume-driven because real lip-sync needs a second live model.
+- Avatar builder with a live preview and a Test button that plays a short speaking rhythm, so you can check the look without recording.
+- `overlay_visual` and `avatar` settings in `studio.json`, validated in Rust (known styles/accessories, hex colors only) so a bad value can't reach the SVG.
+- Playwright coverage for the builder, reduced motion, overlay squiggle/avatar, and the 104px compact dock; the test fixture can now render the recording overlay with mocked events.
+- Voice visuals diagram (`docs/diagrams/voice-visuals.mmd` + `.svg`) and a Voice visuals section in `docs/personalization.md`.
+- Insights ("Say less, stress less"): recurring problems, recurring ideas, and "Fix this first," with dated quotes, computed locally from dictation history with no model, so people see what keeps coming up without anything leaving their computer.
+- Search across all dictations from the Insights screen, because finding "what did I say about X" should not mean scrolling history.
+- Opt-in "Summarize with AI" digest that reuses the Post Process provider and sends only topic labels, counts and up to two short quotes per topic; nothing runs automatically.
+- "Read digest aloud" using the system's built-in voices (no download, works offline).
+- Opt-in Obsidian-friendly notes export (daily notes + Insights.md with wikilinks), nightly or on demand; it only writes files it created and never deletes, so a notes vault stays safe.
+- `--mcp` flag: a local, read-only MCP server (search_transcripts, recent_transcripts, recurring_topics) so Claude and other MCP apps can answer questions about your own history; it never starts the app, tray, or microphone.
+- docs/stress-less.md and a data-flow diagram showing exactly what stays local and what is opt-in.
 - Download site in `site/` (live at say-less-dhi.pages.dev), with "coming soon" buttons until the first signed release exists.
 - Our own auto-update signing key. Private key lives in GitHub secrets; the old Handy public key could never verify our updates.
 
@@ -28,6 +43,7 @@
 - Site: live on saylessvoice.com; replaced unverified claims (8GB auto-model picking, Windows availability) with accurate copy; FAQ says models download once from Handy's model server.
 - Release asset prefix renamed from `handy` to `say-less`.
 - `scripts/setup-apple-signing.sh` walks through uploading the Developer ID certificate and notarization login to GitHub secrets.
+- Companion motion checks (Pause, Reduce Motion, hidden window) moved into a shared `useMotionAllowed` hook so the dock, overlay, and Appearance preview all stop decorative motion the same way.
 
 ## 0.10.1
 

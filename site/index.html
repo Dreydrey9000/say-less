@@ -698,6 +698,18 @@
         }
       }
 
+      .share {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+        color: var(--muted);
+        margin-top: 28px;
+      }
+      .share-done {
+        color: var(--silver);
+        font-size: 14px;
+      }
       footer {
         border-top: 1px solid var(--line);
         padding: 32px 0 48px;
@@ -913,6 +925,67 @@
         </div>
       </section>
 
+      <section id="stress-less">
+        <div class="wrap">
+          <p class="kicker">Say less, stress less</p>
+          <h2>It remembers what you keep saying.</h2>
+          <p class="sub">
+            Everything you dictate stays on your computer. Say Less reads it
+            back to you: the problems you keep running into and the ideas you
+            keep having, so you can actually do something about them.
+          </p>
+          <div class="features">
+            <div class="feature wide">
+              <h3>Fix this first</h3>
+              <p>Your most repeated problem, with what you said and when.</p>
+              <p class="example">
+                "You've brought up <strong>export audio dropping</strong> 27
+                times this month."
+              </p>
+            </div>
+            <div class="feature wide">
+              <h3>Ideas you forgot you had</h3>
+              <p>
+                Every "what if we..." you said out loud, in one list with the
+                date you said it.
+              </p>
+            </div>
+            <div class="feature">
+              <h3>Read it to me</h3>
+              <p>
+                Hear your daily digest out loud, with voices on your computer.
+              </p>
+            </div>
+            <div class="feature">
+              <h3>Notes that write themselves</h3>
+              <p>
+                Turn on nightly notes and your day lands in Obsidian-style
+                Markdown files.
+              </p>
+            </div>
+            <div class="feature">
+              <h3>Ask Claude</h3>
+              <p>
+                Connect Claude or any AI tool to search your own history,
+                locally.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="make-it-yours">
+        <div class="wrap">
+          <p class="kicker">Make it yours</p>
+          <h2>A little face that talks when you do.</h2>
+          <p class="sub">
+            Swap the audio bars for a squiggle that moves with your voice, or
+            build an avatar that mouths along while you talk. Stick figure,
+            person, or animal. Pick the colors. Add a hat.
+          </p>
+        </div>
+      </section>
+
       <section id="compare">
         <div class="wrap">
           <p class="kicker">The difference</p>
@@ -1046,6 +1119,13 @@
               Downloads open soon. The first public release is being built and
               signed right now.
             </p>
+            <p class="share">
+              Know someone who types too much?
+              <button class="btn btn-ghost share-btn" type="button" data-share>
+                Send them Say Less
+              </button>
+              <span class="share-done" data-share-done role="status"></span>
+            </p>
           </div>
         </div>
       </section>
@@ -1081,6 +1161,28 @@
         });
         const status = group.parentElement.querySelector("[data-status]");
         if (missing && status) status.hidden = false;
+      });
+
+      // Share: native share sheet when available, otherwise copy the link.
+      const shareBtn = document.querySelector("[data-share]");
+      const shareDone = document.querySelector("[data-share-done]");
+      shareBtn.addEventListener("click", async () => {
+        const data = {
+          title: "Say Less",
+          text: "Free dictation for Mac and Windows. Hold a key, talk, it types. Nothing leaves your computer.",
+          url: "https://saylessvoice.com",
+        };
+        try {
+          if (navigator.share) {
+            await navigator.share(data);
+            return;
+          }
+          await navigator.clipboard.writeText(data.url);
+          shareDone.textContent = "Link copied.";
+        } catch (e) {
+          if (e && e.name === "AbortError") return;
+          shareDone.textContent = "Copy this: saylessvoice.com";
+        }
       });
 
       // Hero demo: fake the hold-talk-release loop.

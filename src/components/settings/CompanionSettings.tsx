@@ -44,7 +44,7 @@ export function CompanionSettings() {
             void save({ ...settings, dock_character: e.target.value })
           }
         >
-          {["orb", "emblem", "buddy", "both"].map((value) => (
+          {["orb", "emblem", "buddy", "both", "avatar"].map((value) => (
             <option key={value} value={value}>
               {t(`companion.characters.${value}`)}
             </option>

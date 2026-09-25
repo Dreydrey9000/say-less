@@ -16,6 +16,7 @@ import { LogDirectory } from "../debug";
 export const AboutSettings: React.FC = () => {
   const { t } = useTranslation();
   const [version, setVersion] = useState("");
+  const [shareCopied, setShareCopied] = useState(false);
 
   useEffect(() => {
     const fetchVersion = async () => {
@@ -39,6 +40,17 @@ export const AboutSettings: React.FC = () => {
     }
   };
 
+  const handleShareClick = async () => {
+    try {
+      await navigator.clipboard.writeText("https://saylessvoice.com");
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    } catch (error) {
+      console.error("Failed to copy share link:", error);
+      await openUrl("https://saylessvoice.com");
+    }
+  };
+
   return (
     <div className="max-w-3xl w-full mx-auto space-y-6">
       <SettingsGroup title={t("settings.about.title")}>
@@ -54,6 +66,18 @@ export const AboutSettings: React.FC = () => {
         </SettingContainer>
 
         <ShowWhatsNewOnUpdate descriptionMode="tooltip" grouped={true} />
+
+        <SettingContainer
+          title={t("settings.about.share.title")}
+          description={t("settings.about.share.description")}
+          grouped={true}
+        >
+          <Button variant="primary" size="md" onClick={handleShareClick}>
+            {shareCopied
+              ? t("settings.about.share.copied")
+              : t("settings.about.share.button")}
+          </Button>
+        </SettingContainer>
 
         <SettingContainer
           title={t("settings.about.supportDevelopment.title")}

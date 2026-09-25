@@ -568,7 +568,16 @@ pub struct TranscriptionCoordinator {
 }
 
 pub fn is_transcribe_binding(id: &str) -> bool {
-    id == "transcribe" || id == "transcribe_with_post_process"
+    id == "transcribe" || id == "transcribe_fn" || id == "transcribe_with_post_process"
+}
+
+#[cfg(test)]
+mod fn_binding_tests {
+    #[test]
+    fn fn_binding_counts_as_dictation() {
+        assert!(super::is_transcribe_binding("transcribe_fn"));
+        assert!(!super::is_transcribe_binding("cancel"));
+    }
 }
 
 impl TranscriptionCoordinator {

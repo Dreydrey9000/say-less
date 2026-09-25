@@ -1,0 +1,17 @@
+flowchart TD
+    Mic[Microphone audio] --> Levels[overlay::emit_levels: 16 level buckets, up to 30 per second]
+    Levels -->|mic-level event, only while the overlay is enabled| Overlay[Recording overlay]
+    Levels -->|same event, loudest bucket| Dock[Floating dock companion]
+    Levels -->|same event, only while Appearance is open| Preview[Appearance live preview]
+    Overlay --> Choice{Overlay style}
+    Choice --> Bars[Bars - default]
+    Choice --> Squiggle[Squiggle: SVG line redrawn each animation frame]
+    Choice --> Avatar[Avatar: mouth opens with volume, fast open, slow close]
+    Dock --> Avatar
+    Preview --> Avatar
+    Settings[Appearance: overlay style + avatar builder] --> Store[Local studio.json: overlay_visual, avatar]
+    Store -->|studio-changed| Overlay
+    Store -->|studio-changed| Dock
+    Guard[Pause animations / Reduce Motion / hidden window] -->|motion off| Still[Static pose: closed mouth, fixed curve]
+    Still -.-> Squiggle
+    Still -.-> Avatar
