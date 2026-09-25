@@ -288,6 +288,16 @@
         margin-right: 8px;
         vertical-align: middle;
       }
+      .alt-downloads {
+        margin-top: 12px;
+        font-size: 14px;
+        color: var(--muted, #9aa0a8);
+      }
+      .alt-downloads a {
+        color: inherit;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
       .status {
         color: var(--dim);
         font-size: 14px;
@@ -1144,7 +1154,17 @@
 
     <script>
       // Set these to the installer URLs once a release is published. null = "coming soon".
-      const DOWNLOADS = { mac: null, windows: null };
+      const RELEASE =
+        "https://github.com/Dreydrey9000/say-less/releases/download/v0.13.1/";
+      const DOWNLOADS = {
+        mac: RELEASE + "Say.Less_0.13.1_aarch64.dmg",
+        windows: RELEASE + "Say.Less_0.13.1_x64-setup.exe",
+      };
+      // Less common machines get a small text link under the main buttons.
+      const ALT_DOWNLOADS = [
+        ["Intel Mac", RELEASE + "Say.Less_0.13.1_x64.dmg"],
+        ["Windows on ARM", RELEASE + "Say.Less_0.13.1_arm64-setup.exe"],
+      ];
 
       document.querySelectorAll("[data-downloads]").forEach((group) => {
         let missing = false;
@@ -1161,6 +1181,19 @@
         });
         const status = group.parentElement.querySelector("[data-status]");
         if (missing && status) status.hidden = false;
+        if (!missing) {
+          const alt = document.createElement("p");
+          alt.className = "alt-downloads";
+          alt.append("Other computers: ");
+          ALT_DOWNLOADS.forEach(([label, url], i) => {
+            if (i) alt.append(" · ");
+            const link = document.createElement("a");
+            link.href = url;
+            link.textContent = label;
+            alt.append(link);
+          });
+          group.after(alt);
+        }
       });
 
       // Share: native share sheet when available, otherwise copy the link.
