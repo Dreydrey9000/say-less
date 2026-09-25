@@ -2,6 +2,10 @@
 
 ## [2026-09-25]
 
+### Release
+
+- Version 0.13.1: the voice visuals, clarity, accessibility and final polish passes ship together.
+
 ### Changed
 
 - Removed the last em-dashes from the English app text (inherited from Handy), so every string follows our no-em-dash copy rule.
