@@ -14,10 +14,10 @@ said it.
 
 | Feature                    | What it reads                                                          | Where anything goes                                                                                                  | Default                               |
 | -------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
-| Insights screen and search | `history.db`, read-only                                                | Nowhere. Computed on this computer when you open the screen.                                                         | On                                    |
+| Insights screen and search | `history.db` + Wispr import, read-only                                 | Nowhere. Computed on this computer when you open the screen.                                                         | On                                    |
 | Read digest aloud          | The digest on screen                                                   | Your computer's built-in voices (Web Speech API)                                                                     | Click only                            |
-| Notes export               | `history.db`, read-only                                                | A folder you choose (default `~/Documents/Say Less Notes`)                                                           | Off                                   |
-| Use with Claude (`--mcp`)  | `history.db`, read-only                                                | Only to the MCP app you add it to (e.g. Claude Code). That app decides what it sends to its own model.               | Off until you add it                  |
+| Notes export               | `history.db` + Wispr import, read-only                                 | A folder you choose (default `~/Documents/Say Less Notes`)                                                           | Off                                   |
+| Use with Claude (`--mcp`)  | `history.db` + Wispr import, read-only                                 | Only to the MCP app you add it to (e.g. Claude Code). That app decides what it sends to its own model.               | Off until you add it                  |
 | Summarize with AI          | Topic labels, counts and up to 2 short quotes per topic (max 8 topics) | The AI provider you already set up under Post Process (your API key, a custom/local endpoint, or Apple Intelligence) | Click only; disabled with no provider |
 
 Nothing on this list writes to your history. Every database connection is
@@ -60,8 +60,9 @@ Speed: 10,000 dictations take about half a second in a debug build (see the
   topics unless you use the same words.
 - A dictation counts once per topic. The same sentence can appear in two
   topics if it mentions both.
-- Reads Say Less history only. The separate Wispr import archive is not
-  included.
+- Imported Wispr Flow history (`wispr-history.sqlite`) counts everywhere
+  history is read (Insights, search, notes export, `--mcp`), read-only; a
+  missing or damaged import file is skipped and logged.
 - History retention settings still apply. Deleted dictations disappear from
   Insights too.
 
@@ -132,6 +133,10 @@ Where it looks for history:
    - macOS: `~/Library/Application Support/com.dreythomas.sayless/history.db`
    - Windows: `%APPDATA%\com.dreythomas.sayless\history.db`
    - Portable installs: `Data/history.db` next to the app
+
+Imported Wispr history is read from `wispr-history.sqlite` in the same folder
+as that `history.db`. Each result carries `"source": "say_less"` or
+`"source": "wispr"`; Wispr results use negative `id`s.
 
 Try it by hand against a copy of your history:
 

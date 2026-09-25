@@ -27,6 +27,7 @@ fn system_now() -> i64 {
 }
 
 /// `--history-db` beats `SAYLESS_HISTORY_DB`, which beats the app's own data dir.
+/// Imported Wispr history is read from `wispr-history.sqlite` beside that file.
 pub fn resolve_db_path(override_path: Option<PathBuf>) -> Option<PathBuf> {
     override_path
         .or_else(|| std::env::var_os("SAYLESS_HISTORY_DB").map(PathBuf::from))
@@ -44,6 +45,7 @@ fn local_time(ts: i64) -> String {
 fn hit_json(hit: &TranscriptHit) -> Value {
     json!({
         "id": hit.id,
+        "source": db::source_of(hit.id),
         "date": local_time(hit.timestamp),
         "text": engine::shorten(&hit.text, MAX_TEXT_CHARS),
     })
@@ -59,6 +61,7 @@ fn topic_json(topic: &Topic) -> Value {
         "related": topic.keywords,
         "examples": topic.examples.iter().map(|q| json!({
             "id": q.entry_id,
+            "source": db::source_of(q.entry_id),
             "date": local_time(q.timestamp),
             "quote": q.text,
         })).collect::<Vec<_>>(),
@@ -236,7 +239,7 @@ impl McpServer {
             .db_path
             .as_ref()
             .ok_or("Could not locate the Say Less data folder. Pass --history-db <path>.")?;
-        let conn = db::open_read_only(path)?;
+        let history = db::open_history(path)?;
         let now = (self.now)();
         match name {
             "search_transcripts" => {
@@ -252,7 +255,7 @@ impl McpServer {
                 }
                 let days = int_arg(args, "days", 1, 3650)?.map(|d| d as u32);
                 let limit = int_arg(args, "limit", 1, 100)?.unwrap_or(20) as u32;
-                let hits = db::search(&conn, query, db::cutoff(now, days), limit)?;
+                let hits = history.search(query, db::cutoff(now, days), limit)?;
                 Ok(json!({
                     "query": query,
                     "count": hits.len(),
@@ -262,7 +265,7 @@ impl McpServer {
             "recent_transcripts" => {
                 let days = int_arg(args, "days", 1, 3650)?.unwrap_or(7) as u32;
                 let limit = int_arg(args, "limit", 1, 100)?.unwrap_or(30) as u32;
-                let hits = db::recent(&conn, db::cutoff(now, Some(days)), limit)?;
+                let hits = history.recent(db::cutoff(now, Some(days)), limit)?;
                 Ok(json!({
                     "days": days,
                     "count": hits.len(),
@@ -278,7 +281,7 @@ impl McpServer {
                             "`kind` must be one of: all, problem, idea, other.".to_string(),
                         )?),
                     };
-                let entries = db::load_transcripts(&conn, db::cutoff(now, Some(days)))?;
+                let entries = history.load_transcripts(db::cutoff(now, Some(days)))?;
                 let report = engine::analyze(&entries, Some(days), now, &EngineOptions::default());
                 let pick = |k: TopicKind, list: &Vec<Topic>| {
                     if kind.is_none() || kind == Some(k) {
@@ -456,6 +459,63 @@ mod tests {
         let p = tool_payload(&r);
         assert!(p["problems"].as_array().unwrap().is_empty());
         assert_eq!(p["ideas"].as_array().unwrap().len(), 1);
+    }
+
+    #[test]
+    fn imported_wispr_history_counts_in_every_tool() {
+        use super::super::db::test_support::{create_wispr_fixture, wispr_time};
+        let (dir, s) = server();
+        let d = 86_400;
+        create_wispr_fixture(
+            &dir.path().join(db::WISPR_HISTORY_FILE),
+            &[
+                (
+                    "w1",
+                    "Wispr said the video export audio is broken",
+                    &wispr_time(NOW - 2 * d),
+                ),
+                (
+                    "w2",
+                    "Video export audio failing again",
+                    &wispr_time(NOW - 12 * d),
+                ),
+            ],
+        );
+        let r = call(
+            &s,
+            json!({"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"search_transcripts","arguments":{"query":"export audio"}}}),
+        );
+        let p = tool_payload(&r);
+        assert_eq!(p["count"], 5);
+        assert_eq!(
+            p["results"][0]["text"],
+            "Another bug with the video export audio"
+        );
+        assert_eq!(p["results"][0]["source"], "say_less");
+        assert_eq!(p["results"][1]["source"], "wispr");
+        assert!(p["results"][1]["id"].as_i64().unwrap() < 0);
+
+        let r = call(
+            &s,
+            json!({"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"recent_transcripts","arguments":{"days":4}}}),
+        );
+        assert_eq!(tool_payload(&r)["count"], 3);
+
+        let r = call(
+            &s,
+            json!({"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"recurring_topics","arguments":{"days":30}}}),
+        );
+        let p = tool_payload(&r);
+        assert_eq!(p["dictations_analyzed"], 7);
+        assert_eq!(p["problems"][0]["mentions"], 5);
+
+        // A corrupt archive is skipped; the tools still answer.
+        std::fs::write(dir.path().join(db::WISPR_HISTORY_FILE), b"not sqlite").unwrap();
+        let r = call(
+            &s,
+            json!({"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"search_transcripts","arguments":{"query":"export audio"}}}),
+        );
+        assert_eq!(tool_payload(&r)["count"], 3);
     }
 
     #[test]

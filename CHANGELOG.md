@@ -1,5 +1,11 @@
 # Changelog
 
+## [2026-09-25]
+
+### Fixed
+
+- Insights, history search, notes export and `--mcp` now read imported Wispr Flow history (`wispr-history.sqlite`) alongside `history.db`, because a new user who imported months of Wispr dictations saw "Not enough history yet"; a missing, damaged or locked import file is skipped and logged instead of breaking Insights.
+
 ## [2026-09-24]
 
 ### Added
