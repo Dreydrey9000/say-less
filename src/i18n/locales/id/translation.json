@@ -13,7 +13,8 @@
       "cancelled": "Shortcut change cancelled.",
       "saved": "Shortcut saved: {{keys}}.",
       "setFailed": "We couldn't use that shortcut. Try a different key combination.",
-      "startFailed": "We couldn't start listening for keys. Please try again."
+      "startFailed": "We couldn't start listening for keys. Please try again.",
+      "needsModifier": "Add a key like Option, Control or Command. A single letter or space alone would trigger every time you type it."
     },
     "model": {
       "status": "Speech model: {{name}}",

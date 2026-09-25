@@ -216,3 +216,21 @@ export const normalizeKey = (key: string): string => {
   }
   return key;
 };
+
+// Keys that type something. Alone, they would fire the shortcut every time
+// someone types that key, so a global shortcut needs a modifier with them.
+const TYPING_KEYS = new Set(["space", "enter", "return", "tab", "backspace"]);
+
+/**
+ * True when a shortcut is a single typing key with no modifier, like "k" or
+ * "space". Function keys, Fn and modifier-only shortcuts stay allowed.
+ */
+export const isBareTypingKey = (combination: string): boolean => {
+  const parts = combination
+    .split("+")
+    .map((p) => p.trim().toLowerCase())
+    .filter(Boolean);
+  if (parts.length !== 1) return false;
+  const [key] = parts;
+  return key.length === 1 || TYPING_KEYS.has(key);
+};
