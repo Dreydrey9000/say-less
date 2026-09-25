@@ -6,6 +6,12 @@ import { Button } from "../ui/Button";
 export function CompanionSettings() {
   const { t } = useTranslation();
   const { settings, save, busy, loaded } = useStudio();
+  // A face would cover the formation, so the cards preview each one on the orb.
+  const previewCharacter = ["orb", "emblem", "both"].includes(
+    settings.dock_character,
+  )
+    ? settings.dock_character
+    : "orb";
   return (
     <section className="space-y-4">
       <div>
@@ -29,7 +35,7 @@ export function CompanionSettings() {
               })
             }
           >
-            <Companion formation={formation} />
+            <Companion formation={formation} character={previewCharacter} />
             <span>{t(`companion.formations.${formation}`)}</span>
           </button>
         ))}

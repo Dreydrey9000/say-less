@@ -4,88 +4,362 @@
   aspect-ratio: 1;
   color: var(--studio-accent, #b8ff65);
   isolation: isolate;
+  --spring: cubic-bezier(0.2, 0.8, 0.2, 1.2);
 }
-.particle-world {
+
+/* Charcoal lens every companion sits on, so the silver reads in light and
+   dark themes alike. The accent only shows up as a soft glow. */
+.companion-stage {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 36%,
+    #262a31 0%,
+    #16191f 56%,
+    #0c0e11 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    inset 0 -10px 18px rgba(0, 0, 0, 0.45);
+}
+.companion-stage::after {
+  content: "";
   position: absolute;
   inset: 8%;
   border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 56%,
+    color-mix(in srgb, var(--studio-accent, #b8ff65) 24%, transparent) 0%,
+    transparent 64%
+  );
+  opacity: 0.7;
+  transition: opacity 320ms var(--spring);
+}
+.is-listening .companion-stage::after {
+  opacity: 1;
+}
+
+.particle-world,
+.particle-front {
+  position: absolute;
+  inset: 4%;
   transform: scale(var(--voice-scale, 1));
   transition: transform 0.16s ease-out;
+  pointer-events: none;
 }
-.particle-world i {
+.particle-front {
+  z-index: 2;
+}
+.formation-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+/* Beads and rungs scale and slide about their own centers. (Only these:
+   transform-origin would also bend the transform attributes of the groups.) */
+.orbit-bead,
+.helix-bead,
+.helix-rung {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Orbit: steel ring, accent rim-light halo, chrome beads. */
+.orbit-glow {
+  fill: none;
+  stroke: var(--studio-accent, #b8ff65);
+  stroke-width: 0.7;
+  opacity: 0.4;
+}
+.orbit-spin,
+.orbit-counter {
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
+
+/* Helix rungs sit faint behind the beads. */
+.helix-rung {
+  opacity: 0.4;
+}
+
+/* Wave: silver front ribbon, steel middle, accent line at the back. */
+.wave-line {
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
+.wave-front {
+  stroke: #eef0f3;
+}
+.wave-mid {
+  stroke: #a9afb8;
+  opacity: 0.75;
+}
+.wave-back {
+  stroke: var(--studio-accent, #b8ff65);
+  opacity: 0.6;
+}
+.formation-wave .particle-world {
+  transform: scale(1, var(--voice-scale, 1));
+}
+
+.bezel-glint {
+  transform-box: view-box;
+  transform-origin: 50px 50px;
+  opacity: 0.75;
+  transform: rotate(-40deg);
+}
+
+/* Layered chrome orb: dark core, accent inner glow, specular highlight, a
+   thin bright rim and a faint brushed grain. */
+.companion-orb {
   position: absolute;
-  width: var(--dot-size);
-  height: var(--dot-size);
+  inset: 29%;
   border-radius: 50%;
-  background: currentColor;
-  box-shadow: 0 0 8px currentColor;
-  opacity: 0.8;
+  background:
+    radial-gradient(
+      circle at 34% 26%,
+      rgba(255, 255, 255, 0.85) 0,
+      rgba(255, 255, 255, 0.22) 12%,
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 50% 84%,
+      color-mix(in srgb, var(--studio-accent, #b8ff65) 70%, transparent) 0,
+      transparent 58%
+    ),
+    radial-gradient(circle at 42% 36%, #4b5059 0%, #1d2027 54%, #0a0b0e 100%);
+  box-shadow:
+    inset 0 -3px 6px rgba(0, 0, 0, 0.5),
+    0 0 12px color-mix(in srgb, var(--studio-accent, #b8ff65) 32%, transparent),
+    0 4px 10px rgba(0, 0, 0, 0.45);
+  z-index: 1;
+  transform: scale(calc(1 + (var(--voice-scale, 1) - 1) * 0.5));
+  transition: transform 0.16s ease-out;
 }
+.formation-helix .companion-orb,
+.formation-wave .companion-orb {
+  inset: 36%;
+}
+.companion-orb::before,
+.companion-orb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+.companion-orb::before {
+  background: conic-gradient(
+    from 210deg,
+    rgba(255, 255, 255, 0.95),
+    rgba(255, 255, 255, 0.08) 22%,
+    color-mix(in srgb, var(--studio-accent, #b8ff65) 70%, #fff) 50%,
+    rgba(255, 255, 255, 0.08) 78%,
+    rgba(255, 255, 255, 0.95)
+  );
+  -webkit-mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - 1.4px),
+    #000 calc(100% - 0.6px)
+  );
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - 1.4px),
+    #000 calc(100% - 0.6px)
+  );
+}
+.companion-orb::after {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9 0.08' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.6 0'/></filter><rect width='64' height='64' filter='url(%23n)'/></svg>");
+  background-size: 64px 64px;
+  opacity: 0.12;
+  mix-blend-mode: overlay;
+}
+
+/* The real S emblem. Its black backdrop is feathered into the charcoal stage,
+   so the S sits in a soft dark well instead of a hard-edged square. */
 .companion-emblem {
   position: absolute;
-  width: 35%;
-  height: 35%;
-  left: 32.5%;
-  top: 32.5%;
-  border-radius: 28%;
-  box-shadow: 0 12px 26px #0004;
+  inset: 31%;
+  border-radius: 50%;
+  overflow: hidden;
+  z-index: 1;
 }
-.formation-helix .companion-emblem,
-.formation-wave .companion-emblem {
-  width: 25%;
-  height: 25%;
-  left: 37.5%;
-  top: 37.5%;
+.companion-emblem.is-large {
+  inset: 13%;
 }
-.formation-emblem .particle-world {
-  opacity: 0.18;
+.companion-emblem img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  -webkit-mask-image: radial-gradient(circle, #000 60%, transparent 70%);
+  mask-image: radial-gradient(circle, #000 60%, transparent 70%);
 }
-.formation-emblem > img {
-  width: 65%;
-  height: 65%;
-  left: 17.5%;
-  top: 17.5%;
+.emblem-sheen {
+  position: absolute;
+  inset: -20%;
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 62%
+  );
+  mix-blend-mode: overlay;
+  transform: translateX(-70%);
 }
+
 @media (prefers-reduced-motion: no-preference) {
-  .is-moving .particle-world {
-    animation: particle-turn 30s linear infinite;
+  .is-moving .orbit-spin {
+    animation: orbit-spin 14s linear infinite;
   }
-  .is-moving .particle-world i {
-    animation: particle-breathe 4s ease-in-out var(--delay) infinite alternate;
+  .is-moving .orbit-counter {
+    animation: orbit-spin 14s linear infinite reverse;
   }
-  .is-moving.formation-wave .particle-world {
-    animation: particle-sway 7s ease-in-out infinite alternate;
+  .is-moving .bead-front {
+    animation: orbit-front 14s linear infinite;
   }
-  .is-moving.formation-helix .particle-world {
-    animation: particle-sway 12s ease-in-out infinite alternate;
+  .is-moving .bead-back {
+    animation: orbit-back 14s linear infinite;
+  }
+  .is-moving .helix-bead {
+    animation: helix-bead 5s infinite;
+  }
+  .is-moving .helix-rung {
+    animation: helix-rung 5s infinite;
+  }
+  .is-moving .wave-front {
+    animation: wave-flow 6s linear infinite;
+  }
+  .is-moving .wave-mid {
+    animation: wave-flow 9s linear infinite reverse;
+  }
+  .is-moving .wave-back {
+    animation: wave-flow 13s linear infinite;
+  }
+  .is-moving .bezel-glint {
+    animation: orbit-spin 8s linear infinite;
+  }
+  .is-moving .companion-emblem.is-large {
+    animation: emblem-float 6s ease-in-out infinite;
+  }
+  .is-moving .emblem-sheen {
+    animation: emblem-sheen 6s ease-in-out infinite;
+  }
+  .is-moving.is-thinking .companion-orb::before {
+    animation: orbit-spin 2.4s linear infinite;
   }
 }
-@keyframes particle-turn {
+@keyframes orbit-spin {
   from {
-    rotate: 0deg;
+    transform: rotate(0deg);
   }
   to {
-    rotate: 360deg;
+    transform: rotate(360deg);
   }
 }
-@keyframes particle-breathe {
-  from {
-    opacity: 0.35;
-    translate: 0 -2px;
-  }
-  to {
+/* A bead shows on the front layer for the lower half of the ring and on the
+   back layer (dimmer, smaller) for the upper half. */
+@keyframes orbit-front {
+  0% {
     opacity: 1;
-    translate: 0 2px;
+    transform: scale(1);
+  }
+  25% {
+    opacity: 1;
+    transform: scale(1.22);
+  }
+  49.9% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50%,
+  100% {
+    opacity: 0;
+    transform: scale(1);
   }
 }
-@keyframes particle-sway {
+@keyframes orbit-back {
+  0%,
+  49.9% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  75% {
+    opacity: 0.45;
+    transform: scale(0.72);
+  }
+  100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+}
+/* Side to side on a cosine, bigger and brighter while passing in front. */
+@keyframes helix-bead {
+  0% {
+    transform: translateX(22px) scale(0.9);
+    opacity: 0.72;
+    animation-timing-function: ease-in;
+  }
+  25% {
+    transform: translateX(0) scale(1.2);
+    opacity: 1;
+    animation-timing-function: ease-out;
+  }
+  50% {
+    transform: translateX(-22px) scale(0.9);
+    opacity: 0.72;
+    animation-timing-function: ease-in;
+  }
+  75% {
+    transform: translateX(0) scale(0.6);
+    opacity: 0.45;
+    animation-timing-function: ease-out;
+  }
+  100% {
+    transform: translateX(22px) scale(0.9);
+    opacity: 0.72;
+  }
+}
+@keyframes helix-rung {
+  0%,
+  50%,
+  100% {
+    transform: scaleX(1);
+    animation-timing-function: ease-in;
+  }
+  25%,
+  75% {
+    transform: scaleX(0);
+    animation-timing-function: ease-out;
+  }
+}
+@keyframes wave-flow {
   from {
-    rotate: -8deg;
+    transform: translateX(0);
   }
   to {
-    rotate: 8deg;
+    transform: translateX(-50px);
   }
 }
+@keyframes emblem-float {
+  50% {
+    transform: translateY(-2.5%) rotate(-2deg);
+  }
+}
+@keyframes emblem-sheen {
+  0% {
+    transform: translateX(-70%);
+  }
+  45%,
+  100% {
+    transform: translateX(70%);
+  }
+}
+
 .is-paused *,
 .is-paused {
   animation-play-state: paused !important;
@@ -115,23 +389,8 @@
   inset: 9%;
   filter: drop-shadow(0 4px 6px #0005);
 }
-.companion-orb {
-  position: absolute;
-  inset: 23%;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at 30% 24%,
-    #fff,
-    var(--studio-accent) 32%,
-    #151820 82%
-  );
-  box-shadow:
-    inset -3px -5px 9px #0007,
-    0 0 15px color-mix(in srgb, var(--studio-accent) 40%, transparent);
-}
 @media (prefers-reduced-motion: no-preference) {
-  .is-moving .companion-buddy,
-  .is-moving .companion-orb {
+  .is-moving .companion-buddy {
     animation: buddy-float 4s ease-in-out infinite;
   }
   .is-moving .buddy-eyes {

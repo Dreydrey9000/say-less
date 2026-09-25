@@ -2,6 +2,23 @@
 
 ## [2026-09-25]
 
+### Changed
+
+- Squiggle rebuilt as three phase-offset strands (the front one in the accent with a silver core and soft glow) over a fading baseline, 84x24 in the overlay, because the single thin line read as cheap and an idle pill looked empty.
+- Squiggle loudness now drives a spring with a small overshoot and a slow swell along its length, so talking reads as smooth motion instead of jumps; still one animation-frame loop writing paths directly, stopped when motion is off or the window is hidden.
+- Squiggle follows the chosen accent color in the overlay and in Appearance (it used the logo pink), and Reduce Motion or Pause draws a fixed, full resting shape.
+- Talking avatar: one persistent mouth path with a tongue that morphs by opening (no more pop between a line and an oval), eyelid blinks on a random 2.2 to 5.4 second timer, slight pupil drift, breathing while listening, a glance up while thinking, squash-and-bounce on start and a happy squint on stop, and faint voice rings (one in the small pill); all spring-eased and all still under Reduce Motion or Pause.
+- Companion picker: Orbit, Helix, Wave and Chrome S are now four distinct silver silhouettes on a charcoal lens (tilted orbit with beads passing behind and in front, a turning double helix, flowing sine ribbons, and the real S emblem with a bezel glint), with the accent only as glow or rim light; the flat radial ball became a layered chrome orb (dark core, accent inner glow, specular highlight, thin bright rim, brushed grain).
+- Picker cards: the chosen card gets a check badge next to its ring, and only the chosen, hovered or focused card animates, to keep the settings page light.
+- Compact dock disc has depth (inner shadow, specular top rim) and its status dot now means state: neutral gray when idle, bright while transcribing, amber on error, instead of copying the accent.
+- Recording overlay is a recessed charcoal pill in both themes (hairline ring, top highlight, inner shadow, no outer shadow so nothing clips at the window edge), with its text and hairlines pinned to the dark palette.
+- Voice visual samples in Appearance sit in the same charcoal pill, so they preview the real overlay.
+
+### Added
+
+- Playwright checks for the three squiggle strands, the still squiggle under Reduce Motion, a single morphing avatar mouth, the single ring in the small pill, distinct companion cards with only the chosen one animating, and the neutral idle dot in the compact dock.
+- In-app release note 0.13.1 describing the polish; it shows once the app version reaches 0.13.1.
+
 ### Fixed
 
 - Insights, history search, notes export and `--mcp` now read imported Wispr Flow history (`wispr-history.sqlite`) alongside `history.db`, because a new user who imported months of Wispr dictations saw "Not enough history yet"; a missing, damaged or locked import file is skipped and logged instead of breaking Insights.

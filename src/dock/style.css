@@ -141,19 +141,51 @@ button:disabled {
   margin: 8px;
 }
 .compact-companion {
+  position: relative;
   width: 88px;
   height: 88px;
   padding: 0;
-  border: 1px solid #ffffff38;
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 50%;
-  background: #161a20dd;
+  /* Recessed charcoal disc: inner shadow for depth, a specular top rim. */
+  background: radial-gradient(
+    circle at 50% 30%,
+    #2a2e35 0%,
+    #171a20 58%,
+    #0d0f12 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -6px 14px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 3px rgba(0, 0, 0, 0.25),
+    0 4px 10px rgba(0, 0, 0, 0.35);
   color: var(--studio-accent);
   cursor: pointer;
+}
+.compact-companion::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: 50%;
+  background: radial-gradient(
+    120% 55% at 50% 0%,
+    rgba(255, 255, 255, 0.16),
+    transparent 55%
+  );
+  pointer-events: none;
+}
+/* The disc already is the stage, so the companion's own lens steps aside. */
+.compact-companion .companion-stage {
+  background: none;
+  box-shadow: none;
 }
 .compact-companion:focus-visible {
   outline: 2px solid var(--studio-accent);
   outline-offset: -4px;
 }
+/* The dot means state, not decoration: neutral when idle, bright while
+   working, amber when something went wrong. Recording swaps it for the red
+   stop button. */
 .compact-indicator {
   position: absolute;
   right: 8px;
@@ -161,15 +193,17 @@ button:disabled {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: var(--studio-accent);
+  background: #8b9098;
   border: 2px solid #151820;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
   pointer-events: none;
 }
 .compact-dock[data-state="transcribing"] .compact-indicator {
-  background: #ffc65e;
+  background: #eef0f3;
 }
-.compact-indicator.has-error {
-  background: #ff626d;
+.compact-indicator.has-error,
+.compact-dock[data-state="transcribing"] .compact-indicator.has-error {
+  background: #ffb547;
 }
 .compact-action {
   position: absolute;

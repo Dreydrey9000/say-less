@@ -359,6 +359,45 @@
   outline: 2px solid var(--color-text);
   outline-offset: 2px;
 }
+/* Chosen companion: the swatch ring plus a check badge in the corner. */
+.formation-grid > button {
+  position: relative;
+}
+.formation-grid > button[aria-pressed="true"]::before,
+.formation-grid > button[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  z-index: 3;
+  pointer-events: none;
+}
+.formation-grid > button[aria-pressed="true"]::before {
+  background: var(--color-text);
+  box-shadow: 0 1px 4px #0006;
+}
+.formation-grid > button[aria-pressed="true"]::after {
+  background: var(--color-background);
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M5.5 10.4l3 3 6-6.6' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/></svg>")
+    center / 20px 20px no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M5.5 10.4l3 3 6-6.6' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/></svg>")
+    center / 20px 20px no-repeat;
+}
+@media (hover: hover) {
+  .formation-grid > button:not(:disabled):hover {
+    border-color: color-mix(in srgb, var(--color-text), transparent 55%);
+  }
+}
+/* Only the chosen (or hovered/focused) companion moves; the rest hold still. */
+.formation-grid
+  > button:not([aria-pressed="true"]):not(:hover):not(:focus-visible)
+  .companion
+  * {
+  animation-play-state: paused !important;
+}
 .formation-grid > button:focus-visible {
   outline: 3px solid var(--color-text);
   outline-offset: 3px;
@@ -437,12 +476,19 @@
   cursor: default;
   opacity: 0.6;
 }
+/* Each sample sits in a small charcoal pill, like the recording overlay. */
 .voice-visual-sample {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 34px;
-  color: var(--color-logo-primary);
+  padding: 0 12px;
+  border-radius: 999px;
+  color: var(--studio-accent, var(--color-logo-primary));
+  background: linear-gradient(180deg, #1b1e23, #0e1013);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 .voice-visual-bars {
   display: flex;
@@ -464,6 +510,14 @@
 .avatar-kind-thumb {
   width: 44px;
   height: 44px;
+}
+.voice-visual-mini-avatar {
+  width: 28px;
+  height: 28px;
+}
+.voice-visual-sample {
+  max-width: 100%;
+  overflow: hidden;
 }
 .avatar-builder {
   display: grid;
