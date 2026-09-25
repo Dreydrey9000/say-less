@@ -209,9 +209,6 @@ export function VoiceActions() {
                 setTarget(e.target.value);
                 setUrlError(false);
               }}
-              onBlur={() =>
-                setUrlError(!!target.trim() && !normalizeWebsite(target))
-              }
               placeholder="https://example.com"
             />
           )}

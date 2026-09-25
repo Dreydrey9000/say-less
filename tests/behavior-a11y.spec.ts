@@ -202,6 +202,8 @@ test("a section change starts at the top and focuses the new screen", async ({
 
 test("a skip link jumps past the sidebar", async ({ page }) => {
   await page.goto("/tests/fixtures/app.html");
+  // Wait for the app to render before the first Tab.
+  await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
   await page.keyboard.press("Tab");
   const skip = page.getByRole("link", { name: "Skip to content" });
   await expect(skip).toBeFocused();
@@ -254,7 +256,10 @@ test("voice action websites are validated and removal can be undone", async ({
 
 test("an invalid custom color explains why Apply is off", async ({ page }) => {
   await openSection(page, "Appearance");
-  const input = page.getByLabel("Custom hex color", { exact: true });
+  const input = page.getByRole("textbox", {
+    name: "Custom hex color",
+    exact: true,
+  });
   await input.fill("banana");
   await expect(
     page.getByRole("button", { name: "Apply color" }),
@@ -370,10 +375,15 @@ test("overlay says what it is doing, and its controls are big enough", async ({
   expect(box?.width ?? 0).toBeGreaterThanOrEqual(24);
   expect(box?.height ?? 0).toBeGreaterThanOrEqual(24);
   // Silent bars keep a low resting shape instead of lying flat.
-  const heights = await page
-    .locator(".swave i")
-    .evaluateAll((els) => els.map((el) => el.getBoundingClientRect().height));
-  expect(new Set(heights).size).toBeGreaterThan(1);
+  const barHeights = () =>
+    page
+      .locator(".swave i")
+      .evaluateAll((els) =>
+        els.map((el) => Math.round(el.getBoundingClientRect().height)),
+      );
+  await expect
+    .poll(async () => new Set(await barHeights()).size)
+    .toBeGreaterThan(1);
   await page.evaluate(() =>
     (window as unknown as TestWindow).testEmit("show-overlay", "transcribing"),
   );
