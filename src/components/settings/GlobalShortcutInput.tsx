@@ -151,7 +151,9 @@ export const GlobalShortcutInput: React.FC<GlobalShortcutInputProps> = ({
               }
             }
           }
+        }
 
+        if (editingShortcutId && bindings[editingShortcutId]) {
           // Re-register all bindings (the one just committed is already
           // registered; re-registering it fails cleanly and is ignored)
           await commands.resumeAllBindings().catch(console.error);
