@@ -249,7 +249,7 @@ test("talking avatar reads in the 104px compact dock", async ({ page }) => {
     await page
       .locator(".compact-indicator")
       .evaluate((el) => getComputedStyle(el).backgroundColor),
-  ).toBe("rgb(139, 144, 152)");
+  ).toBe("rgb(199, 204, 212)");
   await page.screenshot({ path: "test-results/dock-avatar-104.png" });
 });
 
@@ -278,4 +278,99 @@ test("each companion card has its own shape and only the chosen one moves", asyn
   expect(await running("Helix")).toBe(0);
   expect(await running("Wave")).toBe(0);
   await page.screenshot({ path: "test-results/companion-cards.png" });
+});
+
+for (const visual of ["bars", "squiggle", "avatar"]) {
+  test(`overlay ${visual} sits in its own slot, clear of the label`, async ({
+    page,
+  }) => {
+    await openOverlay(page, visual);
+    await speak(page, 0.9);
+    const label = await page.locator(".sstatus").boundingBox();
+    const slot = await page.locator(".svis").boundingBox();
+    const art = await page
+      .locator(".svis > *")
+      .first()
+      .evaluate((el) => {
+        const r = el.getBoundingClientRect();
+        return { x: r.x, width: r.width };
+      });
+    expect(label && slot).toBeTruthy();
+    // The slot starts after the label and the visual is centered inside it,
+    // so nothing is drawn over "Listening" (the slot clips any overflow).
+    expect(slot!.x).toBeGreaterThanOrEqual(label!.x + label!.width);
+    const slotCenter = slot!.x + slot!.width / 2;
+    expect(Math.abs(art.x + art.width / 2 - slotCenter)).toBeLessThan(1.5);
+    if (art.width <= slot!.width)
+      expect(art.x).toBeGreaterThanOrEqual(label!.x + label!.width);
+    // One 56px pill for every visual, lifted clear of the window edge.
+    const row = await page.locator(".sbase").boundingBox();
+    expect(Math.round(row!.height)).toBe(56);
+    const card = await page.locator(".scard").boundingBox();
+    expect(160 - (card!.y + card!.height)).toBeGreaterThanOrEqual(16);
+    // Red means we are listening.
+    expect(
+      await page
+        .locator(".sdot")
+        .evaluate((el) => getComputedStyle(el).backgroundColor),
+    ).toBe("rgb(255, 90, 90)");
+  });
+}
+
+for (const dock_compact of [true, false]) {
+  test(`${dock_compact ? "compact" : "expanded"} dock shows the Say Less emblem look`, async ({
+    page,
+  }) => {
+    await page.goto("/tests/fixtures/app.html");
+    await page.evaluate((compact) => {
+      const saved = JSON.parse(localStorage.getItem("test-studio") || "{}");
+      localStorage.setItem(
+        "test-studio",
+        JSON.stringify({
+          ...saved,
+          dock_compact: compact,
+          dock_character: "emblem",
+          dock_animation: "orbit",
+        }),
+      );
+    }, dock_compact);
+    await page.setViewportSize(
+      dock_compact ? { width: 104, height: 104 } : { width: 360, height: 112 },
+    );
+    await page.goto("/tests/fixtures/app.html?dock=1");
+    const center = page.locator(
+      dock_compact ? ".compact-companion" : ".dock-companion",
+    );
+    await expect(
+      center.locator('.companion-emblem img[src$="say-less-emblem.png"]'),
+    ).toBeVisible();
+    await expect(center.locator(".companion-orb")).toHaveCount(0);
+    if (dock_compact) {
+      const dot = page.locator(".compact-indicator");
+      await expect(dot).toHaveAttribute("aria-label", /.+/);
+      expect(Math.round((await dot.boundingBox())?.width ?? 0)).toBe(8);
+    } else {
+      await expect(
+        page.getByRole("button", { name: "Shrink to small dock" }),
+      ).toHaveAttribute("aria-label", "Shrink to small dock");
+    }
+  });
+}
+
+test("every select is one 40px control that fits its content", async ({
+  page,
+}) => {
+  await openAppearance(page);
+  for (const name of ["Theme", "Dock placement", "Dock look"]) {
+    const box = await page.getByRole("combobox", { name }).boundingBox();
+    expect(Math.round(box!.height)).toBe(40);
+    expect(box!.width).toBeLessThanOrEqual(280);
+  }
+  await page
+    .getByRole("button", { name: "Shortcuts & mic", exact: true })
+    .click();
+  const behavior = await page
+    .getByRole("combobox", { name: "Shortcut behavior" })
+    .boundingBox();
+  expect(Math.round(behavior!.height)).toBe(40);
 });

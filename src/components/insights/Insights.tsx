@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Lock } from "lucide-react";
 import { commands, type InsightsReport, type Topic } from "@/bindings";
 import { Button } from "../ui/Button";
 import { WorkingStatus } from "../ui/WorkingStatus";
@@ -80,7 +81,10 @@ export function Insights() {
         <p className="studio-eyebrow">{t("insights.tagline")}</p>
         <h1 className="text-3xl font-semibold">{t("insights.title")}</h1>
         <p className="text-sm text-text/75 mt-2">{t("insights.description")}</p>
-        <p className="insight-privacy">{t("insights.privacy")}</p>
+        <p className="insight-privacy">
+          <Lock aria-hidden="true" size={14} className="insight-privacy-icon" />
+          <span>{t("insights.privacy")}</span>
+        </p>
       </header>
 
       <div

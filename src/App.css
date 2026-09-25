@@ -139,6 +139,91 @@
   cursor: not-allowed;
 }
 
+/* The one main action on a screen, in the chosen accent (lime by default). */
+.accent-action {
+  color: var(--studio-on-accent, #000);
+  background: var(--studio-accent, #b8ff65);
+  border-color: transparent;
+  font-weight: 600;
+}
+.accent-action:hover {
+  filter: brightness(1.06);
+}
+.accent-action:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 3px;
+}
+
+/* One select look for every dropdown: 40px tall like the text inputs, a
+   single chevron, and a width that fits the longest option up to 280px. A
+   styled native <select> keeps keyboard, type-ahead and screen readers. */
+.sl-select-wrap {
+  position: relative;
+  display: inline-flex;
+  max-width: 280px;
+  min-width: 0;
+  color: var(--color-text);
+}
+.sl-select-wrap::after {
+  content: "";
+  position: absolute;
+  inset-inline-end: 12px;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin-top: -7px;
+  background: currentColor;
+  opacity: 0.7;
+  pointer-events: none;
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>")
+    center / contain no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>")
+    center / contain no-repeat;
+}
+.sl-select,
+.sl-select-trigger {
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  height: 40px;
+  min-width: 120px;
+  max-width: 280px;
+  padding-block: 0;
+  padding-inline: 12px 36px;
+  border: 1px solid color-mix(in srgb, var(--color-mid-gray) 40%, transparent);
+  border-radius: 8px;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-size: 14px;
+  line-height: 38px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+.sl-select:hover:not(:disabled),
+.sl-select-trigger:hover:not(:disabled) {
+  background-color: color-mix(
+    in srgb,
+    var(--color-logo-primary) 10%,
+    var(--color-background)
+  );
+  border-color: var(--color-logo-primary);
+}
+.sl-select:focus-visible,
+.sl-select-trigger:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+}
+.sl-select:disabled,
+.sl-select-trigger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .setting-row {
   display: grid;
   /* Label and description get the room; the control column stays 220-300px. */
@@ -147,6 +232,8 @@
   column-gap: 24px;
   row-gap: 12px;
   padding: 16px;
+  min-height: 56px;
+  box-sizing: border-box;
 }
 .setting-row-stacked {
   grid-template-columns: minmax(0, 1fr);
@@ -160,6 +247,34 @@
 }
 .settings-content {
   container-type: inline-size;
+  position: relative;
+}
+/* A 24px fade where the page scrolls under the footer, so text never ends in
+   a hard cut against the footer line. */
+.settings-content::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 24px;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--color-background));
+}
+/* One page gutter and width for every screen: 48px from the sidebar, content
+   up to 880px. Pages keep their own inner layout; only the frame is shared. */
+.page-frame {
+  padding: 24px 48px 48px;
+}
+.page-frame > *,
+.section-content > * {
+  width: 100%;
+  max-width: 880px;
+  margin-inline: auto;
+}
+@container (max-width: 560px) {
+  .page-frame {
+    padding-inline: 16px;
+  }
 }
 @container (max-width: 560px) {
   .setting-row {
@@ -277,6 +392,18 @@
 :root {
   --studio-accent: #b8ff65;
   --studio-on-accent: #000000;
+  /* Darker twin for thin marks on the light background (set from the chosen
+     accent by applyAccent; this is lime's). */
+  --studio-accent-on-light: #729e3f;
+  --studio-accent-mark: var(--studio-accent-on-light);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --studio-accent-mark: var(--studio-accent);
+  }
+}
+:root[data-theme="dark"] {
+  --studio-accent-mark: var(--studio-accent);
 }
 /* Appearance: 32px between sections, 12px heading to rows, 16px row padding. */
 .studio-section {
@@ -332,17 +459,25 @@
   outline: 3px solid var(--color-text);
   outline-offset: 3px;
 }
+/* Full-width selects inside forms share the .sl-select look: 40px, one
+   chevron (drawn here as a background, since there is no wrapper). */
 .studio-select {
   display: block;
   max-width: 100%;
   width: 100%;
-  min-height: 40px;
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  height: 40px;
   border: 1px solid color-mix(in srgb, var(--color-mid-gray), transparent 60%);
   border-radius: 8px;
-  padding: 6px 12px;
+  padding: 0 36px 0 12px;
   font-size: 14px;
   color: var(--color-text);
-  background: var(--color-background);
+  background: var(--color-background)
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b919a' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>")
+    no-repeat right 12px center / 14px 14px;
+  cursor: pointer;
 }
 .studio-select:focus-visible {
   outline: 2px solid var(--color-text);
@@ -363,7 +498,7 @@
   min-width: 180px;
 }
 .app-sidebar button[aria-current="page"] {
-  box-shadow: inset 3px 0 0 var(--studio-accent);
+  box-shadow: inset 3px 0 0 var(--studio-accent-mark);
   background: color-mix(in srgb, var(--studio-accent), transparent 89%);
 }
 .formation-grid {
@@ -383,12 +518,16 @@
   outline: 2px solid var(--color-text);
   outline-offset: 2px;
 }
-/* Chosen companion: the swatch ring plus a check badge in the corner. */
-.formation-grid > button {
+/* Chosen companion or accent: the swatch ring plus a check badge in the
+   corner, the same "this one" signal everywhere. */
+.formation-grid > button,
+.palette-choice {
   position: relative;
 }
 .formation-grid > button[aria-pressed="true"]::before,
-.formation-grid > button[aria-pressed="true"]::after {
+.formation-grid > button[aria-pressed="true"]::after,
+.palette-choice[aria-pressed="true"]::before,
+.palette-choice[aria-pressed="true"]::after {
   content: "";
   position: absolute;
   top: 8px;
@@ -399,11 +538,13 @@
   z-index: 3;
   pointer-events: none;
 }
-.formation-grid > button[aria-pressed="true"]::before {
+.formation-grid > button[aria-pressed="true"]::before,
+.palette-choice[aria-pressed="true"]::before {
   background: var(--color-text);
   box-shadow: 0 1px 4px #0006;
 }
-.formation-grid > button[aria-pressed="true"]::after {
+.formation-grid > button[aria-pressed="true"]::after,
+.palette-choice[aria-pressed="true"]::after {
   background: var(--color-background);
   -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M5.5 10.4l3 3 6-6.6' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/></svg>")
     center / 20px 20px no-repeat;

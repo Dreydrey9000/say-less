@@ -12,7 +12,13 @@ test("insights shows the top problem, its quotes, and stays local by default", a
   ).toBeVisible();
   const fixFirst = page.getByRole("region", { name: "Most-mentioned topic" });
   await expect(fixFirst).toContainText("video export audio");
-  await expect(fixFirst).toContainText("mentioned 27 times");
+  // The count is the hero number, with the full phrase for screen readers.
+  await expect(fixFirst.locator(".insight-hero-number")).toHaveText("27");
+  await expect(fixFirst.locator(".insight-hero-unit")).toHaveText("mentions");
+  await expect(fixFirst.locator(".insight-hero-count")).toHaveAttribute(
+    "aria-label",
+    "mentioned 27 times",
+  );
   await fixFirst.getByText("video export audio", { exact: true }).click();
   await expect(fixFirst).toContainText(
     "The video export audio is broken again",

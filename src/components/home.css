@@ -1,12 +1,5 @@
 .say-home {
   width: 100%;
-  max-width: 1080px;
-  padding: 24px 18px;
-}
-.home-kicker {
-  font-size: 13px;
-  line-height: 18px;
-  color: var(--color-text-muted);
 }
 .home-stage {
   display: grid;
@@ -132,10 +125,33 @@
   flex: 1;
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
   gap: 12px;
   padding: 20px 12px;
   cursor: pointer;
   font-size: 13px;
+  text-align: start;
+}
+.home-tool-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.home-tool-title {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+}
+.home-tool-hint {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--color-text-muted);
+}
+.home-tools button svg {
+  flex: none;
+  margin-top: 1px;
+  color: var(--color-text-muted);
 }
 .home-tools button + button {
   border-inline-start: 1px solid #80808040;
@@ -196,9 +212,6 @@
   outline-offset: 3px;
 }
 @container (max-width:580px) {
-  .say-home {
-    padding: 12px 0;
-  }
   .home-stage {
     grid-template-columns: 1fr;
     padding: 28px 0;
@@ -217,8 +230,5 @@
   .home-tools button + button {
     border-inline-start: 0;
     border-top: 1px solid #80808040;
-  }
-  .home-kicker {
-    flex-wrap: wrap;
   }
 }

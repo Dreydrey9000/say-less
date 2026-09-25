@@ -21,6 +21,8 @@ interface DropdownProps {
 
 // Native selection provides arrow keys, type-ahead, Escape, and platform screen
 // reader behavior without maintaining a second, incomplete combobox implementation.
+// `.sl-select` (App.css) gives it the shared look: 40px tall like the text
+// inputs, one chevron, width fits the longest option up to 280px.
 export function Dropdown({
   options,
   selectedValue,
@@ -35,31 +37,33 @@ export function Dropdown({
   const descriptionId = useId();
   const selected = options.find((option) => option.value === selectedValue);
   return (
-    <div className={`w-full min-w-0 max-w-full ${className}`}>
-      <select
-        aria-label={label || placeholder || t("controls.choose")}
-        aria-describedby={selected?.description ? descriptionId : undefined}
-        value={selected?.value ?? ""}
-        onChange={(event) => onSelect(event.target.value)}
-        onFocus={onRefresh}
-        disabled={disabled}
-        className="w-full min-w-0 max-w-full min-h-[40px] rounded-lg border border-mid-gray/40 bg-background px-3 py-2 text-sm text-text cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {!selected && (
-          <option value="" disabled>
-            {placeholder || t("controls.choose")}
-          </option>
-        )}
-        {options.map((option) => (
-          <option
-            key={option.value}
-            value={option.value}
-            disabled={option.disabled}
-          >
-            {option.label}
-          </option>
-        ))}
-      </select>
+    <div className={`min-w-0 max-w-full ${className}`}>
+      <span className="sl-select-wrap">
+        <select
+          aria-label={label || placeholder || t("controls.choose")}
+          aria-describedby={selected?.description ? descriptionId : undefined}
+          value={selected?.value ?? ""}
+          onChange={(event) => onSelect(event.target.value)}
+          onFocus={onRefresh}
+          disabled={disabled}
+          className="sl-select"
+        >
+          {!selected && (
+            <option value="" disabled>
+              {placeholder || t("controls.choose")}
+            </option>
+          )}
+          {options.map((option) => (
+            <option
+              key={option.value}
+              value={option.value}
+              disabled={option.disabled}
+            >
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </span>
       {selected?.description && (
         <p id={descriptionId} className="text-xs text-text/70 mt-1 max-w-xs">
           {selected.description}

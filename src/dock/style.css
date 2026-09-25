@@ -187,27 +187,34 @@ button:disabled {
   outline: 2px solid var(--studio-accent);
   outline-offset: -4px;
 }
-/* The dot means state, not decoration: neutral when idle, bright while
-   working, amber when something went wrong. Recording swaps it for the red
-   stop button. */
+/* The dot means state, not decoration: an 8px light set inside the disc's
+   rim. Silver when idle or working, red while recording, amber when something
+   went wrong. Recording also swaps it for the red stop button. */
 .compact-indicator {
   position: absolute;
-  right: 8px;
-  bottom: 8px;
-  width: 12px;
-  height: 12px;
+  right: 15px;
+  bottom: 15px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: #8b9098;
-  border: 2px solid #151820;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  background: #c7ccd4;
+  box-shadow:
+    0 0 0 1.5px rgba(13, 15, 18, 0.9),
+    0 0 6px rgba(199, 204, 212, 0.35);
   pointer-events: none;
 }
-.compact-dock[data-state="transcribing"] .compact-indicator {
-  background: #eef0f3;
+.compact-dock[data-state="recording"] .compact-indicator {
+  background: #ff5a5a;
+  box-shadow:
+    0 0 0 1.5px rgba(13, 15, 18, 0.9),
+    0 0 6px rgba(255, 90, 90, 0.5);
 }
 .compact-indicator.has-error,
-.compact-dock[data-state="transcribing"] .compact-indicator.has-error {
+.compact-dock[data-state] .compact-indicator.has-error {
   background: #ffb547;
+  box-shadow:
+    0 0 0 1.5px rgba(13, 15, 18, 0.9),
+    0 0 6px rgba(255, 181, 71, 0.5);
 }
 .compact-dock .compact-action-anchor {
   position: absolute;

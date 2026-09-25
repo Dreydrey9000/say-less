@@ -16,9 +16,25 @@ export function TopicCard({
     <details className={`insight-topic${highlight ? " is-highlight" : ""}`}>
       <summary>
         <span className="insight-topic-label">{topic.label}</span>
-        <span className="insight-topic-count">
-          {t("insights.mentions", { count: topic.count })}
-        </span>
+        {highlight ? (
+          // The most-mentioned topic leads with its count: the number is the
+          // headline, "mentions" sits under it.
+          <span
+            className="insight-hero-count"
+            aria-label={t("insights.mentions", { count: topic.count })}
+          >
+            <span className="insight-hero-number" aria-hidden="true">
+              {topic.count}
+            </span>
+            <span className="insight-hero-unit" aria-hidden="true">
+              {t("insights.mentionsUnit", { count: topic.count })}
+            </span>
+          </span>
+        ) : (
+          <span className="insight-topic-count">
+            {t("insights.mentions", { count: topic.count })}
+          </span>
+        )}
         <ChevronDown aria-hidden="true" className="insight-chevron" size={16} />
       </summary>
       <div className="insight-topic-body">

@@ -69,6 +69,12 @@ function App() {
   // Track if this is a returning user who just needs to grant permissions
   // (vs a new user who needs full onboarding including model selection)
   const [isReturningUser, setIsReturningUser] = useState(false);
+  // First-run setup counts the permission screen as a step only when we
+  // actually had to ask (it is skipped when everything is already granted).
+  const [askedPermissions, setAskedPermissions] = useState(false);
+  const markAskedPermissions = useCallback(() => setAskedPermissions(true), []);
+  const setupTotal = askedPermissions ? 3 : 2;
+  const setupOffset = askedPermissions ? 1 : 0;
   const [currentSection, setCurrentSection] = useState<SidebarSection>("home");
   const scrollerRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
@@ -435,6 +441,8 @@ function App() {
     content = (
       <AccessibilityOnboarding
         onComplete={handleAccessibilityComplete}
+        step={isReturningUser ? undefined : { current: 1, total: 3 }}
+        onAsk={isReturningUser ? undefined : markAskedPermissions}
         onExplore={() => {
           setSettingsOnly(true);
           setOnboardingStep("done");
@@ -442,9 +450,19 @@ function App() {
       />
     );
   } else if (onboardingStep === "model") {
-    content = <Onboarding onModelSelected={handleModelSelected} />;
+    content = (
+      <Onboarding
+        onModelSelected={handleModelSelected}
+        step={{ current: 1 + setupOffset, total: setupTotal }}
+      />
+    );
   } else if (onboardingStep === "try") {
-    content = <TryItStep onDone={() => setOnboardingStep("done")} />;
+    content = (
+      <TryItStep
+        onDone={() => setOnboardingStep("done")}
+        step={{ current: 2 + setupOffset, total: setupTotal }}
+      />
+    );
   } else {
     content = (
       <div
@@ -479,7 +497,7 @@ function App() {
           {/* Scrollable content area */}
           <div className="settings-content flex-1 min-w-0 flex flex-col overflow-hidden">
             <div ref={scrollerRef} className="flex-1 overflow-y-auto">
-              <div className="flex flex-col items-center p-4 gap-4">
+              <div className="page-frame flex flex-col items-center gap-4">
                 {settingsOnly ? (
                   <div
                     role="status"

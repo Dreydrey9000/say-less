@@ -188,7 +188,10 @@
       "loading": "The first dictation can take a few seconds while the speech engine starts up.",
       "done": "Start using Say Less",
       "skip": "Skip for now"
-    }
+    },
+    "step": "Step {{current}} of {{total}}",
+    "useEngine": "Use this engine",
+    "downloadEngine": "Download ({{size}})"
   },
   "modelSelector": {
     "custom": "Custom",
@@ -233,7 +236,7 @@
   },
   "settings": {
     "modelSettings": {
-      "title": "{{model}} Settings"
+      "title": "Speech engine settings"
     },
     "general": {
       "title": "Shortcuts",
@@ -253,7 +256,7 @@
             "description": "Hold Fn to talk, same as your main shortcut. Tip: in System Settings > Keyboard, set \"Press Globe key to\" to \"Do Nothing\" so the emoji picker doesn't pop up."
           },
           "cancel": {
-            "name": "Cancel Shortcut",
+            "name": "Cancel shortcut",
             "description": "The keyboard shortcut to cancel the current recording."
           },
           "transcribe_with_post_process": {
@@ -275,7 +278,7 @@
         "auto": "Auto"
       },
       "shortcutActivation": {
-        "title": "Shortcut Behavior",
+        "title": "Shortcut behavior",
         "description": "Choose how the transcribe shortcut starts and stops recording.",
         "options": {
           "holdOrToggle": "Hold or tap",
@@ -318,17 +321,17 @@
         "loading": "Loading..."
       },
       "channel": {
-        "title": "Input Channel",
+        "title": "Input channel",
         "description": "Select which input channel to record from. Use this if your audio interface has multiple inputs.",
         "average": "Average all channels",
         "channel": "Channel {{n}}"
       },
       "audioFeedback": {
-        "label": "Audio Feedback",
+        "label": "Audio feedback",
         "description": "Play sound when recording starts and stops"
       },
       "outputDevice": {
-        "title": "Output Device",
+        "title": "Output device",
         "description": "Select your preferred audio output device for feedback sounds",
         "placeholder": "Select output device...",
         "loading": "Loading..."
@@ -636,7 +639,7 @@
         "description": "Turns on the Talk + AI cleanup shortcut and your cleanup instructions. Your transcript text goes to the provider you choose below."
       },
       "muteWhileRecording": {
-        "label": "Mute While Recording",
+        "label": "Mute while recording",
         "description": "Mute system audio during recording"
       },
       "appendTrailingSpace": {
@@ -739,7 +742,7 @@
     "checkingUpdates": "Checking for updates...",
     "updateAvailableShort": "Update available",
     "upToDate": "Up to date",
-    "updateCheckingDisabled": "Update Checking Disabled",
+    "updateCheckingDisabled": "Updates off",
     "downloading": "Downloading... {{progress}}%",
     "installing": "Installing...",
     "preparing": "Preparing...",
@@ -827,7 +830,8 @@
     "recheck": "Recheck permissions",
     "actionFailed": "Could not run that voice action. Check its destination in Voice actions.",
     "actionOpened": "Voice action opened its destination.",
-    "open": "Open {{page}}"
+    "open": "Open {{page}}",
+    "resetLabel": "Reset"
   },
   "writing": {
     "title": "Writing",
@@ -996,7 +1000,7 @@
     "transcribing": "Turning your voice into text…",
     "arming": "Starting microphone…",
     "expand": "Expand dock",
-    "collapse": "Shrink dock"
+    "collapse": "Shrink to small dock"
   },
   "home": {
     "title": "Home",
@@ -1036,7 +1040,10 @@
       "recording": "Listening…",
       "transcribing": "Typing it out…",
       "processing": "Typing it out…"
-    }
+    },
+    "lookHint": "Colors, the dock, and what shows while you talk",
+    "wordsHint": "Names and terms we should spell right",
+    "actionsHint": "Say a cue to open an app or a website"
   },
   "companion": {
     "title": "Particle pattern",
@@ -1226,6 +1233,8 @@
       "developers": "For developers: setup commands"
     },
     "analyzed_one": "Based on {{count}} dictation.",
-    "analyzed_other": "Based on {{count}} dictations."
+    "analyzed_other": "Based on {{count}} dictations.",
+    "mentionsUnit_one": "mention",
+    "mentionsUnit_other": "mentions"
   }
 }

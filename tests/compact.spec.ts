@@ -10,7 +10,7 @@ test("dock collapses to a small companion and expands without recording", async 
     page.getByRole("button", { name: "Record", exact: true }),
   ).toBeVisible();
   await page.screenshot({ path: "test-results/dock-expanded-0.12.0.png" });
-  await page.getByRole("button", { name: "Shrink dock" }).click();
+  await page.getByRole("button", { name: "Shrink to small dock" }).click();
   await page.setViewportSize({ width: 104, height: 104 });
   await expect(page.getByRole("button", { name: "Expand dock" })).toBeVisible();
   expect(

@@ -11,12 +11,18 @@ import { toast } from "sonner";
 import { commands } from "@/bindings";
 import { useSettingsStore } from "@/stores/settingsStore";
 import SayLessLogo from "../icons/SayLessLogo";
+import { OnboardingStepLabel } from "./OnboardingStepLabel";
 import { Keyboard, Mic, Check, Loader2 } from "lucide-react";
 
 interface AccessibilityOnboardingProps {
   onComplete: () => void;
   onExplore?: () => void;
   preview?: boolean;
+  /** Where this screen sits in first-run setup. Omitted for returning users. */
+  step?: { current: number; total: number };
+  /** Called once when we actually have to ask for a permission, so setup can
+   *  count this screen as a step (it is skipped when nothing is needed). */
+  onAsk?: () => void;
 }
 
 type PermissionStatus = "checking" | "needed" | "waiting" | "granted";
@@ -27,10 +33,20 @@ interface PermissionsState {
   microphone: PermissionStatus;
 }
 
+/** Tells setup, once, that the permission request screen was really shown. */
+function AskedMarker({ onAsk }: { onAsk?: () => void }) {
+  useEffect(() => {
+    onAsk?.();
+  }, [onAsk]);
+  return null;
+}
+
 const AccessibilityOnboarding: React.FC<AccessibilityOnboardingProps> = ({
   onComplete,
   onExplore,
   preview = false,
+  step,
+  onAsk,
 }) => {
   const { t } = useTranslation();
   const refreshAudioDevices = useSettingsStore(
@@ -359,8 +375,10 @@ const AccessibilityOnboarding: React.FC<AccessibilityOnboardingProps> = ({
   // Show permissions request screen
   return (
     <div className="min-h-screen w-full flex flex-col p-6 gap-6 items-center justify-center">
+      <AskedMarker onAsk={onAsk} />
       <div className="flex flex-col items-center gap-2">
         <SayLessLogo width={200} />
+        {step && <OnboardingStepLabel {...step} />}
       </div>
 
       <div className="max-w-md w-full flex flex-col items-center gap-4">

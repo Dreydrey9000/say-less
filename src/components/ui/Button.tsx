@@ -3,6 +3,7 @@ import React from "react";
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?:
     | "primary"
+    | "accent"
     | "primary-soft"
     | "secondary"
     | "warning"
@@ -25,6 +26,8 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variantClasses = {
     primary: "brand-action",
+    // The chosen accent color (lime by default): the one main action on a screen.
+    accent: "accent-action",
     "primary-soft":
       "text-text bg-logo-primary/20 border-transparent hover:bg-logo-primary/30 focus:ring-1 focus:ring-logo-primary",
     secondary:

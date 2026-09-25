@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { type } from "@tauri-apps/plugin-os";
 import SayLessLogo from "../icons/SayLessLogo";
+import { OnboardingStepLabel } from "./OnboardingStepLabel";
 import { Button } from "../ui/Button";
 import { useSettings } from "../../hooks/useSettings";
 import { formatKeyCombination } from "../../lib/utils/keyboard";
 
 interface TryItStepProps {
   onDone: () => void;
+  step?: { current: number; total: number };
 }
 
 /**
@@ -15,7 +17,7 @@ interface TryItStepProps {
  * success happens on purpose instead of by chance. It also shows the Fn /
  * emoji-picker fix before anyone decides the app is broken.
  */
-const TryItStep: React.FC<TryItStepProps> = ({ onDone }) => {
+const TryItStep: React.FC<TryItStepProps> = ({ onDone, step }) => {
   const { t } = useTranslation();
   const { settings } = useSettings();
   const [text, setText] = useState("");
@@ -31,6 +33,7 @@ const TryItStep: React.FC<TryItStepProps> = ({ onDone }) => {
     <div className="h-screen w-full flex flex-col items-center p-6 gap-6 overflow-y-auto">
       <SayLessLogo width={160} />
       <div className="max-w-[560px] w-full space-y-4">
+        {step && <OnboardingStepLabel {...step} />}
         <h1 className="text-[28px] leading-[34px] font-semibold tracking-tight">
           {t("onboarding.try.title")}
         </h1>

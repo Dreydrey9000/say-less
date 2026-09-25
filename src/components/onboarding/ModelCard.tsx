@@ -75,6 +75,11 @@ interface ModelCardProps {
   downloadProgress?: number;
   downloadSpeed?: number; // MB/s
   showRecommended?: boolean;
+  /** Hide the accuracy/speed bars (e.g. when every engine shown scores the same). */
+  showScores?: boolean;
+  /** A visible action button. The card then stops acting as one big button
+   *  for keyboard and screen readers, so controls are never nested. */
+  action?: { label: string; primary: boolean };
 }
 
 const ModelCard: React.FC<ModelCardProps> = ({
@@ -90,6 +95,8 @@ const ModelCard: React.FC<ModelCardProps> = ({
   downloadProgress,
   downloadSpeed,
   showRecommended = true,
+  showScores = true,
+  action,
 }) => {
   const { t } = useTranslation();
   const debugMode = useSettingsStore(
@@ -148,10 +155,10 @@ const ModelCard: React.FC<ModelCardProps> = ({
     <div
       onClick={handleClick}
       onKeyDown={(e) => {
-        if (e.key === "Enter" && isClickable) handleClick();
+        if (e.key === "Enter" && isClickable && !action) handleClick();
       }}
-      role={isClickable ? "button" : undefined}
-      tabIndex={isClickable ? 0 : undefined}
+      role={isClickable && !action ? "button" : undefined}
+      tabIndex={isClickable && !action ? 0 : undefined}
       className={[
         baseClasses,
         getVariantClasses(),
@@ -196,7 +203,7 @@ const ModelCard: React.FC<ModelCardProps> = ({
             {displayDescription}
           </p>
         </div>
-        {(model.accuracy_score > 0 || model.speed_score > 0) && (
+        {showScores && (model.accuracy_score > 0 || model.speed_score > 0) && (
           <div className="hidden sm:flex items-center ms-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
@@ -287,6 +294,21 @@ const ModelCard: React.FC<ModelCardProps> = ({
           </Button>
         )}
       </div>
+
+      {action && isClickable && (
+        <Button
+          variant={action.primary ? "accent" : "secondary"}
+          size="md"
+          disabled={disabled}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleClick();
+          }}
+          className="self-stretch sm:self-end mt-1"
+        >
+          {action.label}
+        </Button>
+      )}
 
       {/* Download/extract progress */}
       {status === "downloading" && downloadProgress !== undefined && (

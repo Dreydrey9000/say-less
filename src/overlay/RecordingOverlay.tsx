@@ -290,8 +290,9 @@ const RecordingOverlay: React.FC = () => {
     ? t("ux.overlay.listening")
     : t("ux.overlay.starting");
 
-  // dot + status (left) | waveform (center) | timer + cancel (right) — same
-  // structure for pill & panel, so the Live morph is a pure width change.
+  // dot + status (left) | voice-visual slot (fills the gap, visual centered in
+  // it) | timer + cancel (right). Same structure for pill & panel, so the Live
+  // morph is a pure width change.
   const listeningRow = (showTimer: boolean, showCancel: boolean) => (
     <div className="sbase">
       <div className="sbase-l">
@@ -300,7 +301,7 @@ const RecordingOverlay: React.FC = () => {
           {listeningLabel}
         </span>
       </div>
-      {waveform}
+      <div className="svis">{waveform}</div>
       <div className="sbase-r">
         {showTimer && <span className="stimer">{fmtTime(elapsed)}</span>}
         {showCancel && cancelBtn}
@@ -308,8 +309,8 @@ const RecordingOverlay: React.FC = () => {
     </div>
   );
 
-  // spinner (left) | label (center) | cancel (right) — same 3-zone grid as the
-  // listening row, so the label is centered.
+  // spinner (left) | label (fills the middle, centered) | cancel (right), the
+  // same zones as the listening row.
   const workingRow = (label: string, showCancel: boolean) => (
     <div className="sbase">
       <div className="sbase-l">

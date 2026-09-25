@@ -301,13 +301,15 @@ test("dock icon buttons are named, big enough and show a tooltip on focus", asyn
   for (const width of sizes) expect(width).toBeGreaterThanOrEqual(32);
 
   // Expanding from the compact dock keeps keyboard focus in the dock.
-  await page.getByRole("button", { name: "Shrink dock" }).click();
+  await page.getByRole("button", { name: "Shrink to small dock" }).click();
   await page.setViewportSize({ width: 104, height: 104 });
   const expand = page.getByRole("button", { name: "Expand dock" });
   await expect(expand).toBeFocused();
   await page.keyboard.press("Enter");
   await page.setViewportSize({ width: 360, height: 112 });
-  await expect(page.getByRole("button", { name: "Shrink dock" })).toBeFocused();
+  await expect(
+    page.getByRole("button", { name: "Shrink to small dock" }),
+  ).toBeFocused();
 });
 
 async function openOverlay(page: Page, query = "") {
@@ -390,7 +392,9 @@ test("overlay says what it is doing, and its controls are big enough", async ({
   await expect(live).toHaveText("Transcribing...");
 });
 
-test("the overlay avatar is at least 44px", async ({ page }) => {
+test("the overlay avatar is 40px with 8px clearance in the pill", async ({
+  page,
+}) => {
   await page.goto("/tests/fixtures/app.html");
   await page.evaluate(() => {
     const saved = JSON.parse(localStorage.getItem("test-studio") || "{}");
@@ -406,8 +410,14 @@ test("the overlay avatar is at least 44px", async ({ page }) => {
     await emit("recording-ready");
   });
   const box = await page.locator(".savatar").boundingBox();
-  expect(box?.width ?? 0).toBeGreaterThanOrEqual(44);
-  expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
+  expect(Math.round(box?.width ?? 0)).toBe(40);
+  expect(Math.round(box?.height ?? 0)).toBe(40);
+  // Room above and below inside the 56px control row.
+  const row = await page.locator(".sbase").boundingBox();
+  expect(box!.y - row!.y).toBeGreaterThanOrEqual(7.5);
+  expect(row!.y + row!.height - (box!.y + box!.height)).toBeGreaterThanOrEqual(
+    7.5,
+  );
 });
 
 test("reduced motion holds the overlay bars still", async ({ page }) => {

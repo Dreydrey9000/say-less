@@ -35,24 +35,43 @@ export const GeneralSettings: React.FC = () => {
         </p>
       </PageHeader>
       <SettingsGroup title={t("settings.general.title")}>
-        <ShortcutInput shortcutId="transcribe" grouped={true} />
-        {isMac && <ShortcutInput shortcutId="transcribe_fn" grouped={true} />}
-        <ShortcutActivationSetting descriptionMode="tooltip" grouped={true} />
+        <ShortcutInput
+          shortcutId="transcribe"
+          descriptionMode="inline"
+          grouped={true}
+        />
+        {isMac && (
+          <ShortcutInput
+            shortcutId="transcribe_fn"
+            descriptionMode="inline"
+            grouped={true}
+          />
+        )}
+        <ShortcutActivationSetting descriptionMode="inline" grouped={true} />
         {/* Cancel shortcut remains hidden on Linux because of dynamic shortcut instability. */}
-        {!isLinux && <ShortcutInput shortcutId="cancel" grouped={true} />}
+        {!isLinux && (
+          <ShortcutInput
+            shortcutId="cancel"
+            descriptionMode="inline"
+            grouped={true}
+          />
+        )}
       </SettingsGroup>
       <ModelSettingsCard />
       <SettingsGroup title={t("settings.sound.title")}>
-        <MicrophoneSelector descriptionMode="tooltip" grouped={true} />
-        <ChannelSelector descriptionMode="tooltip" grouped={true} />
-        <MuteWhileRecording descriptionMode="tooltip" grouped={true} />
-        <AudioFeedback descriptionMode="tooltip" grouped={true} />
+        <MicrophoneSelector descriptionMode="inline" grouped={true} />
+        <ChannelSelector descriptionMode="inline" grouped={true} />
+        <MuteWhileRecording descriptionMode="inline" grouped={true} />
+        <AudioFeedback descriptionMode="inline" grouped={true} />
         <OutputDeviceSelector
-          descriptionMode="tooltip"
+          descriptionMode="inline"
           grouped={true}
           disabled={!audioFeedbackEnabled}
         />
-        <VolumeSlider disabled={!audioFeedbackEnabled} />
+        <VolumeSlider
+          descriptionMode="inline"
+          disabled={!audioFeedbackEnabled}
+        />
       </SettingsGroup>
     </div>
   );
