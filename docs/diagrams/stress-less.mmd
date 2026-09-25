@@ -7,7 +7,9 @@ flowchart LR
         Engine --> Screen[Insights screen<br/>Fix this first / problems / ideas / search]
         Screen --> Voice[Read digest aloud<br/>system voices]
         Engine -.->|opt-in: nightly or Export now| Notes[Markdown notes folder<br/>Daily/YYYY-MM-DD.md + Insights.md]
+        Wispr[(wispr-history.sqlite<br/>imported Wispr Flow history)] -->|read-only, if imported| Engine
         DB -.->|read-only, opt-in: handy --mcp| MCP[Local MCP server<br/>stdio, no GUI]
+        Wispr -.->|read-only, opt-in: handy --mcp| MCP
     end
     Notes --> Obsidian[Obsidian or any notes app]
     MCP --> Claude[Claude Code / Claude Desktop<br/>any MCP client you add it to]

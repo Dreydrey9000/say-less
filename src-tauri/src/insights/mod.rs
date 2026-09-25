@@ -93,11 +93,10 @@ fn notes_folder(app: &AppHandle, settings: &InsightsSettings) -> PathBuf {
 fn compute(app: &AppHandle, days: Option<u32>) -> Result<InsightsReport, String> {
     let path = history_db(app)?;
     let at = now();
-    if !path.exists() {
+    if !db::has_any_history(&path) {
         return Ok(engine::analyze(&[], days, at, &EngineOptions::default()));
     }
-    let conn = db::open_read_only(&path)?;
-    let entries = db::load_transcripts(&conn, db::cutoff(at, days))?;
+    let entries = db::open_history(&path)?.load_transcripts(db::cutoff(at, days))?;
     Ok(engine::analyze(
         &entries,
         days,
@@ -135,11 +134,10 @@ pub async fn search_history_text(
     }
     tauri::async_runtime::spawn_blocking(move || {
         let path = history_db(&app)?;
-        if !path.exists() {
+        if !db::has_any_history(&path) {
             return Ok(Vec::new());
         }
-        let conn = db::open_read_only(&path)?;
-        db::search(&conn, &query, db::cutoff(now(), days), 100)
+        db::open_history(&path)?.search(&query, db::cutoff(now(), days), 100)
     })
     .await
     .map_err(|e| e.to_string())?
@@ -185,9 +183,8 @@ fn run_export(app: &AppHandle) -> Result<ExportReport, String> {
     let folder = notes_folder(app, &settings);
     let result = (|| {
         let path = history_db(app)?;
-        let entries = if path.exists() {
-            let conn = db::open_read_only(&path)?;
-            db::load_transcripts(&conn, i64::MIN)?
+        let entries = if db::has_any_history(&path) {
+            db::open_history(&path)?.load_transcripts(i64::MIN)?
         } else {
             Vec::new()
         };
