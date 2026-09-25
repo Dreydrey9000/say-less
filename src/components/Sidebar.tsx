@@ -94,7 +94,7 @@ export const SECTIONS_CONFIG = {
     enabled: () => true,
   },
   import: {
-    labelKey: "import.title",
+    labelKey: "sidebar.import",
     icon: Download,
     component: WisprImport,
     enabled: () => true,
@@ -105,17 +105,19 @@ export const SECTIONS_CONFIG = {
     component: ModelsSettings,
     enabled: () => true,
   },
+  // Always listed: its on/off switch lives on the page itself, so the
+  // "set up a provider in AI cleanup" hints elsewhere never point nowhere.
+  postprocessing: {
+    labelKey: "sidebar.postProcessing",
+    icon: Sparkles,
+    component: PostProcessingSettings,
+    enabled: () => true,
+  },
   advanced: {
     labelKey: "sidebar.advanced",
     icon: Cog,
     component: AdvancedSettings,
     enabled: () => true,
-  },
-  postprocessing: {
-    labelKey: "sidebar.postProcessing",
-    icon: Sparkles,
-    component: PostProcessingSettings,
-    enabled: (settings) => settings?.post_process_enabled ?? false,
   },
   debug: {
     labelKey: "sidebar.debug",
@@ -150,7 +152,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <nav
       aria-label={t("controls.navigation")}
-      className="app-sidebar flex flex-col w-40 shrink-0 h-full border-e border-mid-gray/20 items-center px-2"
+      className="app-sidebar flex flex-col w-[200px] shrink-0 h-full border-e border-mid-gray/20 items-center px-2"
     >
       <SayLessLogo width={120} className="m-4" />
       <div className="app-sidebar-nav flex flex-col w-full items-center gap-1 pt-2 border-t border-mid-gray/20">

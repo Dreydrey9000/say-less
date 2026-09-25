@@ -12,13 +12,13 @@ said it.
 
 ## Privacy boundaries
 
-| Feature                    | What it reads                                                          | Where anything goes                                                                                                  | Default                               |
-| -------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
-| Insights screen and search | `history.db` + Wispr import, read-only                                 | Nowhere. Computed on this computer when you open the screen.                                                         | On                                    |
-| Read digest aloud          | The digest on screen                                                   | Your computer's built-in voices (Web Speech API)                                                                     | Click only                            |
-| Notes export               | `history.db` + Wispr import, read-only                                 | A folder you choose (default `~/Documents/Say Less Notes`)                                                           | Off                                   |
-| Use with Claude (`--mcp`)  | `history.db` + Wispr import, read-only                                 | Only to the MCP app you add it to (e.g. Claude Code). That app decides what it sends to its own model.               | Off until you add it                  |
-| Summarize with AI          | Topic labels, counts and up to 2 short quotes per topic (max 8 topics) | The AI provider you already set up under Post Process (your API key, a custom/local endpoint, or Apple Intelligence) | Click only; disabled with no provider |
+| Feature                    | What it reads                                                          | Where anything goes                                                                                             | Default                               |
+| -------------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| Insights screen and search | `history.db` + Wispr import, read-only                                 | Nowhere. Computed on this computer when you open the screen.                                                    | On                                    |
+| Read digest aloud          | The digest on screen                                                   | Your computer's built-in voices (Web Speech API)                                                                | Click only                            |
+| Notes export               | `history.db` + Wispr import, read-only                                 | A folder you choose (default `~/Documents/Say Less Notes`)                                                      | Off                                   |
+| Use with Claude (`--mcp`)  | `history.db` + Wispr import, read-only                                 | Only to the MCP app you add it to (e.g. Claude Code). That app decides what it sends to its own model.          | Off until you add it                  |
+| Summarize with AI          | Topic labels, counts and up to 2 short quotes per topic (max 8 topics) | The AI provider you already set up in AI cleanup (your API key, a custom/local endpoint, or Apple Intelligence) | Click only; disabled with no provider |
 
 Nothing on this list writes to your history. Every database connection is
 opened with SQLite's read-only flag.
@@ -155,7 +155,7 @@ been tested on Windows yet.
 
 ## Summarize with AI
 
-This button reuses the provider from **Post Process**. That can be your own
+This button reuses the provider from **AI cleanup**. That can be your own
 API key, a custom endpoint (such as a local Ollama server), or Apple
 Intelligence on supported Macs. It sends only the text built by
 `build_payload` in `src-tauri/src/insights/summary.rs`: up to 8 topic labels

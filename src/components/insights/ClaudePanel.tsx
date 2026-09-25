@@ -55,7 +55,9 @@ export function ClaudePanel() {
         </p>
       )}
       {setup && (
-        <>
+        // Terminal commands and JSON are for developers; keep them folded.
+        <details className="insight-developers">
+          <summary>{t("insights.claude.developers")}</summary>
           <CopyBlock
             label={t("insights.claude.command")}
             text={setup.claude_command}
@@ -65,7 +67,7 @@ export function ClaudePanel() {
             text={setup.config_json}
           />
           <p className="insight-fineprint">{t("insights.claude.tools")}</p>
-        </>
+        </details>
       )}
     </section>
   );

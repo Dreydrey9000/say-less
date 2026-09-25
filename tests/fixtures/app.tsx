@@ -49,24 +49,36 @@ Object.assign(window, {
   },
 });
 const settings = {
-  onboarding_completed: true,
+  // `?newUser` starts first-run onboarding (permissions are granted, so it
+  // moves straight on to picking a speech engine).
+  onboarding_completed: !query.has("newUser"),
   selected_model: "test-model",
   app_language: "en",
   theme: query.get("theme") || "dark",
   show_whats_new_on_update: false,
   bindings: Object.fromEntries(
-    ["transcribe", "cancel", "transcribe_with_post_process"].map((id) => [
+    [
+      "transcribe",
+      "transcribe_fn",
+      "cancel",
+      "transcribe_with_post_process",
+    ].map((id) => [
       id,
       {
         id,
         name: id,
         description: "",
-        current_binding: id === "cancel" ? "Escape" : "option+space",
+        current_binding:
+          id === "cancel"
+            ? "Escape"
+            : id === "transcribe_fn"
+              ? "fn"
+              : "option+space",
         default_binding: "option+space",
       },
     ]),
   ),
-  shortcut_activation: "hold_or_toggle",
+  shortcut_activation: query.get("mode") || "hold_or_toggle",
   hold_threshold_ms: 200,
   selected_language: "auto",
   audio_feedback: true,
@@ -164,6 +176,38 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
   if (cmd === "get_app_settings" || cmd === "get_default_settings")
     return settings;
   if (cmd === "get_current_model") return "test-model";
+  if (cmd === "get_available_models" && query.has("newUser")) {
+    const engine = (id: string, name: string, recommended: boolean) => ({
+      id,
+      name,
+      description: "",
+      filename: `${id}.gguf`,
+      source: { HuggingFace: { repo_id: "test/test", revision: "main" } },
+      size_mb: 600,
+      is_downloaded: id === "test-model",
+      is_downloading: false,
+      partial_size: 0,
+      is_directory: false,
+      engine_type: "TranscribeCpp",
+      accuracy_score: 0.8,
+      speed_score: 0.8,
+      supports_translation: false,
+      is_recommended: recommended,
+      supported_languages: ["en"],
+      supports_language_selection: false,
+      is_custom: false,
+      supports_streaming: false,
+      supports_language_detection: false,
+    });
+    return [
+      engine("test-model", "Nemotron Streaming 3.5", true),
+      engine("pick-one", "Parakeet Unified", true),
+      engine("pick-two", "Canary Flash", true),
+      engine("other-one", "Whisper Small", false),
+      engine("other-two", "Moonshine Tiny", false),
+    ];
+  }
+  if (cmd === "get_transcription_model_status") return "test-model";
   if (cmd === "get_available_models")
     return [
       {
@@ -326,5 +370,9 @@ if (query.has("dock")) {
   Object.assign(window, { testEmit: emit });
   await import("../../src/overlay/main");
 } else {
+  // Same start-up as src/main.tsx: the footer pill and onboarding read models
+  // from this store.
+  const { useModelStore } = await import("../../src/stores/modelStore");
+  void useModelStore.getState().initialize();
   ReactDOM.createRoot(document.getElementById("root")!).render(<App />);
 }

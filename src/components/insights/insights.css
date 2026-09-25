@@ -200,3 +200,14 @@
     transition: transform 150ms ease;
   }
 }
+
+.insight-developers > summary {
+  width: fit-content;
+  display: list-item;
+  padding: 6px 0;
+  cursor: pointer;
+  font-size: 14px;
+}
+.insight-developers[open] > summary {
+  margin-bottom: 8px;
+}

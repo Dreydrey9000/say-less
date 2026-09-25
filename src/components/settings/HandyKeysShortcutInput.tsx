@@ -289,20 +289,9 @@ export const HandyKeysShortcutInput: React.FC<HandyKeysShortcutInputProps> = ({
   }
 
   const binding = bindings[shortcutId];
-  if (!binding) {
-    return (
-      <SettingContainer
-        title={t("settings.general.shortcut.title")}
-        description={t("settings.general.shortcut.notFound")}
-        descriptionMode={descriptionMode}
-        grouped={grouped}
-      >
-        <div className="text-sm text-mid-gray">
-          {t("settings.general.shortcut.none")}
-        </div>
-      </SettingContainer>
-    );
-  }
+  // A shortcut this build doesn't define (e.g. Fn off macOS) shows nothing,
+  // rather than a dead "Shortcut not found" row.
+  if (!binding) return null;
 
   // Get translated name and description for the binding
   const translatedName = t(

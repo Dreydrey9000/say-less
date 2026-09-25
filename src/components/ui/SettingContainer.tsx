@@ -32,14 +32,14 @@ export function SettingContainer({
         className={`setting-row ${layout === "stacked" ? "setting-row-stacked" : ""} ${grouped ? "" : "rounded-xl border border-mid-gray/20"}`}
       >
         <div className={`min-w-0 ${disabled ? "opacity-60" : ""}`}>
-          <h3 id={titleId} className="text-sm font-medium text-text">
+          <h3 id={titleId} className="setting-label">
             {title}
           </h3>
           {description &&
             (descriptionMode === "inline" ? (
-              <p className="text-sm text-text/70 mt-1">{description}</p>
+              <p className="setting-description">{description}</p>
             ) : (
-              <details className="mt-1 text-xs text-text/70">
+              <details className="mt-1 text-[13px] text-text-muted">
                 <summary className="cursor-pointer w-fit rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text">
                   {t("controls.details")}
                 </summary>

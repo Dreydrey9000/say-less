@@ -16,14 +16,13 @@
     "postProcessing": "후처리",
     "history": "히스토리",
     "debug": "디버그",
-    "about": "정보"
+    "about": "정보",
+    "import": "Import"
   },
   "onboarding": {
     "subtitle": "시작하려면 음성 인식 모델을 선택하세요",
     "existingModelsTitle": "호환 가능한 모델",
     "downloadModelsTitle": "다운로드 가능",
-    "showAllModels": "전체 {{total}}개 모델 표시",
-    "showFewerModels": "간략히 표시",
     "recommended": "추천",
     "customModelDescription": "공식 지원되지 않음",
     "modelCard": {
@@ -109,7 +108,7 @@
       "accessibility": {
         "title": "접근성 권한",
         "description": "녹음된 텍스트를 애플리케이션에 입력하기 위해 필요합니다.",
-        "recovery": "Already switched on? In System Settings → Privacy & Security → Accessibility, remove only Say Less with the minus button, then use + to add /Applications/Say Less.app and enable it again. Return here and choose Check again."
+        "recovery": "Switched on but still waiting? macOS sometimes forgets after an update. Open System Settings > Privacy & Security > Accessibility, select Say Less, remove it with the minus button, add it back with +, and turn it on. Then click Check again."
       },
       "grant": "권한 부여",
       "granted": "승인됨",
@@ -120,6 +119,22 @@
         "requestFailed": "권한 요청에 실패했습니다. 다시 시도해주세요."
       },
       "checkAgain": "Check again"
+    },
+    "otherEngines": "See other engines ({{total}})",
+    "hideOtherEngines": "Hide other engines",
+    "otherEnginesNote": "Other engines, for other languages or older computers",
+    "try": {
+      "title": "Try it once",
+      "hold": "Click in the box below, hold {{shortcut}}, and say: “This is faster than typing.” Let go when you're done.",
+      "toggle": "Click in the box below, press {{shortcut}}, and say: “This is faster than typing.” Press it again when you're done.",
+      "fn": "On a Mac you can also hold Fn instead.",
+      "fnTip": "If the emoji picker opens when you press Fn, that's macOS grabbing the key. Open System Settings > Keyboard and set “Press Globe key to” to “Do Nothing.”",
+      "label": "Practice box",
+      "placeholder": "Your words will appear here",
+      "success": "That's it. It works the same in any app: Slack, email, ChatGPT, your code editor.",
+      "loading": "The first dictation can take a few seconds while the speech engine starts up.",
+      "done": "Start using Say Less",
+      "skip": "Skip for now"
     }
   },
   "modelSelector": {
@@ -154,7 +169,14 @@
       "translate": "영어로 번역",
       "streaming": "말하는 동안 실시간으로 음성 인식 결과를 표시"
     },
-    "legacy": "레거시"
+    "legacy": "레거시",
+    "pill": "{{name}} · {{state}}",
+    "states": {
+      "ready": "Ready",
+      "sleeping": "Sleeping",
+      "loading": "Loading",
+      "error": "Error"
+    }
   },
   "settings": {
     "modelSettings": {
@@ -167,7 +189,6 @@
         "description": "음성-텍스트 녹음을 시작하는 키보드 단축키를 설정하세요",
         "loading": "단축키 로딩 중...",
         "none": "설정된 단축키 없음",
-        "notFound": "단축키를 찾을 수 없음",
         "pressKeys": "키를 눌러주세요...",
         "bindings": {
           "transcribe": {
@@ -184,7 +205,7 @@
           },
           "transcribe_with_post_process": {
             "name": "후처리 단축키",
-            "description": "선택 사항: 항상 AI 후처리를 적용하는 전용 단축키입니다."
+            "description": "Optional. Works like your Talk shortcut, but your words go through AI cleanup first. It sends text only, never audio, to the provider you set in AI cleanup."
           }
         },
         "errors": {
@@ -354,7 +375,7 @@
       },
       "autoSubmit": {
         "title": "자동 제출",
-        "description": "텍스트 삽입 후 선택한 키 조합을 자동으로 전송합니다. macOS에서는 Cmd+Enter가, Windows/Linux에서는 Super+Enter가 적용됩니다.",
+        "description": "After your words are typed, Say Less presses this key for you, which usually sends the message right away. Leave it Off if you want to check your words before they are sent. Cmd+Enter applies on macOS; Windows and Linux use Super+Enter.",
         "options": {
           "off": "끄기",
           "enter": "Enter",
@@ -404,6 +425,11 @@
       "fillerWordRemoval": {
         "title": "군더더기 표현 제거",
         "description": "전사에서 흔한 머뭇거림 표현을 제거합니다. 그대로 두려면 이 옵션을 끄세요."
+      },
+      "description": "Less common settings. Most people never need to change these.",
+      "moved": {
+        "overlay": "The recording indicator (the pop-up while you talk) is set in Appearance.",
+        "writing": "Filler words and your personal dictionary are set in Writing."
       }
     },
     "postProcessing": {
@@ -458,6 +484,12 @@
         "cancel": "취소",
         "selectToEdit": "세부 정보를 보고 편집하려면 위에서 프롬프트를 선택하세요.",
         "createFirst": "첫 번째 후처리 프롬프트를 만들려면 위의 '새 프롬프트 만들기'를 클릭하세요."
+      },
+      "page": {
+        "title": "AI cleanup",
+        "description": "Optional. An AI model rewrites your dictation before it is typed: fixes grammar, removes rambling, or follows your own instructions.",
+        "privacy": "AI cleanup sends your transcript text (never audio) to the provider you pick below. Apple Intelligence runs on this computer; other providers are online services. Speech recognition always runs on this computer.",
+        "offHint": "Turn this on to add the Talk + AI cleanup shortcut. The provider below is also what Summarize with AI uses in Insights."
       }
     },
     "history": {
@@ -534,7 +566,7 @@
       },
       "postProcessingToggle": {
         "label": "후처리",
-        "description": "텍스트 변환 후 AI 기반 텍스트 개선 활성화"
+        "description": "Turns on the Talk + AI cleanup shortcut and your cleanup instructions. Your transcript text goes to the provider you choose below."
       },
       "muteWhileRecording": {
         "label": "녹음 중 음소거",
@@ -631,9 +663,9 @@
         "button": "GitHub에서 보기"
       },
       "supportDevelopment": {
-        "title": "개발 지원 · Handy",
-        "description": "Handy 개발을 계속할 수 있도록 도와주세요",
-        "button": "후원하기"
+        "title": "Support Handy",
+        "description": "Say Less is built on Handy, a free, open-source dictation app. Donations go to Handy's developer.",
+        "button": "Donate to Handy"
       },
       "acknowledgments": {
         "title": "감사의 말",
@@ -646,7 +678,8 @@
       "whatsNewUpdates": {
         "label": "새 소식 표시",
         "description": "Say Less 업데이트 후 릴리스 노트를 표시합니다"
-      }
+      },
+      "credit": "Built on Handy (MIT license)"
     }
   },
   "footer": {
@@ -740,20 +773,21 @@
     "reset": "Reset {{setting}}",
     "recheck": "Recheck permissions",
     "actionFailed": "Could not run that voice action. Check its destination in Voice actions.",
-    "actionOpened": "Voice action opened its destination."
+    "actionOpened": "Voice action opened its destination.",
+    "open": "Open {{page}}"
   },
   "writing": {
     "title": "Writing",
     "description": "Make dictation your own. Your words and snippets stay on this computer.",
     "dictionary": "Personal dictionary",
-    "cleanup": "Clean up your words"
+    "cleanup": "Filler words"
   },
   "dictation": {
-    "title": "Dictation",
+    "title": "Shortcuts & mic",
     "description": "Set your shortcut, choose a microphone, and start writing with your voice.",
-    "local": "On-device transcription",
-    "optional": "Optional AI cleanup uses your configured provider.",
-    "private": "Cloud post-processing is off."
+    "local": "Speech recognition runs on this computer",
+    "optional": "AI cleanup is on. It sends your transcript text to your AI provider. Speech recognition still runs on this computer.",
+    "private": "AI cleanup is off. Your words stay on this computer."
   },
   "snippets": {
     "title": "Voice snippets",
@@ -788,15 +822,12 @@
     "undo": "Undo removal"
   },
   "studio": {
-    "eyebrow": "YOUR VOICE. YOUR LOOK.",
+    "eyebrow": "Make it yours",
     "title": "Appearance",
-    "description": "Make Say Less feel like yours. Pick a color, set the mood, and keep your voice one click away.",
-    "preview": "Your Say Less color preview",
-    "previewTitle": "Less typing. More you.",
-    "previewBody": "Your voice, with a little personality.",
+    "description": "Choose your colors, the floating dock, and what shows while you talk.",
     "error": "Could not load or save these settings. Try again.",
     "saving": "Saving your look…",
-    "palette": "Pick your color",
+    "palette": "Accent color",
     "palettes": {
       "acid": "Acid lime",
       "candy": "Candy pink",
@@ -808,11 +839,9 @@
     "pickColor": "Choose custom color",
     "apply": "Apply color",
     "floating": "Floating dock",
-    "floatingDescription": "Keep a small, draggable control above your apps. Record, stop, and return to settings without losing your place.",
-    "hideDock": "Hide dock",
-    "showDock": "Show dock",
+    "floatingDescription": "A small control that floats above your apps. Record, stop, and open settings from anywhere.",
     "styles": "Writing styles",
-    "stylesDescription": "Local formatting applies to normal dictation. Sentence formatting capitalizes sentences and supports “new paragraph” and “new line”. For AI rewriting, use the separate cleanup shortcut in General; its selected provider may use the cloud.",
+    "stylesDescription": "Local formatting applies to normal dictation. Sentence formatting capitalizes sentences and understands “new paragraph” and “new line”. For AI rewriting, use the Talk + AI cleanup shortcut, set up in AI cleanup. Your AI provider may be an online service.",
     "defaultStyle": "Default writing style",
     "stylesList": {
       "original": "Keep original",
@@ -826,7 +855,17 @@
     "saveRule": "Save app style",
     "removeRule": "Remove style for {{app}}",
     "updates": "What’s new",
-    "version": "Version {{version}}"
+    "version": "Version {{version}}",
+    "colorSection": "Color and theme",
+    "customColorHint": "Six-digit hex, like #b8ff65",
+    "showDockLabel": "Show floating dock",
+    "compactLabel": "Small dock",
+    "compactDescription": "Shows only the dock animation. Click it to expand.",
+    "motionSection": "Motion",
+    "pauseLabel": "Pause animations",
+    "pauseDescription": "Holds the dock, companion, and previews still. Recording and typing keep working. Your system's Reduce Motion setting is always respected.",
+    "indicatorSection": "Recording indicator",
+    "indicatorDescription": "The pop-up at the edge of your screen while you talk."
   },
   "actions": {
     "eyebrow": "SPEAK. OPEN. GO.",
@@ -866,19 +905,30 @@
     "tooLarge": "Choose a file smaller than 3 MB.",
     "working": "Preparing your library…",
     "preview": "Ready to review",
-    "counts": "{{words}} words · {{snippets}} snippets/corrections · {{skipped}} skipped",
     "corrections": "Wispr misspelling replacements become exact local phrase replacements. Duplicates and invalid entries are skipped. Account settings, shortcuts, styles, rich text, and shared permissions are not imported.",
     "review": "Review words and expansions",
-    "history": "Also import history text ({{count}} records found)",
     "historyDetails": "Up to 50,000 recent records. Excludes audio, screenshots, meeting transcripts, and app context. Original timestamps are preserved in a separate archive.",
     "confirm": "Import reviewed items",
-    "complete": "Imported {{words}} words, {{snippets}} snippets/corrections, and {{history}} history records.",
+    "complete": "Imported {{words}}, {{snippets}}, and {{history}}.",
     "partialHistory": "Your library imported, but history did not. Retry with history selected; existing entries will be skipped.",
     "openArchive": "Browse imported history",
     "archive": "Wispr text archive",
     "archiveEmpty": "No imported records on this page.",
     "previous": "Previous 50",
-    "next": "Next 50"
+    "next": "Next 50",
+    "counts": "{{words}} · {{snippets}} · {{skipped}}",
+    "n": {
+      "words_one": "{{count}} word",
+      "words_other": "{{count}} words",
+      "snippets_one": "{{count}} snippet or correction",
+      "snippets_other": "{{count}} snippets and corrections",
+      "skipped_one": "{{count}} skipped",
+      "skipped_other": "{{count}} skipped",
+      "history_one": "{{count}} history record",
+      "history_other": "{{count}} history records"
+    },
+    "history_one": "Also import history text ({{count}} record found)",
+    "history_other": "Also import history text ({{count}} records found)"
   },
   "dock": {
     "drag": "Drag floating dock",
@@ -893,43 +943,56 @@
     "transcribing": "Turning your voice into text…",
     "arming": "Starting microphone…",
     "expand": "Expand dock",
-    "collapse": "Collapse to companion"
+    "collapse": "Shrink dock"
   },
   "home": {
     "title": "Home",
-    "eyebrow": "SAY LESS / YOUR VOICE, UNLOCKED",
-    "local": "Speech recognition on your computer",
-    "headline": "Big thoughts.",
-    "headlineAccent": "Less typing.",
-    "description": "Make room for what you mean. Speak naturally and let your words take shape.",
-    "openDock": "Open floating dock",
-    "dockOpened": "Your dock is ready. Click into your destination app, then use Record or your shortcut.",
-    "shortcut": "Hold to talk. Tap or double-tap for hands-free. Press again to finish.",
+    "local": "Speech recognition runs on this computer",
+    "headline": "Speak. We'll type.",
+    "description": "Click where you want to type, then use your shortcut. Your words appear there when you finish.",
+    "openDock": "Show floating dock",
+    "dockOpened": "The floating dock is showing. Click into the app you want to type in, then use Record or your shortcut.",
+    "shortcut": "Hold to talk, let go to finish. For a long thought, tap once to go hands-free and tap again to stop.",
     "fnShortcut": "or hold Fn to talk",
-    "aiShortcut": "AI cleanup shortcut · uses your selected provider",
+    "aiShortcut": "Talk + AI cleanup. Sends your text to your AI provider.",
     "tools": "Make it yours",
     "look": "Change your look",
     "words": "Teach it your words",
     "actions": "Create a voice action",
-    "recent": "Your recent words",
+    "recent": "Recent dictations",
     "allHistory": "View history",
     "loading": "Loading recent dictations",
     "historyError": "Recent dictations could not be loaded.",
-    "empty": "Your next thought goes here. Start with a short sentence in any text field.",
+    "empty": "Nothing yet. Click into any text box, use your shortcut, and say one sentence. It will show up here too.",
     "copy": "Copy dictation",
     "copied": "Copied to clipboard.",
     "copyError": "Could not copy. Open History to try again.",
-    "holdShortcut": "Hold to talk. Release to finish.",
-    "toggleShortcut": "Press to start. Press again to finish."
+    "holdShortcut": "Hold to talk. Let go to finish.",
+    "toggleShortcut": "Press to start. Press again to finish.",
+    "slogan": "Big thoughts. Less typing.",
+    "fnTip": "If the emoji picker opens, go to System Settings > Keyboard and set “Press Globe key to” to “Do Nothing.”",
+    "otherShortcuts": "Other recording shortcuts",
+    "setAiShortcut": "Set up AI cleanup",
+    "cancelShortcut": "Cancel a recording",
+    "share": "Share Say Less",
+    "shareCopied": "Link copied: saylessvoice.com",
+    "shareFailed": "Could not copy. The link is saylessvoice.com",
+    "status": {
+      "idle": "Ready",
+      "arming": "Starting microphone…",
+      "recording": "Listening…",
+      "transcribing": "Typing it out…",
+      "processing": "Typing it out…"
+    }
   },
   "companion": {
-    "title": "Pick your companion",
-    "description": "A little motion, a little personality. Click the companion in your dock to switch it.",
+    "title": "Particle pattern",
+    "description": "How the silver particles move around your dock look. Click the dock animation to switch patterns.",
     "pause": "Pause animations",
     "play": "Play animations",
-    "next": "Switch companion",
-    "cycle": "Cycle companions",
-    "motionNote": "Cycles every 20 seconds while motion is enabled. Respects Reduce Motion and pauses when hidden.",
+    "next": "Switch particle pattern",
+    "cycle": "Cycle patterns",
+    "motionNote": "Changes pattern every 20 seconds while animations are on.",
     "edge": "Dock placement",
     "edges": {
       "free": "Free · drag anywhere",
@@ -942,25 +1005,27 @@
       "wave": "Wave",
       "emblem": "Chrome S"
     },
-    "character": "Companion style",
+    "character": "Dock look",
     "characters": {
-      "orb": "Animated orb",
-      "emblem": "Chrome emblem",
-      "buddy": "Animated character",
-      "both": "Character + particles",
-      "avatar": "Talking avatar"
-    }
+      "orb": "Silver orb",
+      "emblem": "Say Less emblem",
+      "buddy": "Buddy (animated)",
+      "both": "Buddy with particles",
+      "avatar": "Your avatar (talks when you do)"
+    },
+    "noPattern": "This look has no particles, so there is no pattern to pick.",
+    "characterDescription": "What sits in the middle of the floating dock."
   },
   "voiceVisuals": {
-    "title": "Voice visuals",
-    "description": "Choose what moves while you talk. The avatar's mouth follows how loud you are, not the exact words.",
-    "overlay": "Recording overlay style",
+    "title": "Animation",
+    "description": "What moves in the recording indicator while you talk. The avatar's mouth follows how loud you are, not the exact words.",
+    "overlay": "Indicator animation",
     "visuals": {
       "bars": "Bars",
-      "squiggle": "Squiggle",
+      "squiggle": "Voice line",
       "avatar": "Avatar"
     },
-    "avatarTitle": "Build your avatar",
+    "avatarTitle": "Customize your avatar",
     "kind": "Avatar style",
     "kinds": {
       "stick": "Stick figure",
@@ -982,12 +1047,12 @@
       "headphones": "Headphones",
       "sunglasses": "Sunglasses"
     },
-    "test": "Test the voice",
-    "testing": "Talking…",
+    "test": "Preview animation",
+    "testing": "Playing sample. Microphone is off.",
     "recordingHint": "Recording now. The preview follows your voice.",
-    "stillHint": "Motion is off (Pause or Reduce Motion), so the avatar holds still.",
+    "stillHint": "Motion is off (Pause animations or your system's Reduce Motion), so previews hold still.",
     "previewLabel": "Avatar preview: {{style}} with {{accessory}}",
-    "avatarNote": "Use it in the dock with Companion style → Talking avatar, or in the overlay with the Avatar option above."
+    "avatarNote": "Your avatar shows where you picked it: Avatar in the indicator animation above, or Your avatar as the dock look."
   },
   "corrections": {
     "title": "Names & corrections",
@@ -998,14 +1063,14 @@
     "remove": "Remove correction for {{word}}",
     "duplicate": "That phrase already has a correction. Remove it first to change its spelling.",
     "cleanupTitle": "AI cleanup on every dictation",
-    "cleanupDescription": "Uses your selected Post Process provider when AI post-processing is enabled. Apple Intelligence stays on-device; cloud providers receive your dictation. If unavailable, local formatting is used.",
+    "cleanupDescription": "Uses the provider you set in AI cleanup. Apple Intelligence runs on this computer; online providers receive your dictation text. If AI cleanup is unavailable, local formatting is used.",
     "cleanupOn": "Use AI cleanup for normal dictation",
     "cleanupOff": "Use local formatting only",
-    "cleanupFallback": "AI cleanup was unavailable. Used local formatting instead. Check the provider in Post Process."
+    "cleanupFallback": "AI cleanup was unavailable, so local formatting was used. Check your provider in AI cleanup."
   },
   "learning": {
     "title": "Learn from my corrections",
-    "description": "On Mac, watch only the text field where Say Less just pasted, for up to 90 seconds while it stays focused. Save spelling pairs locally—not the surrounding text. One observation appears below; the same correction in two dictations starts applying automatically, or choose Keep now.",
+    "description": "Off by default. When on (Mac only), Say Less watches the text box it just typed into for up to 90 seconds. If you fix a misspelled word, it saves that spelling pair on this computer, never the rest of the text. The same fix in two dictations starts applying automatically, or choose Keep now. Turning this off stops watching but does not delete saved corrections.",
     "enable": "Enable local correction learning",
     "disable": "Stop watching corrections",
     "limits": "Works in accessible plain-text fields. Skips password fields, auto-submit, reliable-paste mode, and script/clipboard-only output. Leave the corrected field focused for four seconds. Existing learned rules remain until removed. This is a personal spelling dictionary, not model training.",
@@ -1022,23 +1087,22 @@
   "insights": {
     "title": "Insights",
     "tagline": "Say less, stress less",
-    "description": "What you keep saying, pulled from your own dictations: recurring problems, ideas worth another look, and the one thing to fix first.",
-    "privacy": "Built from your dictation history on this computer. Nothing is uploaded.",
+    "description": "What you keep saying, pulled from your own dictations: recurring problems, ideas worth another look, and the topic you mention most.",
+    "privacy": "Worked out on this computer from your saved dictations. Nothing here leaves this computer unless you use Summarize with AI or connect Claude below.",
     "loading": "Reading your dictation history…",
     "error": "Could not read your dictation history.",
     "retry": "Try again",
-    "analyzed": "Based on {{count}} dictations.",
     "mentions_one": "mentioned {{count}} time",
     "mentions_other": "mentioned {{count}} times",
     "firstLast": "First {{first}} · last {{last}}",
     "related": "Often said with: {{words}}",
     "quotes": "What you said",
-    "fixFirst": "Fix this first",
+    "fixFirst": "Most-mentioned topic",
     "problems": "Recurring problems",
     "ideas": "Recurring ideas",
     "other": "Other things you keep mentioning",
-    "noProblems": "No repeated problems in this window. Nice.",
-    "noOtherProblems": "Nothing else keeps coming up. Start with the one above.",
+    "noProblems": "No repeated problems in this window.",
+    "noOtherProblems": "Nothing else keeps coming up.",
     "noIdeas": "No repeated ideas in this window yet.",
     "window": {
       "label": "Time window",
@@ -1049,13 +1113,13 @@
     },
     "empty": {
       "fewTitle": "Not enough history yet",
-      "fewBody": "You have {{count}} dictations in this window. Keep talking. Patterns show up after a few days of use.",
       "noneTitle": "Nothing repeats yet",
-      "noneBody": "No topic came up more than once in this window. Try a longer window."
+      "noneBody": "No topic came up more than once in this window. Try a longer window.",
+      "fewBody_one": "You have {{count}} dictation in this window. Patterns show up after {{min}}. Keep talking.",
+      "fewBody_other": "You have {{count}} dictations in this window. Patterns show up after {{min}}. Keep talking."
     },
     "digest": {
       "title": "Your digest",
-      "fixFirst": "Fix this first: {{label}}. You mentioned it {{count}} times.",
       "problems": "Also coming up again: {{list}}.",
       "ideas": "Ideas worth another look: {{list}}.",
       "none": "Nothing repeats yet.",
@@ -1064,9 +1128,11 @@
       "read": "Read digest aloud",
       "stop": "Stop reading",
       "sendsOnly": "Summarize with AI sends only topic labels, counts and up to two short quotes per topic to {{provider}}. It never runs on its own.",
-      "setupProvider": "To use Summarize with AI, set up a provider under Post Process. Read aloud uses your computer's built-in voices.",
-      "noProvider": "No AI provider is set up. Add one under Post Process.",
-      "failed": "The AI provider could not write a digest. Check its key and model under Post Process."
+      "setupProvider": "To use Summarize with AI, set up a provider in AI cleanup. Read aloud uses your computer's built-in voices.",
+      "noProvider": "No AI provider is set up. Add one in AI cleanup.",
+      "failed": "The AI provider could not write a digest. Check its key and model in AI cleanup.",
+      "fixFirst_one": "Most-mentioned topic: {{label}}. You mentioned it {{count}} time.",
+      "fixFirst_other": "Most-mentioned topic: {{label}}. You mentioned it {{count}} times."
     },
     "search": {
       "title": "Search everything you said",
@@ -1096,14 +1162,17 @@
     },
     "claude": {
       "title": "Use with Claude",
-      "description": "Let Claude (or any MCP app) search your dictation history. It runs on this computer, can only read, and works only when you add it.",
+      "description": "Let Claude search everything you've said. It's a local, read-only connection that only works after you add it. Claude then sees the results of the searches it runs.",
       "command": "Claude Code command",
       "config": "MCP config (Claude Desktop and others)",
       "copy": "Copy",
       "copied": "Copied",
       "copyName": "Copy {{what}}",
       "tools": "Tools: search_transcripts, recent_transcripts, recurring_topics. Then ask things like \"what do I keep complaining about?\"",
-      "error": "Could not find the Say Less app path."
-    }
+      "error": "Could not find the Say Less app path.",
+      "developers": "For developers: setup commands"
+    },
+    "analyzed_one": "Based on {{count}} dictation.",
+    "analyzed_other": "Based on {{count}} dictations."
   }
 }

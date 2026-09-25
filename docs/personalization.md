@@ -6,20 +6,20 @@ Open **Appearance**. Choose a preset or enter a six-digit hex color, then Apply 
 
 Show dock creates a separate always-on-top window. On macOS it is a nonactivating NSPanel, so Record does not become the paste destination. Drag its grip; X hides it and saves that preference. Choose Left or Right in Appearance to place it inside the current screen's work area; dragging returns to Free placement. Edge preference survives restart, but arbitrary dragged coordinates do not. Recording status follows backend events. OS microphone and Accessibility permissions are still required.
 
-Choose Orbit, Helix, Wave, or Chrome S, click the companion in the dock to switch, or cycle every 20 seconds. Pause is available in Home, Appearance and the dock. Reduced Motion and hidden windows stop decorative animation. The 48 CSS particles use no camera, remote code, or WebGL. These original formations were inspired by [Casberry Particles](https://particles.casberry.in/); custom animation imports are not implemented.
+Choose Orbit, Helix, Wave, or Chrome S, click the companion in the dock to switch, or cycle every 20 seconds. The pattern cards only show for dock looks that have particles. **Pause animations** is one switch under Appearance → Motion; it never pauses recording. Reduced Motion and hidden windows stop decorative animation. The 48 CSS particles use no camera, remote code, or WebGL. These original formations were inspired by [Casberry Particles](https://particles.casberry.in/); custom animation imports are not implemented.
 
-**Companion style** selects an orb, emblem, animated character, character with particles, or talking avatar (see Voice visuals). The expanded dock has a **Collapse to companion** button; the small companion expands on click, without starting a recording. Your keyboard shortcut works in either size. Compact mode retains a Stop button during recording and a status indicator during processing. Appearance can expand or collapse it too. The compact window is 104×104 logical pixels; expanded controls use 360×112.
+**Dock look** selects a silver orb, the Say Less emblem, Buddy, Buddy with particles, or your avatar (see Voice visuals). The expanded dock has a **Shrink dock** button; the small companion expands on click, without starting a recording. Your keyboard shortcut works in either size. Compact mode retains a Stop button during recording and a status indicator during processing. The **Small dock** switch in Appearance does the same. The compact window is 104×104 logical pixels; expanded controls use 360×112.
 
-Home shows the configured shortcut, opens the dock, and displays the latest three local history entries with Copy controls. In General, Auto (hold or toggle) supports hold/release, single-tap hands-free, and double-tap within 400 ms to lock hands-free recording. Press again to finish. The floating Record button toggles recording.
+Home shows the instruction for your configured shortcut mode (plus Fn on Mac, with the AI cleanup and cancel shortcuts under "Other recording shortcuts"), can show the floating dock, has a Share Say Less link, and displays the latest three local history entries with Copy controls. In Shortcuts & mic, Auto (hold or toggle) supports hold/release, single-tap hands-free, and double-tap within 400 ms to lock hands-free recording. Press again to finish. The floating Record button toggles recording.
 
 ## Voice visuals
 
-Open **Appearance → Voice visuals**.
+Open **Appearance → Recording indicator**. The indicator style (Hidden, Compact, Live text) and its position also live here; they used to be in Advanced.
 
-- **Recording overlay style** picks what moves in the recording pill: **Bars** (the default, unchanged for existing users), **Squiggle** (a smooth wavy line that grows with your voice and bends with the level buckets), or **Avatar** (your avatar's face).
-- **Build your avatar** picks a style (stick figure, person, cat, or dog), three colors (body or skin, accent, background), and an accessory (none, cap, beanie, crown, headphones, or sunglasses). Eyes and mouth switch between dark and light ink automatically so they stay visible on light or dark skin/fur colors. Changes save about a third of a second after you stop adjusting.
-- **Test the voice** plays a short made-up speaking rhythm so you can watch the mouth move. While you are recording, the preview follows your real voice.
-- To put the avatar in the floating dock, set **Companion style → Talking avatar**. It is sized to read in the 104×104 compact dock.
+- **Indicator animation** picks what moves in the recording pill: **Bars** (the default, unchanged for existing users), **Voice line** (a smooth wavy line that grows with your voice and bends with the level buckets), or **Avatar** (your avatar's face).
+- **Customize your avatar** appears once an avatar is in use (Avatar here, or Your avatar as the dock look). It picks a style (stick figure, person, cat, or dog), three colors (body or skin, accent, background), and an accessory (none, cap, beanie, crown, headphones, or sunglasses). Eyes and mouth switch between dark and light ink automatically so they stay visible on light or dark skin/fur colors. Changes save about a third of a second after you stop adjusting.
+- **Preview animation** plays a short made-up speaking rhythm (the microphone stays off) so you can watch the mouth move. While you are recording, the preview follows your real voice.
+- To put the avatar in the floating dock, set **Dock look → Your avatar**. It is sized to read in the 104×104 compact dock.
 
 The mouth follows how loud you are, not the words. It opens quickly on a syllable, closes more slowly, ignores very quiet room noise, and rests with a closed smile and an occasional blink. True word-level lip-sync would need a second live model and is not implemented.
 
@@ -37,7 +37,7 @@ Only an exact, whole-utterance match against the original recognized transcript 
 
 The default and app-specific rules operate locally: keep original, sentence capitalization plus final punctuation and spoken new-line/new-paragraph cues, remove trailing periods, or lowercase. App rules match the foreground macOS app name when output is processed (for example, Mail or Slack). Browser websites share their browser's app rule. Add case-insensitive whole-word spelling corrections in Writing; corrections preserve surrounding punctuation and do not change longer words. Saved snippet formatting is protected.
 
-Writing's opt-in AI cleanup for normal dictation uses the selected Post Process provider when post-processing is enabled. Apple Intelligence is local; cloud providers receive the dictated text. A built-in cleanup prompt is used when no custom prompt is selected. Failed or unavailable cleanup falls back to local formatting with a visible notice. This does not implement Flow's contextual tone model, backtracking, or selected-text Command Mode.
+Writing's opt-in AI cleanup for normal dictation uses the provider selected on the AI cleanup page when AI cleanup is on. Apple Intelligence is local; cloud providers receive the dictated text. A built-in cleanup prompt is used when no custom prompt is selected. Failed or unavailable cleanup falls back to local formatting with a visible notice. This does not implement Flow's contextual tone model, backtracking, or selected-text Command Mode.
 
 ## Learning from edits on Mac
 

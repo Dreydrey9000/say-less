@@ -6,14 +6,14 @@ for (const width of [390, 1200])
       await page.setViewportSize({ width, height: 900 });
       await page.goto(`/tests/fixtures/app.html?theme=${theme}`);
       await expect(
-        page.getByRole("heading", { name: "Big thoughts. Less typing." }),
+        page.getByRole("heading", { name: "Speak. We'll type." }),
       ).toBeVisible();
-      const dock = page.getByRole("button", { name: "Open floating dock" });
+      const dock = page.getByRole("button", { name: "Show floating dock" });
       await dock.focus();
       await expect(dock).toBeFocused();
       await dock.press("Enter");
       await expect(page.getByRole("status")).toContainText(
-        "Your dock is ready",
+        "The floating dock is showing",
       );
       expect(
         await page
@@ -27,7 +27,7 @@ for (const width of [390, 1200])
         .getByRole("button", { name: "Change your look", exact: true })
         .click();
       await expect(
-        page.getByRole("heading", { name: "Pick your companion" }),
+        page.getByRole("heading", { name: "Floating dock" }),
       ).toBeVisible();
     });
   }
@@ -36,19 +36,21 @@ test("companion choice, edge and pause persist", async ({ page }) => {
   await page.goto("/tests/fixtures/app.html");
   await page.getByRole("button", { name: "Appearance", exact: true }).click();
   await page.getByRole("button", { name: "Helix", exact: true }).click();
-  await page.getByLabel("Dock placement").selectOption("right");
   await page
-    .getByRole("button", { name: "Pause animations", exact: true })
-    .click();
+    .getByRole("combobox", { name: "Dock placement" })
+    .selectOption("right");
+  await page.getByRole("switch", { name: "Pause animations" }).check();
   await page.reload();
   await page.getByRole("button", { name: "Appearance", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Helix", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByLabel("Dock placement")).toHaveValue("right");
   await expect(
-    page.getByRole("button", { name: "Play animations", exact: true }),
-  ).toBeVisible();
+    page.getByRole("combobox", { name: "Dock placement" }),
+  ).toHaveValue("right");
+  await expect(
+    page.getByRole("switch", { name: "Pause animations" }),
+  ).toBeChecked();
   expect(
     await page
       .locator(".particle-world")
@@ -62,7 +64,7 @@ test("reduced motion keeps particles static even when cycling is selected", asyn
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/tests/fixtures/app.html");
-  await page.getByRole("button", { name: "Open floating dock" }).click();
+  await page.getByRole("button", { name: "Show floating dock" }).click();
   await page.evaluate(() => {
     const settings = JSON.parse(localStorage.getItem("test-studio")!);
     localStorage.setItem(
@@ -139,7 +141,7 @@ test("dock shows switchable companion and remains usable at 360px", async ({
 }) => {
   await page.setViewportSize({ width: 360, height: 132 });
   await page.goto("/tests/fixtures/app.html?dock=1");
-  await page.getByRole("button", { name: "Switch companion" }).click();
+  await page.getByRole("button", { name: "Switch particle pattern" }).click();
   await expect(page.locator(".formation-helix")).toBeVisible();
   expect(
     await page.evaluate(

@@ -6,11 +6,11 @@ test("insights shows the top problem, its quotes, and stays local by default", a
   await page.goto("/tests/fixtures/app.html");
   await page.getByRole("button", { name: "Insights", exact: true }).click();
   await expect(
-    page.getByText(
-      "Built from your dictation history on this computer. Nothing is uploaded.",
-    ),
+    page.getByText("Worked out on this computer from your saved dictations.", {
+      exact: false,
+    }),
   ).toBeVisible();
-  const fixFirst = page.getByRole("region", { name: "Fix this first" });
+  const fixFirst = page.getByRole("region", { name: "Most-mentioned topic" });
   await expect(fixFirst).toContainText("video export audio");
   await expect(fixFirst).toContainText("mentioned 27 times");
   await fixFirst.getByText("video export audio", { exact: true }).click();

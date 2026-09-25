@@ -37,7 +37,13 @@ test("secondary settings fit narrow windows and enlarged text", async ({
 }) => {
   await page.setViewportSize({ width: 390, height: 850 });
   await page.goto("/tests/fixtures/app.html");
-  for (const name of ["Advanced", "About", "History", "Models"]) {
+  for (const name of [
+    "Advanced",
+    "About",
+    "History",
+    "Speech engine",
+    "AI cleanup",
+  ]) {
     await page.getByRole("button", { name, exact: true }).click();
     expect(
       await page
@@ -127,9 +133,11 @@ for (const theme of ["dark", "light"]) {
         colorScheme: theme as "dark" | "light",
       });
       await page.goto(`/tests/fixtures/app.html?theme=${theme}`);
-      await page.getByRole("button", { name: "General", exact: true }).click();
+      await page
+        .getByRole("button", { name: "Shortcuts & mic", exact: true })
+        .click();
       await expect(
-        page.getByRole("heading", { name: "Dictation", exact: true }),
+        page.getByRole("heading", { name: "Shortcuts & mic", exact: true }),
       ).toBeVisible();
       await expect(page.getByRole("combobox").first()).toBeVisible();
       await page.getByRole("combobox").first().focus();
@@ -163,7 +171,9 @@ test("stalled audio enumeration falls back to the system device", async ({
   page,
 }) => {
   await page.goto("/tests/fixtures/app.html?stallDevices=1");
-  await page.getByRole("button", { name: "General", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Shortcuts & mic", exact: true })
+    .click();
   const microphone = page.getByRole("combobox", {
     name: "Microphone",
     exact: true,

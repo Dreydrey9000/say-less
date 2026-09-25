@@ -37,30 +37,25 @@ const Onboarding: React.FC<OnboardingProps> = ({
 
   // Curate the download list: legacy (.bin/ONNX) downloads are deprecated and
   // never shown here (they still appear in the compatible section if already on
-  // disk). The catalog arrives rank-sorted, so the first two recommended models
-  // are the featured picks — currently Parakeet Unified (English) and Nemotron
-  // Streaming (multilingual). Everything else hides behind "Show all".
-  const { downloadable, topPicks, otherRecommended, rest } = useMemo(() => {
+  // disk). The catalog arrives in editorial rank order, so the first
+  // recommended model is "Our pick". Everything else waits behind "See other
+  // engines", so a first-timer makes one choice instead of reading ~16 names.
+  const { downloadable, topPick, others } = useMemo(() => {
     const downloadable = models.filter(
       (m: ModelInfo) => !m.is_downloaded && !isLegacySource(m),
     );
     const recommended = downloadable.filter((m: ModelInfo) => m.is_recommended);
-    // `models` arrives in editorial rank order (the backend sorts by rank_of,
-    // then accuracy), so keep that order here: ranked-but-not-recommended models
-    // surface first, then the unranked tail by accuracy.
-    const rest = downloadable.filter((m: ModelInfo) => !m.is_recommended);
-    return {
-      downloadable,
-      topPicks: recommended.slice(0, 2),
-      otherRecommended: recommended.slice(2),
-      rest,
-    };
+    const topPick = recommended[0] ?? null;
+    // Remaining recommended picks first, then the ranked tail.
+    const others = [
+      ...recommended.slice(1),
+      ...downloadable.filter((m: ModelInfo) => !m.is_recommended),
+    ];
+    return { downloadable, topPick, others };
   }, [models]);
 
-  const hasRecommended = topPicks.length > 0 || otherRecommended.length > 0;
-  // When nothing recommended remains to download (e.g. all already on disk),
-  // there is no curated subset to collapse, so just show the full list.
-  const showRest = showAll || !hasRecommended;
+  // With no pick left to download (e.g. all already on disk), list everything.
+  const showOthers = showAll || !topPick;
 
   // Watch for the selected model to finish downloading + verifying + extracting
   useEffect(() => {
@@ -163,7 +158,7 @@ const Onboarding: React.FC<OnboardingProps> = ({
     <div className="h-screen w-full flex flex-col p-6 gap-4">
       <div className="flex flex-col items-center gap-2 shrink-0">
         <SayLessLogo width={200} />
-        <p className="text-text/70 max-w-md font-medium mx-auto">
+        <p className="text-text-muted max-w-md font-medium mx-auto text-center">
           {t("onboarding.subtitle")}
         </p>
       </div>
@@ -173,7 +168,7 @@ const Onboarding: React.FC<OnboardingProps> = ({
           {models.some((m: ModelInfo) => m.is_downloaded) && (
             <div className="space-y-3">
               <div className="text-left">
-                <h2 className="text-sm font-medium text-text/60">
+                <h2 className="text-sm font-medium text-text-muted">
                   {t("onboarding.existingModelsTitle")}
                 </h2>
               </div>
@@ -194,54 +189,38 @@ const Onboarding: React.FC<OnboardingProps> = ({
 
           {downloadable.length > 0 && (
             <div className="space-y-3">
-              <div className="text-left">
-                <h2 className="text-sm font-medium text-text/60">
-                  {t("onboarding.downloadModelsTitle")}
-                </h2>
-              </div>
+              {topPick && (
+                <>
+                  <div className="text-left">
+                    <h2 className="text-sm font-medium text-text-muted">
+                      {t("onboarding.downloadModelsTitle")}
+                    </h2>
+                  </div>
+                  <ModelCard
+                    model={topPick}
+                    variant="featured"
+                    status={getModelStatus(topPick.id)}
+                    disabled={isBusy}
+                    onSelect={handleDownloadModel}
+                    onDownload={handleDownloadModel}
+                    onCancel={handleCancelDownload}
+                    downloadProgress={getModelDownloadProgress(topPick.id)}
+                    downloadSpeed={getModelDownloadSpeed(topPick.id)}
+                    showRecommended={false}
+                  />
+                </>
+              )}
 
-              {topPicks.map((model: ModelInfo) => (
-                <ModelCard
-                  key={model.id}
-                  model={model}
-                  variant="featured"
-                  status={getModelStatus(model.id)}
-                  disabled={isBusy}
-                  onSelect={handleDownloadModel}
-                  onDownload={handleDownloadModel}
-                  onCancel={handleCancelDownload}
-                  downloadProgress={getModelDownloadProgress(model.id)}
-                  downloadSpeed={getModelDownloadSpeed(model.id)}
-                  showRecommended={false}
-                />
-              ))}
-
-              {otherRecommended.map((model: ModelInfo) => (
-                <ModelCard
-                  key={model.id}
-                  model={model}
-                  status={getModelStatus(model.id)}
-                  disabled={isBusy}
-                  onSelect={handleDownloadModel}
-                  onDownload={handleDownloadModel}
-                  onCancel={handleCancelDownload}
-                  downloadProgress={getModelDownloadProgress(model.id)}
-                  downloadSpeed={getModelDownloadSpeed(model.id)}
-                  showRecommended={false}
-                />
-              ))}
-
-              {hasRecommended && rest.length > 0 && (
+              {topPick && others.length > 0 && (
                 <button
                   type="button"
+                  aria-expanded={showAll}
                   onClick={() => setShowAll((v) => !v)}
-                  className="flex items-center justify-center gap-1.5 mx-auto py-1 text-sm font-medium text-text/60 hover:text-text transition-colors"
+                  className="flex items-center justify-center gap-1.5 mx-auto min-h-8 py-1 text-sm font-medium text-text-muted hover:text-text transition-colors"
                 >
                   {showAll
-                    ? t("onboarding.showFewerModels")
-                    : t("onboarding.showAllModels", {
-                        total: downloadable.length,
-                      })}
+                    ? t("onboarding.hideOtherEngines")
+                    : t("onboarding.otherEngines", { total: others.length })}
                   <ChevronDown
                     className={`w-4 h-4 transition-transform duration-200 ${
                       showAll ? "rotate-180" : ""
@@ -250,21 +229,29 @@ const Onboarding: React.FC<OnboardingProps> = ({
                 </button>
               )}
 
-              {showRest &&
-                rest.map((model: ModelInfo) => (
-                  <ModelCard
-                    key={model.id}
-                    model={model}
-                    status={getModelStatus(model.id)}
-                    disabled={isBusy}
-                    onSelect={handleDownloadModel}
-                    onDownload={handleDownloadModel}
-                    onCancel={handleCancelDownload}
-                    downloadProgress={getModelDownloadProgress(model.id)}
-                    downloadSpeed={getModelDownloadSpeed(model.id)}
-                    showRecommended={false}
-                  />
-                ))}
+              {showOthers && others.length > 0 && (
+                <>
+                  <div className="text-left pt-2">
+                    <h2 className="text-sm font-medium text-text-muted">
+                      {t("onboarding.otherEnginesNote")}
+                    </h2>
+                  </div>
+                  {others.map((model: ModelInfo) => (
+                    <ModelCard
+                      key={model.id}
+                      model={model}
+                      status={getModelStatus(model.id)}
+                      disabled={isBusy}
+                      onSelect={handleDownloadModel}
+                      onDownload={handleDownloadModel}
+                      onCancel={handleCancelDownload}
+                      downloadProgress={getModelDownloadProgress(model.id)}
+                      downloadSpeed={getModelDownloadSpeed(model.id)}
+                      showRecommended={false}
+                    />
+                  ))}
+                </>
+              )}
             </div>
           )}
         </div>

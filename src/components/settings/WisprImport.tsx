@@ -129,9 +129,11 @@ export function WisprImport() {
           <h2 className="text-lg font-semibold">{t("import.preview")}</h2>
           <p>
             {t("import.counts", {
-              words: preview.words.length,
-              snippets: preview.snippets.length,
-              skipped: preview.skipped,
+              words: t("import.n.words", { count: preview.words.length }),
+              snippets: t("import.n.snippets", {
+                count: preview.snippets.length,
+              }),
+              skipped: t("import.n.skipped", { count: preview.skipped }),
             })}
           </p>
           <p className="text-sm text-text/70">{t("import.corrections")}</p>
@@ -182,9 +184,11 @@ export function WisprImport() {
         <div role="status" className="space-y-2">
           <p>
             {t("import.complete", {
-              words: report.words_added,
-              snippets: report.snippets_added,
-              history: report.history_added,
+              words: t("import.n.words", { count: report.words_added }),
+              snippets: t("import.n.snippets", {
+                count: report.snippets_added,
+              }),
+              history: t("import.n.history", { count: report.history_added }),
             })}
           </p>
           {report.history_error && <p>{t("import.partialHistory")}</p>}

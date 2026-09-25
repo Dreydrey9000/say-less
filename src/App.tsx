@@ -20,20 +20,24 @@ import AccessibilityPermissions from "./components/AccessibilityPermissions";
 import SecureInputWarning from "./components/SecureInputWarning";
 import { Home } from "./components/Home";
 import Footer from "./components/footer";
-import Onboarding, { AccessibilityOnboarding } from "./components/onboarding";
+import Onboarding, {
+  AccessibilityOnboarding,
+  TryItStep,
+} from "./components/onboarding";
 import {
   DebugSettings,
   type OnboardingPreviewStep,
 } from "./components/settings";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Sidebar, SidebarSection, SECTIONS_CONFIG } from "./components/Sidebar";
+import { NavigateContext } from "./components/navigation";
 import { WhatsNewGate } from "./components/whats-new";
 import { useSettings } from "./hooks/useSettings";
 import { useSettingsStore } from "./stores/settingsStore";
 import { commands } from "@/bindings";
 import { getLanguageDirection, initializeRTL } from "@/lib/utils/rtl";
 
-type OnboardingStep = "accessibility" | "model" | "done";
+type OnboardingStep = "accessibility" | "model" | "try" | "done";
 
 // Stable identity so preview effects do not re-run due to callback changes.
 const NOOP = () => {};
@@ -77,7 +81,8 @@ function App() {
   const isShowingOnboarding =
     onboardingPreview !== null ||
     onboardingStep === "accessibility" ||
-    onboardingStep === "model";
+    onboardingStep === "model" ||
+    onboardingStep === "try";
 
   // Classic scrollbars consume layout space. Reserve a matching gutter on the
   // opposite edge while onboarding is visible so its content stays centered in
@@ -97,10 +102,11 @@ function App() {
     initializeRTL(i18n.language);
   }, [i18n.language]);
 
-  // Initialize input automation only after permission setup completes.
+  // Initialize input automation only after permission setup completes. The
+  // "Try it" step needs working shortcuts, so it counts as complete here.
   useEffect(() => {
     if (
-      onboardingStep === "done" &&
+      (onboardingStep === "done" || onboardingStep === "try") &&
       !settingsOnly &&
       !hasCompletedPostOnboardingInit.current
     ) {
@@ -337,8 +343,8 @@ function App() {
   }, [isReturningUser]);
 
   const handleModelSelected = () => {
-    // Transition to main app - user has started a download
-    setOnboardingStep("done");
+    // The engine is ready: one guided dictation before the main app.
+    setOnboardingStep("try");
   };
 
   // Rendered once around every step below (including onboarding) so
@@ -404,6 +410,8 @@ function App() {
     );
   } else if (onboardingStep === "model") {
     content = <Onboarding onModelSelected={handleModelSelected} />;
+  } else if (onboardingStep === "try") {
+    content = <TryItStep onDone={() => setOnboardingStep("done")} />;
   } else {
     content = (
       <div
@@ -441,11 +449,13 @@ function App() {
                   <AccessibilityPermissions />
                 )}
                 <SecureInputWarning />
-                {renderSettingsContent(
-                  currentSection,
-                  setOnboardingPreview,
-                  setCurrentSection,
-                )}
+                <NavigateContext.Provider value={setCurrentSection}>
+                  {renderSettingsContent(
+                    currentSection,
+                    setOnboardingPreview,
+                    setCurrentSection,
+                  )}
+                </NavigateContext.Provider>
               </div>
             </div>
           </div>

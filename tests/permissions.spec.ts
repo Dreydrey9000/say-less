@@ -6,18 +6,20 @@ test("denied permission stops waiting and retains a recovery path", async ({
   await page.clock.install();
   await page.goto("/tests/fixtures/app.html?noPermissions=1");
   const card = page
-    .getByRole("heading", { name: "Accessibility Access" })
+    .getByRole("heading", { name: "Accessibility (this is how it types)" })
     .locator("../..");
-  await card.getByRole("button", { name: "Grant Permission" }).click();
-  await expect(card.getByText("Waiting...", { exact: true })).toBeVisible();
+  await card.getByRole("button", { name: "Allow" }).click();
+  await expect(
+    card.getByText("Waiting for macOS…", { exact: true }),
+  ).toBeVisible();
   await expect(card.getByRole("button", { name: "Check again" })).toBeVisible();
   await page.clock.fastForward(16000);
-  await expect(card.getByText("Waiting...", { exact: true })).toHaveCount(0);
   await expect(
-    card.getByRole("button", { name: "Grant Permission" }),
-  ).toBeVisible();
+    card.getByText("Waiting for macOS…", { exact: true }),
+  ).toHaveCount(0);
+  await expect(card.getByRole("button", { name: "Allow" })).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Permissions Required" }),
+    page.getByRole("heading", { name: "Two permissions, then you're talking" }),
   ).toBeVisible();
 });
 
@@ -27,7 +29,9 @@ for (const method of ["focus", "retry"]) {
   }) => {
     await page.goto("/tests/fixtures/app.html?noPermissions=1");
     await expect(
-      page.getByRole("heading", { name: "Permissions Required" }),
+      page.getByRole("heading", {
+        name: "Two permissions, then you're talking",
+      }),
     ).toBeVisible();
     await page.evaluate(() =>
       sessionStorage.setItem("test-permissions", "granted"),
@@ -36,7 +40,7 @@ for (const method of ["focus", "retry"]) {
       await page.evaluate(() => window.dispatchEvent(new Event("focus")));
     else await page.getByRole("button", { name: "Check again" }).click();
     await expect(
-      page.getByRole("button", { name: "General", exact: true }),
+      page.getByRole("button", { name: "Shortcuts & mic", exact: true }),
     ).toBeVisible();
   });
 }
@@ -52,7 +56,9 @@ for (const width of [390, 1200]) {
     await expect(retry).toBeFocused();
     await retry.press("Enter");
     await expect(
-      page.getByRole("heading", { name: "Permissions Required" }),
+      page.getByRole("heading", {
+        name: "Two permissions, then you're talking",
+      }),
     ).toBeVisible();
     expect(
       await page.evaluate(

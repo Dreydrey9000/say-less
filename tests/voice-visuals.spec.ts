@@ -9,7 +9,15 @@ async function openAppearance(page: Page, query = "") {
   await page.goto(`/tests/fixtures/app.html${query}`);
   await page.getByRole("button", { name: "Appearance", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Voice visuals" }),
+    page.getByRole("heading", { name: "Recording indicator" }),
+  ).toBeVisible();
+}
+
+/** The avatar builder only shows once an avatar is in use somewhere. */
+async function useAvatarIndicator(page: Page) {
+  await page.getByRole("button", { name: "Avatar", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Customize your avatar" }),
   ).toBeVisible();
 }
 
@@ -26,9 +34,24 @@ test("voice visuals default to bars and the avatar builder persists", async ({
   await expect(
     page.getByRole("button", { name: "Bars", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByLabel("Companion style")).toHaveValue("emblem");
+  const look = page.getByRole("combobox", { name: "Dock look" });
+  await expect(look).toHaveValue("emblem");
+  // Neither surface uses an avatar yet, so there is nothing to customize.
+  await expect(
+    page.getByRole("heading", { name: "Customize your avatar" }),
+  ).toHaveCount(0);
+  await look.selectOption("avatar");
+  await expect
+    .poll(async () => (await studio(page))?.dock_character)
+    .toBe("avatar");
+  await expect(
+    page.getByRole("heading", { name: "Customize your avatar" }),
+  ).toBeVisible();
 
-  const squiggle = page.getByRole("button", { name: "Squiggle", exact: true });
+  const squiggle = page.getByRole("button", {
+    name: "Voice line",
+    exact: true,
+  });
   await squiggle.focus();
   await expect(squiggle).toBeFocused();
   await squiggle.press("Space");
@@ -44,14 +67,10 @@ test("voice visuals default to bars and the avatar builder persists", async ({
     .poll(async () => (await studio(page))?.avatar)
     .toMatchObject({ kind: "cat", accessory: "crown", background: "#335577" });
 
-  await page.getByLabel("Companion style").selectOption("avatar");
-  await expect
-    .poll(async () => (await studio(page))?.dock_character)
-    .toBe("avatar");
   await page.reload();
   await page.getByRole("button", { name: "Appearance", exact: true }).click();
   await expect(
-    page.getByRole("button", { name: "Squiggle", exact: true }),
+    page.getByRole("button", { name: "Voice line", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
   await expect(
     page.getByRole("button", { name: "Cat", exact: true }),
@@ -59,18 +78,20 @@ test("voice visuals default to bars and the avatar builder persists", async ({
   await expect(page.getByLabel("Accessory", { exact: true })).toHaveValue(
     "crown",
   );
-  await expect(page.getByLabel("Companion style")).toHaveValue("avatar");
-  // A face would hide the formation, so the picker previews each one on the orb.
-  await expect(
-    page.locator(".formation-grid .companion.character-orb").first(),
-  ).toBeVisible();
+  await expect(page.getByRole("combobox", { name: "Dock look" })).toHaveValue(
+    "avatar",
+  );
+  // A face hides the particles, so there is no pattern to pick.
+  await expect(page.locator(".formation-grid")).toHaveCount(0);
+  await expect(page.getByText("This look has no particles")).toBeVisible();
   await page.screenshot({ path: "test-results/voice-visuals-builder.png" });
 });
 
-test("Test makes the avatar talk, then it closes its mouth", async ({
+test("Preview makes the avatar talk, then it closes its mouth", async ({
   page,
 }) => {
   await openAppearance(page);
+  await useAvatarIndicator(page);
   const preview = page.locator(".avatar-preview svg.avatar");
   const mouth = preview.locator(".avatar-mouth");
   await expect(preview).toHaveAttribute("data-mouth", "0");
@@ -78,7 +99,7 @@ test("Test makes the avatar talk, then it closes its mouth", async ({
   await expect(mouth).toHaveCount(1);
   expect(await mouth.evaluate((el) => el.tagName)).toBe("path");
   const closed = await mouth.getAttribute("d");
-  await page.getByRole("button", { name: "Test the voice" }).click();
+  await page.getByRole("button", { name: "Preview animation" }).click();
   await expect
     .poll(async () => Number(await preview.getAttribute("data-mouth")))
     .toBeGreaterThan(0.3);
@@ -93,8 +114,9 @@ test("Test makes the avatar talk, then it closes its mouth", async ({
 test("reduced motion keeps the avatar in a still pose", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await openAppearance(page);
-  await page.getByRole("button", { name: "Test the voice" }).click();
-  await expect(page.getByText("so the avatar holds still")).toBeVisible();
+  await useAvatarIndicator(page);
+  await page.getByRole("button", { name: "Preview animation" }).click();
+  await expect(page.getByText("so previews hold still")).toBeVisible();
   await page.waitForTimeout(600);
   await expect(page.locator(".avatar-preview svg.avatar")).toHaveAttribute(
     "data-mouth",
