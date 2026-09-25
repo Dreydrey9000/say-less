@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   avatarAccessories,
@@ -88,6 +88,9 @@ export function VoiceVisualSettings() {
     Math.max(0, previewLevel * (0.55 + 0.45 * Math.sin(i * 1.3 + 0.6))),
   );
   const disabled = busy || !loaded;
+  // Controls wrapped in a <label> would otherwise include their own value in
+  // their accessible name ("Accessory None"); point them at the label text.
+  const labelId = useId();
   const avatarLabel = t("voiceVisuals.previewLabel", {
     style: t(`voiceVisuals.kinds.${draft.kind}`),
     accessory: t(`voiceVisuals.accessories.${draft.accessory}`),
@@ -208,18 +211,24 @@ export function VoiceVisualSettings() {
                   type="color"
                   value={draft[field]}
                   disabled={disabled}
+                  aria-labelledby={`${labelId}-${field}`}
                   onChange={(e) =>
                     update({ ...draft, [field]: e.target.value })
                   }
                 />
-                <span>{t(`voiceVisuals.colors.${field}`)}</span>
+                <span id={`${labelId}-${field}`}>
+                  {t(`voiceVisuals.colors.${field}`)}
+                </span>
               </label>
             ))}
           </div>
           <label className="block text-sm">
-            {t("voiceVisuals.accessory")}
+            <span id={`${labelId}-accessory`}>
+              {t("voiceVisuals.accessory")}
+            </span>
             <select
               className="studio-select mt-1"
+              aria-labelledby={`${labelId}-accessory`}
               value={draft.accessory}
               disabled={disabled}
               onChange={(e) => update({ ...draft, accessory: e.target.value })}

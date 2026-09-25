@@ -107,11 +107,17 @@ async function openOverlay(page: Page, overlay_visual?: string) {
   await page.setViewportSize({ width: 420, height: 160 });
   await page.goto("/tests/fixtures/app.html?overlay=1");
   await page.waitForFunction(() => "testEmit" in window);
-  await page.evaluate(async () => {
-    const emit = (window as unknown as TestWindow).testEmit;
-    await emit("show-overlay", "recording");
-    await emit("recording-ready");
-  });
+  // The overlay registers its event listeners asynchronously after mount, so
+  // an event sent too early is simply missed (as it would be in the app).
+  // Repeat the start-of-recording events until the overlay shows it heard them.
+  await expect(async () => {
+    await page.evaluate(async () => {
+      const emit = (window as unknown as TestWindow).testEmit;
+      await emit("show-overlay", "recording");
+      await emit("recording-ready");
+    });
+    await expect(page.locator(".sdot.ready")).toBeVisible({ timeout: 500 });
+  }).toPass({ timeout: 10000 });
 }
 
 function speak(page: Page, level: number) {
