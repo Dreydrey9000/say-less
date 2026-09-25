@@ -392,7 +392,9 @@ test("overlay says what it is doing, and its controls are big enough", async ({
   await expect(live).toHaveText("Transcribing...");
 });
 
-test("the overlay avatar is at least 44px", async ({ page }) => {
+test("the overlay avatar is 40px with 8px clearance in the pill", async ({
+  page,
+}) => {
   await page.goto("/tests/fixtures/app.html");
   await page.evaluate(() => {
     const saved = JSON.parse(localStorage.getItem("test-studio") || "{}");
@@ -408,8 +410,14 @@ test("the overlay avatar is at least 44px", async ({ page }) => {
     await emit("recording-ready");
   });
   const box = await page.locator(".savatar").boundingBox();
-  expect(box?.width ?? 0).toBeGreaterThanOrEqual(44);
-  expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
+  expect(Math.round(box?.width ?? 0)).toBe(40);
+  expect(Math.round(box?.height ?? 0)).toBe(40);
+  // Room above and below inside the 56px control row.
+  const row = await page.locator(".sbase").boundingBox();
+  expect(box!.y - row!.y).toBeGreaterThanOrEqual(7.5);
+  expect(row!.y + row!.height - (box!.y + box!.height)).toBeGreaterThanOrEqual(
+    7.5,
+  );
 });
 
 test("reduced motion holds the overlay bars still", async ({ page }) => {
