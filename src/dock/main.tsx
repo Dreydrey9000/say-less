@@ -85,6 +85,7 @@ function Dock() {
           <Companion
             level={level}
             active={state === "recording"}
+            thinking={state === "transcribing"}
             paused={!settings.floating}
           />
         </button>
@@ -145,6 +146,7 @@ function Dock() {
           <Companion
             level={level}
             active={state === "recording"}
+            thinking={state === "transcribing"}
             paused={!settings.floating}
           />
         </button>

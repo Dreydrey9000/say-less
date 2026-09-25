@@ -84,6 +84,7 @@ export function VoiceVisualSettings() {
 
   const recording = state === "recording";
   const previewLevel = testing ? testValue : recording ? liveLevel : 0;
+  const talking = testing || recording;
   const previewLevels = Array.from({ length: 9 }, (_, i) =>
     Math.max(0, previewLevel * (0.55 + 0.45 * Math.sin(i * 1.3 + 0.6))),
   );
@@ -135,6 +136,8 @@ export function VoiceVisualSettings() {
                     levels={previewLevels}
                     ready
                     moving={moving && (testing || recording)}
+                    width={64}
+                    height={22}
                   />
                 ) : (
                   <span className="voice-visual-mini-avatar">
@@ -142,6 +145,7 @@ export function VoiceVisualSettings() {
                       avatar={draft}
                       level={previewLevel}
                       moving={moving}
+                      state={talking ? "listening" : "idle"}
                     />
                   </span>
                 )}
@@ -159,6 +163,8 @@ export function VoiceVisualSettings() {
               avatar={draft}
               level={previewLevel}
               moving={moving}
+              state={talking ? "listening" : "idle"}
+              rings={2}
               label={avatarLabel}
             />
           </div>

@@ -3,25 +3,116 @@
   width: 100%;
   height: 100%;
   overflow: visible;
+  /* One spring curve for every state change (slight overshoot, then settle). */
+  --avatar-spring: cubic-bezier(0.2, 0.8, 0.2, 1.2);
+}
+.avatar-body,
+.avatar-breath,
+.avatar-ring {
+  transform-box: view-box;
+}
+/* Squash from the chin down, breathe from the center. */
+.avatar-body {
+  transform-origin: 50px 92px;
+}
+.avatar-breath,
+.avatar-ring {
+  transform-origin: 50px 50px;
+}
+.avatar-ring {
+  fill: none;
+  stroke: var(--studio-accent, #f4f6f8);
+  stroke-width: 1.2;
+  opacity: 0.32;
+  transition: transform 140ms ease-out;
+}
+.avatar-ring.ring-2 {
+  opacity: 0.16;
 }
 .avatar-eyes {
+  transition: transform 420ms var(--avatar-spring);
+}
+.avatar-lid {
   transform-box: fill-box;
-  transform-origin: center;
+  transform-origin: 50% 0%;
+  transform: scaleY(0);
+  transition: transform 90ms ease-in;
+}
+.avatar-eyes.is-blinking .avatar-lid {
+  transform: scaleY(1);
+  transition-duration: 70ms;
+}
+.avatar-tongue {
+  transition: opacity 120ms ease-out;
+}
+/* Thinking: eyes glance up and to the side, half-lidded. */
+.avatar.state-thinking .avatar-eyes {
+  transform: translate(1.6px, -1.8px);
+}
+.avatar.state-thinking .avatar-lid {
+  transform: scaleY(0.42);
+  transition: transform 420ms var(--avatar-spring);
+}
+/* Done: a happy squint while the bounce plays. */
+.avatar-body.is-happy .avatar-lid {
+  transform: scaleY(0.55);
+  transition: transform 160ms var(--avatar-spring);
 }
 @media (prefers-reduced-motion: no-preference) {
-  .avatar.is-moving .avatar-eyes {
-    animation: avatar-blink 5.2s infinite;
+  .avatar.is-moving .avatar-look {
+    animation: avatar-drift 9s ease-in-out infinite;
+  }
+  .avatar.is-moving.state-listening .avatar-breath {
+    animation: avatar-breathe 3.2s ease-in-out infinite;
+  }
+  .avatar.is-moving .avatar-body.is-squash {
+    animation: avatar-squash 0.5s cubic-bezier(0.3, 1.6, 0.4, 1);
+  }
+  .avatar.is-moving .avatar-body.is-happy {
+    animation: avatar-happy 0.9s cubic-bezier(0.3, 1.6, 0.4, 1);
   }
 }
-@keyframes avatar-blink {
+/* A slow wander of the pupils, a pixel or so, so the face feels awake. */
+@keyframes avatar-drift {
   0%,
-  46%,
-  50%,
   100% {
-    transform: scaleY(1);
+    transform: translate(0, 0);
+  }
+  22% {
+    transform: translate(1.1px, -0.4px);
   }
   48% {
-    transform: scaleY(0.1);
+    transform: translate(-0.9px, 0.5px);
+  }
+  74% {
+    transform: translate(0.4px, 0.8px);
+  }
+}
+@keyframes avatar-breathe {
+  50% {
+    transform: scale(1.02);
+  }
+}
+@keyframes avatar-squash {
+  20% {
+    transform: scale(1.1, 0.88);
+  }
+  55% {
+    transform: scale(0.95, 1.06);
+  }
+  80% {
+    transform: scale(1.02, 0.98);
+  }
+}
+@keyframes avatar-happy {
+  18% {
+    transform: scale(1.08, 0.9) rotate(-4deg);
+  }
+  50% {
+    transform: scale(0.96, 1.05) rotate(3deg);
+  }
+  78% {
+    transform: scale(1.01, 0.99) rotate(-1deg);
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -29,4 +120,11 @@
     animation: none !important;
     transition: none !important;
   }
+}
+/* Pause animations (or a hidden window): hold the resting pose. */
+.avatar.is-still * {
+  animation: none !important;
+}
+.avatar.is-still .avatar-ring {
+  transition: none;
 }

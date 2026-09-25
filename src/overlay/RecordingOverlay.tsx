@@ -187,6 +187,8 @@ const RecordingOverlay: React.FC = () => {
           avatar={avatar}
           level={captureReady ? Math.max(0, ...levels) : 0}
           moving={moving}
+          state={captureReady ? "listening" : "idle"}
+          rings={1}
         />
       </span>
     ) : (

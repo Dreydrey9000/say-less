@@ -230,26 +230,59 @@ function Figure({
   );
 }
 
+/** What the avatar is doing. "Done" is played on its own when listening ends. */
+export type AvatarState = "idle" | "listening" | "thinking";
+
 /**
- * Flat SVG talking avatar. The mouth follows voice volume (not words), with a
- * closed-mouth idle and a CSS blink. With motion off it holds a static pose.
+ * One mouth outline for every opening, so talking morphs smoothly instead of
+ * swapping a smile line for an oval. Closed, it is a thin smiling crescent;
+ * as `open` grows the bottom lip drops into a rounded bowl.
+ */
+export function mouthPath(head: Head, open: number) {
+  const { cx, mouthY, r } = head;
+  const w = r * 0.22 * (1 + open * 0.2);
+  const y0 = mouthY - 1;
+  const top = mouthY + 1.9 - open * 2.2;
+  const bottom = mouthY + 2.53 + open * r * 0.38;
+  const f = (n: number) => n.toFixed(2);
+  return (
+    `M${f(cx - w)} ${f(y0)}Q${f(cx)} ${f(top)} ${f(cx + w)} ${f(y0)}` +
+    `C${f(cx + w * 0.95)} ${f(bottom)} ${f(cx - w * 0.95)} ${f(bottom)} ${f(cx - w)} ${f(y0)}Z`
+  );
+}
+
+/**
+ * Flat SVG talking avatar. The mouth follows voice volume (not words); the
+ * eyes blink on a random timer and drift a little; it breathes while
+ * listening, looks up while thinking, and squashes when listening starts or
+ * ends. Everything holds still with Reduce Motion or Pause.
  */
 export function Avatar({
   avatar,
   level = 0,
   moving = false,
+  state = "idle",
+  rings = 0,
   label,
   className = "",
 }: {
   avatar: AvatarSettings;
   level?: number;
   moving?: boolean;
+  state?: AvatarState;
+  /** Faint voice-reactive rings behind the face (0 to 2). */
+  rings?: number;
   label?: string;
   className?: string;
 }) {
-  const clip = `avatar-clip-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
+  const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
+  const clip = `avatar-clip-${uid}`;
+  const mouthClip = `avatar-mouth-${uid}`;
   const [open, setOpen] = useState(0);
   const latest = useRef(level);
+  const eyes = useRef<SVGGElement>(null);
+  const body = useRef<SVGGElement>(null);
+  const previous = useRef(state);
   useEffect(() => {
     latest.current = level;
   }, [level]);
@@ -269,6 +302,43 @@ export function Avatar({
     );
     return () => clearInterval(timer);
   }, [moving, idle]);
+  // Blink on a random 2.2-5.4s timer so it never looks mechanical. The class
+  // goes on the eye group directly, so React re-renders never cut a blink short.
+  useEffect(() => {
+    if (!moving) return;
+    let next: ReturnType<typeof setTimeout>;
+    let reopen: ReturnType<typeof setTimeout>;
+    const blink = () => {
+      eyes.current?.classList.add("is-blinking");
+      reopen = setTimeout(
+        () => eyes.current?.classList.remove("is-blinking"),
+        140,
+      );
+      next = setTimeout(blink, 2200 + Math.random() * 3200);
+    };
+    next = setTimeout(blink, 1200 + Math.random() * 2000);
+    const group = eyes.current;
+    return () => {
+      clearTimeout(next);
+      clearTimeout(reopen);
+      group?.classList.remove("is-blinking");
+    };
+  }, [moving]);
+  // Squash-and-bounce when listening starts, a happy squint when it ends.
+  useEffect(() => {
+    const was = previous.current;
+    previous.current = state;
+    const group = body.current;
+    if (!moving || was === state || !group) return;
+    const cls = state === "idle" ? "is-happy" : "is-squash";
+    group.classList.remove("is-squash", "is-happy");
+    void group.getBoundingClientRect(); // restart the animation
+    group.classList.add(cls);
+    const done = () => group.classList.remove(cls);
+    group.addEventListener("animationend", done, { once: true });
+    return () => group.removeEventListener("animationend", done);
+  }, [state, moving]);
+
   const kind = avatar.kind in heads ? avatar.kind : "person";
   const head = heads[kind as keyof typeof heads];
   // Stick figures draw their face in the line color; filled faces pick
@@ -279,10 +349,16 @@ export function Avatar({
       : prefersDarkInk(avatar.body)
         ? "#15181e"
         : "#f4f6f8";
-  const mouthW = head.r * 0.22;
+  // Eyelids match the skin, so a blink reads as a lid closing.
+  const lid = kind === "stick" ? avatar.background : avatar.body;
+  const eyeR = kind === "stick" ? 2.4 : 2.8;
+  const mouth = mouthPath(head, open);
+  const mouthW = head.r * 0.22 * (1 + open * 0.2);
+  const lipBottom = head.mouthY + 1.65 + open * head.r * 0.285;
+  const tongueRy = 1 + open * head.r * 0.13;
   return (
     <svg
-      className={`avatar avatar-${kind} ${moving ? "is-moving" : "is-still"} ${open > 0 ? "is-talking" : ""} ${className}`}
+      className={`avatar avatar-${kind} state-${state} ${moving ? "is-moving" : "is-still"} ${open > 0 ? "is-talking" : ""} ${className}`}
       viewBox="0 0 100 100"
       focusable="false"
       data-mouth={open}
@@ -294,61 +370,102 @@ export function Avatar({
         <clipPath id={clip}>
           <circle cx="50" cy="50" r="50" />
         </clipPath>
+        <clipPath id={mouthClip}>
+          <path d={mouth} />
+        </clipPath>
       </defs>
-      <circle cx="50" cy="50" r="50" fill={avatar.background} />
-      <g
-        clipPath={`url(#${clip})`}
-        style={{ transform: `translateY(${-open * 1.5}px)` } as CSSProperties}
-      >
-        <Figure
-          kind={kind}
-          ink={ink}
-          colors={{
-            body: avatar.body,
-            accent: avatar.accent,
-            bg: avatar.background,
-          }}
-        />
-        <g className="avatar-eyes" fill={ink}>
-          {[-1, 1].map((side) =>
-            kind === "cat" ? (
-              <ellipse
-                key={side}
-                cx={head.cx + side * head.eyeDx}
-                cy={head.eyeY}
-                rx="2.8"
-                ry="4"
-              />
-            ) : (
-              <circle
-                key={side}
-                cx={head.cx + side * head.eyeDx}
-                cy={head.eyeY}
-                r={kind === "stick" ? 2.4 : 2.8}
-              />
-            ),
-          )}
+      {rings > 0 && (
+        <g className="avatar-rings">
+          {Array.from({ length: Math.min(2, rings) }, (_, i) => (
+            <circle
+              key={i}
+              className={`avatar-ring ring-${i + 1}`}
+              cx="50"
+              cy="50"
+              r={53 + i * 4}
+              style={{ transform: `scale(${1 + open * (0.05 + i * 0.03)})` }}
+            />
+          ))}
         </g>
-        {open > 0 ? (
-          <ellipse
-            className="avatar-mouth"
-            cx={head.cx}
-            cy={head.mouthY}
-            rx={mouthW * (1 + open * 0.25)}
-            ry={0.8 + open * head.r * 0.2}
-            fill={ink}
-          />
-        ) : (
-          <path
-            className="avatar-mouth"
-            d={`M${head.cx - mouthW} ${head.mouthY - 1}Q${head.cx} ${head.mouthY + 3} ${head.cx + mouthW} ${head.mouthY - 1}`}
-            fill="none"
-            stroke={ink}
-            strokeWidth="2.4"
-            strokeLinecap="round"
-          />
-        )}
-        <Accessory kind={avatar.accessory} head={head} accent={avatar.accent} />
+      )}
+      <g className="avatar-body" ref={body}>
+        <g className="avatar-breath">
+          <circle cx="50" cy="50" r="50" fill={avatar.background} />
+          <g
+            clipPath={`url(#${clip})`}
+            style={
+              { transform: `translateY(${-open * 1.5}px)` } as CSSProperties
+            }
+          >
+            <Figure
+              kind={kind}
+              ink={ink}
+              colors={{
+                body: avatar.body,
+                accent: avatar.accent,
+                bg: avatar.background,
+              }}
+            />
+            <g className="avatar-eyes" ref={eyes}>
+              <g className="avatar-look" fill={ink}>
+                {[-1, 1].map((side) =>
+                  kind === "cat" ? (
+                    <ellipse
+                      key={side}
+                      cx={head.cx + side * head.eyeDx}
+                      cy={head.eyeY}
+                      rx="2.8"
+                      ry="4"
+                    />
+                  ) : (
+                    <circle
+                      key={side}
+                      cx={head.cx + side * head.eyeDx}
+                      cy={head.eyeY}
+                      r={eyeR}
+                    />
+                  ),
+                )}
+              </g>
+              {[-1, 1].map((side) => (
+                <ellipse
+                  key={side}
+                  className="avatar-lid"
+                  cx={head.cx + side * head.eyeDx}
+                  cy={head.eyeY}
+                  rx={(kind === "cat" ? 2.8 : eyeR) + 1.4}
+                  ry={(kind === "cat" ? 4 : eyeR) + 1.4}
+                  fill={lid}
+                />
+              ))}
+            </g>
+            <g className="avatar-mouth-group">
+              <path
+                className="avatar-mouth"
+                d={mouth}
+                fill={ink === "#15181e" ? ink : "#2b1418"}
+                stroke={ink}
+                strokeWidth="1.3"
+                strokeLinejoin="round"
+              />
+              <ellipse
+                className="avatar-tongue"
+                clipPath={`url(#${mouthClip})`}
+                cx={head.cx}
+                cy={lipBottom - tongueRy * 0.35}
+                rx={mouthW * 0.62}
+                ry={tongueRy}
+                fill="#e8737f"
+                opacity={Math.min(1, Math.max(0, (open - 0.12) / 0.3))}
+              />
+            </g>
+            <Accessory
+              kind={avatar.accessory}
+              head={head}
+              accent={avatar.accent}
+            />
+          </g>
+        </g>
       </g>
     </svg>
   );
