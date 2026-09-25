@@ -50,13 +50,15 @@
      the card's max footprint (--ov-work-w for compact, --ov-open-w for Live),
      since the card is anchored flush to the screen edge in CSS. Keep overlay.rs
      in sync when these change. */
-  --ov-rest-w: 172px; /* resting compact pill (minimal, recording) -- roomy enough
-                         for the English working label before the grow starts */
-  --ov-pill-w: 184px; /* base width / Live pill before it opens or collapses */
-  --ov-work-w: 216px; /* working pill (transcribing / polishing) -- wide enough to
-                         center longer labels; shared by Live (collapsed) + minimal */
+  /* One stable frame for starting, listening and working: wide enough for the
+     "Listening" status text beside the dot, the voice visual and a real
+     cancel target. */
+  --ov-rest-w: 240px; /* compact pill (minimal, recording) */
+  --ov-pill-w: 240px; /* base width / Live pill before it opens or collapses */
+  --ov-work-w: 240px; /* working pill (transcribing / polishing) */
   --ov-open-w: 392px; /* Live panel, expanded */
-  --ov-base-h: 40px; /* control-row height (.sbase) */
+  --ov-base-h: 48px; /* control-row height (.sbase); fits the 44px avatar */
+  --ov-enter-y: 8px; /* entry slide distance, from the screen edge */
   --ov-cap-max-h: 64px; /* max height of the scrolling live-text region */
 }
 @media (prefers-color-scheme: dark) {
@@ -113,6 +115,19 @@
 }
 .ov-stage.top {
   align-items: flex-start; /* top placement: flush to the top edge */
+  --ov-enter-y: -8px;
+}
+/* Screen-reader-only live status ("Listening", "Transcribing…"). */
+.ov-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Compact pill: fade the whole container in/out (the pill itself never pops or
@@ -123,6 +138,10 @@
 }
 .ov-fade.show {
   opacity: 1;
+}
+.ov-fade:not(.show) {
+  transition-duration: 140ms;
+  transition-timing-function: ease-in;
 }
 
 /* Top placement, Live panel: stack the control pill above the text region so the
@@ -192,8 +211,8 @@
   --s-border: rgba(244, 246, 248, 0.12);
   --s-hair: rgba(244, 246, 248, 0.08);
   color-scheme: dark;
-  /* pop-in plays on mount; morph (width/radius) is a transition */
-  animation: scard-pop 460ms cubic-bezier(0.22, 1, 0.36, 1);
+  /* short slide-in on mount; morph (width/radius) is a transition */
+  animation: scard-pop 180ms cubic-bezier(0.22, 1, 0.36, 1);
   transition:
     width 460ms cubic-bezier(0.22, 1, 0.36, 1),
     border-radius 460ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -202,8 +221,8 @@
 @keyframes scard-pop {
   from {
     opacity: 0;
-    /* Scale from the anchored edge (transform-origin) — never translate past it. */
-    transform: scale(0.92);
+    /* Slide in from the anchored screen edge (never past it). */
+    transform: translateY(var(--ov-enter-y));
   }
   to {
     opacity: 1;
@@ -212,10 +231,10 @@
 }
 .scard.leaving {
   opacity: 0;
-  transform: scale(0.96);
+  transform: translateY(var(--ov-enter-y));
   transition:
-    opacity 240ms ease,
-    transform 300ms ease;
+    opacity 140ms ease-in,
+    transform 140ms ease-in;
 }
 .scard.open {
   width: var(--ov-open-w);
@@ -232,7 +251,6 @@
    grow). The resting pill hugs the waveform; the working pill is roomy enough to
    center the longest label — the .swork-label ellipsis is only a safety net past it. */
 .scard.compact {
-  animation: none;
   width: var(--ov-rest-w);
 }
 .scard.compact.cworking {
@@ -269,7 +287,7 @@
   padding-left: 14px;
   padding-right: 14px;
   font-size: 15px;
-  font-style: italic;
+  font-style: normal;
   line-height: 1.35;
   letter-spacing: -0.003em;
   color: color-mix(in srgb, var(--color-text) 90%, transparent);
@@ -313,17 +331,29 @@
   flex: none; /* the control row never squashes; only the text region gives */
   padding: 0 10px;
   display: grid;
-  /* Equal side columns (min 22px to hold the cancel button) keep the center item
-     — waveform or label — centered whether the pill is at min width or content-
-     sized. */
-  grid-template-columns: minmax(22px, 1fr) auto minmax(22px, 1fr);
+  /* Equal side columns (min 32px to hold the cancel button) keep the center
+     item — waveform or label — centered whether the pill is at min width or
+     content-sized. */
+  grid-template-columns: minmax(32px, 1fr) auto minmax(32px, 1fr);
   align-items: center;
 }
 .sbase-l {
   display: flex;
+  min-width: 0;
+  gap: 7px;
   padding-left: 5px;
   align-items: center;
   justify-self: start;
+}
+/* "Starting…" / "Listening": the state in words, readable with motion off. */
+.sstatus {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--s-muted);
 }
 .sbase-r {
   display: flex;
@@ -413,11 +443,12 @@
 .ssquiggle.arming .ssquiggle-core {
   stop-color: currentColor;
 }
+/* 44px so the mouth still reads when it opens (at 30px it was ~2px). */
 .savatar {
   display: block;
   flex: none;
-  width: 30px;
-  height: 30px;
+  width: 44px;
+  height: 44px;
   margin-right: 8px;
 }
 .swave.arming i {
@@ -453,8 +484,8 @@
   }
 }
 .sx {
-  width: 22px;
-  height: 22px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   flex: none;
   padding: 0;
@@ -473,9 +504,13 @@
     transform 100ms ease;
 }
 .sx svg {
-  width: 9px;
-  height: 9px;
+  width: 12px;
+  height: 12px;
   display: block;
+}
+.sx:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 1px;
 }
 .sx:hover {
   background: var(--s-accent-soft);
@@ -515,4 +550,21 @@
 .srecording-dot,
 .swave i {
   background: var(--studio-accent, var(--color-logo-primary));
+}
+
+/* User paused animations: freeze the decorative loops (dot pulse, caret,
+   arming pulse, spinner) where they are. The card's own entry slide is left
+   alone so it never freezes half-transparent. */
+.ov-stage.is-paused .scard * {
+  animation-play-state: paused !important;
+}
+
+/* Reduce Motion: no slides, pulses, blinking caret or bar interpolation. The
+   status text carries the state instead. */
+@media (prefers-reduced-motion: reduce) {
+  .ov-stage,
+  .ov-stage * {
+    animation: none !important;
+    transition: none !important;
+  }
 }

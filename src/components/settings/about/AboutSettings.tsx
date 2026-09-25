@@ -5,6 +5,9 @@ import { openUrl } from "@tauri-apps/plugin-opener";
 import { SettingsGroup } from "../../ui/SettingsGroup";
 import { SettingContainer } from "../../ui/SettingContainer";
 import { Button } from "../../ui/Button";
+import { copyText } from "@/lib/clipboard";
+
+const SHARE_URL = "https://saylessvoice.com";
 import { AppDataDirectory } from "../AppDataDirectory";
 import { AppLanguageSelector } from "../AppLanguageSelector";
 import { ShowWhatsNewOnUpdate } from "../ShowWhatsNewOnUpdate";
@@ -16,6 +19,7 @@ export const AboutSettings: React.FC = () => {
   const { t } = useTranslation();
   const [version, setVersion] = useState("");
   const [shareCopied, setShareCopied] = useState(false);
+  const [shareFailed, setShareFailed] = useState(false);
 
   useEffect(() => {
     const fetchVersion = async () => {
@@ -39,14 +43,17 @@ export const AboutSettings: React.FC = () => {
     }
   };
 
+  // Copy on the first press and say so. If the clipboard truly fails, show
+  // the link to copy by hand; never open the website instead.
   const handleShareClick = async () => {
+    setShareFailed(false);
     try {
-      await navigator.clipboard.writeText("https://saylessvoice.com");
+      await copyText(SHARE_URL);
       setShareCopied(true);
       setTimeout(() => setShareCopied(false), 2000);
     } catch (error) {
       console.error("Failed to copy share link:", error);
-      await openUrl("https://saylessvoice.com");
+      setShareFailed(true);
     }
   };
 
@@ -76,11 +83,23 @@ export const AboutSettings: React.FC = () => {
           description={t("settings.about.share.description")}
           grouped={true}
         >
-          <Button variant="primary" size="md" onClick={handleShareClick}>
-            {shareCopied
-              ? t("settings.about.share.copied")
-              : t("settings.about.share.button")}
-          </Button>
+          <div className="flex flex-col items-end gap-1">
+            <Button variant="primary" size="md" onClick={handleShareClick}>
+              {shareCopied
+                ? t("settings.about.share.copied")
+                : t("settings.about.share.button")}
+            </Button>
+            {(shareFailed || shareCopied) && (
+              <p
+                role="status"
+                className={shareFailed ? "text-xs select-text" : "sr-only"}
+              >
+                {shareFailed
+                  ? t("ux.copy.linkFailed", { url: SHARE_URL })
+                  : t("settings.about.share.copied")}
+              </p>
+            )}
+          </div>
         </SettingContainer>
 
         <SettingContainer

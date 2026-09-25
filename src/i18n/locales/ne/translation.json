@@ -1,4 +1,57 @@
 {
+  "ux": {
+    "skipToContent": "Skip to content",
+    "working": "Working…",
+    "overlay": {
+      "starting": "Starting…",
+      "listening": "Listening",
+      "cancel": "Cancel recording"
+    },
+    "shortcut": {
+      "change": "Change {{name}}. Now set to {{keys}}.",
+      "capturing": "Press the new keys, Escape to cancel.",
+      "cancelled": "Shortcut change cancelled.",
+      "saved": "Shortcut saved: {{keys}}.",
+      "setFailed": "We couldn't use that shortcut. Try a different key combination.",
+      "startFailed": "We couldn't start listening for keys. Please try again."
+    },
+    "model": {
+      "status": "Speech model: {{name}}",
+      "manage": "Manage models"
+    },
+    "models": {
+      "loading": "Loading your speech models…",
+      "slow": "This is taking longer than usual.",
+      "error": "We couldn't load your speech models.",
+      "retry": "Try again"
+    },
+    "history": {
+      "error": "Couldn't load your history.",
+      "retry": "Try again"
+    },
+    "copy": {
+      "copied": "Copied",
+      "failed": "We couldn't copy that. Select the text and copy it yourself.",
+      "linkFailed": "We couldn't copy the link. Here it is: {{url}}"
+    },
+    "actions": {
+      "removed": "Action removed.",
+      "undo": "Undo removal",
+      "invalidUrl": "Enter a website address, like calendly.com/you or https://example.com."
+    },
+    "color": {
+      "invalid": "Use # and six letters or numbers, like #b8ff65."
+    },
+    "errors": {
+      "recordingFailed": "We couldn't start recording. Check that your microphone is connected, then try again.",
+      "transcriptionFailed": "We couldn't turn that recording into text. You can try again from History.",
+      "modelLoadFailed": "Try again, or pick a different model in Models.",
+      "dataFolder": "We couldn't find the app's data folder."
+    },
+    "notes": {
+      "exportFailed": "We couldn't export your notes. Check that the folder still exists, then try again."
+    }
+  },
   "tray": {
     "settings": "सेटिङहरू...",
     "checkUpdates": "अपडेटहरू जाँच गर्नुहोस्...",

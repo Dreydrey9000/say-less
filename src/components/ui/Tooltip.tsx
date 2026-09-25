@@ -1,114 +1,64 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import {
+  cloneElement,
+  useId,
+  useState,
+  type ReactElement,
+  type KeyboardEvent,
+} from "react";
+import "./tooltip.css";
 
-type TooltipPosition = "top" | "bottom";
-
-interface TooltipCoords {
-  top: number;
-  left: number;
-  arrowLeft: number;
-  actualPosition: TooltipPosition;
-}
+type Placement = "top" | "bottom" | "left" | "inside";
+type Align = "center" | "start" | "end";
 
 interface TooltipProps {
-  targetRef: React.RefObject<HTMLElement>;
-  position?: TooltipPosition;
-  children: React.ReactNode;
+  /** Visible text. It also becomes the control's accessible name. */
+  label: string;
+  /** One focusable control, usually an icon-only button. */
+  children: ReactElement;
+  placement?: Placement;
+  /** Horizontal alignment for top/bottom, so edge buttons stay on screen. */
+  align?: Align;
+  /** Extra class for the wrapper, e.g. to position it absolutely. */
+  className?: string;
 }
 
-const TOOLTIP_WIDTH = 200;
-const VIEWPORT_PADDING = 12;
-const GAP = 8;
-const ARROW_MARGIN = 12;
-const DEFAULT_HEIGHT = 60;
-
-export const Tooltip: React.FC<TooltipProps> = ({
-  targetRef,
-  position = "top",
+/**
+ * A small tooltip for icon-only controls. It shows on hover and on keyboard
+ * focus, hides on Escape, and names the control through aria-labelledby, so
+ * sighted and screen-reader users get the same words. Pure CSS positioning:
+ * no portal, so it works in the tiny dock and overlay windows too.
+ */
+export function Tooltip({
+  label,
   children,
-}) => {
-  const [coords, setCoords] = useState<TooltipCoords | null>(null);
-  const tooltipRef = useRef<HTMLDivElement>(null);
-
-  const updatePosition = useCallback(() => {
-    if (!targetRef.current) return;
-
-    const targetRect = targetRef.current.getBoundingClientRect();
-    const tooltipHeight = tooltipRef.current?.offsetHeight || DEFAULT_HEIGHT;
-
-    let actualPosition = position;
-    let top: number;
-
-    if (position === "top") {
-      const spaceAbove = targetRect.top - tooltipHeight - GAP;
-      if (spaceAbove < VIEWPORT_PADDING) {
-        actualPosition = "bottom";
-        top = targetRect.bottom + GAP;
-      } else {
-        top = targetRect.top - GAP - tooltipHeight;
-      }
-    } else {
-      const spaceBelow =
-        window.innerHeight - targetRect.bottom - tooltipHeight - GAP;
-      if (spaceBelow < VIEWPORT_PADDING) {
-        actualPosition = "top";
-        top = targetRect.top - GAP - tooltipHeight;
-      } else {
-        top = targetRect.bottom + GAP;
-      }
-    }
-
-    const targetCenter = targetRect.left + targetRect.width / 2;
-    let left = targetCenter - TOOLTIP_WIDTH / 2;
-
-    if (left < VIEWPORT_PADDING) {
-      left = VIEWPORT_PADDING;
-    } else if (left + TOOLTIP_WIDTH > window.innerWidth - VIEWPORT_PADDING) {
-      left = window.innerWidth - TOOLTIP_WIDTH - VIEWPORT_PADDING;
-    }
-
-    const arrowLeft = Math.min(
-      Math.max(targetCenter - left, ARROW_MARGIN),
-      TOOLTIP_WIDTH - ARROW_MARGIN,
-    );
-
-    setCoords({ top, left, arrowLeft, actualPosition });
-  }, [targetRef, position]);
-
-  useEffect(() => {
-    updatePosition();
-
-    window.addEventListener("scroll", updatePosition, true);
-    window.addEventListener("resize", updatePosition);
-
-    return () => {
-      window.removeEventListener("scroll", updatePosition, true);
-      window.removeEventListener("resize", updatePosition);
-    };
-  }, [updatePosition]);
-
-  const arrowClasses =
-    coords?.actualPosition === "top" ? "top-full" : "bottom-full rotate-180";
-
-  return createPortal(
-    <div
-      ref={tooltipRef}
-      style={{
-        position: "fixed",
-        top: coords?.top ?? -9999,
-        left: coords?.left ?? -9999,
-        width: TOOLTIP_WIDTH,
-        zIndex: 9999,
-        opacity: coords ? 1 : 0,
-      }}
-      className="px-3 py-2 bg-background border border-mid-gray/80 rounded-lg shadow-lg whitespace-normal transition-opacity duration-150"
+  placement = "top",
+  align = "center",
+  className = "",
+}: TooltipProps) {
+  const id = `tip-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
+  const [dismissed, setDismissed] = useState(false);
+  const child = children as ReactElement<{
+    onKeyDown?: (event: KeyboardEvent<HTMLElement>) => void;
+  }>;
+  return (
+    <span
+      className={`sl-tip-anchor ${className}`}
+      data-placement={placement}
+      data-align={align}
+      data-dismissed={dismissed || undefined}
+      onMouseLeave={() => setDismissed(false)}
+      onBlur={() => setDismissed(false)}
     >
-      {children}
-      <div
-        style={{ left: coords?.arrowLeft ?? 0 }}
-        className={`absolute ${arrowClasses} transform -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-mid-gray/80`}
-      />
-    </div>,
-    document.body,
+      {cloneElement(child, {
+        "aria-labelledby": id,
+        onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
+          if (event.key === "Escape") setDismissed(true);
+          child.props.onKeyDown?.(event);
+        },
+      } as Record<string, unknown>)}
+      <span role="tooltip" id={id} className="sl-tip">
+        {label}
+      </span>
+    </span>
   );
-};
+}

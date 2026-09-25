@@ -50,6 +50,8 @@ export function StudioSettings() {
   const { t } = useTranslation();
   const { settings, loaded, busy, error, load, save } = useStudio();
   const [color, setColor] = useState(settings.accent);
+  // Explain why Apply is off instead of disabling it silently.
+  const colorInvalid = color.trim() !== "" && !HEX.test(color);
   const preview = useAnimationPreview();
   useEffect(() => {
     void load();
@@ -103,12 +105,16 @@ export function StudioSettings() {
             descriptionMode="inline"
             grouped
           >
-            <div className="flex gap-2 items-center">
+            <div className="flex gap-2 items-center flex-wrap">
               <Input
                 value={color}
                 maxLength={7}
                 onChange={(e) => setColor(e.target.value)}
                 aria-label={t("studio.customColor")}
+                aria-invalid={colorInvalid || undefined}
+                aria-describedby={
+                  colorInvalid ? "custom-color-hint" : undefined
+                }
                 placeholder="#b8ff65"
                 className="w-28 min-w-0"
               />
@@ -125,6 +131,15 @@ export function StudioSettings() {
               >
                 {t("studio.apply")}
               </Button>
+              {colorInvalid && (
+                <p
+                  id="custom-color-hint"
+                  role="status"
+                  className="basis-full text-sm text-error"
+                >
+                  {t("ux.color.invalid")}
+                </p>
+              )}
             </div>
           </SettingContainer>
           <ThemeSelector descriptionMode="inline" grouped />

@@ -1,10 +1,34 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { useTranslation } from "react-i18next";
 import { useStudio, type VoiceAction } from "@/lib/studio";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { WorkingStatus } from "../ui/WorkingStatus";
+
+/**
+ * Turns what the user typed into a website address we can open, or null.
+ * "calendly.com/you" becomes "https://calendly.com/you"; "calendly dot com"
+ * is rejected.
+ */
+export function normalizeWebsite(input: string): string | null {
+  const value = input.trim();
+  if (!value || /\s/.test(value)) return null;
+  const withScheme = /^[a-z][a-z0-9+.-]*:\/\//i.test(value)
+    ? value
+    : `https://${value}`;
+  try {
+    const url = new URL(withScheme);
+    if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+    if (url.username || url.password) return null;
+    const host = url.hostname;
+    if (host !== "localhost" && !/^[^.]+(\.[^.]+)+$/.test(host)) return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
 export function VoiceActions() {
   const { t } = useTranslation();
   const { settings, loaded, busy, error, load, save } = useStudio();
@@ -14,26 +38,75 @@ export function VoiceActions() {
   const [target, setTarget] = useState("");
   const [status, setStatus] = useState("");
   const [testing, setTesting] = useState(false);
+  const [removed, setRemoved] = useState<VoiceAction[] | null>(null);
+  const [urlError, setUrlError] = useState(false);
+  // A ref, not state: a second click before React re-renders is still blocked.
+  const saving = useRef(false);
+  const targetId = "voice-action-target";
+  const urlErrorId = "voice-action-url-error";
   useEffect(() => {
     void load();
     invoke<string[]>("list_launchable_apps")
       .then(setApps)
       .catch(() => setStatus(t("actions.failed")));
   }, [load, t]);
-  async function add() {
-    if (
-      await save({
-        ...settings,
-        actions: [
-          ...settings.actions,
-          { cue: cue.trim(), kind, target: target.trim() },
-        ],
-      })
-    ) {
-      setCue("");
-      setTarget("");
-      setStatus(t("actions.saved"));
+  async function guarded(action: () => Promise<void>) {
+    if (saving.current) return;
+    saving.current = true;
+    try {
+      await action();
+    } finally {
+      saving.current = false;
     }
+  }
+  function add() {
+    const destination =
+      kind === "website" ? normalizeWebsite(target) : target.trim();
+    if (!destination) {
+      setUrlError(true);
+      document.getElementById(targetId)?.focus();
+      return;
+    }
+    void guarded(async () => {
+      if (
+        await save({
+          ...settings,
+          actions: [
+            ...settings.actions,
+            { cue: cue.trim(), kind, target: destination },
+          ],
+        })
+      ) {
+        setCue("");
+        setTarget("");
+        setRemoved(null);
+        setStatus(t("actions.saved"));
+      }
+    });
+  }
+  function remove(action: VoiceAction) {
+    void guarded(async () => {
+      const previous = settings.actions;
+      if (
+        await save({
+          ...settings,
+          actions: previous.filter((x) => x.cue !== action.cue),
+        })
+      ) {
+        setRemoved(previous);
+        setStatus(t("ux.actions.removed"));
+      }
+    });
+  }
+  function undoRemove() {
+    const previous = removed;
+    if (!previous) return;
+    void guarded(async () => {
+      if (await save({ ...useStudio.getState().settings, actions: previous })) {
+        setRemoved(null);
+        setStatus(t("actions.saved"));
+      }
+    });
   }
   return (
     <div className="max-w-3xl mx-auto space-y-5">
@@ -59,12 +132,22 @@ export function VoiceActions() {
       </div>
       {error && <p role="alert">{t("actions.invalid")}</p>}
       {status && <p role="status">{status}</p>}
+      {removed && (
+        <Button
+          variant="secondary"
+          size="sm"
+          disabled={busy}
+          onClick={undoRemove}
+        >
+          {t("ux.actions.undo")}
+        </Button>
+      )}
       {(busy || testing) && <WorkingStatus label={t("actions.working")} />}
       <form
         className="space-y-3"
         onSubmit={(e) => {
           e.preventDefault();
-          void add();
+          add();
         }}
       >
         <label className="block text-sm">
@@ -87,6 +170,7 @@ export function VoiceActions() {
             onChange={(e) => {
               setKind(e.target.value as VoiceAction["kind"]);
               setTarget("");
+              setUrlError(false);
             }}
           >
             <option value="app">{t("actions.app")}</option>
@@ -114,16 +198,29 @@ export function VoiceActions() {
             </select>
           ) : (
             <Input
+              id={targetId}
+              inputMode="url"
               className="block w-full mt-1"
               aria-label={t("actions.target")}
+              aria-invalid={urlError || undefined}
+              aria-describedby={urlError ? urlErrorId : undefined}
               value={target}
-              onChange={(e) => setTarget(e.target.value)}
+              onChange={(e) => {
+                setTarget(e.target.value);
+                setUrlError(false);
+              }}
               placeholder="https://example.com"
             />
           )}
         </label>
+        {kind === "website" && urlError && (
+          <p id={urlErrorId} role="alert" className="text-sm text-error">
+            {t("ux.actions.invalidUrl")}
+          </p>
+        )}
         <Button
           type="submit"
+          aria-busy={busy}
           disabled={!loaded || busy || !cue.trim() || !target.trim()}
         >
           {t("actions.add")}
@@ -161,12 +258,7 @@ export function VoiceActions() {
                 size="sm"
                 disabled={busy}
                 aria-label={t("actions.remove", { cue: a.cue })}
-                onClick={() =>
-                  void save({
-                    ...settings,
-                    actions: settings.actions.filter((x) => x.cue !== a.cue),
-                  })
-                }
+                onClick={() => remove(a)}
               >
                 {t("snippets.remove")}
               </Button>

@@ -1,6 +1,6 @@
 import { useEffect, useId, useState, type CSSProperties } from "react";
 import { useStudio } from "@/lib/studio";
-import { useMotionAllowed } from "@/hooks/useMotionAllowed";
+import { useMotionPolicy } from "@/hooks/useMotionAllowed";
 import { Avatar } from "./Avatar";
 import "./companion.css";
 
@@ -297,7 +297,8 @@ export function Companion({
   const settings = useStudio((s) => s.settings);
   const id = `cmp-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   const [cycle, setCycle] = useState(0);
-  const moving = useMotionAllowed(paused);
+  const motion = useMotionPolicy(paused);
+  const moving = motion === "full";
   useEffect(() => {
     if (!moving || !settings.dock_cycle || formation) return;
     const timer = setInterval(
@@ -306,11 +307,21 @@ export function Companion({
     );
     return () => clearInterval(timer);
   }, [moving, settings.dock_cycle, formation]);
+  // Pausing freezes the current formation in place; only reduced motion
+  // falls back to the one saved formation.
   const picked =
     formation ||
-    (settings.dock_cycle && moving
+    (settings.dock_cycle && motion !== "reduced"
       ? formations[cycle]
       : settings.dock_animation);
+  // "is-frozen" keeps each animation declared but paused, so a pause holds the
+  // current pose instead of snapping back to the start. "is-still" (reduced
+  // motion) removes the animations entirely.
+  const motionClass = moving
+    ? "is-moving"
+    : motion === "paused"
+      ? "is-paused is-frozen"
+      : "is-paused is-still";
   const selected: Formation = (formations as readonly string[]).includes(picked)
     ? (picked as Formation)
     : "orbit";
@@ -321,7 +332,7 @@ export function Companion({
   return (
     <div
       aria-hidden="true"
-      className={`companion character-${who} formation-${selected} ${moving ? "is-moving" : "is-paused"} ${active ? "is-listening" : ""} ${thinking ? "is-thinking" : ""}`}
+      className={`companion character-${who} formation-${selected} ${motionClass} ${active ? "is-listening" : ""} ${thinking ? "is-thinking" : ""}`}
       style={
         {
           "--voice-scale": 1 + (active && moving ? level * 0.28 : 0),

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { open } from "@tauri-apps/plugin-dialog";
 import { commands, type ExportReport, type InsightsSettings } from "@/bindings";
@@ -13,6 +13,8 @@ export function NotesExportPanel() {
   const [busy, setBusy] = useState(false);
   const [report, setReport] = useState<ExportReport | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // A ref, not state: a second click before React re-renders is still blocked.
+  const exporting = useRef(false);
 
   useEffect(() => {
     void Promise.all([
@@ -46,13 +48,26 @@ export function NotesExportPanel() {
   };
 
   const exportNow = async () => {
+    if (exporting.current) return;
+    exporting.current = true;
     setBusy(true);
     setError(null);
     setReport(null);
-    const result = await commands.exportNotesNow();
-    setBusy(false);
-    if (result.status === "ok") setReport(result.data);
-    else setError(result.error);
+    try {
+      const result = await commands.exportNotesNow();
+      if (result.status === "ok") setReport(result.data);
+      else {
+        // Keep the technical reason in the log, show a plain message.
+        console.error("Notes export failed:", result.error);
+        setError(t("ux.notes.exportFailed"));
+      }
+    } catch (reason) {
+      console.error("Notes export failed:", reason);
+      setError(t("ux.notes.exportFailed"));
+    } finally {
+      exporting.current = false;
+      setBusy(false);
+    }
     const fresh = await commands.getInsightsSettings().catch(() => null);
     if (fresh) setSettings(fresh);
   };
@@ -101,6 +116,7 @@ export function NotesExportPanel() {
         <Button
           variant="secondary"
           size="sm"
+          aria-busy={busy}
           disabled={!settings || busy}
           onClick={() => void exportNow()}
         >
@@ -120,7 +136,7 @@ export function NotesExportPanel() {
       )}
       {(error || settings?.last_export_error) && (
         <p role="alert" className="insight-error">
-          {error ?? settings?.last_export_error}
+          {error ?? t("ux.notes.exportFailed")}
         </p>
       )}
       {settings?.last_export_at && (

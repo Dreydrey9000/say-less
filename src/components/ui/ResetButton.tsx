@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { SettingLabelContext } from "./SettingLabelContext";
 import ResetIcon from "../icons/ResetIcon";
+import { Tooltip } from "./Tooltip";
 
 interface ResetButtonProps {
   onClick: () => void;
@@ -15,10 +16,11 @@ export const ResetButton: React.FC<ResetButtonProps> = React.memo(
   ({ onClick, disabled = false, className = "", ariaLabel, children }) => {
     const label = useContext(SettingLabelContext);
     const { t } = useTranslation();
-    return (
+    const name = ariaLabel ?? t("controls.reset", { setting: label });
+    const button = (
       <button
         type="button"
-        aria-label={ariaLabel ?? t("controls.reset", { setting: label })}
+        aria-label={name}
         className={`min-h-8 min-w-8 p-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-logo-primary rounded-md border border-transparent transition-all duration-150 ${
           disabled
             ? "opacity-50 cursor-not-allowed text-text/40"
@@ -29,6 +31,13 @@ export const ResetButton: React.FC<ResetButtonProps> = React.memo(
       >
         {children ?? <ResetIcon />}
       </button>
+    );
+    // Icon-only: show its name on hover and keyboard focus.
+    if (children) return button;
+    return (
+      <Tooltip label={name} placement="top" align="end">
+        {button}
+      </Tooltip>
     );
   },
 );

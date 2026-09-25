@@ -1,0 +1,84 @@
+/* Shared tooltip for icon-only controls (see Tooltip.tsx). Hidden with
+   visibility so it takes no clicks, but it still names the control through
+   aria-labelledby. Shows on hover and on keyboard focus (never on a mouse
+   click's focus), and Escape dismisses it. */
+.sl-tip-anchor {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+.sl-tip {
+  position: absolute;
+  z-index: 60;
+  pointer-events: none;
+  white-space: nowrap;
+  font:
+    500 11px/1.3 system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
+  letter-spacing: 0;
+  font-style: normal;
+  color: #f4f6f8;
+  background: #15181e;
+  border: 1px solid rgba(244, 246, 248, 0.16);
+  border-radius: 6px;
+  padding: 4px 7px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  visibility: hidden;
+  opacity: 0;
+}
+.sl-tip-anchor:hover > .sl-tip,
+.sl-tip-anchor:has(> :focus-visible) > .sl-tip {
+  visibility: visible;
+  opacity: 1;
+}
+.sl-tip-anchor[data-dismissed] > .sl-tip {
+  visibility: hidden;
+  opacity: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sl-tip {
+    transition:
+      opacity 120ms ease-out,
+      visibility 0s linear 120ms;
+  }
+  .sl-tip-anchor:hover > .sl-tip,
+  .sl-tip-anchor:has(> :focus-visible) > .sl-tip {
+    transition-delay: 250ms, 250ms;
+    transition-duration: 120ms, 0s;
+  }
+}
+
+.sl-tip-anchor[data-placement="top"] > .sl-tip {
+  bottom: calc(100% + 6px);
+}
+.sl-tip-anchor[data-placement="bottom"] > .sl-tip {
+  top: calc(100% + 6px);
+}
+.sl-tip-anchor:is(
+    [data-placement="top"],
+    [data-placement="bottom"]
+  )[data-align="center"]
+  > .sl-tip {
+  left: 50%;
+  transform: translateX(-50%);
+}
+.sl-tip-anchor[data-align="start"] > .sl-tip {
+  left: 0;
+}
+.sl-tip-anchor[data-align="end"] > .sl-tip {
+  right: 0;
+}
+/* Beside the control, toward the inside of a pill (e.g. the overlay cancel). */
+.sl-tip-anchor[data-placement="left"] > .sl-tip {
+  right: calc(100% + 6px);
+  top: 50%;
+  transform: translateY(-50%);
+}
+/* Centered over the control, for windows too small to show it outside. */
+.sl-tip-anchor[data-placement="inside"] > .sl-tip {
+  left: 50%;
+  bottom: 8px;
+  transform: translateX(-50%);
+}

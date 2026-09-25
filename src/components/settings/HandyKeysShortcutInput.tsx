@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { listen } from "@tauri-apps/api/event";
 import { formatKeyCombination } from "../../lib/utils/keyboard";
 import { ResetButton } from "../ui/ResetButton";
+import { ShortcutChip } from "../ui/ShortcutChip";
 import { SettingContainer } from "../ui/SettingContainer";
 import { useSettings } from "../../hooks/useSettings";
 import { useOsType } from "../../hooks/useOsType";
@@ -37,7 +38,11 @@ export const HandyKeysShortcutInput: React.FC<HandyKeysShortcutInputProps> = ({
   const [isRecording, setIsRecording] = useState(false);
   const [currentKeys, setCurrentKeys] = useState<string>("");
   const [originalBinding, setOriginalBinding] = useState<string>("");
-  const shortcutRef = useRef<HTMLDivElement | null>(null);
+  const [status, setStatus] = useState("");
+  const shortcutRef = useRef<HTMLButtonElement | null>(null);
+  // Escape can arrive from the webview and from the backend key listener at
+  // once; cancel only once.
+  const cancellingRef = useRef(false);
   const unlistenRef = useRef<(() => void) | null>(null);
   // Use a ref to track currentKeys for the event handler (avoids stale closure)
   const currentKeysRef = useRef<string>("");
@@ -54,7 +59,8 @@ export const HandyKeysShortcutInput: React.FC<HandyKeysShortcutInputProps> = ({
 
   // Handle cancellation
   const cancelRecording = useCallback(async () => {
-    if (!isRecording) return;
+    if (!isRecording || cancellingRef.current) return;
+    cancellingRef.current = true;
 
     // Stop listening for backend events
     if (unlistenRef.current) {
@@ -81,6 +87,8 @@ export const HandyKeysShortcutInput: React.FC<HandyKeysShortcutInputProps> = ({
     keyedShortcutRef.current = "";
     modifierOnlyShortcutRef.current = "";
     setOriginalBinding("");
+    setStatus(t("ux.shortcut.cancelled"));
+    cancellingRef.current = false;
   }, [isRecording, originalBinding, shortcutId, updateBinding, t]);
 
   // Set up event listener for handy-keys events
@@ -94,13 +102,16 @@ export const HandyKeysShortcutInput: React.FC<HandyKeysShortcutInputProps> = ({
       const commitAndStop = async (keysToCommit: string) => {
         try {
           await updateBinding(shortcutId, keysToCommit);
-        } catch (error) {
-          console.error("Failed to change binding:", error);
-          toast.error(
-            t("settings.general.shortcut.errors.set", {
-              error: String(error),
+          setStatus(
+            t("ux.shortcut.saved", {
+              keys: formatKeyCombination(keysToCommit, osType),
             }),
           );
+        } catch (error) {
+          // Log the details; show a plain message, never the raw error.
+          console.error("Failed to change binding:", error);
+          toast.error(t("ux.shortcut.setFailed"));
+          setStatus(t("ux.shortcut.setFailed"));
 
           // Reset to original binding on error
           if (originalBinding) {
@@ -133,6 +144,12 @@ export const HandyKeysShortcutInput: React.FC<HandyKeysShortcutInputProps> = ({
           if (cleanup) return;
 
           const { hotkey_string, is_key_down, key, modifiers } = event.payload;
+
+          // Escape cancels and keeps the shortcut the user already had.
+          if (key && ["escape", "esc"].includes(key.toLowerCase())) {
+            if (is_key_down) void cancelRecording();
+            return;
+          }
 
           if (is_key_down && hotkey_string) {
             // Update both state (for display) and refs (for release handler)
@@ -187,6 +204,7 @@ export const HandyKeysShortcutInput: React.FC<HandyKeysShortcutInputProps> = ({
     originalBinding,
     updateBinding,
     cancelRecording,
+    osType,
     t,
   ]);
 
@@ -203,8 +221,19 @@ export const HandyKeysShortcutInput: React.FC<HandyKeysShortcutInputProps> = ({
       }
     };
 
+    // The webview also sees Escape when it has focus.
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      e.preventDefault();
+      void cancelRecording();
+    };
+
     window.addEventListener("click", handleClickOutside);
-    return () => window.removeEventListener("click", handleClickOutside);
+    window.addEventListener("keydown", handleEscape);
+    return () => {
+      window.removeEventListener("click", handleClickOutside);
+      window.removeEventListener("keydown", handleEscape);
+    };
   }, [isRecording, cancelRecording]);
 
   // Start recording a new shortcut
@@ -212,6 +241,7 @@ export const HandyKeysShortcutInput: React.FC<HandyKeysShortcutInputProps> = ({
     if (isRecording) return;
 
     // Store the original binding to restore if canceled
+    setStatus("");
     setOriginalBinding(bindings[shortcutId]?.current_binding || "");
 
     // Start backend recording. The backend refuses while macOS Secure Input
@@ -229,11 +259,8 @@ export const HandyKeysShortcutInput: React.FC<HandyKeysShortcutInputProps> = ({
             },
           });
         } else {
-          toast.error(
-            t("settings.general.shortcut.errors.set", {
-              error: String(result.error),
-            }),
-          );
+          console.error("Failed to start shortcut recording:", result.error);
+          toast.error(t("ux.shortcut.startFailed"));
         }
         return;
       }
@@ -244,9 +271,7 @@ export const HandyKeysShortcutInput: React.FC<HandyKeysShortcutInputProps> = ({
       modifierOnlyShortcutRef.current = "";
     } catch (error) {
       console.error("Failed to start recording:", error);
-      toast.error(
-        t("settings.general.shortcut.errors.set", { error: String(error) }),
-      );
+      toast.error(t("ux.shortcut.startFailed"));
     }
   };
 
@@ -313,21 +338,16 @@ export const HandyKeysShortcutInput: React.FC<HandyKeysShortcutInputProps> = ({
       layout="horizontal"
     >
       <div className="flex items-center space-x-1">
-        {isRecording ? (
-          <div
-            ref={shortcutRef}
-            className="px-2 py-1 text-sm font-semibold border border-logo-primary bg-logo-primary/30 rounded-md"
-          >
-            {formatCurrentKeys()}
-          </div>
-        ) : (
-          <div
-            className="px-2 py-1 text-sm font-semibold bg-mid-gray/10 border border-mid-gray/80 hover:bg-logo-primary/10 rounded-md cursor-pointer hover:border-logo-primary"
-            onClick={startRecording}
-          >
-            {formatKeyCombination(binding.current_binding, osType)}
-          </div>
-        )}
+        <ShortcutChip
+          ref={shortcutRef}
+          name={translatedName}
+          keysLabel={formatKeyCombination(binding.current_binding, osType)}
+          recording={isRecording}
+          recordingLabel={formatCurrentKeys()}
+          status={status}
+          disabled={disabled}
+          onStart={() => void startRecording()}
+        />
         <ResetButton
           onClick={() => resetBinding(shortcutId)}
           disabled={isUpdating(`binding_${shortcutId}`)}

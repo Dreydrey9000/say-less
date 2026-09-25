@@ -40,7 +40,7 @@ export function SettingContainer({
               <p className="setting-description">{description}</p>
             ) : (
               <details className="mt-1 text-[13px] text-text-muted">
-                <summary className="cursor-pointer w-fit rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text">
+                <summary className="cursor-pointer w-fit min-h-[24px] py-1 px-1.5 -mx-1.5 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text">
                   {t("controls.details")}
                 </summary>
                 <p className="mt-2 max-w-prose leading-relaxed">

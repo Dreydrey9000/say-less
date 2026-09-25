@@ -11,7 +11,8 @@ import type {
 } from "@/bindings";
 import i18n, { syncLanguageFromSettings } from "@/i18n";
 import { useStudio } from "@/lib/studio";
-import { useMotionAllowed } from "@/hooks/useMotionAllowed";
+import { useMotionPolicy } from "@/hooks/useMotionAllowed";
+import { Tooltip } from "@/components/ui/Tooltip";
 import { VoiceSquiggle } from "@/components/companion/VoiceSquiggle";
 import { Avatar } from "@/components/companion/Avatar";
 import { getLanguageDirection } from "@/lib/utils/rtl";
@@ -21,9 +22,22 @@ type OverlayState = "recording" | "streaming" | "transcribing" | "processing";
 // Number of reactive bars in the waveform (the simple, smoothed style shared by
 // every overlay form). Mic levels arrive as 16 FFT buckets; we take the first N.
 const WAVE_BARS = 9;
+// A low, rounded resting silhouette (px) so silent bars never sit dead flat.
+// Loud input grows each bar from here; with motion off the bars hold this shape.
+const REST_HEIGHTS = [4, 5, 6, 7, 8, 7, 6, 5, 4];
+const MAX_BAR = 18;
+// Exit fade before the component unmounts. The backend waits 300ms before it
+// hides the native window, so this has time to play.
+const EXIT_MS = 140;
+
+const prefersReducedMotion = () =>
+  matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const RecordingOverlay: React.FC = () => {
   const { t } = useTranslation();
+  // `present` keeps the card mounted through its exit fade; `isVisible` is
+  // whether the backend currently wants it shown.
+  const [present, setPresent] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [state, setState] = useState<OverlayState>("recording");
   // `Stream::play()` returning does not mean hardware callbacks are flowing.
@@ -57,11 +71,34 @@ const RecordingOverlay: React.FC = () => {
   const direction = getLanguageDirection(i18n.language);
   const overlayVisual = useStudio((s) => s.settings.overlay_visual);
   const avatar = useStudio((s) => s.settings.avatar);
-  const moving = useMotionAllowed();
+  const motion = useMotionPolicy();
+  const moving = motion === "full";
+  // Bumped by every show and hide. A show that finishes its settings reads
+  // after a newer hide/show must not bring back the session that just ended.
+  const generationRef = useRef(0);
+  const exitTimerRef = useRef<number>();
 
   useEffect(() => {
-    const setupEventListeners = async () => {
-      const unlistenShow = await listen("show-overlay", async (event) => {
+    // Tauri's listen() resolves asynchronously. Collect each unlisten as it
+    // arrives and return a synchronous cleanup, so a registration that lands
+    // after unmount (React Strict Mode mounts twice) is released immediately.
+    let disposed = false;
+    const stops: Array<() => void> = [];
+    const own = (registration: Promise<() => void>) => {
+      registration
+        .then((stop) => {
+          if (disposed) stop();
+          else stops.push(stop);
+        })
+        .catch((error) =>
+          console.error("Overlay could not listen for events:", error),
+        );
+    };
+
+    own(
+      listen("show-overlay", async (event) => {
+        const generation = ++generationRef.current;
+        window.clearTimeout(exitTimerRef.current);
         const overlayState = event.payload as OverlayState;
         // Reset synchronously before settings I/O. A fast microphone can emit
         // recording-ready while the awaits below are in flight; resetting after
@@ -76,16 +113,20 @@ const RecordingOverlay: React.FC = () => {
         await syncLanguageFromSettings();
         // The Live panel flows downward from a top overlay and upward from a
         // bottom one; read the placement so the layout can flip to match.
+        let placement: "top" | "bottom" | null = null;
         try {
           const settings = await commands.getAppSettings();
           if (settings.status === "ok") {
-            setPosition(
-              settings.data.overlay_position === "top" ? "top" : "bottom",
-            );
+            placement =
+              settings.data.overlay_position === "top" ? "top" : "bottom";
           }
         } catch {
           // Keep the previous/default placement if settings can't be read.
         }
+        // A hide (or a newer show) arrived while settings were loading. This
+        // show belongs to a session that is already over, so drop it.
+        if (disposed || generation !== generationRef.current) return;
+        if (placement) setPosition(placement);
         setState(overlayState);
         if (overlayState === "streaming") {
           setPhase("listening");
@@ -93,52 +134,67 @@ const RecordingOverlay: React.FC = () => {
           setElapsed(0);
           setSession((s) => s + 1); // remount the card fresh for this session
         }
+        setPresent(true);
         setIsVisible(true);
-      });
+      }),
+    );
 
-      const unlistenHide = await listen("hide-overlay", () => {
+    own(
+      listen("hide-overlay", () => {
+        generationRef.current++;
         setIsVisible(false);
         setCaptureReady(false);
-      });
+        window.clearTimeout(exitTimerRef.current);
+        exitTimerRef.current = window.setTimeout(
+          () => setPresent(false),
+          prefersReducedMotion() ? 0 : EXIT_MS,
+        );
+      }),
+    );
 
-      const unlistenReady = await listen("recording-ready", () => {
+    own(
+      listen("recording-ready", () => {
         setElapsed(0);
         setCaptureReady(true);
-      });
+      }),
+    );
 
-      const unlistenLevel = await listen<number[]>("mic-level", (event) => {
+    own(
+      listen<number[]>("mic-level", (event) => {
         const newLevels = event.payload as number[];
         // Exponential smoothing across the 16 buckets, then take the first N
         // bars for the shared waveform.
         const smoothed = smoothedLevelsRef.current.map((prev, i) => {
-          const target = newLevels[i] || 0;
+          const raw = Number(newLevels[i]);
+          const target = Number.isFinite(raw)
+            ? Math.min(1, Math.max(0, raw))
+            : 0;
           return prev * 0.7 + target * 0.3;
         });
         smoothedLevelsRef.current = smoothed;
         setLevels(smoothed.slice(0, WAVE_BARS));
-      });
+      }),
+    );
 
-      const unlistenStream = await events.streamTextEvent.listen((event) => {
+    own(
+      events.streamTextEvent.listen((event) => {
         setStreamText(event.payload);
-      });
+      }),
+    );
 
-      const unlistenPhase = await events.streamPhaseEvent.listen((event) => {
+    own(
+      events.streamPhaseEvent.listen((event) => {
         const payload: StreamPhaseEvent = event.payload;
         setPhase(payload.phase);
         if (payload.kind) setWorkKind(payload.kind);
-      });
+      }),
+    );
 
-      return () => {
-        unlistenShow();
-        unlistenHide();
-        unlistenReady();
-        unlistenLevel();
-        unlistenStream();
-        unlistenPhase();
-      };
+    return () => {
+      disposed = true;
+      stops.splice(0).forEach((stop) => stop());
+      window.clearTimeout(exitTimerRef.current);
     };
-
-    setupEventListeners();
   }, []);
 
   // Elapsed capture timer starts only once microphone samples are flowing.
@@ -164,7 +220,7 @@ const RecordingOverlay: React.FC = () => {
     setOverflowing(false);
   }, [session]);
 
-  if (!isVisible) return null;
+  if (!present) return null;
 
   // Re-pin when the user is within ~a line of the bottom; unpin otherwise.
   const handleStreamScroll = () => {
@@ -192,41 +248,57 @@ const RecordingOverlay: React.FC = () => {
         />
       </span>
     ) : (
-      <div className={`swave ${captureReady ? "ready" : "arming"}`}>
-        {levels.map((v, i) => (
-          <i
-            key={i}
-            style={{
-              height: `${Math.max(3, Math.min(18, 3 + Math.pow(v, 0.7) * 15))}px`,
-            }}
-          />
-        ))}
+      <div
+        className={`swave ${captureReady ? "ready" : "arming"} ${moving ? "" : "is-still"}`}
+      >
+        {levels.map((v, i) => {
+          // With motion off the bars hold the resting shape instead of
+          // following the voice; the "Listening" text still says it's live.
+          const voice = moving ? 3 + Math.pow(v, 0.7) * (MAX_BAR - 3) : 0;
+          const height = Math.min(MAX_BAR, Math.max(REST_HEIGHTS[i], voice));
+          return <i key={i} style={{ height: `${height}px` }} />;
+        })}
       </div>
     );
 
+  const cancelLabel = t("ux.overlay.cancel");
   const cancelBtn = (
-    <button
-      className="sx"
-      aria-label="cancel"
-      onClick={() => commands.cancelOperation()}
-    >
-      <svg viewBox="0 0 16 16" aria-hidden="true">
-        <path
-          d="M4 4 L12 12 M12 4 L4 12"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-        />
-      </svg>
-    </button>
+    <Tooltip label={cancelLabel} placement="left">
+      <button
+        type="button"
+        className="sx"
+        onClick={() => {
+          commands
+            .cancelOperation()
+            .catch((error) => console.error("Cancel recording failed:", error));
+        }}
+      >
+        <svg viewBox="0 0 16 16" aria-hidden="true">
+          <path
+            d="M4 4 L12 12 M12 4 L4 12"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+          />
+        </svg>
+      </button>
+    </Tooltip>
   );
 
-  // dot (left) | waveform (center) | timer + cancel (right) — same structure for
-  // pill & panel, so the Live morph is a pure width change.
+  // Status in words, so the state reads even with every animation frozen.
+  const listeningLabel = captureReady
+    ? t("ux.overlay.listening")
+    : t("ux.overlay.starting");
+
+  // dot + status (left) | waveform (center) | timer + cancel (right) — same
+  // structure for pill & panel, so the Live morph is a pure width change.
   const listeningRow = (showTimer: boolean, showCancel: boolean) => (
     <div className="sbase">
       <div className="sbase-l">
         <span className={`sdot ${captureReady ? "ready" : "arming"}`} />
+        <span className="sstatus" aria-hidden="true">
+          {listeningLabel}
+        </span>
       </div>
       {waveform}
       <div className="sbase-r">
@@ -243,7 +315,9 @@ const RecordingOverlay: React.FC = () => {
       <div className="sbase-l">
         <span className="sspinner" />
       </div>
-      <span className="swork-label">{label}</span>
+      <span className="swork-label" aria-hidden="true">
+        {label}
+      </span>
       <div className="sbase-r">{showCancel && cancelBtn}</div>
     </div>
   );
@@ -259,9 +333,25 @@ const RecordingOverlay: React.FC = () => {
     // when there was no text to preserve.
     const open = hasText;
     const collapsed = working && !hasText;
+    const liveStatus = working
+      ? workKind === "polishing"
+        ? t("overlay.processing")
+        : t("overlay.transcribing")
+      : listeningLabel;
 
     return (
-      <div dir={direction} className={`ov-stage ${position}`}>
+      <div
+        dir={direction}
+        className={`ov-stage ${position} ${motion === "paused" ? "is-paused" : ""}`}
+      >
+        <span
+          className="ov-sr"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          {liveStatus}
+        </span>
         <div
           key={session}
           className={`scard ${open ? "open" : ""} ${collapsed ? "working" : ""} ${
@@ -312,8 +402,16 @@ const RecordingOverlay: React.FC = () => {
   return (
     <div
       dir={direction}
-      className={`ov-stage ${position} ov-fade ${isVisible ? "show" : ""}`}
+      className={`ov-stage ${position} ov-fade ${isVisible ? "show" : ""} ${motion === "paused" ? "is-paused" : ""}`}
     >
+      <span
+        className="ov-sr"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {working ? workLabel : listeningLabel}
+      </span>
       <div
         className={`scard compact ${working && isVisible ? "cworking" : ""}`}
       >

@@ -43,15 +43,15 @@ tauri_panel! {
 // On Windows these sizes are additionally multiplied by the accessibility text
 // scale (see windows_text_scale_factor), which WebView2 applies as a zoom.
 //
-// Compact overlay (Minimal / transcribing / processing): the 40h pill animates
-// width from 172 (--ov-rest-w) to 216 (--ov-work-w) and expands from center, so
-// the window must fit the widest state plus a little slack.
-const OVERLAY_WIDTH: f64 = 256.0;
-const OVERLAY_HEIGHT: f64 = 50.0;
+// Compact overlay (Minimal / transcribing / processing): one stable 240x48 pill
+// (--ov-rest-w / --ov-work-w, --ov-base-h; 48 tall so the 44px avatar fits),
+// plus a little slack.
+const OVERLAY_WIDTH: f64 = 280.0;
+const OVERLAY_HEIGHT: f64 = 58.0;
 
-// Actual is 394x118, just a little extra
+// Actual is 394x126 (48 row + 64 text + 12 padding + 2 border), plus slack.
 const OVERLAY_STREAM_WIDTH: f64 = 400.0;
-const OVERLAY_STREAM_HEIGHT: f64 = 120.0;
+const OVERLAY_STREAM_HEIGHT: f64 = 128.0;
 
 /// Overlay window size (logical) for a given UI state.
 fn overlay_dimensions(state: &str) -> (f64, f64) {
@@ -770,6 +770,36 @@ pub fn emit_levels(app_handle: &AppHandle, levels: &[f32]) {
 mod tests {
     use super::*;
 
+    /// Reads a `--ov-*: NNpx` custom property from the overlay stylesheet.
+    fn css_px(name: &str) -> f64 {
+        let css = include_str!("../../src/overlay/RecordingOverlay.css");
+        let start = css
+            .find(&format!("{name}:"))
+            .unwrap_or_else(|| panic!("{name} missing from RecordingOverlay.css"));
+        let rest = &css[start + name.len() + 1..];
+        let value = rest.trim_start().split("px").next().unwrap();
+        value.trim().parse().unwrap()
+    }
+
+    #[test]
+    fn overlay_windows_fit_the_css_card_geometry() {
+        // The card is anchored flush to the window edge, so the native window
+        // must be at least the card's size (+2 for the 1px border each side).
+        let border = 2.0;
+        let (width, height) = overlay_dimensions("recording");
+        let widest = css_px("--ov-rest-w").max(css_px("--ov-work-w"));
+        assert!(width >= widest + border, "compact window too narrow");
+        assert!(
+            height >= css_px("--ov-base-h") + border,
+            "compact window too short"
+        );
+
+        // Live panel: control row + capped text region + 12px text padding.
+        let (width, height) = overlay_dimensions("streaming");
+        assert!(width >= css_px("--ov-open-w") + border);
+        assert!(height >= css_px("--ov-base-h") + css_px("--ov-cap-max-h") + 12.0 + border);
+    }
+
     #[test]
     fn monitor_hit_test_uses_half_open_physical_bounds() {
         let position = PhysicalPosition::new(-2560, -200);
@@ -824,7 +854,7 @@ mod tests {
                 OVERLAY_HEIGHT,
                 OverlayPosition::Bottom,
             ),
-            (3648, 2025, 384, 75)
+            (3630, 2013, 420, 87)
         );
         assert_eq!(
             windows_overlay_bounds(
@@ -836,7 +866,7 @@ mod tests {
                 OVERLAY_HEIGHT,
                 OverlayPosition::Top,
             ),
-            (3648, 6, 384, 75)
+            (3630, 6, 420, 87)
         );
     }
 
@@ -853,7 +883,7 @@ mod tests {
                 OVERLAY_STREAM_HEIGHT,
                 OverlayPosition::Bottom,
             ),
-            (-1530, 1040, 500, 150)
+            (-1530, 1030, 500, 160)
         );
     }
 
@@ -872,9 +902,9 @@ mod tests {
             OVERLAY_STREAM_HEIGHT,
             OverlayPosition::Bottom,
         );
-        // 400x120 logical at 1.25 DPI x 1.1 text, still centered horizontally.
-        assert_eq!((x, y, width, height), (-1555, 1025, 550, 165));
-        // Bottom edge unchanged from the 1.0 case above (1040 + 150).
+        // 400x128 logical at 1.25 DPI x 1.1 text, still centered horizontally.
+        assert_eq!((x, y, width, height), (-1555, 1014, 550, 176));
+        // Bottom edge unchanged from the 1.0 case above (1030 + 160).
         assert_eq!(y + height, 1190);
 
         let (_, top_y, _, _) = windows_overlay_bounds(

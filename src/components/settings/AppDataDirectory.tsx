@@ -25,12 +25,12 @@ export const AppDataDirectory: React.FC<AppDataDirectoryProps> = ({
         if (result.status === "ok") {
           setAppDirPath(result.data);
         } else {
-          setError(result.error);
+          console.error("Failed to load app directory:", result.error);
+          setError(t("ux.errors.dataFolder"));
         }
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to load app directory",
-        );
+        console.error("Failed to load app directory:", err);
+        setError(t("ux.errors.dataFolder"));
       } finally {
         setLoading(false);
       }
@@ -60,9 +60,7 @@ export const AppDataDirectory: React.FC<AppDataDirectoryProps> = ({
   if (error) {
     return (
       <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-        <p className="text-red-600 text-sm">
-          {t("errors.loadDirectory", { error })}
-        </p>
+        <p className="text-red-600 text-sm">{error}</p>
       </div>
     );
   }

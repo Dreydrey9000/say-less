@@ -18,6 +18,7 @@ import {
   supportsLanguageCode,
 } from "@/lib/constants/languages.ts";
 import type { ModelInfo } from "@/bindings";
+import { Button } from "../../ui/Button";
 
 // check if model supports a language based on its supported_languages list
 const modelSupportsLanguage = (model: ModelInfo, langCode: string): boolean => {
@@ -41,6 +42,8 @@ export const ModelsSettings: React.FC = () => {
   const [languageSearch, setLanguageSearch] = useState("");
   const languageDropdownRef = useRef<HTMLDivElement>(null);
   const languageSearchInputRef = useRef<HTMLInputElement>(null);
+  // After a while, a spinner alone reads as "stuck": say so and offer a retry.
+  const [slowLoad, setSlowLoad] = useState(false);
   const {
     models,
     currentModel,
@@ -50,6 +53,8 @@ export const ModelsSettings: React.FC = () => {
     verifyingModels,
     extractingModels,
     loading,
+    error: loadError,
+    loadModels,
     isRescanning,
     downloadModel,
     cancelDownload,
@@ -57,6 +62,15 @@ export const ModelsSettings: React.FC = () => {
     deleteModel,
     rescanLocalModels,
   } = useModelStore();
+
+  useEffect(() => {
+    if (!loading) {
+      setSlowLoad(false);
+      return;
+    }
+    const timer = window.setTimeout(() => setSlowLoad(true), 10000);
+    return () => window.clearTimeout(timer);
+  }, [loading]);
 
   // click outside handler for language dropdown
   useEffect(() => {
@@ -230,8 +244,47 @@ export const ModelsSettings: React.FC = () => {
   if (loading) {
     return (
       <div className="max-w-3xl w-full mx-auto">
-        <div className="flex items-center justify-center py-16">
-          <div className="w-8 h-8 border-2 border-logo-primary border-t-transparent rounded-full animate-spin" />
+        <div
+          role="status"
+          className="flex flex-col items-center justify-center gap-3 py-16 text-sm text-text/70"
+        >
+          <div
+            aria-hidden="true"
+            className="w-8 h-8 border-2 border-logo-primary border-t-transparent rounded-full motion-safe:animate-spin"
+          />
+          <p>{t("ux.models.loading")}</p>
+          {slowLoad && (
+            <div className="flex flex-col items-center gap-2">
+              <p>{t("ux.models.slow")}</p>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => void loadModels()}
+              >
+                {t("ux.models.retry")}
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (loadError && models.length === 0) {
+    return (
+      <div className="max-w-3xl w-full mx-auto">
+        <div
+          role="alert"
+          className="flex flex-col items-center justify-center gap-3 py-16 text-sm"
+        >
+          <p>{t("ux.models.error")}</p>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => void loadModels()}
+          >
+            {t("ux.models.retry")}
+          </Button>
         </div>
       </div>
     );

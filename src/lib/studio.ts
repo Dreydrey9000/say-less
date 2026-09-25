@@ -77,6 +77,9 @@ interface StudioStore {
   load: () => Promise<void>;
   save: (settings: StudioSettings) => Promise<boolean>;
 }
+// Saves can overlap (a quick second edit). Only the newest save may write its
+// settings into the store, so a slower, older save can't undo a newer edit.
+let saveSequence = 0;
 export const useStudio = create<StudioStore>((set) => ({
   settings: defaultStudio,
   loaded: false,
@@ -94,17 +97,21 @@ export const useStudio = create<StudioStore>((set) => ({
     }
   },
   save: async (settings) => {
+    const sequence = ++saveSequence;
+    const latest = () => sequence === saveSequence;
     set({ busy: true, error: false });
     try {
       await invoke("save_studio_settings", { settings });
-      applyAccent(settings.accent);
-      set({ settings, loaded: true });
+      if (latest()) {
+        applyAccent(settings.accent);
+        set({ settings, loaded: true });
+      }
       return true;
     } catch {
-      set({ error: true });
+      if (latest()) set({ error: true });
       return false;
     } finally {
-      set({ busy: false });
+      if (latest()) set({ busy: false });
     }
   },
 }));

@@ -14,6 +14,7 @@ import { Companion } from "./companion/Companion";
 import type { SidebarSection } from "./Sidebar";
 import { Button } from "./ui/Button";
 import { WorkingStatus } from "./ui/WorkingStatus";
+import { Tooltip } from "./ui/Tooltip";
 import "./home.css";
 
 export function Home({
@@ -215,22 +216,23 @@ export function Home({
             {entries.map((entry) => (
               <li key={entry.id}>
                 <p>{entry.post_processed_text || entry.transcription_text}</p>
-                <button
-                  type="button"
-                  aria-label={t("home.copy")}
-                  onClick={async () => {
-                    try {
-                      await writeText(
-                        entry.post_processed_text || entry.transcription_text,
-                      );
-                      setNotice(t("home.copied"));
-                    } catch {
-                      setNotice(t("home.copyError"));
-                    }
-                  }}
-                >
-                  <Copy size={18} />
-                </button>
+                <Tooltip label={t("home.copy")} placement="top" align="end">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        await writeText(
+                          entry.post_processed_text || entry.transcription_text,
+                        );
+                        setNotice(t("home.copied"));
+                      } catch {
+                        setNotice(t("home.copyError"));
+                      }
+                    }}
+                  >
+                    <Copy size={18} />
+                  </button>
+                </Tooltip>
               </li>
             ))}
           </ul>

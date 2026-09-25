@@ -63,7 +63,7 @@ button:disabled {
 }
 .floating-bar .dock-grip {
   cursor: grab;
-  min-width: 18px;
+  min-width: 24px;
 }
 .floating-shell > p {
   margin: 3px 0 0;
@@ -102,8 +102,9 @@ button:disabled {
   min-height: 44px;
   padding: 0 8px;
 }
+/* Icon buttons stay at least 32px wide so they're easy to hit. */
 .floating-bar button {
-  min-width: 30px;
+  min-width: 32px;
 }
 .dock-transcript {
   white-space: nowrap;
@@ -126,7 +127,10 @@ button:disabled {
     width: 46px;
   }
   .floating-bar button {
-    min-width: 28px;
+    min-width: 32px;
+  }
+  .floating-bar .dock-grip {
+    min-width: 24px;
   }
   .floating-bar {
     gap: 2px;
@@ -205,10 +209,12 @@ button:disabled {
 .compact-dock[data-state="transcribing"] .compact-indicator.has-error {
   background: #ffb547;
 }
-.compact-action {
+.compact-dock .compact-action-anchor {
   position: absolute;
   right: 0;
   bottom: 0;
+}
+.compact-action {
   width: 44px;
   height: 44px;
   display: grid;
