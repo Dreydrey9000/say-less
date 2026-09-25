@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { voiceSnippets, type VoiceSnippet } from "../../lib/voiceSnippets";
 import { Button } from "../ui/Button";
@@ -19,6 +19,20 @@ export function VoiceSnippets() {
   const [editing, setEditing] = useState<number | null>(null);
   const [sample, setSample] = useState("");
   const [preview, setPreview] = useState<string | null>(null);
+  // Which field a save error belongs to, so it can be marked and focused.
+  const [fieldError, setFieldError] = useState<"trigger" | "expansion" | null>(
+    null,
+  );
+  // A ref, not state: a second click before React re-renders is still blocked.
+  const saving = useRef(false);
+  useEffect(() => {
+    if (!fieldError || busy) return;
+    document
+      .getElementById(
+        fieldError === "trigger" ? "snippet-trigger" : "snippet-expansion",
+      )
+      ?.focus();
+  }, [fieldError, busy]);
   const load = async () => {
     setBusy(true);
     setError("");
@@ -40,8 +54,11 @@ export function VoiceSnippets() {
     setExpansion("");
   };
   const persist = async (next: VoiceSnippet[]) => {
+    if (saving.current) return false;
+    saving.current = true;
     setBusy(true);
     setError("");
+    setFieldError(null);
     setMessage("");
     try {
       await voiceSnippets.save(next);
@@ -63,8 +80,16 @@ export function VoiceSnippets() {
           ? reason
           : "storage";
       setError(t(`snippets.errors.${code}`));
+      setFieldError(
+        code === "duplicate" || code === "invalid_trigger"
+          ? "trigger"
+          : code === "invalid_expansion"
+            ? "expansion"
+            : null,
+      );
       return false;
     } finally {
+      saving.current = false;
       setBusy(false);
     }
   };
@@ -99,7 +124,7 @@ export function VoiceSnippets() {
         {t("snippets.privacy")}
       </p>
       {error && (
-        <div role="alert" className="text-error text-sm">
+        <div id="snippet-error" role="alert" className="text-error text-sm">
           <p>{error}</p>
           {!loaded && (
             <Button
@@ -147,7 +172,14 @@ export function VoiceSnippets() {
                 id="snippet-trigger"
                 className="w-full"
                 value={trigger}
-                onChange={(e) => setTrigger(e.target.value)}
+                onChange={(e) => {
+                  setTrigger(e.target.value);
+                  if (fieldError === "trigger") setFieldError(null);
+                }}
+                aria-invalid={fieldError === "trigger" || undefined}
+                aria-describedby={
+                  fieldError === "trigger" ? "snippet-error" : undefined
+                }
                 maxLength={80}
                 placeholder={t("snippets.triggerExample")}
                 disabled={busy}
@@ -162,7 +194,14 @@ export function VoiceSnippets() {
                 id="snippet-expansion"
                 className="w-full"
                 value={expansion}
-                onChange={(e) => setExpansion(e.target.value)}
+                onChange={(e) => {
+                  setExpansion(e.target.value);
+                  if (fieldError === "expansion") setFieldError(null);
+                }}
+                aria-invalid={fieldError === "expansion" || undefined}
+                aria-describedby={
+                  fieldError === "expansion" ? "snippet-error" : undefined
+                }
                 maxLength={4000}
                 placeholder={t("snippets.expansionExample")}
                 disabled={busy}
@@ -172,6 +211,7 @@ export function VoiceSnippets() {
             <div className="flex flex-wrap gap-2">
               <Button
                 type="submit"
+                aria-busy={busy}
                 disabled={
                   busy ||
                   !trigger.trim() ||

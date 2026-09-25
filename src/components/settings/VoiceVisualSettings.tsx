@@ -157,21 +157,31 @@ export function AvatarBuilder({ preview }: { preview: AnimationPreview }) {
   const [draft, setDraft] = useState<AvatarSettings>(settings.avatar);
   const saveTimer = useRef<ReturnType<typeof setTimeout>>();
   const pending = useRef<AvatarSettings>();
+  // Edit revisions. `editRev` counts local edits; `settledRev` is the newest
+  // edit whose save has finished. While they differ an edit is still waiting
+  // or in flight, so outside updates must not replace the draft, and a save
+  // that finishes late must not undo a newer edit.
+  const editRev = useRef(0);
+  const settledRev = useRef(0);
 
   // Follow saved changes from other windows unless an edit is pending.
   useEffect(() => {
-    if (!saveTimer.current) setDraft(settings.avatar);
+    if (editRev.current === settledRev.current) setDraft(settings.avatar);
   }, [settings.avatar]);
 
   // Color pickers fire continuously while dragging; save once they settle.
   function update(next: AvatarSettings) {
     setDraft(next);
     pending.current = next;
+    const rev = ++editRev.current;
     clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
       saveTimer.current = undefined;
       const current = useStudio.getState().settings;
       void save({ ...current, avatar: next }).then((ok) => {
+        // A newer edit exists: its own save decides what stays on screen.
+        if (rev !== editRev.current) return;
+        settledRev.current = rev;
         // A rejected save must not leave an unsaved look on screen.
         if (!ok) setDraft(useStudio.getState().settings.avatar);
       });

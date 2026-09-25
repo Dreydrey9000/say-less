@@ -209,43 +209,43 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .is-moving .orbit-spin {
+  :is(.is-moving, .is-frozen) .orbit-spin {
     animation: orbit-spin 14s linear infinite;
   }
-  .is-moving .orbit-counter {
+  :is(.is-moving, .is-frozen) .orbit-counter {
     animation: orbit-spin 14s linear infinite reverse;
   }
-  .is-moving .bead-front {
+  :is(.is-moving, .is-frozen) .bead-front {
     animation: orbit-front 14s linear infinite;
   }
-  .is-moving .bead-back {
+  :is(.is-moving, .is-frozen) .bead-back {
     animation: orbit-back 14s linear infinite;
   }
-  .is-moving .helix-bead {
+  :is(.is-moving, .is-frozen) .helix-bead {
     animation: helix-bead 5s infinite;
   }
-  .is-moving .helix-rung {
+  :is(.is-moving, .is-frozen) .helix-rung {
     animation: helix-rung 5s infinite;
   }
-  .is-moving .wave-front {
+  :is(.is-moving, .is-frozen) .wave-front {
     animation: wave-flow 6s linear infinite;
   }
-  .is-moving .wave-mid {
+  :is(.is-moving, .is-frozen) .wave-mid {
     animation: wave-flow 9s linear infinite reverse;
   }
-  .is-moving .wave-back {
+  :is(.is-moving, .is-frozen) .wave-back {
     animation: wave-flow 13s linear infinite;
   }
-  .is-moving .bezel-glint {
+  :is(.is-moving, .is-frozen) .bezel-glint {
     animation: orbit-spin 8s linear infinite;
   }
-  .is-moving .companion-emblem.is-large {
+  :is(.is-moving, .is-frozen) .companion-emblem.is-large {
     animation: emblem-float 6s ease-in-out infinite;
   }
-  .is-moving .emblem-sheen {
+  :is(.is-moving, .is-frozen) .emblem-sheen {
     animation: emblem-sheen 6s ease-in-out infinite;
   }
-  .is-moving.is-thinking .companion-orb::before {
+  :is(.is-moving, .is-frozen).is-thinking .companion-orb::before {
     animation: orbit-spin 2.4s linear infinite;
   }
 }
@@ -390,10 +390,10 @@
   filter: drop-shadow(0 4px 6px #0005);
 }
 @media (prefers-reduced-motion: no-preference) {
-  .is-moving .companion-buddy {
+  :is(.is-moving, .is-frozen) .companion-buddy {
     animation: buddy-float 4s ease-in-out infinite;
   }
-  .is-moving .buddy-eyes {
+  :is(.is-moving, .is-frozen) .buddy-eyes {
     transform-origin: 50px 46px;
     animation: buddy-blink 6s infinite;
   }

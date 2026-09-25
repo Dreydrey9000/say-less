@@ -31,6 +31,7 @@ import {
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Sidebar, SidebarSection, SECTIONS_CONFIG } from "./components/Sidebar";
 import { NavigateContext } from "./components/navigation";
+import { NAVIGATE_EVENT } from "./lib/navigation";
 import { WhatsNewGate } from "./components/whats-new";
 import { useSettings } from "./hooks/useSettings";
 import { useSettingsStore } from "./stores/settingsStore";
@@ -69,6 +70,9 @@ function App() {
   // (vs a new user who needs full onboarding including model selection)
   const [isReturningUser, setIsReturningUser] = useState(false);
   const [currentSection, setCurrentSection] = useState<SidebarSection>("home");
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const mainRef = useRef<HTMLDivElement>(null);
+  const shownSection = useRef<SidebarSection | null>(null);
   const { settings, updateSetting } = useSettings();
   const direction = getLanguageDirection(i18n.language);
   const refreshAudioDevices = useSettingsStore(
@@ -168,6 +172,33 @@ function App() {
     };
   }, [t]);
 
+  // Other parts of the window (e.g. the footer model popover) can ask to open a
+  // section without prop drilling.
+  useEffect(() => {
+    const open = (event: Event) => {
+      const section = (event as CustomEvent<SidebarSection>).detail;
+      if (section in SECTIONS_CONFIG) setCurrentSection(section);
+    };
+    window.addEventListener(NAVIGATE_EVENT, open);
+    return () => window.removeEventListener(NAVIGATE_EVENT, open);
+  }, []);
+
+  // Every section shares one scroller. On a section change, start the new
+  // screen at the top and move focus to its heading, so keyboard and screen
+  // reader users land on the new content instead of <body>.
+  useEffect(() => {
+    const main = mainRef.current;
+    if (!main) return;
+    const previous = shownSection.current;
+    shownSection.current = currentSection;
+    if (previous === null || previous === currentSection) return;
+    if (scrollerRef.current) scrollerRef.current.scrollTop = 0;
+    const heading = main.querySelector<HTMLElement>("h1, h2");
+    const target = heading ?? main;
+    if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
+    target.focus({ preventScroll: true });
+  }, [currentSection, onboardingStep]);
+
   // Handle keyboard shortcuts for debug mode toggle
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -210,9 +241,9 @@ function App() {
           description: t("errors.noInputDevice"),
         });
       } else {
-        toast.error(
-          t("errors.recordingFailed", { error: detail ?? "Unknown error" }),
-        );
+        // Details go to the log; people get a plain next step.
+        console.error("Recording failed:", detail);
+        toast.error(t("ux.errors.recordingFailed"));
       }
     });
     return () => {
@@ -239,8 +270,9 @@ function App() {
   // The payload is the backend error message (also logged to handy.log).
   useEffect(() => {
     const unlisten = listen<string>("transcription-error", (event) => {
+      console.error("Transcription failed:", event.payload);
       toast.error(t("errors.transcriptionFailedTitle"), {
-        description: event.payload,
+        description: t("ux.errors.transcriptionFailed"),
       });
     });
     return () => {
@@ -252,13 +284,14 @@ function App() {
   useEffect(() => {
     const unlisten = listen<ModelStateEvent>("model-state-changed", (event) => {
       if (event.payload.event_type === "loading_failed") {
+        console.error("Model failed to load:", event.payload.error);
         toast.error(
           t("errors.modelLoadFailed", {
             model:
               event.payload.model_name || t("errors.modelLoadFailedUnknown"),
           }),
           {
-            description: event.payload.error,
+            description: t("ux.errors.modelLoadFailed"),
           },
         );
       }
@@ -418,6 +451,22 @@ function App() {
         dir={direction}
         className="h-screen flex flex-col select-none cursor-default"
       >
+        <a
+          href="#main-content"
+          className="skip-link"
+          onClick={(event) => {
+            event.preventDefault();
+            const main = mainRef.current;
+            if (!main) return;
+            const heading = main.querySelector<HTMLElement>("h1, h2");
+            const target = heading ?? main;
+            if (!target.hasAttribute("tabindex"))
+              target.setAttribute("tabindex", "-1");
+            target.focus();
+          }}
+        >
+          {t("ux.skipToContent")}
+        </a>
         <ErrorBoundary context="What's New">
           <WhatsNewGate />
         </ErrorBoundary>
@@ -429,7 +478,7 @@ function App() {
           />
           {/* Scrollable content area */}
           <div className="settings-content flex-1 min-w-0 flex flex-col overflow-hidden">
-            <div className="flex-1 overflow-y-auto">
+            <div ref={scrollerRef} className="flex-1 overflow-y-auto">
               <div className="flex flex-col items-center p-4 gap-4">
                 {settingsOnly ? (
                   <div
@@ -450,11 +499,27 @@ function App() {
                 )}
                 <SecureInputWarning />
                 <NavigateContext.Provider value={setCurrentSection}>
-                  {renderSettingsContent(
-                    currentSection,
-                    setOnboardingPreview,
-                    setCurrentSection,
-                  )}
+                  <div
+                    ref={mainRef}
+                    id="main-content"
+                    role="region"
+                    tabIndex={-1}
+                    aria-label={t(SECTIONS_CONFIG[currentSection].labelKey)}
+                    className="section-content w-full flex flex-col items-center gap-4"
+                  >
+                    {/* One broken screen must not blank the whole window;
+                        switching sections resets the boundary. */}
+                    <ErrorBoundary
+                      key={currentSection}
+                      context={currentSection}
+                    >
+                      {renderSettingsContent(
+                        currentSection,
+                        setOnboardingPreview,
+                        setCurrentSection,
+                      )}
+                    </ErrorBoundary>
+                  </div>
                 </NavigateContext.Provider>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { useTranslation } from "react-i18next";
 import { useSettingsStore } from "@/stores/settingsStore";
@@ -33,7 +33,22 @@ export function WisprImport() {
   const [rows, setRows] = useState<HistoryRow[]>([]);
   const [offset, setOffset] = useState(0);
   const [archiveOpen, setArchiveOpen] = useState(false);
-  async function scan(value: string | null) {
+  // One read or write at a time. A ref, not state, so a second click that
+  // lands before React re-renders cannot start a duplicate import.
+  const working = useRef(false);
+  async function exclusive(action: () => Promise<void>) {
+    if (working.current) return;
+    working.current = true;
+    try {
+      await action();
+    } finally {
+      working.current = false;
+    }
+  }
+  const scan = (value: string | null) => exclusive(() => scanNow(value));
+  const apply = () => exclusive(applyNow);
+  const archive = (next: number) => exclusive(() => archiveNow(next));
+  async function scanNow(value: string | null) {
     setBusy(true);
     setError("");
     setReport(null);
@@ -49,7 +64,7 @@ export function WisprImport() {
       setBusy(false);
     }
   }
-  async function apply() {
+  async function applyNow() {
     setBusy(true);
     setError("");
     try {
@@ -68,7 +83,7 @@ export function WisprImport() {
       setBusy(false);
     }
   }
-  async function archive(next: number) {
+  async function archiveNow(next: number) {
     setBusy(true);
     setError("");
     try {
@@ -170,6 +185,7 @@ export function WisprImport() {
             </label>
           )}
           <Button
+            aria-busy={busy}
             disabled={
               busy ||
               (preview.words.length + preview.snippets.length === 0 && !history)

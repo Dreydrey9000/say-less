@@ -173,8 +173,24 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
       !query.has("noPermissions") ||
       sessionStorage.getItem("test-permissions") === "granted"
     );
-  if (cmd === "get_app_settings" || cmd === "get_default_settings")
+  if (cmd === "get_app_settings" || cmd === "get_default_settings") {
+    // ?slowSettings=1 delays settings reads so tests can race a hide against
+    // an in-flight show.
+    if (query.has("slowSettings"))
+      return new Promise((resolve) => setTimeout(() => resolve(settings), 300));
     return settings;
+  }
+  if (cmd === "change_binding") {
+    const id = String(payload?.id);
+    const binding = String(payload?.binding);
+    settings.bindings[id as keyof typeof settings.bindings].current_binding =
+      binding;
+    return {
+      success: true,
+      binding: settings.bindings[id as keyof typeof settings.bindings],
+      error: null,
+    };
+  }
   if (cmd === "get_current_model") return "test-model";
   if (cmd === "get_available_models") {
     // Complete ModelInfo rows: the model store is loaded now, so the Speech
@@ -364,6 +380,30 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
 };
 // The overlay listens for backend events; tests drive it with `testEmit`.
 mockIPC(ipc, { shouldMockEvents: query.has("overlay") });
+// Count live event listeners per event (listen minus unlisten), so tests can
+// catch listeners that leak across React Strict Mode's double mount.
+{
+  const internals = (
+    window as unknown as {
+      __TAURI_INTERNALS__: {
+        invoke: (
+          cmd: string,
+          args?: Record<string, unknown>,
+          options?: unknown,
+        ) => Promise<unknown>;
+      };
+    }
+  ).__TAURI_INTERNALS__;
+  const live: Record<string, number> = {};
+  Object.assign(window, { testListeners: live });
+  const invoke = internals.invoke;
+  internals.invoke = (cmd, args, options) => {
+    const event = String(args?.event);
+    if (cmd === "plugin:event|listen") live[event] = (live[event] ?? 0) + 1;
+    if (cmd === "plugin:event|unlisten") live[event] = (live[event] ?? 0) - 1;
+    return invoke(cmd, args, options);
+  };
+}
 const { default: App } = await import("../../src/App");
 await import("../../src/i18n");
 const { applyTheme } = await import("../../src/lib/utils/theme");

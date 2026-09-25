@@ -28,7 +28,7 @@ export const Button: React.FC<ButtonProps> = ({
     "primary-soft":
       "text-text bg-logo-primary/20 border-transparent hover:bg-logo-primary/30 focus:ring-1 focus:ring-logo-primary",
     secondary:
-      "bg-mid-gray/10 border-mid-gray/20 hover:bg-background-ui/30 hover:border-logo-primary focus:outline-none",
+      "bg-mid-gray/10 border-mid-gray/20 hover:bg-background-ui/30 hover:border-logo-primary",
     // Secondary's neutral resting look, but hover/focus use the semantic
     // --color-warning token (theme.css) instead of the pink accent — for
     // buttons sitting on warning surfaces like SecureInputWarning

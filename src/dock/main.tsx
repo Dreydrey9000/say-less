@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom/client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
@@ -20,6 +20,7 @@ import {
 import { Companion, formations } from "@/components/companion/Companion";
 import { useVoiceActivity } from "@/hooks/useVoiceActivity";
 import { startStudioSync, useStudio } from "@/lib/studio";
+import { Tooltip } from "@/components/ui/Tooltip";
 import {
   applyTheme,
   getStoredTheme,
@@ -36,6 +37,21 @@ function Dock() {
   const { settings, save, busy, loaded } = useStudio();
   const [error, setError] = useState(false);
   const [pending, setPending] = useState(false);
+  // Expanding or collapsing swaps the whole dock, which would drop keyboard
+  // focus to <body>. When the user toggled it here, land focus on the control
+  // that undoes the change.
+  const toggledHere = useRef(false);
+  const expandRef = useRef<HTMLButtonElement>(null);
+  const collapseRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!toggledHere.current) return;
+    toggledHere.current = false;
+    (settings.dock_compact ? expandRef : collapseRef).current?.focus();
+  }, [settings.dock_compact]);
+  function setCompact(compact: boolean) {
+    toggledHere.current = true;
+    void save({ ...settings, dock_compact: compact });
+  }
   useEffect(() => {
     let disposed = false;
     const unlisteners: Array<() => void> = [];
@@ -73,28 +89,32 @@ function Dock() {
   if (settings.dock_compact)
     return (
       <main className="compact-dock" data-state={state}>
-        <button
-          className="compact-companion"
-          disabled={!loaded || busy}
-          aria-label={t("dock.expand")}
-          title={t("dock.expand")}
-          onClick={() => void save({ ...settings, dock_compact: false })}
-        >
-          <Companion
-            level={level}
-            active={state === "recording"}
-            thinking={state === "transcribing"}
-            paused={!settings.floating}
-          />
-        </button>
-        {state === "recording" ? (
+        <Tooltip label={t("dock.expand")} placement="inside">
           <button
-            className="compact-action"
-            aria-label={t("dock.stop")}
-            onClick={() => void record()}
+            ref={expandRef}
+            className="compact-companion"
+            disabled={!loaded || busy}
+            onClick={() => setCompact(false)}
           >
-            <Square size={14} />
+            <Companion
+              level={level}
+              active={state === "recording"}
+              thinking={state === "transcribing"}
+              paused={!settings.floating}
+            />
           </button>
+        </Tooltip>
+        {state === "recording" ? (
+          <Tooltip
+            label={t("dock.stop")}
+            placement="top"
+            align="end"
+            className="compact-action-anchor"
+          >
+            <button className="compact-action" onClick={() => void record()}>
+              <Square size={14} />
+            </button>
+          </Tooltip>
         ) : (
           <span
             className={`compact-indicator ${error ? "has-error" : ""}`}
@@ -107,47 +127,47 @@ function Dock() {
   return (
     <main className="floating-shell" data-state={state}>
       <div className="floating-bar">
-        <button
-          className="dock-grip"
-          aria-label={t("dock.drag")}
-          title={t("dock.drag")}
-          onPointerDown={(e) => {
-            if (e.button === 0)
-              void (async () => {
-                if (
-                  settings.dock_edge !== "free" &&
-                  !(await save({ ...settings, dock_edge: "free" }))
-                )
-                  return;
-                await getCurrentWindow().startDragging();
-              })().catch(() => setError(true));
-          }}
-        >
-          <GripVertical size={18} />
-        </button>
-        <button
-          className="dock-companion"
-          disabled={!loaded || busy}
-          aria-label={t("companion.next")}
-          title={t("companion.next")}
-          onClick={() => {
-            const index = formations.indexOf(
-              settings.dock_animation as (typeof formations)[number],
-            );
-            void save({
-              ...settings,
-              dock_animation: formations[(index + 1) % formations.length],
-              dock_cycle: false,
-            });
-          }}
-        >
-          <Companion
-            level={level}
-            active={state === "recording"}
-            thinking={state === "transcribing"}
-            paused={!settings.floating}
-          />
-        </button>
+        <Tooltip label={t("dock.drag")} placement="bottom" align="start">
+          <button
+            className="dock-grip"
+            onPointerDown={(e) => {
+              if (e.button === 0)
+                void (async () => {
+                  if (
+                    settings.dock_edge !== "free" &&
+                    !(await save({ ...settings, dock_edge: "free" }))
+                  )
+                    return;
+                  await getCurrentWindow().startDragging();
+                })().catch(() => setError(true));
+            }}
+          >
+            <GripVertical size={18} />
+          </button>
+        </Tooltip>
+        <Tooltip label={t("companion.next")} placement="bottom" align="start">
+          <button
+            className="dock-companion"
+            disabled={!loaded || busy}
+            onClick={() => {
+              const index = formations.indexOf(
+                settings.dock_animation as (typeof formations)[number],
+              );
+              void save({
+                ...settings,
+                dock_animation: formations[(index + 1) % formations.length],
+                dock_cycle: false,
+              });
+            }}
+          >
+            <Companion
+              level={level}
+              active={state === "recording"}
+              thinking={state === "transcribing"}
+              paused={!settings.floating}
+            />
+          </button>
+        </Tooltip>
         <button
           className="dock-record"
           disabled={pending || state === "transcribing"}
@@ -165,30 +185,31 @@ function Dock() {
             )}
           </span>
         </button>
-        <button
-          aria-label={t("dock.settings")}
-          onClick={() => void invoke("show_main_window_command")}
-        >
-          <Settings size={19} />
-        </button>
-        <button
-          disabled={!loaded || busy}
-          aria-label={t("dock.collapse")}
-          title={t("dock.collapse")}
-          onClick={() => void save({ ...settings, dock_compact: true })}
-        >
-          <ChevronDown size={18} />
-        </button>
-        <button
-          aria-label={t("dock.hide")}
-          onClick={() =>
-            void useStudio
-              .getState()
-              .save({ ...useStudio.getState().settings, floating: false })
-          }
-        >
-          <X size={18} />
-        </button>
+        <Tooltip label={t("dock.settings")} placement="bottom" align="end">
+          <button onClick={() => void invoke("show_main_window_command")}>
+            <Settings size={19} />
+          </button>
+        </Tooltip>
+        <Tooltip label={t("dock.collapse")} placement="bottom" align="end">
+          <button
+            ref={collapseRef}
+            disabled={!loaded || busy}
+            onClick={() => setCompact(true)}
+          >
+            <ChevronDown size={18} />
+          </button>
+        </Tooltip>
+        <Tooltip label={t("dock.hide")} placement="bottom" align="end">
+          <button
+            onClick={() =>
+              void useStudio
+                .getState()
+                .save({ ...useStudio.getState().settings, floating: false })
+            }
+          >
+            <X size={18} />
+          </button>
+        </Tooltip>
       </div>
       <p role="status">
         {error

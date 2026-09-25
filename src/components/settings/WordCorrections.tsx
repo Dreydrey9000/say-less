@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useStudio } from "@/lib/studio";
 import { Input } from "../ui/Input";
@@ -10,15 +10,28 @@ export function WordCorrections() {
   const [heard, setHeard] = useState("");
   const [wanted, setWanted] = useState("");
   const [duplicate, setDuplicate] = useState(false);
+  const saving = useRef(false);
+  const heardRef = useRef<HTMLLabelElement>(null);
+  const errorId = useId();
+  // A duplicate marks the "heard" field and moves focus back to it.
+  useEffect(() => {
+    if (duplicate) heardRef.current?.querySelector("input")?.focus();
+  }, [duplicate]);
   return (
     <section className="space-y-3">
       <h2 className="text-lg font-semibold">{t("corrections.title")}</h2>
       <p className="text-sm text-text/70">{t("corrections.description")}</p>
-      {duplicate && <p role="alert">{t("corrections.duplicate")}</p>}
+      {duplicate && (
+        <p id={errorId} role="alert">
+          {t("corrections.duplicate")}
+        </p>
+      )}
       <form
         className="correction-form"
         onSubmit={async (e) => {
           e.preventDefault();
+          // Ignore a second submit while the first is still saving.
+          if (saving.current) return;
           if (
             settings.corrections.some(
               (c) => c.trigger.toLowerCase() === heard.trim().toLowerCase(),
@@ -28,27 +41,37 @@ export function WordCorrections() {
             return;
           }
           setDuplicate(false);
-          if (
-            await save({
-              ...settings,
-              corrections: [
-                ...settings.corrections,
-                { trigger: heard.trim(), expansion: wanted.trim() },
-              ],
-            })
-          ) {
-            setHeard("");
-            setWanted("");
+          saving.current = true;
+          try {
+            if (
+              await save({
+                ...settings,
+                corrections: [
+                  ...settings.corrections,
+                  { trigger: heard.trim(), expansion: wanted.trim() },
+                ],
+              })
+            ) {
+              setHeard("");
+              setWanted("");
+            }
+          } finally {
+            saving.current = false;
           }
         }}
       >
-        <label>
+        <label ref={heardRef}>
           {t("corrections.heard")}
           <Input
             required
             maxLength={80}
             value={heard}
-            onChange={(e) => setHeard(e.target.value)}
+            aria-invalid={duplicate || undefined}
+            aria-describedby={duplicate ? errorId : undefined}
+            onChange={(e) => {
+              setHeard(e.target.value);
+              setDuplicate(false);
+            }}
           />
         </label>
         <label>
@@ -62,6 +85,7 @@ export function WordCorrections() {
         </label>
         <Button
           type="submit"
+          aria-busy={busy}
           disabled={!loaded || busy || !heard.trim() || !wanted.trim()}
         >
           {t("corrections.save")}

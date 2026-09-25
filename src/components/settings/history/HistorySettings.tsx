@@ -11,9 +11,11 @@ import {
   type HistoryUpdatePayload,
 } from "@/bindings";
 import { useOsType } from "@/hooks/useOsType";
+import { copyText } from "@/lib/clipboard";
 import { formatDateTime } from "@/utils/dateFormat";
 import { AudioPlayer, AudioPlayerGroup } from "../../ui/AudioPlayer";
 import { Button } from "../../ui/Button";
+import { Tooltip } from "../../ui/Tooltip";
 
 const IconButton: React.FC<{
   onClick: () => void;
@@ -22,18 +24,20 @@ const IconButton: React.FC<{
   active?: boolean;
   children: React.ReactNode;
 }> = ({ onClick, title, disabled, active, children }) => (
-  <button
-    onClick={onClick}
-    disabled={disabled}
-    className={`p-1.5 rounded-md flex items-center justify-center transition-colors cursor-pointer disabled:cursor-not-allowed disabled:text-text/20 ${
-      active
-        ? "text-logo-primary hover:text-logo-primary/80"
-        : "text-text/50 hover:text-logo-primary"
-    }`}
-    title={title}
-  >
-    {children}
-  </button>
+  <Tooltip label={title} placement="top" align="end">
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={`p-1.5 rounded-md flex items-center justify-center transition-colors cursor-pointer disabled:cursor-not-allowed disabled:text-text/20 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-text ${
+        active
+          ? "text-logo-primary hover:text-logo-primary/80"
+          : "text-text/50 hover:text-logo-primary"
+      }`}
+    >
+      {children}
+    </button>
+  </Tooltip>
 );
 
 const PAGE_SIZE = 30;
@@ -64,6 +68,8 @@ export const HistorySettings: React.FC = () => {
   const osType = useOsType();
   const [entries, setEntries] = useState<HistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  // Loading failed is its own state: an unknown must never read as "empty".
+  const [loadError, setLoadError] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const entriesRef = useRef<HistoryEntry[]>([]);
@@ -79,7 +85,10 @@ export const HistorySettings: React.FC = () => {
     if (!isFirstPage && loadingRef.current) return;
     loadingRef.current = true;
 
-    if (isFirstPage) setLoading(true);
+    if (isFirstPage) {
+      setLoading(true);
+      setLoadError(false);
+    }
 
     try {
       const result = await commands.getHistoryEntries(
@@ -92,9 +101,15 @@ export const HistorySettings: React.FC = () => {
           isFirstPage ? newEntries : [...prev, ...newEntries],
         );
         setHasMore(has_more);
+      } else {
+        console.error("Failed to load history entries:", result.error);
+        if (isFirstPage) setLoadError(true);
+        else setHasMore(false);
       }
     } catch (error) {
       console.error("Failed to load history entries:", error);
+      if (isFirstPage) setLoadError(true);
+      else setHasMore(false);
     } finally {
       setLoading(false);
       loadingRef.current = false;
@@ -174,9 +189,12 @@ export const HistorySettings: React.FC = () => {
 
   const copyToClipboard = async (text: string) => {
     try {
-      await navigator.clipboard.writeText(text);
+      await copyText(text);
+      return true;
     } catch (error) {
       console.error("Failed to copy to clipboard:", error);
+      toast.error(t("ux.copy.failed"));
+      return false;
     }
   };
 
@@ -242,6 +260,18 @@ export const HistorySettings: React.FC = () => {
         {t("settings.history.loading")}
       </div>
     );
+  } else if (loadError) {
+    content = (
+      <div
+        role="alert"
+        className="px-4 py-3 flex flex-wrap items-center justify-center gap-3 text-center"
+      >
+        <p>{t("ux.history.error")}</p>
+        <Button variant="secondary" size="sm" onClick={() => void loadPage()}>
+          {t("ux.history.retry")}
+        </Button>
+      </div>
+    );
   } else if (entries.length === 0) {
     content = (
       <div className="px-4 py-3 text-center text-text/60">
@@ -297,7 +327,7 @@ export const HistorySettings: React.FC = () => {
 interface HistoryEntryProps {
   entry: HistoryEntry;
   onToggleSaved: () => void;
-  onCopyText: () => void;
+  onCopyText: () => Promise<boolean>;
   getAudioUrl: (fileName: string) => Promise<string | null>;
   deleteAudio: (id: number) => Promise<void>;
   retryTranscription: (id: number) => Promise<void>;
@@ -322,12 +352,12 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
     [getAudioUrl, entry.file_name],
   );
 
-  const handleCopyText = () => {
+  const handleCopyText = async () => {
     if (!hasTranscription) {
       return;
     }
 
-    onCopyText();
+    if (!(await onCopyText())) return;
     setShowCopied(true);
     setTimeout(() => setShowCopied(false), 2000);
   };

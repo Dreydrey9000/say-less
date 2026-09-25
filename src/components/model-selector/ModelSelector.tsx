@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useId } from "react";
 import { useTranslation } from "react-i18next";
 import { listen } from "@tauri-apps/api/event";
 import { commands } from "@/bindings";
@@ -9,6 +9,7 @@ import ModelDropdown from "./ModelDropdown";
 import DownloadProgressDisplay from "./DownloadProgressDisplay";
 
 import { ModelStateEvent } from "@/lib/types/events";
+import { navigateTo } from "@/lib/navigation";
 
 type ModelStatus =
   | "ready"
@@ -43,6 +44,7 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({ onError }) => {
   const [pendingModelId, setPendingModelId] = useState<string | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const popoverId = `model-popover-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
 
   const displayModelId = pendingModelId || currentModel;
 
@@ -85,8 +87,10 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({ onError }) => {
             setPendingModelId(null);
             break;
           case "loading_failed":
+            // Keep the details in the log; the pill shows a plain message.
+            console.error("Model failed to load:", error);
             setModelStatus("error");
-            setModelError(error || "Failed to load model");
+            setModelError(null);
             setPendingModelId(null);
             break;
           case "unloaded":
@@ -134,6 +138,7 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({ onError }) => {
     document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
+      // (Escape handling lives in its own effect below.)
       document.removeEventListener("mousedown", handleClickOutside);
       modelStateUnlisten.then((fn) => fn());
       downloadCompleteUnlisten.then((fn) => fn());
@@ -234,6 +239,19 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({ onError }) => {
     }
   };
 
+  // Escape closes the popover and returns focus to the button that opened it.
+  useEffect(() => {
+    if (!showModelDropdown) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      setShowModelDropdown(false);
+      dropdownRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [showModelDropdown]);
+
   // Derive display status from model status + store state
   const getDisplayStatus = (): ModelStatus => {
     if (Object.keys(verifyingModels).length > 0) return "verifying";
@@ -250,15 +268,21 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({ onError }) => {
           status={getDisplayStatus()}
           displayText={getModelDisplayText()}
           isDropdownOpen={showModelDropdown}
+          popoverId={popoverId}
           onClick={() => setShowModelDropdown(!showModelDropdown)}
         />
 
         {/* Model Dropdown */}
         {showModelDropdown && (
           <ModelDropdown
+            id={popoverId}
             models={models}
             currentModelId={displayModelId}
             onModelSelect={handleModelSelect}
+            onManage={() => {
+              setShowModelDropdown(false);
+              navigateTo("models");
+            }}
           />
         )}
       </div>

@@ -15,6 +15,11 @@
 - Privacy copy says what runs where: Insights no longer claims "Nothing is uploaded" next to its AI and Claude features, AI cleanup states that it sends transcript text (never audio) to your provider, and Auto Submit and Learn from my corrections state their consequences inline.
 - Insights calls its top topic "Most-mentioned topic" (it counts mentions, it does not give advice) and the Claude setup commands sit behind "For developers".
 - About says Support Handy instead of "Help us continue building Handy", with a "Built on Handy (MIT license)" credit line.
+- Recording overlay is one stable 240x48 pill for starting, listening and working, with the state written out ("Starting...", "Listening", "Transcribing...") beside the dot, so it reads even with every animation frozen; the native overlay window grew to 280x58 (Live 400x128) to match, and a Rust test now reads the CSS sizes so the two can't drift apart.
+- Overlay avatar is 44px (it was about 30px, so an open mouth was about 2px), the cancel button is 32px and named "Cancel recording", silent bars keep a low resting shape instead of lying flat, live text is upright, entry is a 180ms slide and the 140ms exit now actually plays.
+- Pausing animations freezes the companion where it is instead of snapping it back to its start pose; only Reduce Motion draws the still pose.
+- Dock icon buttons are at least 32px wide, the drag handle 24px, and the Details toggles and footer model button have a 24px hit area.
+- Errors people see are plain sentences with a next step; the technical detail goes to the log instead of the toast (shortcut changes, recording, transcription, model loading, notes export, data folder).
 - Squiggle rebuilt as three phase-offset strands (the front one in the accent with a silver core and soft glow) over a fading baseline, 84x24 in the overlay, because the single thin line read as cheap and an idle pill looked empty.
 - Squiggle loudness now drives a spring with a small overshoot and a slow swell along its length, so talking reads as smooth motion instead of jumps; still one animation-frame loop writing paths directly, stopped when motion is off or the window is hidden.
 - Squiggle follows the chosen accent color in the overlay and in Appearance (it used the logo pink), and Reduce Motion or Pause draws a fixed, full resting shape.
@@ -28,6 +33,11 @@
 ### Added
 
 - Playwright checks for the single dock-look control, Home showing only the saved mode's instruction, onboarding recommending one engine plus the Try it step, About saying Say Less, and duplicates pointing to their one home; the fixture now loads the model store and supports `?newUser` and `?mode=`.
+- Keyboard and screen reader support: the shortcut chip is a real button that announces "Press the new keys, Escape to cancel."; a Skip to content link; each section change starts at the top and moves focus to the new screen's heading; Escape closes the model popover and returns focus; expanding or collapsing the dock keeps focus on the matching control; a polite live region in the overlay says Listening or Transcribing.
+- One small Tooltip component (hover and keyboard focus, Escape to hide, no new dependency) on every icon-only button: dock icons, overlay cancel, Home and History icon buttons, and reset buttons.
+- The footer model popover has a Manage models link, so it is never a dead end.
+- Undo after removing a voice action, like snippets already had.
+- Playwright checks for the keyboard shortcut chip, double-submit guards, the History error state, copy feedback, focus on section change, the skip link, the model popover, overlay listener cleanup, a hide racing a slow show, overlay status text and sizes, the 44px overlay avatar, reduced-motion bars, and dock tooltips and sizes.
 - Playwright checks for the three squiggle strands, the still squiggle under Reduce Motion, a single morphing avatar mouth, the single ring in the small pill, distinct companion cards with only the chosen one animating, and the neutral idle dot in the compact dock.
 - In-app release note 0.13.1 describing the polish; it shows once the app version reaches 0.13.1.
 
@@ -36,6 +46,13 @@
 - "1 words" and "1 snippets" in the Wispr import summary, and "1 dictations" in Insights, now pluralize correctly.
 - Hints that said "set up a provider under Post Process" pointed to a hidden screen; AI cleanup is now always in the sidebar.
 - A shortcut a build does not define no longer shows a dead "Shortcut not found" row.
+- Overlay event listeners leaked because the effect never returned its cleanup (React Strict Mode doubled them), and a slow "show" could bring back an overlay the user had already cancelled; listeners are now released as they register and a stale show is dropped.
+- "Import reviewed items", "Save snippet", "Save correction", "Save action" and "Export now" ignore a second click while the first is saving (duplicate Wispr imports were possible) and mark themselves busy.
+- A History load failure said "No transcriptions yet"; it now says "Couldn't load your history." with Try again. Models loading shows words, a "taking longer than usual" retry after 10 seconds, and an error state.
+- "Copy link" in About copies on the first press and shows "Copied!"; it no longer opens the website when the browser clipboard is unavailable. Insights "Copy" and History copy say when they worked or failed.
+- A late voice-visual save could overwrite a newer edit; edits and store saves are now latest-wins.
+- Invalid custom colors explain why Apply is off, website voice actions are checked ("calendly dot com" is refused, "calendly.com/you" becomes https://calendly.com/you), and duplicate snippet or correction cues mark the field and move focus to it.
+- The Volume slider has a name, and "Preview animation" and other secondary buttons show a focus ring again.
 - Insights, history search, notes export and `--mcp` now read imported Wispr Flow history (`wispr-history.sqlite`) alongside `history.db`, because a new user who imported months of Wispr dictations saw "Not enough history yet"; a missing, damaged or locked import file is skipped and logged instead of breaking Insights.
 
 ## [2026-09-24]

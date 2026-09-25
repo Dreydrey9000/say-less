@@ -7,15 +7,20 @@ import {
 } from "../../lib/utils/modelTranslation";
 
 interface ModelDropdownProps {
+  id?: string;
   models: ModelInfo[];
   currentModelId: string;
   onModelSelect: (modelId: string) => void;
+  /** Opens the Models screen, so the popover is never a dead end. */
+  onManage?: () => void;
 }
 
 const ModelDropdown: React.FC<ModelDropdownProps> = ({
+  id,
   models,
   currentModelId,
   onModelSelect,
+  onManage,
 }) => {
   const { t } = useTranslation();
   const downloadedModels = models.filter((m) => m.is_downloaded);
@@ -25,7 +30,10 @@ const ModelDropdown: React.FC<ModelDropdownProps> = ({
   };
 
   return (
-    <div className="absolute bottom-full start-0 mb-2 w-64 max-h-[60vh] overflow-y-auto bg-background border border-mid-gray/20 rounded-lg shadow-lg py-2 z-50">
+    <div
+      id={id}
+      className="absolute bottom-full start-0 mb-2 w-64 max-h-[60vh] overflow-y-auto bg-background border border-mid-gray/20 rounded-lg shadow-lg py-2 z-50"
+    >
       {downloadedModels.length > 0 ? (
         <div>
           {downloadedModels.map((model) => (
@@ -40,7 +48,7 @@ const ModelDropdown: React.FC<ModelDropdownProps> = ({
               }}
               tabIndex={0}
               role="button"
-              className={`w-full px-3 py-2 text-start hover:bg-mid-gray/10 transition-colors cursor-pointer focus:outline-none ${
+              className={`w-full px-3 py-2 text-start hover:bg-mid-gray/10 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-text ${
                 currentModelId === model.id
                   ? "bg-logo-primary/10 text-logo-primary"
                   : ""
@@ -77,6 +85,17 @@ const ModelDropdown: React.FC<ModelDropdownProps> = ({
       ) : (
         <div className="px-3 py-2 text-sm text-text/60">
           {t("modelSelector.noModelsAvailable")}
+        </div>
+      )}
+      {onManage && (
+        <div className="border-t border-mid-gray/20 mt-1 pt-1 px-1">
+          <button
+            type="button"
+            onClick={onManage}
+            className="w-full min-h-8 px-2 text-start text-sm rounded hover:bg-mid-gray/10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-text cursor-pointer"
+          >
+            {t("ux.model.manage")}
+          </button>
         </div>
       )}
     </div>

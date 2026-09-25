@@ -2,17 +2,22 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { commands, type McpSetup } from "@/bindings";
 import { Button } from "../ui/Button";
+import { copyText } from "@/lib/clipboard";
 
 function CopyBlock({ label, text }: { label: string; text: string }) {
   const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
+  const [failed, setFailed] = useState(false);
   const copy = async () => {
+    setFailed(false);
     try {
-      await navigator.clipboard.writeText(text);
+      await copyText(text);
       setCopied(true);
-      window.setTimeout(() => setCopied(false), 1500);
-    } catch {
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error("Copy failed:", error);
       setCopied(false);
+      setFailed(true);
     }
   };
   return (
@@ -29,6 +34,12 @@ function CopyBlock({ label, text }: { label: string; text: string }) {
         </Button>
       </div>
       <pre tabIndex={0}>{text}</pre>
+      {/* Announce the result: the button's own name doesn't change. */}
+      {(failed || copied) && (
+        <p role="status" className={failed ? "insight-error" : "sr-only"}>
+          {failed ? t("ux.copy.failed") : t("ux.copy.copied")}
+        </p>
+      )}
     </div>
   );
 }
