@@ -4,6 +4,10 @@
 
 ### Changed
 
+- Removed the last em-dashes from the English app text (inherited from Handy), so every string follows our no-em-dash copy rule.
+
+### Changed
+
 - Recording pill is 264x56 with a real layout (dot 10, label, a flexible voice-visual slot, cancel 32); the squiggle, bars or avatar center in that slot, which clips and fades its ends over 8px, because the squiggle was centered on the whole pill and drew about 7px over "Listening".
 - Overlay avatar is 40px in the 56px pill (8px clearance above and below) instead of 44px in 48px (about 1px), the same height for all three voice visuals.
 - The pill sits 18px (--ov-lift) above the window's screen-edge side with a soft outer shadow; the native window grew to 300x84 (Live 420x160) and its offsets shrank by the same 18px so the pill lands where it did, and the Rust geometry test now includes the lift.
