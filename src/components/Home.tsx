@@ -92,6 +92,12 @@ export function Home({
               )}
             </span>
           </div>
+          {app?.bindings?.transcribe_fn?.current_binding && (
+            <div className="home-shortcut">
+              <kbd>{app.bindings.transcribe_fn.current_binding}</kbd>
+              <span>{t("home.fnShortcut")}</span>
+            </div>
+          )}
           {app?.post_process_enabled && (
             <div className="home-shortcut">
               <kbd>

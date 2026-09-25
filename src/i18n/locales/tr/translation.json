@@ -194,6 +194,10 @@
             "name": "Transkripsiyon Kısayolu",
             "description": "Sesinizi kaydetmek ve metne dönüştürmek için klavye kısayolu."
           },
+          "transcribe_fn": {
+            "name": "Fn key (Globe)",
+            "description": "Hold Fn to talk, same as your main shortcut. Tip: in System Settings > Keyboard, set \"Press Globe key to\" to \"Do Nothing\" so the emoji picker doesn't pop up."
+          },
           "cancel": {
             "name": "İptal Kısayolu",
             "description": "Mevcut kaydı iptal etmek için klavye kısayolu."
@@ -901,6 +905,7 @@
     "openDock": "Open floating dock",
     "dockOpened": "Your dock is ready. Click into your destination app, then use Record or your shortcut.",
     "shortcut": "Hold to talk. Tap or double-tap for hands-free. Press again to finish.",
+    "fnShortcut": "or hold Fn to talk",
     "aiShortcut": "AI cleanup shortcut · uses your selected provider",
     "tools": "Make it yours",
     "look": "Change your look",

@@ -17,6 +17,7 @@ export const GeneralSettings: React.FC = () => {
   const { t } = useTranslation();
   const { audioFeedbackEnabled, settings } = useSettings();
   const isLinux = type() === "linux";
+  const isMac = type() === "macos";
   return (
     <div className="max-w-3xl w-full mx-auto space-y-6">
       <header className="space-y-2">
@@ -37,6 +38,7 @@ export const GeneralSettings: React.FC = () => {
       </header>
       <SettingsGroup title={t("settings.general.title")}>
         <ShortcutInput shortcutId="transcribe" grouped={true} />
+        {isMac && <ShortcutInput shortcutId="transcribe_fn" grouped={true} />}
         <ShortcutActivationSetting descriptionMode="tooltip" grouped={true} />
         {/* Cancel shortcut remains hidden on Linux because of dynamic shortcut instability. */}
         {!isLinux && <ShortcutInput shortcutId="cancel" grouped={true} />}

@@ -876,6 +876,21 @@ pub fn get_default_settings() -> AppSettings {
             current_binding: default_shortcut.to_string(),
         },
     );
+    // Hold Fn (the Globe key) to talk, like Wispr Flow. It works alongside the
+    // main shortcut; existing installs pick it up because missing default
+    // bindings are merged in on load. macOS only: Windows keyboards handle Fn in
+    // firmware, so the OS never sees it.
+    #[cfg(target_os = "macos")]
+    bindings.insert(
+        "transcribe_fn".to_string(),
+        ShortcutBinding {
+            id: "transcribe_fn".to_string(),
+            name: "Transcribe with Fn".to_string(),
+            description: "Hold Fn (Globe) to talk.".to_string(),
+            default_binding: "fn".to_string(),
+            current_binding: "fn".to_string(),
+        },
+    );
     #[cfg(target_os = "windows")]
     let default_post_process_shortcut = "ctrl+shift+space";
     #[cfg(target_os = "macos")]
@@ -1240,6 +1255,25 @@ pub fn get_recording_retention_period(app: &AppHandle) -> RecordingRetentionPeri
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn macos_defaults_include_fn_alongside_main_shortcut() {
+        let bindings = get_default_settings().bindings;
+        assert_eq!(bindings["transcribe"].current_binding, "option+space");
+        assert_eq!(bindings["transcribe_fn"].current_binding, "fn");
+        assert_eq!(bindings["transcribe_fn"].default_binding, "fn");
+        // The default keyboard engine must accept a bare Fn as a hotkey.
+        assert!(crate::shortcut::handy_keys::validate_shortcut("fn").is_ok());
+    }
+
+    #[cfg(not(target_os = "macos"))]
+    #[test]
+    fn fn_binding_is_macos_only() {
+        assert!(!get_default_settings()
+            .bindings
+            .contains_key("transcribe_fn"));
+    }
 
     fn default_settings_json() -> serde_json::Value {
         serde_json::to_value(get_default_settings()).unwrap()

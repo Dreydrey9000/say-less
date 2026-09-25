@@ -4,6 +4,7 @@
 
 ### Added
 
+- Hold Fn (Globe) to talk on Mac, like Wispr Flow, alongside Option+Space; it is a second default shortcut, so existing installs get it on update and either key works.
 - Share Say Less button in About that copies saylessvoice.com, so members can pass the app on in one tap.
 - Voice visuals: choose Bars, Squiggle, or Avatar for the recording overlay in Appearance, so the overlay can match your style; Bars stays the default so nothing changes until you pick.
 - Talking avatar (stick figure, person, cat, dog; three colors; cap, beanie, crown, headphones, sunglasses) whose mouth follows voice volume, usable as the dock companion and the overlay; volume-driven because real lip-sync needs a second live model.
