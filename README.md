@@ -100,3 +100,11 @@ See [personalization](docs/personalization.md) and the [editable companion workf
 In **Appearance → Voice visuals**, switch the recording overlay between Bars (default), a Squiggle line, or a talking Avatar, and build the avatar (stick figure, person, cat or dog; colors; cap, beanie, crown, headphones or sunglasses). The mouth follows voice volume, not words. Pause and Reduce Motion hold it still. See [personalization](docs/personalization.md#voice-visuals) and the [editable voice visuals diagram](docs/diagrams/voice-visuals.mmd).
 
 ![Voice visuals workflow](docs/diagrams/voice-visuals.svg)
+
+## Say less, stress less
+
+Open **Insights** to see what you keep saying: recurring problems, recurring ideas, and "Fix this first," each with dated quotes from your own dictations. It is built on this computer from your history, and nothing is uploaded. Optional extras, all off until you choose them: **Summarize with AI** (uses your Post Process provider and sends only topic labels and a few short quotes), **Read digest aloud** (system voices), nightly **Obsidian-friendly notes export**, and **Use with Claude**, a local read-only MCP server (`handy --mcp`).
+
+![Say less, stress less data flow](docs/diagrams/stress-less.svg)
+
+[How it works, privacy boundaries, and MCP setup](docs/stress-less.md) · [Editable diagram](docs/diagrams/stress-less.mmd)

@@ -611,6 +611,12 @@
         "title": "Version",
         "description": "Aktuelle Version von Say Less"
       },
+      "share": {
+        "title": "Share Say Less",
+        "description": "Send friends the free download link: saylessvoice.com",
+        "button": "Copy link",
+        "copied": "Copied!"
+      },
       "appDataDirectory": {
         "title": "App-Datenverzeichnis",
         "description": "Speicherort der Say Less-Daten"
@@ -1007,5 +1013,92 @@
     "error": "Could not load or save learned corrections.",
     "loading": "Loading observed corrections…",
     "saving": "Saving your correction…"
+  },
+  "insights": {
+    "title": "Insights",
+    "tagline": "Say less, stress less",
+    "description": "What you keep saying, pulled from your own dictations: recurring problems, ideas worth another look, and the one thing to fix first.",
+    "privacy": "Built from your dictation history on this computer. Nothing is uploaded.",
+    "loading": "Reading your dictation history…",
+    "error": "Could not read your dictation history.",
+    "retry": "Try again",
+    "analyzed": "Based on {{count}} dictations.",
+    "mentions_one": "mentioned {{count}} time",
+    "mentions_other": "mentioned {{count}} times",
+    "firstLast": "First {{first}} · last {{last}}",
+    "related": "Often said with: {{words}}",
+    "quotes": "What you said",
+    "fixFirst": "Fix this first",
+    "problems": "Recurring problems",
+    "ideas": "Recurring ideas",
+    "other": "Other things you keep mentioning",
+    "noProblems": "No repeated problems in this window. Nice.",
+    "noOtherProblems": "Nothing else keeps coming up. Start with the one above.",
+    "noIdeas": "No repeated ideas in this window yet.",
+    "window": {
+      "label": "Time window",
+      "week": "7 days",
+      "month": "30 days",
+      "quarter": "90 days",
+      "all": "All time"
+    },
+    "empty": {
+      "fewTitle": "Not enough history yet",
+      "fewBody": "You have {{count}} dictations in this window. Keep talking. Patterns show up after a few days of use.",
+      "noneTitle": "Nothing repeats yet",
+      "noneBody": "No topic came up more than once in this window. Try a longer window."
+    },
+    "digest": {
+      "title": "Your digest",
+      "fixFirst": "Fix this first: {{label}}. You mentioned it {{count}} times.",
+      "problems": "Also coming up again: {{list}}.",
+      "ideas": "Ideas worth another look: {{list}}.",
+      "none": "Nothing repeats yet.",
+      "summarize": "Summarize with AI",
+      "summarizing": "Writing your digest…",
+      "read": "Read digest aloud",
+      "stop": "Stop reading",
+      "sendsOnly": "Summarize with AI sends only topic labels, counts and up to two short quotes per topic to {{provider}}. It never runs on its own.",
+      "setupProvider": "To use Summarize with AI, set up a provider under Post Process. Read aloud uses your computer's built-in voices.",
+      "noProvider": "No AI provider is set up. Add one under Post Process.",
+      "failed": "The AI provider could not write a digest. Check its key and model under Post Process."
+    },
+    "search": {
+      "title": "Search everything you said",
+      "label": "Search your dictations",
+      "placeholder": "Try: export audio",
+      "count_one": "{{count}} match",
+      "count_other": "{{count}} matches",
+      "none": "No dictations match.",
+      "error": "Search failed. Try again."
+    },
+    "notes": {
+      "title": "Notes export",
+      "description": "Save your dictations as Markdown notes that Obsidian and other notes apps can open: one note per day plus an Insights note, linked together. Say Less only writes its own files and never deletes anything.",
+      "nightly": "Export notes nightly",
+      "folder": "Folder:",
+      "choose": "Choose folder",
+      "chooseTitle": "Choose a folder for your Say Less notes",
+      "useDefault": "Use default folder",
+      "exportNow": "Export now",
+      "exporting": "Writing notes…",
+      "done": "Done. {{written}} notes written, {{unchanged}} already up to date.",
+      "skipped_one": "{{count}} file was left alone because Say Less did not create it.",
+      "skipped_other": "{{count}} files were left alone because Say Less did not create them.",
+      "last": "Last export: {{when}}",
+      "loadError": "Could not load notes export settings.",
+      "saveError": "Could not save notes export settings."
+    },
+    "claude": {
+      "title": "Use with Claude",
+      "description": "Let Claude (or any MCP app) search your dictation history. It runs on this computer, can only read, and works only when you add it.",
+      "command": "Claude Code command",
+      "config": "MCP config (Claude Desktop and others)",
+      "copy": "Copy",
+      "copied": "Copied",
+      "copyName": "Copy {{what}}",
+      "tools": "Tools: search_transcripts, recent_transcripts, recurring_topics. Then ask things like \"what do I keep complaining about?\"",
+      "error": "Could not find the Say Less app path."
+    }
   }
 }

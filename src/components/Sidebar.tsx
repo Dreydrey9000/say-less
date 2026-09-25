@@ -13,8 +13,10 @@ import {
   WandSparkles,
   Download,
   House,
+  Lightbulb,
 } from "lucide-react";
 import { Home } from "./Home";
+import { Insights } from "./insights/Insights";
 import { StudioSettings } from "./settings/StudioSettings";
 import { VoiceActions } from "./settings/VoiceActions";
 import { WisprImport } from "./settings/WisprImport";
@@ -65,6 +67,12 @@ export const SECTIONS_CONFIG = {
     labelKey: "sidebar.history",
     icon: History,
     component: HistorySettings,
+    enabled: () => true,
+  },
+  insights: {
+    labelKey: "insights.title",
+    icon: Lightbulb,
+    component: Insights,
     enabled: () => true,
   },
   writing: {

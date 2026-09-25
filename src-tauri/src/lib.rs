@@ -12,6 +12,7 @@ mod correction_learning;
 mod floating;
 mod helpers;
 mod input;
+mod insights;
 mod llm_client;
 mod managers;
 mod memory;
@@ -647,6 +648,13 @@ pub fn run(cli_args: CliArgs) {
     // Detect portable mode before anything else
     portable::init();
 
+    // `--mcp`: serve the read-only history MCP server on stdio and exit.
+    // Runs before Tauri is built, so no window, tray, audio, shortcuts or
+    // single-instance forwarding ever start.
+    if cli_args.mcp {
+        std::process::exit(insights::mcp::run_stdio(cli_args.history_db.clone()));
+    }
+
     // Parse console logging directives from RUST_LOG, falling back to info-level logging
     // when the variable is unset
     let console_filter = build_console_filter();
@@ -783,6 +791,15 @@ pub fn run(cli_args: CliArgs) {
             commands::history::update_history_limit,
             commands::history::update_recording_retention_period,
             helpers::clamshell::is_laptop,
+            insights::get_insights,
+            insights::search_history_text,
+            insights::get_insights_settings,
+            insights::save_insights_settings,
+            insights::get_default_notes_folder,
+            insights::export_notes_now,
+            insights::get_ai_summary_status,
+            insights::summarize_insights,
+            insights::get_mcp_setup,
         ])
         .events(collect_events![
             managers::history::HistoryUpdatePayload,
@@ -1031,6 +1048,7 @@ pub fn run(cli_args: CliArgs) {
             app.manage(TranscriptionCoordinator::new(app_handle.clone()));
 
             initialize_core_logic(&app_handle);
+            insights::start_background_export(app_handle.clone());
             if studio::get_studio_settings(app_handle.clone()).map(|s|s.floating).unwrap_or(false) {
                 let _=floating::set_visible(&app_handle,true);
             }

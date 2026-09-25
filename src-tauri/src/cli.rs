@@ -60,4 +60,13 @@ pub struct CliArgs {
     /// Emit --transcribe-file results as JSON.
     #[arg(long)]
     pub json: bool,
+
+    /// Run a read-only MCP server on stdin/stdout so AI tools (e.g. Claude)
+    /// can search your local dictation history. Does not start the app.
+    #[arg(long)]
+    pub mcp: bool,
+
+    /// History database for --mcp (default: the app's own history.db).
+    #[arg(long, value_name = "PATH")]
+    pub history_db: Option<PathBuf>,
 }
