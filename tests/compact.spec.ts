@@ -10,7 +10,7 @@ test("dock collapses to a small companion and expands without recording", async 
     page.getByRole("button", { name: "Record", exact: true }),
   ).toBeVisible();
   await page.screenshot({ path: "test-results/dock-expanded-0.12.0.png" });
-  await page.getByRole("button", { name: "Collapse to companion" }).click();
+  await page.getByRole("button", { name: "Shrink dock" }).click();
   await page.setViewportSize({ width: 104, height: 104 });
   await expect(page.getByRole("button", { name: "Expand dock" })).toBeVisible();
   expect(
@@ -42,8 +42,8 @@ test("character choice persists and is visible in the compact dock", async ({
 }) => {
   await page.goto("/tests/fixtures/app.html");
   await page.getByRole("button", { name: "Appearance", exact: true }).click();
-  await page.getByLabel("Companion style").selectOption("both");
-  await page.getByRole("button", { name: "Collapse to companion" }).click();
+  await page.getByRole("combobox", { name: "Dock look" }).selectOption("both");
+  await page.getByRole("switch", { name: "Small dock" }).check();
   await page.goto("/tests/fixtures/app.html?dock=1");
   await page.setViewportSize({ width: 104, height: 104 });
   await expect(page.locator(".companion-buddy")).toBeVisible();

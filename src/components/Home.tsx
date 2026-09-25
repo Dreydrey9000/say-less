@@ -3,7 +3,9 @@ import { useTranslation } from "react-i18next";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
-import { Copy, ArrowUpRight, Pause, Play } from "lucide-react";
+import { type } from "@tauri-apps/plugin-os";
+import { Copy, ArrowUpRight, Share2 } from "lucide-react";
+import { formatKeyCombination } from "@/lib/utils/keyboard";
 import type { HistoryEntry, PaginatedHistory } from "@/bindings";
 import { useSettings } from "@/hooks/useSettings";
 import { useVoiceActivity } from "@/hooks/useVoiceActivity";
@@ -23,6 +25,7 @@ export function Home({
   const { settings: app } = useSettings();
   const { settings, save, load, loaded, busy, error } = useStudio();
   const activity = useVoiceActivity();
+  const isMac = type() === "macos";
   const [entries, setEntries] = useState<HistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [historyError, setHistoryError] = useState(false);
@@ -56,77 +59,109 @@ export function Home({
       void pending.then((unlisten) => unlisten());
     };
   }, [revision]);
-  const shortcut = app?.bindings?.transcribe?.current_binding || "";
+  const binding = (id: string) =>
+    formatKeyCombination(app?.bindings?.[id]?.current_binding ?? "", "unknown");
+  const shortcut = binding("transcribe");
+  const fnKey = isMac ? binding("transcribe_fn") : "";
+  const aiKey = app?.post_process_enabled
+    ? binding("transcribe_with_post_process")
+    : "";
+  const cancelKey = binding("cancel");
+  const modeCopy =
+    app?.shortcut_activation === "push_to_talk"
+      ? "home.holdShortcut"
+      : app?.shortcut_activation === "toggle"
+        ? "home.toggleShortcut"
+        : "home.shortcut";
+  const share = async () => {
+    try {
+      await writeText("https://saylessvoice.com");
+      setNotice(t("home.shareCopied"));
+    } catch {
+      setNotice(t("home.shareFailed"));
+    }
+  };
   return (
     <main className="say-home">
-      <header className="home-kicker">
-        <span>{t("home.eyebrow")}</span>
-        <span>{t("home.local")}</span>
-      </header>
+      <p className="home-kicker">{t("home.local")}</p>
       <section className="home-stage">
         <div className="home-intro">
-          <h1>
-            {t("home.headline")}
-            <br />
-            <em>{t("home.headlineAccent")}</em>
-          </h1>
+          <h1>{t("home.headline")}</h1>
           <p>{t("home.description")}</p>
-          <Button
-            disabled={!loaded || busy}
-            onClick={async () => {
-              if (await save({ ...settings, floating: true }))
-                setNotice(t("home.dockOpened"));
-            }}
-          >
-            {t("home.openDock")} <ArrowUpRight size={18} />
-          </Button>
-          <div className="home-shortcut">
-            <kbd>{shortcut}</kbd>
-            <span>
-              {t(
-                app?.shortcut_activation === "push_to_talk"
-                  ? "home.holdShortcut"
-                  : app?.shortcut_activation === "toggle"
-                    ? "home.toggleShortcut"
-                    : "home.shortcut",
-              )}
-            </span>
+          {/* Only the instruction for the saved mode. Never an empty <kbd>. */}
+          <div className="home-shortcut" data-testid="home-instruction">
+            {shortcut && <kbd>{shortcut}</kbd>}
+            <span>{t(modeCopy)}</span>
           </div>
-          {app?.bindings?.transcribe_fn?.current_binding && (
-            <div className="home-shortcut">
-              <kbd>{app.bindings.transcribe_fn.current_binding}</kbd>
+          {fnKey && (
+            <div className="home-shortcut home-shortcut-fn">
+              <kbd>{fnKey}</kbd>
               <span>{t("home.fnShortcut")}</span>
             </div>
           )}
-          {app?.post_process_enabled && (
-            <div className="home-shortcut">
-              <kbd>
-                {app.bindings?.transcribe_with_post_process?.current_binding}
-              </kbd>
-              <span>{t("home.aiShortcut")}</span>
-            </div>
-          )}
+          <details className="home-more">
+            <summary>{t("home.otherShortcuts")}</summary>
+            <ul>
+              {fnKey && <li className="home-tip">{t("home.fnTip")}</li>}
+              <li>
+                {aiKey ? (
+                  <>
+                    <kbd>{aiKey}</kbd>
+                    <span>{t("home.aiShortcut")}</span>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    className="home-link"
+                    onClick={() => onNavigate?.("postprocessing")}
+                  >
+                    {t("home.setAiShortcut")}
+                  </button>
+                )}
+              </li>
+              {cancelKey && (
+                <li>
+                  <kbd>{cancelKey}</kbd>
+                  <span>{t("home.cancelShortcut")}</span>
+                </li>
+              )}
+            </ul>
+          </details>
+          <div className="home-actions">
+            {!settings.floating && (
+              <Button
+                variant="secondary"
+                disabled={!loaded || busy}
+                onClick={async () => {
+                  if (await save({ ...settings, floating: true }))
+                    setNotice(t("home.dockOpened"));
+                }}
+              >
+                {t("home.openDock")} <ArrowUpRight size={16} />
+              </Button>
+            )}
+            <button
+              type="button"
+              className="home-link"
+              onClick={() => void share()}
+            >
+              <Share2 size={14} aria-hidden="true" /> {t("home.share")}
+            </button>
+          </div>
         </div>
         <div className="home-companion">
           <Companion
             level={activity.level}
             active={activity.state === "recording"}
           />
-          <div className="home-companion-caption">
-            <span>{t(`dock.${activity.state}`)}</span>
-            <button
-              type="button"
-              disabled={!loaded || busy}
-              aria-label={t(
-                settings.dock_motion ? "companion.pause" : "companion.play",
-              )}
-              onClick={() =>
-                void save({ ...settings, dock_motion: !settings.dock_motion })
-              }
-            >
-              {settings.dock_motion ? <Pause size={16} /> : <Play size={16} />}
-            </button>
-          </div>
+          <p className="home-companion-caption">
+            <span className="home-slogan">{t("home.slogan")}</span>
+            <span>
+              {t(`home.status.${activity.state}`, {
+                defaultValue: t("home.status.idle"),
+              })}
+            </span>
+          </p>
         </div>
       </section>
       {(error || notice) && (

@@ -15,7 +15,7 @@ These are actual application screens rendered with safe sample state. The still 
 **Three things to try:**
 
 1. **Home → Open floating dock.** The shortcut shown on Home works while the dock is collapsed. Click the little companion to expand, then use the down arrow to collapse.
-2. **Appearance → Companion style.** Choose an orb, chrome emblem, character, or character with particles. Set Left/Right placement, color, pause, or cycle.
+2. **Appearance → Floating dock.** Choose a dock look (silver orb, Say Less emblem, Buddy, Buddy with particles, or your avatar), a particle pattern, placement, and color. **Pause animations** is under Appearance → Motion.
 3. **Writing → Learn from my corrections.** Enable on Mac, dictate into a supported text field, fix one spelling and keep focus there for four seconds. Review the observed pair, choose Keep now, or repeat it in another dictation to activate it automatically. Remove a learned rule anytime.
 
 ### How the words move
@@ -97,13 +97,13 @@ See [personalization](docs/personalization.md) and the [editable companion workf
 
 ### Voice visuals
 
-In **Appearance → Voice visuals**, switch the recording overlay between Bars (default), a Squiggle line, or a talking Avatar, and build the avatar (stick figure, person, cat or dog; colors; cap, beanie, crown, headphones or sunglasses). The mouth follows voice volume, not words. Pause and Reduce Motion hold it still. See [personalization](docs/personalization.md#voice-visuals) and the [editable voice visuals diagram](docs/diagrams/voice-visuals.mmd).
+In **Appearance → Recording indicator**, switch the animation between Bars (default), a Voice line, or a talking Avatar, and (once an avatar is in use) customize it (stick figure, person, cat or dog; colors; cap, beanie, crown, headphones or sunglasses). The mouth follows voice volume, not words. Pause and Reduce Motion hold it still. See [personalization](docs/personalization.md#voice-visuals) and the [editable voice visuals diagram](docs/diagrams/voice-visuals.mmd).
 
 ![Voice visuals workflow](docs/diagrams/voice-visuals.svg)
 
 ## Say less, stress less
 
-Open **Insights** to see what you keep saying: recurring problems, recurring ideas, and "Fix this first," each with dated quotes from your own dictations. It is built on this computer from your history, and nothing is uploaded. Optional extras, all off until you choose them: **Summarize with AI** (uses your Post Process provider and sends only topic labels and a few short quotes), **Read digest aloud** (system voices), nightly **Obsidian-friendly notes export**, and **Use with Claude**, a local read-only MCP server (`handy --mcp`).
+Open **Insights** to see what you keep saying: recurring problems, recurring ideas, and your most-mentioned topic, each with dated quotes from your own dictations. It is worked out on this computer from your history; nothing leaves your computer unless you use Summarize with AI or connect Claude. Optional extras, all off until you choose them: **Summarize with AI** (uses your AI cleanup provider and sends only topic labels and a few short quotes), **Read digest aloud** (system voices), nightly **Obsidian-friendly notes export**, and **Use with Claude**, a local read-only MCP server (`handy --mcp`).
 
 ![Say less, stress less data flow](docs/diagrams/stress-less.svg)
 

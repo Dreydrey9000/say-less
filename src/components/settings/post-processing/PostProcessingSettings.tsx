@@ -20,6 +20,8 @@ import { ApiKeyField } from "../PostProcessingSettingsApi/ApiKeyField";
 import { ModelSelect } from "../PostProcessingSettingsApi/ModelSelect";
 import { usePostProcessProviderState } from "../PostProcessingSettingsApi/usePostProcessProviderState";
 import { ShortcutInput } from "../ShortcutInput";
+import { PostProcessingToggle } from "../PostProcessingToggle";
+import { PageHeader } from "../../ui/PageHeader";
 import { useSettings } from "../../../hooks/useSettings";
 
 const PostProcessingSettingsApiComponent: React.FC = () => {
@@ -426,24 +428,43 @@ PostProcessingSettingsPrompts.displayName = "PostProcessingSettingsPrompts";
 
 export const PostProcessingSettings: React.FC = () => {
   const { t } = useTranslation();
+  const { getSetting } = useSettings();
+  const enabled = getSetting("post_process_enabled") || false;
 
   return (
-    <div className="max-w-3xl w-full mx-auto space-y-6">
-      <SettingsGroup title={t("settings.postProcessing.hotkey.title")}>
-        <ShortcutInput
-          shortcutId="transcribe_with_post_process"
-          descriptionMode="tooltip"
-          grouped={true}
-        />
+    <div className="max-w-3xl w-full mx-auto space-y-8">
+      <PageHeader
+        title={t("settings.postProcessing.page.title")}
+        description={t("settings.postProcessing.page.description")}
+      />
+      <SettingsGroup description={t("settings.postProcessing.page.privacy")}>
+        <PostProcessingToggle descriptionMode="inline" grouped={true} />
       </SettingsGroup>
 
+      {enabled ? (
+        <SettingsGroup title={t("settings.postProcessing.hotkey.title")}>
+          <ShortcutInput
+            shortcutId="transcribe_with_post_process"
+            descriptionMode="inline"
+            grouped={true}
+          />
+        </SettingsGroup>
+      ) : (
+        <p className="setting-description">
+          {t("settings.postProcessing.page.offHint")}
+        </p>
+      )}
+
+      {/* Summarize with AI (Insights) uses this provider even when cleanup is off. */}
       <SettingsGroup title={t("settings.postProcessing.api.title")}>
         <PostProcessingSettingsApi />
       </SettingsGroup>
 
-      <SettingsGroup title={t("settings.postProcessing.prompts.title")}>
-        <PostProcessingSettingsPrompts />
-      </SettingsGroup>
+      {enabled && (
+        <SettingsGroup title={t("settings.postProcessing.prompts.title")}>
+          <PostProcessingSettingsPrompts />
+        </SettingsGroup>
+      )}
     </div>
   );
 };

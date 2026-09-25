@@ -5,6 +5,7 @@ import { MicrophoneSelector } from "../MicrophoneSelector";
 import { ChannelSelector } from "../ChannelSelector";
 import { ShortcutInput } from "../ShortcutInput";
 import { SettingsGroup } from "../../ui/SettingsGroup";
+import { PageHeader } from "../../ui/PageHeader";
 import { OutputDeviceSelector } from "../OutputDeviceSelector";
 import { ShortcutActivationSetting } from "../ShortcutActivation";
 import { AudioFeedback } from "../AudioFeedback";
@@ -19,23 +20,20 @@ export const GeneralSettings: React.FC = () => {
   const isLinux = type() === "linux";
   const isMac = type() === "macos";
   return (
-    <div className="max-w-3xl w-full mx-auto space-y-6">
-      <header className="space-y-2">
-        <p className="text-xs font-medium tracking-wide text-text/65">
-          {t("dictation.local")}
-        </p>
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {t("dictation.title")}
-        </h1>
-        <p className="text-sm text-text/75">{t("dictation.description")}</p>
-        <p className="text-xs text-text/65">
+    <div className="max-w-3xl w-full mx-auto space-y-8">
+      <PageHeader
+        eyebrow={t("dictation.local")}
+        title={t("dictation.title")}
+        description={t("dictation.description")}
+      >
+        <p className="text-[13px] text-text-muted">
           {t(
             settings?.post_process_enabled
               ? "dictation.optional"
               : "dictation.private",
           )}
         </p>
-      </header>
+      </PageHeader>
       <SettingsGroup title={t("settings.general.title")}>
         <ShortcutInput shortcutId="transcribe" grouped={true} />
         {isMac && <ShortcutInput shortcutId="transcribe_fn" grouped={true} />}

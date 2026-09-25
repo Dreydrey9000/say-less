@@ -15,8 +15,6 @@ import {
   Settings,
   GripVertical,
   X,
-  Pause,
-  Play,
   ChevronDown,
 } from "lucide-react";
 import { Companion, formations } from "@/components/companion/Companion";
@@ -172,17 +170,6 @@ function Dock() {
           onClick={() => void invoke("show_main_window_command")}
         >
           <Settings size={19} />
-        </button>
-        <button
-          disabled={!loaded || busy}
-          aria-label={t(
-            settings.dock_motion ? "companion.pause" : "companion.play",
-          )}
-          onClick={() =>
-            void save({ ...settings, dock_motion: !settings.dock_motion })
-          }
-        >
-          {settings.dock_motion ? <Pause size={16} /> : <Play size={16} />}
         </button>
         <button
           disabled={!loaded || busy}

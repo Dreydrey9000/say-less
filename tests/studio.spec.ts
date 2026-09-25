@@ -8,25 +8,26 @@ test("appearance persists custom color, contrast and floating preference", async
   await expect(
     page.getByRole("button", { name: "Candy pink", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
-  await page.getByLabel("Custom hex color", { exact: true }).fill("#000000");
+  await page
+    .getByRole("textbox", { name: "Custom hex color", exact: true })
+    .fill("#000000");
   await page.getByRole("button", { name: "Apply color" }).click();
   expect(
     await page.evaluate(() =>
       document.documentElement.style.getPropertyValue("--studio-on-accent"),
     ),
   ).toBe("#ffffff");
-  await page.getByRole("button", { name: "Show dock", exact: true }).click();
-  await expect(
-    page.getByRole("button", { name: "Hide dock", exact: true }),
-  ).toBeVisible();
+  const dock = page.getByRole("switch", { name: "Show floating dock" });
+  await dock.check();
+  await expect(dock).toBeChecked();
   await page.reload();
   await page.getByRole("button", { name: "Appearance", exact: true }).click();
   await expect(
-    page.getByLabel("Custom hex color", { exact: true }),
+    page.getByRole("textbox", { name: "Custom hex color", exact: true }),
   ).toHaveValue("#000000");
   await expect(
-    page.getByRole("button", { name: "Hide dock", exact: true }),
-  ).toBeVisible();
+    page.getByRole("switch", { name: "Show floating dock" }),
+  ).toBeChecked();
 });
 test("failed appearance save keeps the saved color", async ({ page }) => {
   await page.goto("/tests/fixtures/app.html?failStudio=1");
@@ -60,12 +61,10 @@ test("import previews before writing and history is opt-in", async ({
   page,
 }) => {
   await page.goto("/tests/fixtures/app.html");
-  await page
-    .getByRole("button", { name: "Import from Wispr", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Import", exact: true }).click();
   await page.getByRole("button", { name: "Find Wispr on this Mac" }).click();
   await expect(
-    page.getByText("1 words · 1 snippets/corrections · 1 skipped"),
+    page.getByText("1 word · 1 snippet or correction · 1 skipped"),
   ).toBeVisible();
   await expect(page.getByRole("checkbox")).not.toBeChecked();
   expect(
@@ -78,16 +77,14 @@ test("import previews before writing and history is opt-in", async ({
   await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Import reviewed items" }).click();
   await expect(page.getByRole("status")).toContainText(
-    "Imported 1 words, 1 snippets/corrections, and 2 history records",
+    "Imported 1 word, 1 snippet or correction, and 2 history records.",
   );
   await page.getByRole("button", { name: "Browse imported history" }).click();
   await expect(page.getByText("Imported example only")).toBeVisible();
 });
 test("source read failure cannot import", async ({ page }) => {
   await page.goto("/tests/fixtures/app.html?failImport=1");
-  await page
-    .getByRole("button", { name: "Import from Wispr", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Import", exact: true }).click();
   await page.getByRole("button", { name: "Find Wispr on this Mac" }).click();
   await expect(page.getByRole("alert")).toContainText("Could not read");
   await expect(
@@ -111,7 +108,7 @@ for (const width of [390, 1200])
   test(`new controls fit ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/tests/fixtures/app.html");
-    for (const name of ["Appearance", "Voice actions", "Import from Wispr"]) {
+    for (const name of ["Appearance", "Voice actions", "Import"]) {
       await page.getByRole("button", { name, exact: true }).click();
       expect(
         await page

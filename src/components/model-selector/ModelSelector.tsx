@@ -201,18 +201,21 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({ onError }) => {
     }
 
     const currentModelInfo = models.find((m) => m.id === displayModelId);
+    // Short name plus a word state ("Nemotron · Ready"), so the pill never
+    // truncates and never relies on the dot color alone.
+    const pill = (state: string) =>
+      currentModelInfo
+        ? t("modelSelector.pill", {
+            name: getTranslatedModelName(currentModelInfo, t).split(" ")[0],
+            state: t(`modelSelector.states.${state}`),
+          })
+        : t(`modelSelector.states.${state}`);
 
     switch (modelStatus) {
       case "ready":
-        return currentModelInfo
-          ? getTranslatedModelName(currentModelInfo, t)
-          : t("modelSelector.modelReady");
+        return pill("ready");
       case "loading":
-        return currentModelInfo
-          ? t("modelSelector.loading", {
-              modelName: getTranslatedModelName(currentModelInfo, t),
-            })
-          : t("modelSelector.loadingGeneric");
+        return pill("loading");
       case "extracting":
         return currentModelInfo
           ? t("modelSelector.extracting", {
@@ -220,17 +223,14 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({ onError }) => {
             })
           : t("modelSelector.extractingGeneric");
       case "error":
-        return modelError || t("modelSelector.modelError");
-      case "unloaded":
         return currentModelInfo
-          ? getTranslatedModelName(currentModelInfo, t)
-          : t("modelSelector.modelUnloaded");
+          ? pill("error")
+          : modelError || t("modelSelector.modelError");
       case "none":
         return t("modelSelector.noModelDownloadRequired");
+      case "unloaded":
       default:
-        return currentModelInfo
-          ? getTranslatedModelName(currentModelInfo, t)
-          : t("modelSelector.modelUnloaded");
+        return pill("sleeping");
     }
   };
 

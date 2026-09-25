@@ -123,6 +123,7 @@ export function Insights() {
                 {tooLittle
                   ? t("insights.empty.fewBody", {
                       count: report.analyzed_entries,
+                      min: MIN_ENTRIES,
                     })
                   : t("insights.empty.noneBody")}
               </p>

@@ -49,24 +49,36 @@ Object.assign(window, {
   },
 });
 const settings = {
-  onboarding_completed: true,
+  // `?newUser` starts first-run onboarding (permissions are granted, so it
+  // moves straight on to picking a speech engine).
+  onboarding_completed: !query.has("newUser"),
   selected_model: "test-model",
   app_language: "en",
   theme: query.get("theme") || "dark",
   show_whats_new_on_update: false,
   bindings: Object.fromEntries(
-    ["transcribe", "cancel", "transcribe_with_post_process"].map((id) => [
+    [
+      "transcribe",
+      "transcribe_fn",
+      "cancel",
+      "transcribe_with_post_process",
+    ].map((id) => [
       id,
       {
         id,
         name: id,
         description: "",
-        current_binding: id === "cancel" ? "Escape" : "option+space",
+        current_binding:
+          id === "cancel"
+            ? "Escape"
+            : id === "transcribe_fn"
+              ? "fn"
+              : "option+space",
         default_binding: "option+space",
       },
     ]),
   ),
-  shortcut_activation: "hold_or_toggle",
+  shortcut_activation: query.get("mode") || "hold_or_toggle",
   hold_threshold_ms: 200,
   selected_language: "auto",
   audio_feedback: true,
@@ -164,18 +176,55 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
   if (cmd === "get_app_settings" || cmd === "get_default_settings")
     return settings;
   if (cmd === "get_current_model") return "test-model";
-  if (cmd === "get_available_models")
-    return [
-      {
-        id: "test-model",
-        name: "Nemotron Streaming 3.5",
-        is_downloaded: true,
-        supported_languages: ["en", "es", "fr"],
-        supports_language_selection: true,
-        supports_language_detection: true,
-        supports_streaming: true,
-      },
-    ];
+  if (cmd === "get_available_models") {
+    // Complete ModelInfo rows: the model store is loaded now, so the Speech
+    // engine page and onboarding render these for real.
+    const engine = (
+      id: string,
+      name: string,
+      recommended: boolean,
+      extra: Record<string, unknown> = {},
+    ) => ({
+      id,
+      name,
+      description: "",
+      filename: `${id}.gguf`,
+      source: { HuggingFace: { repo_id: "test/test", revision: "main" } },
+      size_mb: 600,
+      is_downloaded: id === "test-model",
+      is_downloading: false,
+      partial_size: 0,
+      is_directory: false,
+      engine_type: "TranscribeCpp",
+      accuracy_score: 0.8,
+      speed_score: 0.8,
+      supports_translation: false,
+      is_recommended: recommended,
+      supported_languages: ["en"],
+      supports_language_selection: false,
+      is_custom: false,
+      supports_streaming: false,
+      supports_language_detection: false,
+      ...extra,
+    });
+    const current = engine("test-model", "Nemotron Streaming 3.5", true, {
+      supported_languages: ["en", "es", "fr"],
+      supports_language_selection: true,
+      supports_language_detection: true,
+      supports_streaming: true,
+    });
+    // `?newUser` also offers engines to download, so onboarding has a pick.
+    return query.has("newUser")
+      ? [
+          current,
+          engine("pick-one", "Parakeet Unified", true),
+          engine("pick-two", "Canary Flash", true),
+          engine("other-one", "Whisper Small", false),
+          engine("other-two", "Moonshine Tiny", false),
+        ]
+      : [current];
+  }
+  if (cmd === "get_transcription_model_status") return "test-model";
   if (cmd === "get_model_load_status")
     return { state: "unloaded", model_id: null };
   if (
@@ -326,5 +375,9 @@ if (query.has("dock")) {
   Object.assign(window, { testEmit: emit });
   await import("../../src/overlay/main");
 } else {
+  // Same start-up as src/main.tsx: the footer pill and onboarding read models
+  // from this store.
+  const { useModelStore } = await import("../../src/stores/modelStore");
+  void useModelStore.getState().initialize();
   ReactDOM.createRoot(document.getElementById("root")!).render(<App />);
 }

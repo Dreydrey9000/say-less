@@ -4,6 +4,17 @@
 
 ### Changed
 
+- One home per setting: the recording indicator style and position moved from Advanced to Appearance, filler words and the personal dictionary live only in Writing, Theme only in Appearance, the AI cleanup on/off switch lives on the AI cleanup page, and Pause animations is one switch in Appearance (the Home and dock copies are gone); where a duplicate used to be, a short "Open Writing / Open Appearance" note points to the real one, because two controls for one setting left people unsure which one won.
+- The companion picker no longer shows two "selected" controls at once: "Dock look" (orb, emblem, buddy, avatar) is one dropdown, and the particle-pattern cards only appear for looks that actually have particles.
+- Renames in plain words: General is Shortcuts & mic, Models is Speech engine, Post Process is AI cleanup, "Import from…" is Import, "Test the voice" is Preview animation, Squiggle is Voice line, and the overlay is the Recording indicator; every locale file was updated (existing translations kept where the meaning did not change, English as the fallback where it did).
+- Appearance restructured into Color and theme, Floating dock, Recording indicator, (Your avatar) and Motion, with a 28px title, one row pattern (label and description left, control right), switches for on/off modes, 40px controls and 18px section headings; the "Less typing. More you." banner and its five-bar glyph were removed because they outranked the page title.
+- Shared type scale (28 / 18 / 15 / 14 / 13) with a solid muted text color instead of opacity fades, and setting rows use a fixed 220-300px control column instead of a 50/50 split.
+- Home leads with the operating instruction ("Speak. We'll type."), shows only the instruction for your saved shortcut mode, keeps Fn visible on Mac, tucks the AI cleanup and cancel shortcuts under "Other recording shortcuts", never shows an empty key cap, and adds a small "Share Say Less" link; the brand line and companion are now secondary.
+- The footer shows the speech engine as a short name plus a word ("Nemotron · Ready") instead of a truncated name and an unexplained dot.
+- First-run setup shows one recommended speech engine with the rest behind "See other engines", plain-language permission copy, and a new "Try it once" step with a practice box and the Fn / emoji-picker fix.
+- Privacy copy says what runs where: Insights no longer claims "Nothing is uploaded" next to its AI and Claude features, AI cleanup states that it sends transcript text (never audio) to your provider, and Auto Submit and Learn from my corrections state their consequences inline.
+- Insights calls its top topic "Most-mentioned topic" (it counts mentions, it does not give advice) and the Claude setup commands sit behind "For developers".
+- About says Support Handy instead of "Help us continue building Handy", with a "Built on Handy (MIT license)" credit line.
 - Squiggle rebuilt as three phase-offset strands (the front one in the accent with a silver core and soft glow) over a fading baseline, 84x24 in the overlay, because the single thin line read as cheap and an idle pill looked empty.
 - Squiggle loudness now drives a spring with a small overshoot and a slow swell along its length, so talking reads as smooth motion instead of jumps; still one animation-frame loop writing paths directly, stopped when motion is off or the window is hidden.
 - Squiggle follows the chosen accent color in the overlay and in Appearance (it used the logo pink), and Reduce Motion or Pause draws a fixed, full resting shape.
@@ -16,11 +27,15 @@
 
 ### Added
 
+- Playwright checks for the single dock-look control, Home showing only the saved mode's instruction, onboarding recommending one engine plus the Try it step, About saying Say Less, and duplicates pointing to their one home; the fixture now loads the model store and supports `?newUser` and `?mode=`.
 - Playwright checks for the three squiggle strands, the still squiggle under Reduce Motion, a single morphing avatar mouth, the single ring in the small pill, distinct companion cards with only the chosen one animating, and the neutral idle dot in the compact dock.
 - In-app release note 0.13.1 describing the polish; it shows once the app version reaches 0.13.1.
 
 ### Fixed
 
+- "1 words" and "1 snippets" in the Wispr import summary, and "1 dictations" in Insights, now pluralize correctly.
+- Hints that said "set up a provider under Post Process" pointed to a hidden screen; AI cleanup is now always in the sidebar.
+- A shortcut a build does not define no longer shows a dead "Shortcut not found" row.
 - Insights, history search, notes export and `--mcp` now read imported Wispr Flow history (`wispr-history.sqlite`) alongside `history.db`, because a new user who imported months of Wispr dictations saw "Not enough history yet"; a missing, damaged or locked import file is skipped and logged instead of breaking Insights.
 
 ## [2026-09-24]

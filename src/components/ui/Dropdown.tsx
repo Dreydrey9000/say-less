@@ -35,7 +35,7 @@ export function Dropdown({
   const descriptionId = useId();
   const selected = options.find((option) => option.value === selectedValue);
   return (
-    <div className={`min-w-0 max-w-full ${className}`}>
+    <div className={`w-full min-w-0 max-w-full ${className}`}>
       <select
         aria-label={label || placeholder || t("controls.choose")}
         aria-describedby={selected?.description ? descriptionId : undefined}
@@ -43,7 +43,7 @@ export function Dropdown({
         onChange={(event) => onSelect(event.target.value)}
         onFocus={onRefresh}
         disabled={disabled}
-        className="w-full min-w-0 max-w-full min-h-10 rounded-lg border border-mid-gray/40 bg-background px-3 py-2 text-sm text-text cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full min-w-0 max-w-full min-h-[40px] rounded-lg border border-mid-gray/40 bg-background px-3 py-2 text-sm text-text cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {!selected && (
           <option value="" disabled>
