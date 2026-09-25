@@ -41,10 +41,24 @@ echo "  Exported only the Developer ID certificate."
 echo
 echo "Step 2 of 2: notarization login (Apple scans the app so Macs trust it)."
 echo "  Make an app-specific password at https://account.apple.com > Sign-In and Security > App-Specific Passwords > +"
-read -r -p "Apple ID email: " APPLE_ID
-read -r -s -p "App-specific password (paste, then Enter): " APPLE_APP_PW; echo
 read -r -p "Team ID [$TEAM_ID_DEFAULT]: " TEAM_ID
 TEAM_ID=${TEAM_ID:-$TEAM_ID_DEFAULT}
+# Check the login with Apple before saving anything, so a typo fails here in
+# seconds instead of at the end of a 30-minute release build.
+for attempt in 1 2 3; do
+  read -r -p "Apple ID email (the one that owns the developer account): " APPLE_ID
+  read -r -s -p "App-specific password (paste, then Enter): " APPLE_APP_PW; echo
+  APPLE_ID=$(printf '%s' "$APPLE_ID" | tr -d '[:space:]')
+  APPLE_APP_PW=$(printf '%s' "$APPLE_APP_PW" | tr -d '[:space:]')
+  echo "  Checking that login with Apple..."
+  if xcrun notarytool history --apple-id "$APPLE_ID" --password "$APPLE_APP_PW" \
+      --team-id "$TEAM_ID" >/dev/null 2>&1; then
+    echo "  Apple accepted it."
+    break
+  fi
+  echo "  Apple said no. Check the email, or make a fresh app-specific password and paste it."
+  if [ "$attempt" = 3 ]; then echo "Nothing was saved."; exit 1; fi
+done
 
 echo
 echo "Uploading to GitHub secrets for $REPO ..."
