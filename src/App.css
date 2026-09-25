@@ -131,7 +131,9 @@
   filter: brightness(1.05);
 }
 .brand-action:focus-visible {
-  outline: 2px solid currentColor;
+  /* The button is light, so its dark text color vanishes as a ring on the
+     dark page. Use the page text color, like the other controls. */
+  outline: 2px solid var(--color-text);
   outline-offset: 4px;
 }
 .brand-action:disabled {

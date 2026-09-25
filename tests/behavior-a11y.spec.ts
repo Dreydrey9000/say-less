@@ -447,3 +447,24 @@ test("reduced motion holds the overlay bars still", async ({ page }) => {
       .evaluate((el) => getComputedStyle(el).transitionDuration),
   ).toBe("0s");
 });
+
+test("a single letter cannot become the talk shortcut", async ({ page }) => {
+  await openSection(page, "Shortcuts & mic");
+  const row = page.getByRole("group", { name: "Talk shortcut", exact: true });
+  const chip = row.locator("[data-shortcut-chip]");
+  await chip.focus();
+  await page.keyboard.press("Enter");
+  await expect(
+    page
+      .getByRole("status")
+      .filter({ hasText: "Press the new keys, Escape to cancel." }),
+  ).toHaveCount(1);
+  await page.keyboard.down("K");
+  await page.keyboard.up("K");
+  await expect(
+    page
+      .getByRole("status")
+      .filter({ hasText: "A single letter or space alone" }),
+  ).toHaveCount(1);
+  await expect(chip).toContainText("Option");
+});

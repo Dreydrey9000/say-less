@@ -4,6 +4,7 @@ import {
   getKeyName,
   formatKeyCombination,
   normalizeKey,
+  isBareTypingKey,
 } from "../../lib/utils/keyboard";
 import { ResetButton } from "../ui/ResetButton";
 import { ShortcutChip } from "../ui/ShortcutChip";
@@ -116,7 +117,17 @@ export const GlobalShortcutInput: React.FC<GlobalShortcutInputProps> = ({
         });
         const newShortcut = sortedKeys.join("+");
 
-        if (editingShortcutId && bindings[editingShortcutId]) {
+        if (isBareTypingKey(newShortcut)) {
+          // A lone letter or space would fire every time the user types it.
+          const message = t("ux.shortcut.needsModifier");
+          toast.error(message);
+          setStatus(message);
+          if (editingShortcutId && originalBinding) {
+            await updateBinding(editingShortcutId, originalBinding).catch(
+              console.error,
+            );
+          }
+        } else if (editingShortcutId && bindings[editingShortcutId]) {
           try {
             await updateBinding(editingShortcutId, newShortcut);
             setStatus(
@@ -140,7 +151,9 @@ export const GlobalShortcutInput: React.FC<GlobalShortcutInputProps> = ({
               }
             }
           }
+        }
 
+        if (editingShortcutId && bindings[editingShortcutId]) {
           // Re-register all bindings (the one just committed is already
           // registered; re-registering it fails cleanly and is ignored)
           await commands.resumeAllBindings().catch(console.error);

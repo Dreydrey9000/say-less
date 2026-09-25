@@ -1,7 +1,10 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { listen } from "@tauri-apps/api/event";
-import { formatKeyCombination } from "../../lib/utils/keyboard";
+import {
+  formatKeyCombination,
+  isBareTypingKey,
+} from "../../lib/utils/keyboard";
 import { ResetButton } from "../ui/ResetButton";
 import { ShortcutChip } from "../ui/ShortcutChip";
 import { SettingContainer } from "../ui/SettingContainer";
@@ -100,26 +103,38 @@ export const HandyKeysShortcutInput: React.FC<HandyKeysShortcutInputProps> = ({
     const setupListener = async () => {
       // Listen for key events from backend
       const commitAndStop = async (keysToCommit: string) => {
-        try {
-          await updateBinding(shortcutId, keysToCommit);
-          setStatus(
-            t("ux.shortcut.saved", {
-              keys: formatKeyCombination(keysToCommit, osType),
-            }),
-          );
-        } catch (error) {
-          // Log the details; show a plain message, never the raw error.
-          console.error("Failed to change binding:", error);
-          toast.error(t("ux.shortcut.setFailed"));
-          setStatus(t("ux.shortcut.setFailed"));
-
-          // Reset to original binding on error
+        if (isBareTypingKey(keysToCommit)) {
+          // A lone letter or space would fire every time the user types it.
+          const message = t("ux.shortcut.needsModifier");
+          toast.error(message);
+          setStatus(message);
           if (originalBinding) {
-            try {
-              await updateBinding(shortcutId, originalBinding);
-            } catch (resetError) {
-              console.error("Failed to reset binding:", resetError);
-              toast.error(t("settings.general.shortcut.errors.reset"));
+            await updateBinding(shortcutId, originalBinding).catch(
+              console.error,
+            );
+          }
+        } else {
+          try {
+            await updateBinding(shortcutId, keysToCommit);
+            setStatus(
+              t("ux.shortcut.saved", {
+                keys: formatKeyCombination(keysToCommit, osType),
+              }),
+            );
+          } catch (error) {
+            // Log the details; show a plain message, never the raw error.
+            console.error("Failed to change binding:", error);
+            toast.error(t("ux.shortcut.setFailed"));
+            setStatus(t("ux.shortcut.setFailed"));
+
+            // Reset to original binding on error
+            if (originalBinding) {
+              try {
+                await updateBinding(shortcutId, originalBinding);
+              } catch (resetError) {
+                console.error("Failed to reset binding:", resetError);
+                toast.error(t("settings.general.shortcut.errors.reset"));
+              }
             }
           }
         }

@@ -2,6 +2,15 @@
 
 ## [2026-09-25]
 
+### Release
+
+- Version 0.13.1: the voice visuals, clarity, accessibility and final polish passes ship together.
+
+### Fixed
+
+- A single letter or space can no longer be saved as a global shortcut, because it would fire every time you typed it.
+- The focus ring on light primary buttons (Apply color, Start using Say Less) is visible in dark mode again.
+
 ### Changed
 
 - Removed the last em-dashes from the English app text (inherited from Handy), so every string follows our no-em-dash copy rule.
