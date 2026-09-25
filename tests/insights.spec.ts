@@ -51,6 +51,8 @@ test("insights search, notes export, and Claude setup", async ({ page }) => {
   await expect(page.getByRole("status").last()).toContainText(
     "4 notes written",
   );
+  // Setup commands are for developers, so they sit behind a disclosure.
+  await page.getByText("For developers: setup commands").click();
   await expect(
     page.getByText(
       'claude mcp add say-less -- "/Applications/Say Less.app/Contents/MacOS/handy" --mcp',

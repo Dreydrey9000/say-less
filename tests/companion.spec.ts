@@ -27,7 +27,7 @@ for (const width of [390, 1200])
         .getByRole("button", { name: "Change your look", exact: true })
         .click();
       await expect(
-        page.getByRole("heading", { name: "Floating dock" }),
+        page.getByRole("heading", { name: "Floating dock", exact: true }),
       ).toBeVisible();
     });
   }

@@ -176,8 +176,15 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
   if (cmd === "get_app_settings" || cmd === "get_default_settings")
     return settings;
   if (cmd === "get_current_model") return "test-model";
-  if (cmd === "get_available_models" && query.has("newUser")) {
-    const engine = (id: string, name: string, recommended: boolean) => ({
+  if (cmd === "get_available_models") {
+    // Complete ModelInfo rows: the model store is loaded now, so the Speech
+    // engine page and onboarding render these for real.
+    const engine = (
+      id: string,
+      name: string,
+      recommended: boolean,
+      extra: Record<string, unknown> = {},
+    ) => ({
       id,
       name,
       description: "",
@@ -198,28 +205,26 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
       is_custom: false,
       supports_streaming: false,
       supports_language_detection: false,
+      ...extra,
     });
-    return [
-      engine("test-model", "Nemotron Streaming 3.5", true),
-      engine("pick-one", "Parakeet Unified", true),
-      engine("pick-two", "Canary Flash", true),
-      engine("other-one", "Whisper Small", false),
-      engine("other-two", "Moonshine Tiny", false),
-    ];
+    const current = engine("test-model", "Nemotron Streaming 3.5", true, {
+      supported_languages: ["en", "es", "fr"],
+      supports_language_selection: true,
+      supports_language_detection: true,
+      supports_streaming: true,
+    });
+    // `?newUser` also offers engines to download, so onboarding has a pick.
+    return query.has("newUser")
+      ? [
+          current,
+          engine("pick-one", "Parakeet Unified", true),
+          engine("pick-two", "Canary Flash", true),
+          engine("other-one", "Whisper Small", false),
+          engine("other-two", "Moonshine Tiny", false),
+        ]
+      : [current];
   }
   if (cmd === "get_transcription_model_status") return "test-model";
-  if (cmd === "get_available_models")
-    return [
-      {
-        id: "test-model",
-        name: "Nemotron Streaming 3.5",
-        is_downloaded: true,
-        supported_languages: ["en", "es", "fr"],
-        supports_language_selection: true,
-        supports_language_detection: true,
-        supports_streaming: true,
-      },
-    ];
   if (cmd === "get_model_load_status")
     return { state: "unloaded", model_id: null };
   if (

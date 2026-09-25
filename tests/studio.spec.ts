@@ -8,25 +8,26 @@ test("appearance persists custom color, contrast and floating preference", async
   await expect(
     page.getByRole("button", { name: "Candy pink", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
-  await page.getByLabel("Custom hex color", { exact: true }).fill("#000000");
+  await page
+    .getByRole("textbox", { name: "Custom hex color", exact: true })
+    .fill("#000000");
   await page.getByRole("button", { name: "Apply color" }).click();
   expect(
     await page.evaluate(() =>
       document.documentElement.style.getPropertyValue("--studio-on-accent"),
     ),
   ).toBe("#ffffff");
-  await page.getByRole("button", { name: "Show dock", exact: true }).click();
-  await expect(
-    page.getByRole("button", { name: "Hide dock", exact: true }),
-  ).toBeVisible();
+  const dock = page.getByRole("switch", { name: "Show floating dock" });
+  await dock.check();
+  await expect(dock).toBeChecked();
   await page.reload();
   await page.getByRole("button", { name: "Appearance", exact: true }).click();
   await expect(
-    page.getByLabel("Custom hex color", { exact: true }),
+    page.getByRole("textbox", { name: "Custom hex color", exact: true }),
   ).toHaveValue("#000000");
   await expect(
-    page.getByRole("button", { name: "Hide dock", exact: true }),
-  ).toBeVisible();
+    page.getByRole("switch", { name: "Show floating dock" }),
+  ).toBeChecked();
 });
 test("failed appearance save keeps the saved color", async ({ page }) => {
   await page.goto("/tests/fixtures/app.html?failStudio=1");
