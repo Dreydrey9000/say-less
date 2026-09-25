@@ -4,6 +4,21 @@
 
 ### Changed
 
+- Recording pill is 264x56 with a real layout (dot 10, label, a flexible voice-visual slot, cancel 32); the squiggle, bars or avatar center in that slot, which clips and fades its ends over 8px, because the squiggle was centered on the whole pill and drew about 7px over "Listening".
+- Overlay avatar is 40px in the 56px pill (8px clearance above and below) instead of 44px in 48px (about 1px), the same height for all three voice visuals.
+- The pill sits 18px (--ov-lift) above the window's screen-edge side with a soft outer shadow; the native window grew to 300x84 (Live 420x160) and its offsets shrank by the same 18px so the pill lands where it did, and the Rust geometry test now includes the lift.
+- The overlay dot is red (#ff5a5a) while Listening and silver while starting, because a silver dot did not read as "recording".
+- Compact dock status dot is an 8px light inside the disc rim (silver idle or working, red recording, amber error) instead of a 12px gray disc on the edge that looked like a stray button; the expanded dock's chevron is labeled "Shrink to small dock" (tooltip and aria-label).
+- Onboarding has one main action: an engine already on this computer gets a lime "Use this engine" button (no download), otherwise "Our pick" gets a lime "Download (size)" button; accuracy and speed bars hide when every engine on screen scores the same, and each setup screen says "Step N of M" with the real count (the permission screen only counts when we had to ask).
+- One select look: every dropdown is a styled native select, 40px tall like the text inputs, one chevron, width fits the longest option up to 280px; the form selects and the searchable Language picker use the same look, because native selects rendered about 21px tall next to 40px inputs.
+- Insights: the privacy note is a quiet 13px gray line with a lock icon and a neutral border, and the most-mentioned topic leads with its count as a 32px number with "mentions" under it.
+- One page frame: every screen sits 48px from the sidebar with content up to 880px, and the Home eyebrow uses the same uppercase style and position as the other pages.
+- Home tiles use an in-app arrow instead of the external-link glyph and each has a one-line description; "View history" hides until there is history; a 24px fade sits where pages scroll under the footer.
+- Shortcuts & mic rows show their caption directly instead of repeating "Details", use sentence case (Cancel shortcut, Shortcut behavior, Input channel, Audio feedback, Output device, Mute while recording), the engine group is "Speech engine settings", and reset buttons say "Reset" next to the icon; setting rows are at least 56px tall.
+- Accent swatches get the same check badge as the particle cards.
+- Light mode draws thin accent marks (the active nav bar, quote rules) with a darker twin of the accent, derived for any accent by mixing toward black until it reaches 3:1 against the light background, because lime vanished on near-white.
+- Footer says "Updates off · v{version}" instead of "Update Checking Disabled • v{version}".
+
 - One home per setting: the recording indicator style and position moved from Advanced to Appearance, filler words and the personal dictionary live only in Writing, Theme only in Appearance, the AI cleanup on/off switch lives on the AI cleanup page, and Pause animations is one switch in Appearance (the Home and dock copies are gone); where a duplicate used to be, a short "Open Writing / Open Appearance" note points to the real one, because two controls for one setting left people unsure which one won.
 - The companion picker no longer shows two "selected" controls at once: "Dock look" (orb, emblem, buddy, avatar) is one dropdown, and the particle-pattern cards only appear for looks that actually have particles.
 - Renames in plain words: General is Shortcuts & mic, Models is Speech engine, Post Process is AI cleanup, "Import from…" is Import, "Test the voice" is Preview animation, Squiggle is Voice line, and the overlay is the Recording indicator; every locale file was updated (existing translations kept where the meaning did not change, English as the fallback where it did).
@@ -38,6 +53,7 @@
 - The footer model popover has a Manage models link, so it is never a dead end.
 - Undo after removing a voice action, like snippets already had.
 - Playwright checks for the keyboard shortcut chip, double-submit guards, the History error state, copy feedback, focus on section change, the skip link, the model popover, overlay listener cleanup, a hide racing a slow show, overlay status text and sizes, the 44px overlay avatar, reduced-motion bars, and dock tooltips and sizes.
+- Playwright checks that the pill's voice visual never overlaps the label (bounding boxes, all three visuals), the 56px pill and its lift, the red listening dot, the dock center showing the S emblem compact and expanded, onboarding having exactly one main button and the step count, and 40px selects.
 - Playwright checks for the three squiggle strands, the still squiggle under Reduce Motion, a single morphing avatar mouth, the single ring in the small pill, distinct companion cards with only the chosen one animating, and the neutral idle dot in the compact dock.
 - In-app release note 0.13.1 describing the polish; it shows once the app version reaches 0.13.1.
 

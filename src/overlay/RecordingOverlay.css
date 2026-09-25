@@ -50,14 +50,17 @@
      the card's max footprint (--ov-work-w for compact, --ov-open-w for Live),
      since the card is anchored flush to the screen edge in CSS. Keep overlay.rs
      in sync when these change. */
-  /* One stable frame for starting, listening and working: wide enough for the
-     "Listening" status text beside the dot, the voice visual and a real
-     cancel target. */
-  --ov-rest-w: 240px; /* compact pill (minimal, recording) */
-  --ov-pill-w: 240px; /* base width / Live pill before it opens or collapses */
-  --ov-work-w: 240px; /* working pill (transcribing / polishing) */
+  /* One stable frame for starting, listening and working: dot 10, gap 8,
+     status label, gap 12, a flexible voice-visual slot, gap 12, cancel 32.
+     264 leaves the slot ~100px, room for the 84px squiggle plus its fades. */
+  --ov-rest-w: 264px; /* compact pill (minimal, recording) */
+  --ov-pill-w: 264px; /* base width / Live pill before it opens or collapses */
+  --ov-work-w: 264px; /* working pill (transcribing / polishing) */
   --ov-open-w: 392px; /* Live panel, expanded */
-  --ov-base-h: 48px; /* control-row height (.sbase); fits the 44px avatar */
+  --ov-base-h: 56px; /* control-row height (.sbase); 40px avatar + 8px clearance */
+  /* Gap between the card and the window's screen-edge side, so the card's
+     outer shadow has room to draw instead of being cut off by the window. */
+  --ov-lift: 18px;
   --ov-enter-y: 8px; /* entry slide distance, from the screen edge */
   --ov-cap-max-h: 64px; /* max height of the scrolling live-text region */
 }
@@ -108,6 +111,8 @@
 .ov-stage {
   position: fixed;
   inset: 0;
+  box-sizing: border-box;
+  padding-bottom: var(--ov-lift);
   display: flex;
   justify-content: center; /* horizontal centering, kept for both forms */
   align-items: flex-end; /* bottom placement: flush to the bottom edge */
@@ -115,6 +120,8 @@
 }
 .ov-stage.top {
   align-items: flex-start; /* top placement: flush to the top edge */
+  padding-bottom: 0;
+  padding-top: var(--ov-lift);
   --ov-enter-y: -8px;
 }
 /* Screen-reader-only live status ("Listening", "Transcribing…"). */
@@ -183,22 +190,23 @@
   /* Never wider than the window: an unaccounted content zoom degrades to a
      narrower card instead of clipping. 2px = our border (no border-box reset). */
   max-width: calc(100vw - 2px);
-  border-radius: 24px;
+  border-radius: 28px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   flex: none; /* hold our own width; never let the stage flex shrink the card */
   transform-origin: bottom center;
   /* Recessed charcoal pill in both themes (the brand is silver on charcoal):
-     a hairline ring, a soft top highlight and an inner shadow. No outer
-     shadow, since the card sits flush to the window edge and it would clip. */
+     a hairline ring, a soft top highlight, an inner shadow, and a soft outer
+     shadow that fits inside the --ov-lift gap below the card. */
   position: relative;
   background: linear-gradient(180deg, #1c1f24 0%, #111316 100%);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
     inset 0 0 0 1px rgba(255, 255, 255, 0.03),
-    inset 0 -8px 14px rgba(0, 0, 0, 0.35);
+    inset 0 -8px 14px rgba(0, 0, 0, 0.35),
+    0 6px 16px -4px rgba(0, 0, 0, 0.45);
   /* The pill is always dark, so its text and hairlines use the dark set. */
   --color-text: #f4f6f8;
   --s-accent-soft: color-mix(
@@ -277,7 +285,10 @@
 .stext-cap {
   /* Vertical counterpart of the .scard clamp: show fewer lines rather than clip.
      20px = cap padding (12) + card borders (2) + 6px slack for zoom rounding. */
-  max-height: min(var(--ov-cap-max-h), calc(100vh - var(--ov-base-h) - 20px));
+  max-height: min(
+    var(--ov-cap-max-h),
+    calc(100vh - var(--ov-base-h) - var(--ov-lift) - 20px)
+  );
   overflow-y: auto;
   overscroll-behavior: contain;
   display: flex;
@@ -324,26 +335,26 @@
   }
 }
 
-/* base row — dot (left) | waveform (center) | timer + cancel (right).
-   Same structure for pill & panel; the dot stays anchored left in both. */
+/* base row: dot, status label, voice-visual slot, timer + cancel. The slot
+   takes the free space between the label and the cancel button and centers
+   its visual there, so the visual can never slide under the label. Same
+   structure for pill and panel; the dot stays anchored left in both. */
 .sbase {
   height: var(--ov-base-h);
   flex: none; /* the control row never squashes; only the text region gives */
-  padding: 0 10px;
-  display: grid;
-  /* Equal side columns (min 32px to hold the cancel button) keep the center
-     item — waveform or label — centered whether the pill is at min width or
-     content-sized. */
-  grid-template-columns: minmax(32px, 1fr) auto minmax(32px, 1fr);
+  box-sizing: border-box;
+  padding: 0 12px 0 16px;
+  display: flex;
   align-items: center;
+  gap: 12px;
 }
 .sbase-l {
   display: flex;
+  flex: none;
   min-width: 0;
-  gap: 7px;
-  padding-left: 5px;
+  max-width: 45%;
+  gap: 8px;
   align-items: center;
-  justify-self: start;
 }
 /* "Starting…" / "Listening": the state in words, readable with motion off. */
 .sstatus {
@@ -351,19 +362,44 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--s-muted);
 }
-.sbase-r {
+/* The voice-visual slot. Anything wider than the slot is clipped and its ends
+   fade out over 8px, so a long squiggle never draws over the label or X. */
+.svis {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
   display: flex;
   align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 8px,
+    #000 calc(100% - 8px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 8px,
+    #000 calc(100% - 8px),
+    transparent 100%
+  );
+}
+.sbase-r {
+  display: flex;
+  flex: none;
+  align-items: center;
   gap: 10px;
-  justify-self: end;
 }
 .sdot {
-  width: 7px;
-  height: 7px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   flex: none;
   box-sizing: border-box;
@@ -372,19 +408,21 @@
     opacity 180ms ease;
 }
 .sdot.ready {
-  background: var(--s-accent);
+  /* Red while we are listening: the universal "recording" signal. */
+  background: #ff5a5a;
   opacity: 1;
   animation: sdot-pulse 1.9s infinite;
 }
-/* A quiet neutral dot while the host has not delivered its first sample yet. */
+/* Silver while the host has not delivered its first sample yet (and in the
+   working states, which show a spinner instead of the dot). */
 .sdot.arming {
-  background: var(--s-muted);
-  opacity: 0.45;
+  background: #c7ccd4;
+  opacity: 0.7;
   animation: none;
 }
 @keyframes sdot-pulse {
   0% {
-    box-shadow: 0 0 0 0 var(--s-accent-soft);
+    box-shadow: 0 0 0 0 rgba(255, 90, 90, 0.35);
   }
   70% {
     box-shadow: 0 0 0 7px transparent;
@@ -409,7 +447,6 @@
   display: flex;
   align-items: center;
   gap: 3px;
-  padding-right: 8px;
   height: 18px;
   flex: none;
 }
@@ -430,7 +467,6 @@
 .ssquiggle {
   display: block;
   flex: none;
-  margin-right: 8px;
   color: var(--studio-accent, var(--s-accent));
   transition:
     color 180ms ease,
@@ -443,13 +479,13 @@
 .ssquiggle.arming .ssquiggle-core {
   stop-color: currentColor;
 }
-/* 44px so the mouth still reads when it opens (at 30px it was ~2px). */
+/* 40px in the 56px pill: 8px clearance above and below, and the mouth still
+   reads when it opens (at 30px it was ~2px). */
 .savatar {
   display: block;
   flex: none;
-  width: 44px;
-  height: 44px;
-  margin-right: 8px;
+  width: 40px;
+  height: 40px;
 }
 .swave.arming i {
   height: 6px !important;
@@ -537,17 +573,17 @@
   }
 }
 .swork-label {
-  font-size: 12px;
+  flex: 1 1 auto;
+  text-align: center;
+  font-size: 13px;
   color: var(--s-muted);
   white-space: nowrap;
-  padding: 0 8px; /* breathing room from the spinner / cancel when content-sized */
   /* Safety net: ellipsize rather than clip if a label exceeds the max pill width. */
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.srecording-dot,
 .swave i {
   background: var(--studio-accent, var(--color-logo-primary));
 }

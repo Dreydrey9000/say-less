@@ -193,6 +193,7 @@ function Dock() {
         <Tooltip label={t("dock.collapse")} placement="bottom" align="end">
           <button
             ref={collapseRef}
+            aria-label={t("dock.collapse")}
             disabled={!loaded || busy}
             onClick={() => setCompact(true)}
           >

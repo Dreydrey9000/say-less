@@ -36,22 +36,28 @@ tauri_panel! {
 // Native overlay window sizes (logical points). One window is reused for every
 // state and resized in `show_overlay_state`; each size need only be at least as
 // large as the card it hosts (the `--ov-*` vars in RecordingOverlay.css). The
-// card is CSS-anchored flush to the screen edge, so window height doesn't move
-// where the card sits — only OVERLAY_TOP_OFFSET / OVERLAY_BOTTOM_OFFSET do. Keep
+// card is CSS-anchored a fixed --ov-lift from the window's screen-edge side, so
+// window height doesn't move where the card sits; only OVERLAY_TOP_OFFSET /
+// OVERLAY_BOTTOM_OFFSET (plus that fixed lift) do. Keep
 // these in sync with the CSS card geometry.
 //
 // On Windows these sizes are additionally multiplied by the accessibility text
 // scale (see windows_text_scale_factor), which WebView2 applies as a zoom.
 //
-// Compact overlay (Minimal / transcribing / processing): one stable 240x48 pill
-// (--ov-rest-w / --ov-work-w, --ov-base-h; 48 tall so the 44px avatar fits),
-// plus a little slack.
-const OVERLAY_WIDTH: f64 = 280.0;
-const OVERLAY_HEIGHT: f64 = 58.0;
+// The card sits --ov-lift (18px) in from the window's screen-edge side so its
+// outer shadow has room to draw, and the window leaves ~6px on the far side
+// and ~12px on each end for the same shadow.
+//
+// Compact overlay (Minimal / transcribing / processing): one stable 264x56 pill
+// (--ov-rest-w / --ov-work-w, --ov-base-h; 56 tall so the 40px avatar has 8px
+// clearance). 266x58 with border, plus 18 lift and shadow room.
+const OVERLAY_WIDTH: f64 = 300.0;
+const OVERLAY_HEIGHT: f64 = 84.0;
 
-// Actual is 394x126 (48 row + 64 text + 12 padding + 2 border), plus slack.
-const OVERLAY_STREAM_WIDTH: f64 = 400.0;
-const OVERLAY_STREAM_HEIGHT: f64 = 128.0;
+// Card is 394x134 (56 row + 64 text + 12 padding + 2 border), plus 18 lift
+// and shadow room.
+const OVERLAY_STREAM_WIDTH: f64 = 420.0;
+const OVERLAY_STREAM_HEIGHT: f64 = 160.0;
 
 /// Overlay window size (logical) for a given UI state.
 fn overlay_dimensions(state: &str) -> (f64, f64) {
@@ -65,16 +71,19 @@ fn overlay_dimensions(state: &str) -> (f64, f64) {
 static LAST_MIC_LEVEL_EMIT: AtomicU64 = AtomicU64::new(0);
 const EMIT_THROTTLE_MS: u64 = 33; // ~30 FPS
 
+// Window offsets from the screen edge. The visible card sits a further 18px
+// (--ov-lift) in, so the card lands at: macOS top 46, bottom 18; Windows and
+// Linux top 18, bottom 40.
 #[cfg(target_os = "macos")]
-const OVERLAY_TOP_OFFSET: f64 = 46.0;
+const OVERLAY_TOP_OFFSET: f64 = 28.0;
 #[cfg(any(target_os = "windows", target_os = "linux"))]
-const OVERLAY_TOP_OFFSET: f64 = 4.0;
+const OVERLAY_TOP_OFFSET: f64 = 0.0;
 
 #[cfg(target_os = "macos")]
-const OVERLAY_BOTTOM_OFFSET: f64 = 15.0;
+const OVERLAY_BOTTOM_OFFSET: f64 = 0.0;
 
 #[cfg(any(target_os = "windows", target_os = "linux"))]
-const OVERLAY_BOTTOM_OFFSET: f64 = 40.0;
+const OVERLAY_BOTTOM_OFFSET: f64 = 22.0;
 
 /// Configures the edge and offset of a GTK layer surface. gtk-layer-shell
 /// commits anchor and margin changes itself, including while the surface is
@@ -783,21 +792,23 @@ mod tests {
 
     #[test]
     fn overlay_windows_fit_the_css_card_geometry() {
-        // The card is anchored flush to the window edge, so the native window
-        // must be at least the card's size (+2 for the 1px border each side).
+        // The card sits --ov-lift in from the window edge (room for its
+        // shadow), so the native window must hold the card (+2 for the 1px
+        // border each side) plus that lift.
         let border = 2.0;
+        let lift = css_px("--ov-lift");
         let (width, height) = overlay_dimensions("recording");
         let widest = css_px("--ov-rest-w").max(css_px("--ov-work-w"));
         assert!(width >= widest + border, "compact window too narrow");
         assert!(
-            height >= css_px("--ov-base-h") + border,
+            height >= css_px("--ov-base-h") + border + lift,
             "compact window too short"
         );
 
         // Live panel: control row + capped text region + 12px text padding.
         let (width, height) = overlay_dimensions("streaming");
         assert!(width >= css_px("--ov-open-w") + border);
-        assert!(height >= css_px("--ov-base-h") + css_px("--ov-cap-max-h") + 12.0 + border);
+        assert!(height >= css_px("--ov-base-h") + css_px("--ov-cap-max-h") + 12.0 + border + lift);
     }
 
     #[test]
@@ -854,7 +865,7 @@ mod tests {
                 OVERLAY_HEIGHT,
                 OverlayPosition::Bottom,
             ),
-            (3630, 2013, 420, 87)
+            (3615, 2001, 450, 126)
         );
         assert_eq!(
             windows_overlay_bounds(
@@ -866,7 +877,7 @@ mod tests {
                 OVERLAY_HEIGHT,
                 OverlayPosition::Top,
             ),
-            (3630, 6, 420, 87)
+            (3615, 0, 450, 126)
         );
     }
 
@@ -883,7 +894,7 @@ mod tests {
                 OVERLAY_STREAM_HEIGHT,
                 OverlayPosition::Bottom,
             ),
-            (-1530, 1030, 500, 160)
+            (-1543, 1013, 525, 200)
         );
     }
 
@@ -902,10 +913,10 @@ mod tests {
             OVERLAY_STREAM_HEIGHT,
             OverlayPosition::Bottom,
         );
-        // 400x128 logical at 1.25 DPI x 1.1 text, still centered horizontally.
-        assert_eq!((x, y, width, height), (-1555, 1014, 550, 176));
-        // Bottom edge unchanged from the 1.0 case above (1030 + 160).
-        assert_eq!(y + height, 1190);
+        // 420x160 logical at 1.25 DPI x 1.1 text, still centered horizontally.
+        assert_eq!((x, y, width, height), (-1569, 993, 578, 220));
+        // Bottom edge unchanged from the 1.0 case above (1013 + 200).
+        assert_eq!(y + height, 1213);
 
         let (_, top_y, _, _) = windows_overlay_bounds(
             monitor_position,
@@ -917,6 +928,6 @@ mod tests {
             OverlayPosition::Top,
         );
         // Top offset rides the DPI scale alone, so the top edge doesn't move.
-        assert_eq!(top_y, -195);
+        assert_eq!(top_y, -200);
     }
 }

@@ -31,7 +31,7 @@ const Footer: React.FC = () => {
         {/* Update Status */}
         <div className="flex items-center gap-1">
           <UpdateChecker />
-          <span>•</span>
+          <span aria-hidden="true">·</span>
           {/* eslint-disable-next-line i18next/no-literal-string */}
           <span>v{version}</span>
         </div>

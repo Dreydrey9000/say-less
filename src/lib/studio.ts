@@ -44,14 +44,41 @@ export const defaultStudio: StudioSettings = {
   overlay_visual: "bars",
   avatar: defaultAvatar,
 };
-/** True when black text/ink reads better than white on this hex color. */
-export function prefersDarkInk(hex: string) {
+/** WCAG relative luminance of a #rrggbb color. */
+function luminance(hex: string) {
   const channels = [1, 3, 5]
     .map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
     .map((v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
-  const luminance =
-    channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
-  return luminance > 0.179;
+  return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+}
+/** True when black text/ink reads better than white on this hex color. */
+export function prefersDarkInk(hex: string) {
+  return luminance(hex) > 0.179;
+}
+/** WCAG contrast ratio between two #rrggbb colors. */
+export function contrastRatio(a: string, b: string) {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  return (hi + 0.05) / (lo + 0.05);
+}
+/**
+ * The accent for thin marks (the active nav bar, quote rules) on the light
+ * background. Bright accents like lime vanish on near-white, so we mix toward
+ * black in small steps until the mark reaches 3:1 contrast. Accents that
+ * already pass come back unchanged.
+ */
+export function accentForLight(hex: string, background = "#fbfbfb") {
+  let out = hex;
+  for (let k = 1; k >= 0; k -= 0.02) {
+    out = `#${[1, 3, 5]
+      .map((i) =>
+        Math.round(parseInt(hex.slice(i, i + 2), 16) * k)
+          .toString(16)
+          .padStart(2, "0"),
+      )
+      .join("")}`;
+    if (contrastRatio(out, background) >= 3) return out;
+  }
+  return out;
 }
 export function applyAccent(accent: string) {
   if (!/^#[0-9a-f]{6}$/i.test(accent)) return;
@@ -59,6 +86,10 @@ export function applyAccent(accent: string) {
   document.documentElement.style.setProperty(
     "--studio-on-accent",
     prefersDarkInk(accent) ? "#000000" : "#ffffff",
+  );
+  document.documentElement.style.setProperty(
+    "--studio-accent-on-light",
+    accentForLight(accent),
   );
 }
 /** Fill fields a payload may lack (older saves, older test fixtures). */

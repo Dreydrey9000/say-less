@@ -148,36 +148,24 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
     >
       <div className="flex items-center space-x-1">
         <div className="relative" ref={dropdownRef}>
-          <button
-            type="button"
-            className={`px-2 py-1 text-sm font-semibold bg-mid-gray/10 border border-mid-gray/80 rounded min-w-[200px] text-start flex items-center justify-between transition-all duration-150 ${
-              isUpdating("selected_language")
-                ? "opacity-50 cursor-not-allowed"
-                : "hover:bg-logo-primary/10 cursor-pointer hover:border-logo-primary"
-            }`}
-            onClick={handleToggle}
-            disabled={isUpdating("selected_language")}
-          >
-            <span className="truncate">{selectedLanguageName}</span>
-            <svg
-              className={`w-4 h-4 ms-2 transition-transform duration-200 ${
-                isOpen ? "transform rotate-180" : ""
-              }`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          {/* Same look as every other select (App.css .sl-select), but a
+              custom list so the long language list can be searched. */}
+          <span className="sl-select-wrap">
+            <button
+              type="button"
+              className="sl-select-trigger text-start"
+              aria-haspopup="listbox"
+              aria-expanded={isOpen}
+              aria-label={`${t("settings.general.language.title")}: ${selectedLanguageName}`}
+              onClick={handleToggle}
+              disabled={isUpdating("selected_language")}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </button>
+              {selectedLanguageName}
+            </button>
+          </span>
 
           {isOpen && !isUpdating("selected_language") && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-mid-gray/80 rounded shadow-lg z-50 max-h-60 overflow-hidden">
+            <div className="absolute top-full start-0 min-w-[220px] mt-1 bg-background border border-mid-gray/80 rounded shadow-lg z-50 max-h-60 overflow-hidden">
               {/* Search input */}
               <div className="p-2 border-b border-mid-gray/80">
                 <input

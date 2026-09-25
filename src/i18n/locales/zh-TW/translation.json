@@ -188,7 +188,10 @@
       "loading": "The first dictation can take a few seconds while the speech engine starts up.",
       "done": "Start using Say Less",
       "skip": "Skip for now"
-    }
+    },
+    "step": "Step {{current}} of {{total}}",
+    "useEngine": "Use this engine",
+    "downloadEngine": "Download ({{size}})"
   },
   "modelSelector": {
     "custom": "自訂",
@@ -233,7 +236,7 @@
   },
   "settings": {
     "modelSettings": {
-      "title": "{{model}} 設定"
+      "title": "Speech engine settings"
     },
     "general": {
       "title": "一般",
@@ -827,7 +830,8 @@
     "recheck": "Recheck permissions",
     "actionFailed": "Could not run that voice action. Check its destination in Voice actions.",
     "actionOpened": "Voice action opened its destination.",
-    "open": "Open {{page}}"
+    "open": "Open {{page}}",
+    "resetLabel": "Reset"
   },
   "writing": {
     "title": "Writing",
@@ -1036,7 +1040,10 @@
       "recording": "Listening…",
       "transcribing": "Typing it out…",
       "processing": "Typing it out…"
-    }
+    },
+    "lookHint": "Colors, the dock, and what shows while you talk",
+    "wordsHint": "Names and terms we should spell right",
+    "actionsHint": "Say a cue to open an app or a website"
   },
   "companion": {
     "title": "Particle pattern",
@@ -1226,6 +1233,8 @@
       "developers": "For developers: setup commands"
     },
     "analyzed_one": "Based on {{count}} dictation.",
-    "analyzed_other": "Based on {{count}} dictations."
+    "analyzed_other": "Based on {{count}} dictations.",
+    "mentionsUnit_one": "mention",
+    "mentionsUnit_other": "mentions"
   }
 }

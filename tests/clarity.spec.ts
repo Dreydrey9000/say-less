@@ -63,6 +63,16 @@ test("onboarding recommends one engine, then guides a first dictation", async ({
   await expect(
     page.getByRole("heading", { name: "Parakeet Unified" }),
   ).toBeVisible();
+  // Permissions were already granted, so setup is two steps.
+  await expect(page.getByText("Step 1 of 2")).toBeVisible();
+  // Exactly one main action: the engine already here needs no download.
+  await expect(page.locator(".accent-action")).toHaveCount(1);
+  await expect(page.locator(".accent-action")).toHaveText("Use this engine");
+  await expect(
+    page.getByRole("button", { name: "Download (600 MB)" }),
+  ).toBeVisible();
+  // Every engine here scores the same, so the bars would say nothing.
+  await expect(page.getByText("accuracy", { exact: true })).toHaveCount(0);
   for (const other of ["Canary Flash", "Whisper Small", "Moonshine Tiny"])
     await expect(page.getByRole("heading", { name: other })).toHaveCount(0);
   await page.getByRole("button", { name: "See other engines (3)" }).click();
@@ -70,10 +80,11 @@ test("onboarding recommends one engine, then guides a first dictation", async ({
     page.getByRole("heading", { name: "Whisper Small" }),
   ).toBeVisible();
 
-  await page.getByRole("heading", { name: "Nemotron Streaming 3.5" }).click();
+  await page.getByRole("button", { name: "Use this engine" }).click();
   await expect(
     page.getByRole("heading", { name: "Try it once" }),
   ).toBeVisible();
+  await expect(page.getByText("Step 2 of 2")).toBeVisible();
   await expect(
     page.getByText("Press Globe key to", { exact: false }),
   ).toBeVisible();

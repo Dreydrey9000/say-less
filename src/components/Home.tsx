@@ -4,7 +4,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { type } from "@tauri-apps/plugin-os";
-import { Copy, ArrowUpRight, Share2 } from "lucide-react";
+import { Copy, ArrowRight, ArrowUpRight, Share2 } from "lucide-react";
 import { formatKeyCombination } from "@/lib/utils/keyboard";
 import type { HistoryEntry, PaginatedHistory } from "@/bindings";
 import { useSettings } from "@/hooks/useSettings";
@@ -84,7 +84,7 @@ export function Home({
   };
   return (
     <main className="say-home">
-      <p className="home-kicker">{t("home.local")}</p>
+      <p className="page-eyebrow">{t("home.local")}</p>
       <section className="home-stage">
         <div className="home-intro">
           <h1>{t("home.headline")}</h1>
@@ -173,27 +173,40 @@ export function Home({
       <section className="home-tools" aria-label={t("home.tools")}>
         {(
           [
-            ["studio", "home.look"],
-            ["writing", "home.words"],
-            ["actions", "home.actions"],
+            ["studio", "home.look", "home.lookHint"],
+            ["writing", "home.words", "home.wordsHint"],
+            ["actions", "home.actions", "home.actionsHint"],
           ] as const
-        ).map(([section, label]) => (
+        ).map(([section, label, hint]) => (
           <button
             type="button"
             key={section}
+            aria-labelledby={`home-tool-${section}`}
+            aria-describedby={`home-tool-${section}-hint`}
             onClick={() => onNavigate?.(section)}
           >
-            <span>{t(label)}</span>
-            <ArrowUpRight size={18} />
+            <span className="home-tool-text">
+              <span id={`home-tool-${section}`} className="home-tool-title">
+                {t(label)}
+              </span>
+              <span id={`home-tool-${section}-hint`} className="home-tool-hint">
+                {t(hint)}
+              </span>
+            </span>
+            {/* A plain arrow: these open a page in the app, not a website. */}
+            <ArrowRight size={18} aria-hidden="true" />
           </button>
         ))}
       </section>
       <section className="home-history">
         <header>
           <h2>{t("home.recent")}</h2>
-          <button type="button" onClick={() => onNavigate?.("history")}>
-            {t("home.allHistory")}
-          </button>
+          {/* Nothing to show yet, so no link to an empty page. */}
+          {entries.length > 0 && (
+            <button type="button" onClick={() => onNavigate?.("history")}>
+              {t("home.allHistory")}
+            </button>
+          )}
         </header>
         {loading ? (
           <WorkingStatus label={t("home.loading")} />
