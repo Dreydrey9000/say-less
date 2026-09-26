@@ -44,7 +44,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,600..800&display=swap"
       rel="stylesheet"
     />
     <style>
@@ -61,24 +61,31 @@
         --silver-lo: #7d848f;
         --focus: #e6ebf2;
         --radius: 18px;
-        --shadow:
-          0 1px 1px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.35),
-          0 16px 32px rgba(0, 0, 0, 0.35);
+        --font-body: Manrope, system-ui, sans-serif;
+        --font-display: "Bricolage Grotesque", Manrope, system-ui, sans-serif;
+        /* elevation ladder: 1 = resting card, 2 = raised card, 3 = floating window */
+        --elev-1:
+          inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 1px 2px rgba(0, 0, 0, 0.4);
+        --elev-2:
+          inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 2px 4px rgba(0, 0, 0, 0.4),
+          0 12px 28px rgba(0, 0, 0, 0.45);
+        --elev-3:
+          inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 1px 1px rgba(0, 0, 0, 0.5),
+          0 8px 16px rgba(0, 0, 0, 0.45), 0 32px 64px rgba(0, 0, 0, 0.55);
+        --shadow: var(--elev-3);
       }
       * {
         box-sizing: border-box;
       }
       html {
         scroll-behavior: smooth;
+        scroll-padding-top: 80px;
       }
       body {
         margin: 0;
         background: var(--bg);
         color: var(--text);
-        font:
-          400 17px/1.6 Inter,
-          system-ui,
-          sans-serif;
+        font: 400 17px/1.6 var(--font-body);
         -webkit-font-smoothing: antialiased;
       }
       a {
@@ -91,9 +98,10 @@
       h1,
       h2,
       h3 {
-        font-family: "Inter Tight", Inter, sans-serif;
-        letter-spacing: -0.02em;
-        line-height: 1.08;
+        font-family: var(--font-display);
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1.04;
         margin: 0;
       }
       .wrap {
@@ -125,7 +133,7 @@
         position: sticky;
         top: 0;
         z-index: 5;
-        background: rgba(10, 10, 11, 0.8);
+        background: rgba(10, 10, 11, 0.94);
         backdrop-filter: blur(12px);
         border-bottom: 1px solid var(--line);
       }
@@ -175,15 +183,16 @@
         min-height: 48px;
         padding: 0 22px;
         border-radius: 999px;
-        font:
-          600 16px/1 Inter,
-          sans-serif;
+        font: 600 16px/1 var(--font-body);
         text-decoration: none;
         border: 1px solid transparent;
         cursor: pointer;
         transition:
           transform 0.15s ease,
-          background 0.15s ease;
+          background 0.15s ease,
+          box-shadow 0.15s ease,
+          filter 0.15s ease,
+          border-color 0.15s ease;
       }
       .btn-silver {
         color: #0b0c0e;
@@ -199,6 +208,16 @@
       }
       .btn-silver:hover {
         transform: translateY(-1px);
+        background: linear-gradient(
+          180deg,
+          #ffffff,
+          var(--silver-hi) 45%,
+          var(--silver)
+        );
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 1),
+          0 0 0 3px rgba(201, 206, 214, 0.28),
+          0 8px 22px rgba(201, 206, 214, 0.3);
       }
       .btn-ghost {
         color: var(--text);
@@ -206,7 +225,38 @@
         border-color: var(--line-2);
       }
       .btn-ghost:hover {
-        background: var(--bg-2);
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--silver-lo);
+      }
+      .tag {
+        display: inline-block;
+        background: #0b0c0e;
+        color: var(--silver-hi);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 4px 8px;
+        border-radius: 999px;
+        line-height: 1;
+      }
+      .alt {
+        color: var(--muted);
+        font-size: 14px;
+        margin: 12px 0 0;
+      }
+      .alt a {
+        display: inline-block;
+        color: var(--text);
+        text-underline-offset: 3px;
+        white-space: nowrap;
+        padding: 12px 0;
+        line-height: 20px;
+        margin: -12px 0;
+      }
+      .btn-ghost .tag {
+        background: var(--line-2);
+        color: var(--text);
       }
       .btn[aria-disabled="true"] {
         cursor: default;
@@ -224,6 +274,11 @@
         padding: 0 16px;
         font-size: 14px;
       }
+      @media (max-width: 640px) {
+        .nav-cta {
+          margin-left: auto;
+        }
+      }
 
       /* hero */
       .hero {
@@ -236,16 +291,19 @@
         align-items: center;
       }
       .eyebrow {
-        display: inline-block;
-        color: var(--muted);
+        display: block;
+        color: var(--silver);
         font-size: 14px;
-        border: 1px solid var(--line-2);
-        border-radius: 999px;
-        padding: 5px 12px;
-        margin-bottom: 22px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 20px;
       }
       .hero h1 {
-        font-size: clamp(48px, 7.5vw, 92px);
+        font-size: clamp(56px, 8vw, 104px);
+        font-weight: 800;
+        letter-spacing: -0.045em;
+        line-height: 0.98;
       }
       .hero h1 span {
         background: linear-gradient(
@@ -271,12 +329,13 @@
       .facts {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px 20px;
-        margin: 28px 0 0;
+        gap: 8px 22px;
+        margin: 26px 0 0;
         padding: 0;
         list-style: none;
-        color: var(--dim);
-        font-size: 14px;
+        color: var(--muted);
+        font-size: 15px;
+        font-weight: 500;
       }
       .facts li::before {
         content: "";
@@ -296,10 +355,16 @@
       @media (max-width: 880px) {
         .hero .wrap {
           grid-template-columns: 1fr;
-          gap: 40px;
+          gap: 36px;
         }
         .hero {
-          padding: 48px 0 64px;
+          padding: 40px 0 44px;
+        }
+      }
+      @media (max-width: 640px) {
+        .ctas .btn {
+          flex: 1 1 100%;
+          justify-content: center;
         }
       }
 
@@ -309,11 +374,11 @@
       }
       .demo-emblem {
         position: absolute;
-        right: -30px;
-        top: -60px;
-        width: 260px;
+        right: 24px;
+        top: -44px;
+        width: 176px;
         opacity: 0.95;
-        filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.6));
+        filter: drop-shadow(0 24px 32px rgba(0, 0, 0, 0.6));
         pointer-events: none;
       }
       .window {
@@ -321,9 +386,9 @@
         background: var(--bg-2);
         border: 1px solid var(--line-2);
         border-radius: var(--radius);
-        box-shadow: var(--shadow);
+        box-shadow: var(--elev-3);
         overflow: hidden;
-        margin-top: 120px;
+        margin-top: 150px;
       }
       .window-bar {
         display: flex;
@@ -410,14 +475,57 @@
       .pill.idle {
         opacity: 0;
       }
+      .pill.idle .bars b {
+        animation: none;
+      }
+      .caret.still {
+        animation: none;
+      }
+      .hero-copy {
+        position: relative;
+      }
+      .hero-mark {
+        display: none;
+      }
       @media (max-width: 880px) {
         .demo-emblem {
-          width: 170px;
-          right: 0;
-          top: -40px;
+          display: none;
         }
         .window {
-          margin-top: 80px;
+          margin-top: 0;
+        }
+        .hero-mark {
+          display: block;
+          position: absolute;
+          right: 0;
+          top: 44px;
+          width: 76px;
+          height: 76px;
+          filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.6));
+          pointer-events: none;
+        }
+      }
+
+      /* make it yours */
+      .yours {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 48px;
+        align-items: center;
+      }
+      .face {
+        width: 240px;
+        height: 240px;
+        filter: drop-shadow(0 24px 32px rgba(0, 0, 0, 0.55));
+      }
+      @media (max-width: 880px) {
+        .yours {
+          grid-template-columns: 1fr;
+          gap: 32px;
+        }
+        .face {
+          width: 180px;
+          height: 180px;
         }
       }
 
@@ -425,6 +533,11 @@
       section {
         padding: 88px 0;
         border-top: 1px solid var(--line);
+      }
+      @media (max-width: 640px) {
+        section {
+          padding: 48px 0;
+        }
       }
       .kicker {
         color: var(--silver-lo);
@@ -435,7 +548,8 @@
         margin-bottom: 14px;
       }
       h2 {
-        font-size: clamp(34px, 4.6vw, 56px);
+        font-size: clamp(36px, 4.8vw, 60px);
+        letter-spacing: -0.035em;
         max-width: 18ch;
       }
       .sub {
@@ -447,7 +561,7 @@
       /* steps */
       .steps {
         display: grid;
-        grid-template-columns: 1.3fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr;
         gap: 16px;
         margin-top: 48px;
         counter-reset: s;
@@ -457,9 +571,12 @@
         border: 1px solid var(--line);
         border-radius: var(--radius);
         padding: 26px;
+        box-shadow: var(--elev-1);
       }
       .step:first-child {
-        padding: 32px;
+        border-color: var(--line-2);
+        background: linear-gradient(180deg, #16181c, #111215);
+        box-shadow: var(--elev-2);
       }
       .step h3 {
         font-size: 22px;
@@ -477,17 +594,27 @@
         height: 40px;
         padding: 0 12px;
         border-radius: 10px;
-        font:
-          600 15px Inter,
-          sans-serif;
+        font: 600 15px var(--font-body);
         color: var(--text);
         background: linear-gradient(180deg, #26282e, #1a1c20);
         border: 1px solid var(--line-2);
         box-shadow: 0 3px 0 #050506;
       }
       .num {
+        display: block;
         color: var(--dim);
         font-size: 14px;
+      }
+      .keys {
+        display: flex;
+        gap: 6px;
+        margin: 4px 0 0;
+      }
+      .alt-key {
+        display: block;
+        color: var(--dim);
+        font-size: 14px;
+        margin: 10px 0 14px;
       }
       @media (max-width: 880px) {
         .steps {
@@ -507,10 +634,12 @@
         border-radius: var(--radius);
         padding: 26px;
         background: var(--bg-2);
+        box-shadow: var(--elev-1);
       }
       .flow.ours {
         border-color: var(--line-2);
         background: linear-gradient(180deg, #16181c, #111215);
+        box-shadow: var(--elev-2);
       }
       .flow h3 {
         font-size: 18px;
@@ -541,6 +670,18 @@
       .arrow {
         color: var(--dim);
       }
+      @media (max-width: 640px) {
+        .chain {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 6px;
+        }
+        .arrow {
+          display: inline-block;
+          transform: rotate(90deg);
+          margin-left: 18px;
+        }
+      }
       .flow p {
         color: var(--dim);
         font-size: 15px;
@@ -565,6 +706,7 @@
         border-radius: var(--radius);
         padding: 26px;
         grid-column: span 2;
+        box-shadow: var(--elev-1);
       }
       .feature.wide {
         grid-column: span 3;
@@ -635,6 +777,50 @@
       }
       td.them {
         color: var(--dim);
+      }
+      @media (max-width: 640px) {
+        .table-wrap {
+          overflow: visible;
+          border: 0;
+          border-radius: 0;
+          margin-top: 32px;
+        }
+        table {
+          min-width: 0;
+        }
+        thead {
+          position: absolute;
+          left: -9999px;
+        }
+        tbody tr {
+          display: block;
+          background: var(--bg-2);
+          border: 1px solid var(--line);
+          border-radius: 14px;
+          box-shadow: var(--elev-1);
+          padding: 14px 16px 6px;
+          margin-bottom: 10px;
+        }
+        tbody th {
+          display: block;
+          padding: 0 0 10px;
+          border: 0;
+          font-size: 16px;
+        }
+        tbody td {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          padding: 8px 0;
+          border: 0;
+          border-top: 1px solid var(--line);
+          font-size: 15px;
+        }
+        tbody td::before {
+          content: attr(data-label);
+          color: var(--dim);
+          font-weight: 500;
+        }
       }
 
       /* faq */
@@ -755,43 +941,54 @@
     <main id="main">
       <header class="hero">
         <div class="wrap">
-          <div>
-            <span class="eyebrow"
-              >Free for our coaching group, and for everyone else</span
-            >
+          <div class="hero-copy">
+            <img
+              class="hero-mark"
+              src="/assets/emblem-640-alpha.webp"
+              alt=""
+              width="76"
+              height="76"
+            />
+            <span class="eyebrow">Free dictation for Mac and Windows</span>
             <h1>Talk.<br /><span>It types.</span></h1>
             <p class="lede">
-              Hold a key, say what you mean, and the words show up wherever your
-              cursor is. Email, Slack, ChatGPT, anything.
+              Hold a key, talk, and the words land wherever your cursor is.
+              Email, Slack, ChatGPT, anything. Your voice never leaves your
+              laptop.
             </p>
             <div class="ctas" data-downloads>
               <a class="btn btn-silver" data-os="mac" href="#download"
-                >Download for Mac</a
+                >Download for Mac <span class="tag">Free</span></a
               >
               <a class="btn btn-ghost" data-os="windows" href="#download"
-                >Download for Windows</a
+                >Download for Windows <span class="tag">Free</span></a
               >
             </div>
-            <p class="status" data-intel>Mac button is for Apple Silicon (M1 and newer). Intel Mac: <a href="https://github.com/Dreydrey9000/say-less/releases/download/v0.13.1/Say.Less_0.13.1_x64.dmg">download here</a>.</p>
+            <p class="alt">
+              Mac button is for Apple Silicon.
+              <a
+                href="https://github.com/Dreydrey9000/say-less/releases/download/v0.13.1/Say.Less_0.13.1_x64.dmg"
+                >Intel Mac? Get the Intel version.</a
+              >
+            </p>
             <p class="status" data-status hidden>
               Downloads open soon. The first public release is being built and
               signed right now.
             </p>
             <ul class="facts">
-              <li>Free, no subscription</li>
-              <li>No account</li>
+              <li>Free, no account</li>
               <li>Works offline</li>
-              <li>Made for everyday laptops</li>
+              <li>Runs on everyday laptops</li>
             </ul>
           </div>
 
           <div class="demo" aria-hidden="true">
             <img
               class="demo-emblem"
-              src="/assets/emblem-640.webp"
+              src="/assets/emblem-640-alpha.webp"
               alt=""
-              width="260"
-              height="260"
+              width="176"
+              height="176"
             />
             <div class="window">
               <div class="window-bar"><i></i><i></i><i></i></div>
@@ -815,13 +1012,13 @@
           <h2>Three steps. The first one is the whole trick.</h2>
           <div class="steps">
             <div class="step">
-              <kbd>Option</kbd> <kbd>Space</kbd>
-              <span class="num">&nbsp; Ctrl + Space on Windows</span>
+              <span class="num">Step 1</span>
               <h3>Hold your shortcut</h3>
+              <span class="keys"><kbd>Option</kbd> <kbd>Space</kbd></span>
+              <span class="alt-key">Windows: Ctrl + Space</span>
               <p>
                 Click into any text box, anywhere on your computer, and hold the
-                keys down. Or tap once to keep it listening. You can change the
-                keys.
+                keys. Or tap once to keep it listening.
               </p>
             </div>
             <div class="step">
@@ -977,13 +1174,68 @@
 
       <section id="make-it-yours">
         <div class="wrap">
-          <p class="kicker">Make it yours</p>
-          <h2>A little face that talks when you do.</h2>
-          <p class="sub">
-            Swap the audio bars for a squiggle that moves with your voice, or
-            build an avatar that mouths along while you talk. Stick figure,
-            person, or animal. Pick the colors. Add a hat.
-          </p>
+          <div class="yours">
+            <div>
+              <p class="kicker">Make it yours</p>
+              <h2>A little face that talks when you do.</h2>
+              <p class="sub">
+                Swap the audio bars for a squiggle that moves with your voice,
+                or build an avatar that mouths along while you talk. Stick
+                figure, person, or animal. Pick the colors. Add a hat.
+              </p>
+            </div>
+            <svg
+              class="face"
+              viewBox="0 0 240 240"
+              role="img"
+              aria-label="A round chrome avatar with voice bars for eyes, an open mouth and a small hat"
+            >
+              <defs>
+                <linearGradient id="chrome" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#f4f6f8" />
+                  <stop offset="0.5" stop-color="#c9ced6" />
+                  <stop offset="1" stop-color="#7d848f" />
+                </linearGradient>
+                <linearGradient id="hat" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#30333a" />
+                  <stop offset="1" stop-color="#111215" />
+                </linearGradient>
+              </defs>
+              <circle cx="120" cy="132" r="88" fill="url(#chrome)" />
+              <circle
+                cx="120"
+                cy="132"
+                r="88"
+                fill="none"
+                stroke="#f4f6f8"
+                stroke-opacity="0.5"
+              />
+              <g fill="#0a0a0b">
+                <rect x="78" y="112" width="6" height="22" rx="3" />
+                <rect x="88" y="102" width="6" height="42" rx="3" />
+                <rect x="98" y="116" width="6" height="14" rx="3" />
+                <rect x="136" y="116" width="6" height="14" rx="3" />
+                <rect x="146" y="102" width="6" height="42" rx="3" />
+                <rect x="156" y="112" width="6" height="22" rx="3" />
+              </g>
+              <ellipse cx="120" cy="170" rx="16" ry="11" fill="#0a0a0b" />
+              <ellipse cx="120" cy="176" rx="8" ry="4" fill="#7d848f" />
+              <rect
+                x="66"
+                y="52"
+                width="108"
+                height="10"
+                rx="5"
+                fill="url(#hat)"
+                stroke="#30333a"
+              />
+              <path
+                d="M84 54 L92 20 H148 L156 54 Z"
+                fill="url(#hat)"
+                stroke="#30333a"
+              />
+            </svg>
+          </div>
         </div>
       </section>
 
@@ -991,7 +1243,11 @@
         <div class="wrap">
           <p class="kicker">The difference</p>
           <h2>Same job. None of the bill.</h2>
-          <div class="table-wrap">
+          <div
+            class="table-wrap"
+            role="region"
+            aria-label="Say Less compared with paid dictation apps"
+          >
             <table>
               <thead>
                 <tr>
@@ -1003,28 +1259,32 @@
               <tbody>
                 <tr>
                   <th scope="row">Price</th>
-                  <td class="us">Free</td>
-                  <td class="them">Monthly subscription</td>
+                  <td class="us" data-label="Say Less">Free</td>
+                  <td class="them" data-label="Typical paid dictation">
+                    Monthly subscription
+                  </td>
                 </tr>
                 <tr>
                   <th scope="row">Works without internet</th>
-                  <td class="us">Yes</td>
-                  <td class="them">Usually no</td>
+                  <td class="us" data-label="Say Less">Yes</td>
+                  <td class="them" data-label="Typical paid dictation">
+                    Usually no
+                  </td>
                 </tr>
                 <tr>
                   <th scope="row">Account required</th>
-                  <td class="us">No</td>
-                  <td class="them">Yes</td>
+                  <td class="us" data-label="Say Less">No</td>
+                  <td class="them" data-label="Typical paid dictation">Yes</td>
                 </tr>
                 <tr>
                   <th scope="row">Audio leaves your computer</th>
-                  <td class="us">Never</td>
-                  <td class="them">Yes</td>
+                  <td class="us" data-label="Say Less">Never</td>
+                  <td class="them" data-label="Typical paid dictation">Yes</td>
                 </tr>
                 <tr>
                   <th scope="row">Open source</th>
-                  <td class="us">Yes</td>
-                  <td class="them">No</td>
+                  <td class="us" data-label="Say Less">Yes</td>
+                  <td class="them" data-label="Typical paid dictation">No</td>
                 </tr>
               </tbody>
             </table>
@@ -1103,7 +1363,7 @@
       <section id="download" class="final">
         <div class="wrap">
           <img
-            src="/assets/emblem-640.webp"
+            src="/assets/emblem-640-alpha.webp"
             alt="Say Less logo, a silver S shaped like a speech bubble"
             width="180"
             height="180"
@@ -1113,13 +1373,19 @@
             <p class="sub">Download Say Less, hold a key, and talk.</p>
             <div class="ctas" style="margin-top: 28px" data-downloads>
               <a class="btn btn-silver" data-os="mac" href="#download"
-                >Download for Mac</a
+                >Download for Mac <span class="tag">Free</span></a
               >
               <a class="btn btn-ghost" data-os="windows" href="#download"
-                >Download for Windows</a
+                >Download for Windows <span class="tag">Free</span></a
               >
             </div>
-            <p class="status" data-intel>Mac button is for Apple Silicon (M1 and newer). Intel Mac: <a href="https://github.com/Dreydrey9000/say-less/releases/download/v0.13.1/Say.Less_0.13.1_x64.dmg">download here</a>.</p>
+            <p class="alt">
+              Mac button is for Apple Silicon.
+              <a
+                href="https://github.com/Dreydrey9000/say-less/releases/download/v0.13.1/Say.Less_0.13.1_x64.dmg"
+                >Intel Mac? Get the Intel version.</a
+              >
+            </p>
             <p class="status" data-status hidden>
               Downloads open soon. The first public release is being built and
               signed right now.
@@ -1176,6 +1442,7 @@
       const shareBtn = document.querySelector("[data-share]");
       const shareDone = document.querySelector("[data-share-done]");
       shareBtn.addEventListener("click", async () => {
+        shareDone.textContent = "";
         const data = {
           title: "Say Less",
           text: "Free dictation for Mac and Windows. Hold a key, talk, it types. Nothing leaves your computer.",
@@ -1184,6 +1451,7 @@
         try {
           if (navigator.share) {
             await navigator.share(data);
+            shareDone.textContent = "Sent.";
             return;
           }
           await navigator.clipboard.writeText(data.url);
@@ -1202,25 +1470,46 @@
       ];
       const out = document.querySelector("[data-typed]");
       const pill = document.querySelector("[data-pill]");
+      const caret = document.querySelector(".caret");
+      const demoWindow = document.querySelector(".window");
       const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
       const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      // Pause the demo while it is off screen, and stop for good after 2 full cycles.
+      let onScreen = true;
+      if ("IntersectionObserver" in window) {
+        new IntersectionObserver((entries) => {
+          onScreen = entries[0].isIntersecting;
+        }).observe(demoWindow);
+      }
+      const whenVisible = async () => {
+        while (!onScreen) await wait(400);
+      };
+      function finish() {
+        pill.classList.add("idle");
+        caret.classList.add("still");
+      }
       async function loop() {
         if (reduced) {
           out.textContent = lines[0];
+          finish();
           return;
         }
-        for (let i = 0; ; i = (i + 1) % lines.length) {
+        const total = lines.length * 2;
+        for (let n = 0; n < total; n++) {
+          const line = lines[n % lines.length];
+          await whenVisible();
           out.textContent = "";
           pill.classList.remove("idle");
           await wait(1800);
           pill.classList.add("idle");
-          const words = lines[i].split(" ");
-          for (const w of words) {
+          for (const w of line.split(" ")) {
+            await whenVisible();
             out.textContent += (out.textContent ? " " : "") + w;
             await wait(55);
           }
           await wait(2600);
         }
+        finish();
       }
       loop();
     </script>
