@@ -1,0 +1,23 @@
+PROMPT (as given):
+Square avatar portrait for a desktop app. Subject: a chubby brown bear cub with small round ears and a lighter tan muzzle. Framing: close head-and-shoulders bust, facing the camera straight on, perfectly centered, the head is large (about 55 percent of the frame height) with the eyes on the horizontal center line of the frame, a little of the shoulders visible at the bottom edge. Face: two simple glossy dark bead eyes, calm friendly look, and NO mouth at all: the lower half of the face is smooth and blank, because a talking mouth is animated on top of it later. Animals keep a small dark nose but still NO mouth. Style: soft 3D clay render like a premium designer vinyl toy: rounded simplified shapes, matte clay surface with very subtle texture, soft subsurface glow, muted sophisticated colors. Lighting: soft key light from the upper left and a gentle cool rim light. Background: one flat solid charcoal color (#22262E) filling the whole frame, no gradient, no floor, no props. No text, letters, numbers, logos or watermark anywhere; plain clothing without prints.
+
+PROMPT (as the generate_image tool received it):
+Square avatar portrait for a desktop app. Subject: a chubby brown bear cub with small round ears and a lighter tan muzzle. Framing: close head-and-shoulders bust, facing the camera straight on, perfectly centered, the head is large (about 55 percent of the frame height) with the eyes on the horizontal center line of the frame, a little of the shoulders visible at the bottom edge. Face: two simple glossy dark bead eyes, calm friendly look, and NO mouth at all: the lower half of the face is smooth and blank, because a talking mouth is animated on top of it later. Animals keep a small dark nose but still NO mouth. Style: soft 3D clay render like a premium designer vinyl toy: rounded simplified shapes, matte clay surface with very subtle texture, soft subsurface glow, muted sophisticated colors. Lighting: soft key light from the upper left and a gentle cool rim light. Background: one flat solid charcoal color (#22262E) filling the whole frame, no gradient, no floor, no props. No text, letters, numbers, logos or watermark anywhere; plain clothing without prints.
+
+provenance:
+  door: antigravity-image (~/.claude/skills/subpowers/bin)
+  date: 2026-09-26 00:43:42 -0400
+  agy: 1.2.11
+  auth: Antigravity OAuth subscription, isolated profile, zero MCP servers, no API key
+  driver model: gemini-3.8-flash-high (chain: gemini-3.8-flash-high:gemini-3.7-flash-high:default; effort high)
+  image model: gemini-3.1-flash-image (Gemini 3.1 Flash Image = Nano Banana 2), chosen server-side by Antigravity; recorded in the step record
+  C2PA: Google C2PA Core Generator Library; actions: Created by Google Generative AI + Applied imperceptible SynthID watermark (signed by Google LLC)
+  generate_image calls: 1; tool time: 8.406031s; door wall: 28s
+  aspect requested: 1:1; aspect passed: 1:1
+  references: 0; passed ImagePaths: none
+  requested size: 1024x1024
+  painter size: 1024x1024 (jpg)
+  delivered size: 1024x1024
+  signed original: ~/worktrees/say-less/avatar-pack/docs/avatars/raw/bear.original.jpg
+  agy conversation: f096439a-8a95-4964-9e90-c5823d007b10
+  bytes: 924088

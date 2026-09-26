@@ -1,0 +1,21 @@
+PROMPT (as given):
+Paint a NEW character in exactly the same art style, framing, lighting and flat charcoal background as the reference image (the reference only shows the style; do not copy its species or face). Subject: a red fox with big pointed ears, white cheeks and chest. Framing: close head-and-shoulders bust, facing the camera straight on, perfectly centered, the head is large (about 55 percent of the frame height) with the eyes on the horizontal center line of the frame. Face: two small simple glossy dark bead eyes like the reference, and absolutely NO mouth, NO lips and NO smile line: the lower half of the face is completely smooth and blank, because a talking mouth is animated on top of it later. A small dark nose is fine, but no mouth. Style: soft 3D clay render like a premium designer vinyl toy: rounded simplified shapes, matte clay surface with very subtle texture, muted sophisticated colors. Lighting: soft key light from the upper left and a gentle cool rim light. Background: one flat solid charcoal color (#22262E) filling the whole frame, no gradient, no floor, no props. No text, letters, numbers, logos or watermark anywhere.
+
+REVISED PROMPT (as returned by the image tool):
+Create one NEW image at 1024x1024 resolution, square aspect ratio. Use the attached reference only for its exact soft 3D clay / premium designer vinyl toy art style, close head-and-shoulders framing, and lighting, but create a NEW species and face: a red fox with big pointed ears, white cheeks and white chest. Straight-on front view, perfectly centered bust. Large head approximately 55 percent of frame height, small simple glossy dark bead eyes positioned on the horizontal center line of the image. Rounded simplified forms, matte clay surface with extremely subtle texture, muted sophisticated rusty red-orange, ivory white, and dark nose colors. ABSOLUTELY NO MOUTH, NO LIPS, NO SMILE LINE, NO muzzle seam or philtrum suggesting a mouth: the lower half of the face must be completely smooth and blank, suitable for later overlay animation of a talking mouth. A small dark nose is allowed. Soft key light from upper left and gentle cool rim lighting as in the reference. Background must be one perfectly flat solid charcoal color #22262E throughout, no gradient, no floor, no props. No text, letters, numbers, logos, watermark. Preserve the reference's beautiful soft toy-like sculptural rendering, not the bear species or bear face.
+
+provenance:
+  door: subpowers/bin/chatgpt-image (~/.claude/skills/subpowers/bin)
+  date: 2026-09-26 00:46:40 -0400
+  codex: codex-cli 0.153.4
+  driver model: gpt-6-astra (chain: gpt-6-astra:gpt-5.6-sol:gpt-5.6-terra:gpt-5.6-luna:default; reasoning high)
+  image model: OpenAI's current ChatGPT image model, chosen server-side (last confirmed: GPT Image 2.5, rolled to Codex 2026-09-08; flare vs sunburst is not visible on this path) | C2PA says: ChatGPT/gpt-image (signed by OpenAI)
+  references: 1 (~/worktrees/say-less/avatar-pack/docs/avatars/raw/bear.png )
+  requested size: 1024x1024
+  painter size: 1254x1254
+  delivered size: 1024x1024 (resized locally from 1254x1254; signed original kept at ~/worktrees/say-less/avatar-pack/docs/avatars/raw/fox.original.png)
+  codex rollout: ~/.codex/sessions/2026/09/26/rollout-2026-09-26T00-45-42-01a0dc08-8b02-7a61-9594-b57236388778.jsonl
+  transparent_background reported: False
+  image_gen saved_path: ~/.codex/generated_images/01a0dc08-8b02-7a61-9594-b57236388778/exec-5a47ca4a-5ca7-4526-885e-5de20b763a4f.png
+  tokens: input=62113 output=381
+  bytes: 1196786

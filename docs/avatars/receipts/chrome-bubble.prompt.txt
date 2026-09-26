@@ -1,0 +1,21 @@
+PROMPT (as given):
+Paint a NEW character in exactly the same art style, framing, lighting and flat charcoal background as the reference image (the reference only shows the style; do not copy its species or face). Subject: a character shaped like a rounded speech bubble made of polished silver chrome, with a short bubble tail at the lower left, reflecting soft studio light. Framing: close head-and-shoulders bust, facing the camera straight on, perfectly centered, the head is large (about 55 percent of the frame height) with the eyes on the horizontal center line of the frame. Face: two small simple glossy dark bead eyes like the reference, and absolutely NO mouth, NO lips and NO smile line: the lower half of the face is completely smooth and blank, because a talking mouth is animated on top of it later. The whole character is liquid silver chrome; the bead eyes are dark and glossy on the chrome. Style: soft 3D clay render like a premium designer vinyl toy: rounded simplified shapes, matte clay surface with very subtle texture, muted sophisticated colors. Lighting: soft key light from the upper left and a gentle cool rim light. Background: one flat solid charcoal color (#22262E) filling the whole frame, no gradient, no floor, no props. No text, letters, numbers, logos or watermark anywhere.
+
+REVISED PROMPT (as returned by the image tool):
+Create exactly one NEW image, 1024x1024 pixels. Use the attached image as the reference for soft premium designer vinyl toy 3D art style, front-facing centered bust composition, lighting and flat charcoal background only. Do not copy the bear species or bear face. Subject: an original character with a large rounded speech-bubble-shaped head made of polished liquid silver chrome, including a short integrated speech-bubble tail at the lower left. A simplified rounded silver chrome neck, shoulders and upper torso appear beneath it in a close head-and-shoulders bust, cropped by the lower frame edge. Facing the camera straight on, perfectly centered. The head occupies about 55 percent of the frame height; two small simple glossy dark bead eyes sit on the horizontal center line of the whole image. Absolutely NO mouth, NO lips, NO smile line, NO nose, and no facial seams: the entire lower half of the face is perfectly smooth and blank for later animated mouth overlay. Eyes are dark glossy beads on silver chrome. Whole character is liquid silver chrome with soft broad studio reflections, rounded simplified forms, very subtle tactile clay-like microtexture and premium sculpted vinyl-toy softness. Silver must visibly read as polished chrome, while retaining the soft rendering and restrained sophisticated palette of the reference. Soft studio key light from upper left and gentle cool rim light. One perfectly flat uniform solid charcoal background, exact color #22262E, filling the entire background; no gradient, no floor, no horizon, no props. No text, letters, numbers, logos or watermark anywhere.
+
+provenance:
+  door: subpowers/bin/chatgpt-image (~/.claude/skills/subpowers/bin)
+  date: 2026-09-26 00:47:42 -0400
+  codex: codex-cli 0.153.4
+  driver model: gpt-6-astra (chain: gpt-6-astra:gpt-5.6-sol:gpt-5.6-terra:gpt-5.6-luna:default; reasoning high)
+  image model: OpenAI's current ChatGPT image model, chosen server-side (last confirmed: GPT Image 2.5, rolled to Codex 2026-09-08; flare vs sunburst is not visible on this path) | C2PA says: ChatGPT/gpt-image (signed by OpenAI)
+  references: 1 (~/worktrees/say-less/avatar-pack/docs/avatars/raw/bear.png )
+  requested size: 1024x1024
+  painter size: 1254x1254
+  delivered size: 1024x1024 (resized locally from 1254x1254; signed original kept at ~/worktrees/say-less/avatar-pack/docs/avatars/raw/chrome-bubble.original.png)
+  codex rollout: ~/.codex/sessions/2026/09/26/rollout-2026-09-26T00-46-43-01a0dc09-789f-7df0-be6d-15c990c87fc1.jsonl
+  transparent_background reported: False
+  image_gen saved_path: ~/.codex/generated_images/01a0dc09-789f-7df0-be6d-15c990c87fc1/exec-a7ebde77-1343-45e4-80cd-7fe238ceb876.png
+  tokens: input=62237 output=440
+  bytes: 1009830

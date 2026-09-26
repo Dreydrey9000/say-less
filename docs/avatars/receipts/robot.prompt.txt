@@ -1,0 +1,21 @@
+PROMPT (as given):
+Paint a NEW character in exactly the same art style, framing, lighting and flat charcoal background as the reference image (the reference only shows the style; do not copy its species or face). Subject: a friendly round robot with a glossy white shell, a dark glass face plate, and a small antenna. Framing: close head-and-shoulders bust, facing the camera straight on, perfectly centered, the head is large (about 55 percent of the frame height) with the eyes on the horizontal center line of the frame. Face: two small simple glossy dark bead eyes like the reference, and absolutely NO mouth, NO lips and NO smile line: the lower half of the face is completely smooth and blank, because a talking mouth is animated on top of it later. The bead eyes glow soft cyan on the dark face plate. Style: soft 3D clay render like a premium designer vinyl toy: rounded simplified shapes, matte clay surface with very subtle texture, muted sophisticated colors. Lighting: soft key light from the upper left and a gentle cool rim light. Background: one flat solid charcoal color (#22262E) filling the whole frame, no gradient, no floor, no props. No text, letters, numbers, logos or watermark anywhere.
+
+REVISED PROMPT (as returned by the image tool):
+Create one NEW image, 1024x1024 square. Use the supplied reference only for its premium soft 3D clay designer vinyl toy art style, frontal centered head-and-shoulders framing and lighting; do NOT copy the bear species or face. Subject: a friendly round robot with a glossy white shell, a dark glass face plate, and a small antenna. Close head-and-shoulders bust, facing camera perfectly straight on, perfectly centered. Head large, about 55 percent of frame height, with eyes on the horizontal center line of the full image. Two small simple glossy bead eyes like reference but glowing soft cyan on dark face plate. Absolutely NO mouth, NO lips, NO smile line, NO mouth-like seams or symbols: the lower half of face plate must be completely smooth and blank for later animated mouth overlay. Soft 3D clay render, rounded simplified forms, subtly textured matte clay treatment balanced with glossy white shell and dark glass face plate, muted sophisticated colors. Soft upper-left key light and gentle cool rim light as in reference. Background must be one completely flat solid charcoal #22262E across entire frame, no gradient, no floor, no props. No text, letters, numbers, logos, or watermark anywhere.
+
+provenance:
+  door: subpowers/bin/chatgpt-image (~/.claude/skills/subpowers/bin)
+  date: 2026-09-26 00:47:40 -0400
+  codex: codex-cli 0.153.4
+  driver model: gpt-6-astra (chain: gpt-6-astra:gpt-5.6-sol:gpt-5.6-terra:gpt-5.6-luna:default; reasoning high)
+  image model: OpenAI's current ChatGPT image model, chosen server-side (last confirmed: GPT Image 2.5, rolled to Codex 2026-09-08; flare vs sunburst is not visible on this path) | C2PA says: ChatGPT/gpt-image (signed by OpenAI)
+  references: 1 (~/worktrees/say-less/avatar-pack/docs/avatars/raw/bear.png )
+  requested size: 1024x1024
+  painter size: 1254x1254
+  delivered size: 1024x1024 (resized locally from 1254x1254; signed original kept at ~/worktrees/say-less/avatar-pack/docs/avatars/raw/robot.original.png)
+  codex rollout: ~/.codex/sessions/2026/09/26/rollout-2026-09-26T00-46-43-01a0dc09-788c-70d3-9e6f-53a5359e52ea.jsonl
+  transparent_background reported: False
+  image_gen saved_path: ~/.codex/generated_images/01a0dc09-788c-70d3-9e6f-53a5359e52ea/exec-26c60466-2d9c-4688-aa5e-9a5d572f52cc.png
+  tokens: input=62164 output=371
+  bytes: 1000836
