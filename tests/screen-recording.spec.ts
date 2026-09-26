@@ -164,7 +164,11 @@ test("dock on Windows keeps the button focusable and says why", async ({
     name: "Screen recording is coming to Windows soon.",
   });
   await expect(button).toHaveAttribute("aria-disabled", "true");
-  await button.click();
+  // Playwright won't click an aria-disabled button, so use the keyboard:
+  // it must stay focusable and do nothing.
+  await button.focus();
+  await expect(button).toBeFocused();
+  await page.keyboard.press("Enter");
   expect(
     await page.evaluate(() =>
       (window as unknown as { testCommands: string[] }).testCommands.includes(
