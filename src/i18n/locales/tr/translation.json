@@ -1115,7 +1115,30 @@
     "recordingHint": "Recording now. The preview follows your voice.",
     "stillHint": "Motion is off (Pause animations or your system's Reduce Motion), so previews hold still.",
     "previewLabel": "Avatar preview: {{style}} with {{accessory}}",
-    "avatarNote": "Your avatar shows where you picked it: Avatar in the indicator animation above, or Your avatar as the dock look."
+    "avatarNote": "Your avatar shows where you picked it: Avatar in the indicator animation above, or Your avatar as the dock look.",
+    "gallery": "Pick a character",
+    "makeYourOwn": "Make your own",
+    "ringColor": "Ring color",
+    "presetPreviewLabel": "Avatar preview: {{name}}",
+    "presetNote": "These characters come with the app and work offline. Their mouth and eyes still move with your voice.",
+    "presets": {
+      "woman-curls": "Curls",
+      "man-beard": "Beard",
+      "silver-bob": "Silver bob",
+      "fade": "Fade",
+      "hijab": "Hijab",
+      "grey-hair": "Grey hair",
+      "cat": "Tabby",
+      "dog": "Puppy",
+      "fox": "Fox",
+      "frog": "Frog",
+      "bear": "Bear",
+      "owl": "Owl",
+      "robot": "Robot",
+      "alien": "Alien",
+      "chrome-bubble": "Chrome bubble",
+      "chrome-bot": "Chrome bot"
+    }
   },
   "corrections": {
     "title": "Names & corrections",

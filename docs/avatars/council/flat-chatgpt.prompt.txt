@@ -1,0 +1,21 @@
+PROMPT (as given):
+Square avatar portrait for a desktop app icon. Subject: a friendly woman in her thirties with warm brown skin and short natural curly hair, wearing a plain charcoal crewneck sweater. Framing: centered head-and-shoulders bust, facing the camera straight on, head filling the middle 60 percent of the frame, shoulders cut off by the bottom edge. Face: two simple dark eyes, calm friendly expression, and NO mouth at all: the lower half of the face is smooth and blank, because a talking mouth is animated on top of it later. Lighting: soft key light from the upper left and a gentle rim light. Style: premium flat vector illustration: clean geometric shapes, two-tone soft shading, very subtle grain, no outlines, limited modern palette, polished editorial look. Background: one flat solid charcoal color (#22262E) filling the whole frame, no gradient, no floor, no props. No text, letters, numbers, logos or watermark anywhere; plain clothing without prints.
+
+REVISED PROMPT (as returned by the image tool):
+Create one brand new image, exactly 1024x1024 pixels, square avatar portrait for a desktop app icon. Subject: a friendly woman in her thirties with warm brown skin and short natural curly hair, wearing a plain charcoal crewneck sweater. Framing: centered head-and-shoulders bust, facing the camera straight on, head filling the middle 60 percent of the frame, shoulders cut off by the bottom edge. Face: two simple dark eyes, calm friendly expression, and NO mouth at all: the lower half of the face is smooth and blank, because a talking mouth is animated on top of it later. No lips, no mouth line, no mouth-shaped shadow or mark. Lighting: soft key light from the upper left and a gentle rim light. Style: premium flat vector illustration: clean geometric shapes, two-tone soft shading, very subtle grain, no outlines, limited modern palette, polished editorial look. Background: one flat solid charcoal color (#22262E) filling the whole frame, no gradient, no floor, no props. No text, letters, numbers, logos or watermark anywhere; plain clothing without prints.
+
+provenance:
+  door: subpowers/bin/chatgpt-image (~/.claude/skills/subpowers/bin)
+  date: 2026-09-26 00:41:13 -0400
+  codex: codex-cli 0.153.4
+  driver model: gpt-6-astra (chain: gpt-6-astra:gpt-5.6-sol:gpt-5.6-terra:gpt-5.6-luna:default; reasoning high)
+  image model: OpenAI's current ChatGPT image model, chosen server-side (last confirmed: GPT Image 2.5, rolled to Codex 2026-09-08; flare vs sunburst is not visible on this path) | C2PA says: ChatGPT/gpt-image (signed by OpenAI)
+  references: 0
+  requested size: 1024x1024
+  painter size: 1254x1254
+  delivered size: 1024x1024 (resized locally from 1254x1254; signed original kept at ~/worktrees/say-less/avatar-pack/docs/avatars/council/flat-chatgpt.original.png)
+  codex rollout: ~/.codex/sessions/2026/09/26/rollout-2026-09-26T00-40-20-01a0dc03-9ff7-7df0-beda-17593ab63cc3.jsonl
+  transparent_background reported: False
+  image_gen saved_path: ~/.codex/generated_images/01a0dc03-9ff7-7df0-beda-17593ab63cc3/exec-d2591f98-ea1e-4af6-887d-15ae8ffea518.png
+  tokens: input=59151 output=308
+  bytes: 1169698

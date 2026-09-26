@@ -374,3 +374,148 @@ test("every select is one 40px control that fits its content", async ({
     .boundingBox();
   expect(Math.round(behavior!.height)).toBe(40);
 });
+
+/** Save studio settings the fixture reads on its next load. */
+async function seedStudio(page: Page, patch: Record<string, unknown>) {
+  await page.goto("/tests/fixtures/app.html");
+  await page.evaluate((extra) => {
+    const saved = JSON.parse(localStorage.getItem("test-studio") || "{}");
+    localStorage.setItem("test-studio", JSON.stringify({ ...saved, ...extra }));
+  }, patch);
+}
+
+const foxAvatar = {
+  kind: "person",
+  body: "#e2b48f",
+  accent: "#8796ab",
+  background: "#22262e",
+  accessory: "none",
+  preset: "fox",
+};
+
+test("picking a painted avatar persists, and Make your own brings back the builder", async ({
+  page,
+}) => {
+  await openAppearance(page);
+  await useAvatarIndicator(page);
+  const gallery = page.getByRole("group", { name: "Pick a character" });
+  // 16 painted characters plus Make your own, which starts selected.
+  await expect(gallery.getByRole("button")).toHaveCount(17);
+  await expect(
+    gallery.getByRole("button", { name: "Make your own" }),
+  ).toHaveAttribute("aria-pressed", "true");
+  const fox = gallery.getByRole("button", { name: "Fox", exact: true });
+  await fox.click();
+  await expect(fox).toHaveAttribute("aria-pressed", "true");
+  await expect(
+    page.getByRole("img", { name: "Avatar preview: Fox" }),
+  ).toBeVisible();
+  const preview = page.locator(".avatar-preview svg.avatar");
+  await expect(preview).toHaveClass(/preset-fox/);
+  await expect(preview.locator("image")).toHaveAttribute(
+    "href",
+    "/avatars/fox-256.webp",
+  );
+  // The painting keeps the live mouth and both eyelids.
+  await expect(preview.locator(".avatar-mouth")).toHaveCount(1);
+  await expect(preview.locator(".avatar-lid")).toHaveCount(2);
+  // Painted characters only take a ring color; the SVG controls step aside.
+  await expect(page.getByLabel("Accessory", { exact: true })).toHaveCount(0);
+  await page.getByLabel("Ring color", { exact: true }).fill("#ff5a5a");
+  await expect(preview.locator(".avatar-frame")).toHaveAttribute(
+    "stroke",
+    "#ff5a5a",
+  );
+  await expect
+    .poll(async () => (await studio(page))?.avatar)
+    .toMatchObject({ preset: "fox", accent: "#ff5a5a" });
+
+  await page.reload();
+  await page.getByRole("button", { name: "Appearance", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Fox", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+
+  await page.getByRole("button", { name: "Make your own" }).click();
+  await expect(page.getByLabel("Accessory", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Person", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect
+    .poll(async () => (await studio(page))?.avatar?.preset)
+    .toBeNull();
+  await page.screenshot({ path: "test-results/avatar-pack-picker.png" });
+});
+
+test("overlay pill shows the painted avatar and it talks", async ({ page }) => {
+  await seedStudio(page, { avatar: foxAvatar });
+  await openOverlay(page, "avatar");
+  const avatar = page.locator(".savatar svg.avatar");
+  await expect(avatar).toHaveClass(/preset-fox/);
+  // The 40px pill loads the small image.
+  await expect(avatar.locator("image")).toHaveAttribute(
+    "href",
+    "/avatars/fox-128.webp",
+  );
+  expect(
+    await page
+      .locator("img, image")
+      .evaluateAll((els) =>
+        els.some((el) => el.getAttribute("href")?.startsWith("http")),
+      ),
+  ).toBe(false);
+  await speak(page, 0.9);
+  await expect
+    .poll(async () => Number(await avatar.getAttribute("data-mouth")))
+    .toBeGreaterThan(0.3);
+  await expect(avatar.locator(".avatar-mouth")).toHaveCount(1);
+  await page.screenshot({ path: "test-results/overlay-avatar-preset.png" });
+});
+
+test("reduced motion keeps a painted avatar's mouth shut", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await seedStudio(page, { avatar: foxAvatar });
+  await openOverlay(page, "avatar");
+  const avatar = page.locator(".savatar svg.avatar.preset-fox");
+  await expect(avatar).toHaveClass(/is-still/);
+  await speak(page, 0.9);
+  await page.waitForTimeout(300);
+  await expect(avatar).toHaveAttribute("data-mouth", "0");
+});
+
+test("painted avatar fills the 104px dock", async ({ page }) => {
+  await seedStudio(page, {
+    dock_compact: true,
+    dock_character: "avatar",
+    avatar: foxAvatar,
+  });
+  await page.setViewportSize({ width: 104, height: 104 });
+  await page.goto("/tests/fixtures/app.html?dock=1");
+  const face = page.locator(".companion-avatar svg.avatar.preset-fox");
+  await expect(face).toBeVisible();
+  await expect(face.locator("image")).toHaveAttribute(
+    "href",
+    "/avatars/fox-256.webp",
+  );
+  expect((await face.boundingBox())?.width ?? 0).toBeGreaterThanOrEqual(64);
+  // The image really loaded (a missing file would leave it 0x0).
+  expect(
+    await page.evaluate(async () => {
+      const img = new Image();
+      img.src = "/avatars/fox-256.webp";
+      await img.decode();
+      return img.naturalWidth;
+    }),
+  ).toBe(256);
+});
+
+test("an unknown painted avatar falls back to the custom one", async ({
+  page,
+}) => {
+  await seedStudio(page, { avatar: { ...foxAvatar, preset: "dragon" } });
+  await openOverlay(page, "avatar");
+  const avatar = page.locator(".savatar svg.avatar");
+  await expect(avatar).toBeVisible();
+  await expect(avatar).not.toHaveClass(/avatar-preset/);
+  await expect(avatar).toHaveClass(/avatar-person/);
+});

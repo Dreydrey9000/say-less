@@ -1,0 +1,21 @@
+PROMPT (as given):
+Paint a NEW character in exactly the same art style, framing, lighting and flat charcoal background as the reference image (the reference only shows the style; do not copy its species or face). Subject: a fluffy orange tabby cat with pointed ears and white chest fur. Framing: close head-and-shoulders bust, facing the camera straight on, perfectly centered, the head is large (about 55 percent of the frame height) with the eyes on the horizontal center line of the frame. Face: two small simple glossy dark bead eyes like the reference, and absolutely NO mouth, NO lips and NO smile line: the lower half of the face is completely smooth and blank, because a talking mouth is animated on top of it later. A small pink nose is fine, but no mouth. Style: soft 3D clay render like a premium designer vinyl toy: rounded simplified shapes, matte clay surface with very subtle texture, muted sophisticated colors. Lighting: soft key light from the upper left and a gentle cool rim light. Background: one flat solid charcoal color (#22262E) filling the whole frame, no gradient, no floor, no props. No text, letters, numbers, logos or watermark anywhere.
+
+REVISED PROMPT (as returned by the image tool):
+Create exactly one NEW 1024x1024 square image. Use the attached bear image solely as the exact reference for premium soft 3D clay designer vinyl toy art style, soft lighting, straight-on centered bust composition and charcoal background. Make a NEW species and face: a fluffy orange tabby cat with pointed ears and white chest fur. Close head-and-shoulders bust facing camera straight on, perfectly centered, large head about 55 percent of frame height, eyes precisely on the horizontal center line of the image. Two small simple glossy dark bead eyes matching the reference's simplicity. Small pink nose. Absolutely NO mouth, NO lips, NO smile line, NO muzzle split or philtrum, NO dark mark or groove below the nose. The entire lower half of the face must be a completely smooth, blank, uninterrupted clay surface suitable for later overlay of an animated talking mouth. Convey fluffy cat through rounded sculpted cheek silhouette and restrained soft sculpted tufts, not realistic strands; rounded simplified shapes, matte clay with very subtle texture, muted sophisticated orange with subtle tabby stripes on forehead and sides, white chest fur. Soft key light upper left and gentle cool rim light. Background one perfectly flat solid charcoal #22262E across the entire image, with no gradient, floor, props or scenery. Preserve reference quality and understated toy aesthetic but do not copy bear species or bear face. No text, letters, numbers, logos, watermark.
+
+provenance:
+  door: subpowers/bin/chatgpt-image (~/.claude/skills/subpowers/bin)
+  date: 2026-09-26 00:45:24 -0400
+  codex: codex-cli 0.153.4
+  driver model: gpt-6-astra (chain: gpt-6-astra:gpt-5.6-sol:gpt-5.6-terra:gpt-5.6-luna:default; reasoning high)
+  image model: OpenAI's current ChatGPT image model, chosen server-side (last confirmed: GPT Image 2.5, rolled to Codex 2026-09-08; flare vs sunburst is not visible on this path) | C2PA says: ChatGPT/gpt-image (signed by OpenAI)
+  references: 1 (~/worktrees/say-less/avatar-pack/docs/avatars/raw/bear.png )
+  requested size: 1024x1024
+  painter size: 1254x1254
+  delivered size: 1024x1024 (resized locally from 1254x1254; signed original kept at ~/worktrees/say-less/avatar-pack/docs/avatars/raw/cat.original.png)
+  codex rollout: ~/.codex/sessions/2026/09/26/rollout-2026-09-26T00-44-34-01a0dc07-80c0-7332-91d2-90145947f91c.jsonl
+  transparent_background reported: False
+  image_gen saved_path: ~/.codex/generated_images/01a0dc07-80c0-7332-91d2-90145947f91c/exec-7e6e5430-a5f4-4103-b8e0-ccbd3f4bd02c.png
+  tokens: input=61866 output=417
+  bytes: 1162358
