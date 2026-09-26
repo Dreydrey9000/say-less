@@ -1,0 +1,21 @@
+PROMPT (as given):
+Paint a NEW character in exactly the same art style, framing, lighting and flat charcoal background as the reference image (the reference only shows the style; do not copy its species or face). Subject: a cute alien with smooth pale mint green skin, a large rounded bald head and two tiny antennae, wearing a plain lavender top. Framing: close head-and-shoulders bust, facing the camera straight on, perfectly centered, the head is large (about 55 percent of the frame height) with the eyes on the horizontal center line of the frame. Face: two small simple glossy dark bead eyes like the reference, and absolutely NO mouth, NO lips and NO smile line: the lower half of the face is completely smooth and blank, because a talking mouth is animated on top of it later. No nose. Style: soft 3D clay render like a premium designer vinyl toy: rounded simplified shapes, matte clay surface with very subtle texture, muted sophisticated colors. Lighting: soft key light from the upper left and a gentle cool rim light. Background: one flat solid charcoal color (#22262E) filling the whole frame, no gradient, no floor, no props. No text, letters, numbers, logos or watermark anywhere.
+
+REVISED PROMPT (as returned by the image tool):
+Create one NEW image at 1024x1024 resolution, square aspect ratio. Use the supplied image solely as a reference for exact art style, framing, lighting and flat charcoal background. Do not copy its species or face. Subject: a cute alien with smooth pale mint green skin, a large rounded bald head and two tiny antennae, wearing a plain lavender top. Close head-and-shoulders bust, facing camera straight on, perfectly centered. The head is large, about 55 percent of the frame height, with the eyes on the horizontal center line of the frame. Face: two small simple glossy dark bead eyes like the reference. Absolutely NO mouth, NO lips, NO smile line, and NO nose. The entire lower half of the face is completely smooth and blank because a talking mouth will be animated on top later. Soft 3D clay render like a premium designer vinyl toy: rounded simplified shapes, matte clay surface with very subtle texture, muted sophisticated colors. Soft key light from upper left and gentle cool rim light, closely matching the reference. Background: one flat solid charcoal color #22262E filling the entire frame, no gradient, no floor, no props. No text, letters, numbers, logos or watermark anywhere.
+
+provenance:
+  door: subpowers/bin/chatgpt-image (~/.claude/skills/subpowers/bin)
+  date: 2026-09-26 00:47:37 -0400
+  codex: codex-cli 0.153.4
+  driver model: gpt-6-astra (chain: gpt-6-astra:gpt-5.6-sol:gpt-5.6-terra:gpt-5.6-luna:default; reasoning high)
+  image model: OpenAI's current ChatGPT image model, chosen server-side (last confirmed: GPT Image 2.5, rolled to Codex 2026-09-08; flare vs sunburst is not visible on this path) | C2PA says: ChatGPT/gpt-image (signed by OpenAI)
+  references: 1 (~/worktrees/say-less/avatar-pack/docs/avatars/raw/woman-curls.png )
+  requested size: 1024x1024
+  painter size: 1254x1254
+  delivered size: 1024x1024 (resized locally from 1254x1254; signed original kept at ~/worktrees/say-less/avatar-pack/docs/avatars/raw/alien.original.png)
+  codex rollout: ~/.codex/sessions/2026/09/26/rollout-2026-09-26T00-46-43-01a0dc09-787b-7621-bcab-fd215fdef4d3.jsonl
+  transparent_background reported: False
+  image_gen saved_path: ~/.codex/generated_images/01a0dc09-787b-7621-bcab-fd215fdef4d3/exec-f48c68a7-274b-44c2-a7dd-4aba5e017a1a.png
+  tokens: input=62137 output=376
+  bytes: 948564

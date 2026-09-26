@@ -14,6 +14,7 @@ export const defaultAvatar: AvatarSettings = {
   accent: "#8796ab",
   background: "#22262e",
   accessory: "none",
+  preset: null,
 };
 export const avatarKinds = ["stick", "person", "cat", "dog"] as const;
 export const avatarAccessories = [
