@@ -7,6 +7,7 @@ import {
   useStudio,
   type AvatarSettings,
 } from "@/lib/studio";
+import { avatarPresets, findPreset, presetImage } from "@/lib/avatarPresets";
 import { useMotionAllowed } from "@/hooks/useMotionAllowed";
 import { useVoiceActivity } from "@/hooks/useVoiceActivity";
 import { Avatar } from "../companion/Avatar";
@@ -118,6 +119,7 @@ export function IndicatorAnimation({ preview }: { preview: AnimationPreview }) {
                       level={level}
                       moving={moving}
                       state={talking ? "listening" : "idle"}
+                      small
                     />
                   </span>
                 )}
@@ -149,7 +151,10 @@ export function IndicatorAnimation({ preview }: { preview: AnimationPreview }) {
   );
 }
 
-/** Avatar style, colors and accessory. Shown only when an avatar is in use. */
+/**
+ * Pick a painted character from the pack, or make your own flat avatar
+ * (style, colors and accessory). Shown only when an avatar is in use.
+ */
 export function AvatarBuilder({ preview }: { preview: AnimationPreview }) {
   const { t } = useTranslation();
   const { settings, save } = useStudio();
@@ -201,10 +206,15 @@ export function AvatarBuilder({ preview }: { preview: AnimationPreview }) {
   // Controls wrapped in a <label> would otherwise include their own value in
   // their accessible name ("Accessory None"); point them at the label text.
   const labelId = useId();
-  const avatarLabel = t("voiceVisuals.previewLabel", {
-    style: t(`voiceVisuals.kinds.${draft.kind}`),
-    accessory: t(`voiceVisuals.accessories.${draft.accessory}`),
-  });
+  const preset = findPreset(draft.preset);
+  const avatarLabel = preset
+    ? t("voiceVisuals.presetPreviewLabel", {
+        name: t(`voiceVisuals.presets.${preset.id}`),
+      })
+    : t("voiceVisuals.previewLabel", {
+        style: t(`voiceVisuals.kinds.${draft.kind}`),
+        accessory: t(`voiceVisuals.accessories.${draft.accessory}`),
+      });
 
   return (
     <div className="avatar-builder">
@@ -222,59 +232,110 @@ export function AvatarBuilder({ preview }: { preview: AnimationPreview }) {
       </div>
 
       <div className="avatar-controls">
-        <div role="group" aria-label={t("voiceVisuals.kind")}>
+        <div role="group" aria-label={t("voiceVisuals.gallery")}>
           <p className="setting-label mb-1" aria-hidden="true">
-            {t("voiceVisuals.kind")}
+            {t("voiceVisuals.gallery")}
           </p>
-          <div className="avatar-kind-grid">
-            {avatarKinds.map((kind) => (
+          <div className="avatar-gallery">
+            {avatarPresets.map(({ id }) => (
               <button
                 type="button"
-                key={kind}
-                aria-pressed={draft.kind === kind}
-                onClick={() => update({ ...draft, kind })}
+                key={id}
+                aria-pressed={draft.preset === id}
+                aria-label={t(`voiceVisuals.presets.${id}`)}
+                title={t(`voiceVisuals.presets.${id}`)}
+                onClick={() => update({ ...draft, preset: id })}
               >
-                <span className="avatar-kind-thumb" aria-hidden="true">
-                  <Avatar avatar={{ ...draft, kind }} />
-                </span>
-                <span>{t(`voiceVisuals.kinds.${kind}`)}</span>
+                <img src={presetImage(id, 128)} alt="" draggable={false} />
               </button>
             ))}
+            <button
+              type="button"
+              className="avatar-gallery-own"
+              aria-pressed={!preset}
+              title={t("voiceVisuals.makeYourOwn")}
+              onClick={() => update({ ...draft, preset: null })}
+            >
+              <span className="avatar-gallery-own-face" aria-hidden="true">
+                <Avatar avatar={{ ...draft, preset: null }} small />
+              </span>
+              <span>{t("voiceVisuals.makeYourOwn")}</span>
+            </button>
           </div>
         </div>
-        <div className="avatar-color-row">
-          {colorFields.map((field) => (
-            <label key={field} className="avatar-color">
-              <input
-                type="color"
-                value={draft[field]}
-                aria-labelledby={`${labelId}-${field}`}
-                onChange={(e) => update({ ...draft, [field]: e.target.value })}
-              />
-              <span id={`${labelId}-${field}`}>
-                {t(`voiceVisuals.colors.${field}`)}
+        {preset ? (
+          <label className="avatar-color">
+            <input
+              type="color"
+              value={draft.accent}
+              aria-labelledby={`${labelId}-ring`}
+              onChange={(e) => update({ ...draft, accent: e.target.value })}
+            />
+            <span id={`${labelId}-ring`}>{t("voiceVisuals.ringColor")}</span>
+          </label>
+        ) : (
+          <>
+            <div role="group" aria-label={t("voiceVisuals.kind")}>
+              <p className="setting-label mb-1" aria-hidden="true">
+                {t("voiceVisuals.kind")}
+              </p>
+              <div className="avatar-kind-grid">
+                {avatarKinds.map((kind) => (
+                  <button
+                    type="button"
+                    key={kind}
+                    aria-pressed={draft.kind === kind}
+                    onClick={() => update({ ...draft, kind })}
+                  >
+                    <span className="avatar-kind-thumb" aria-hidden="true">
+                      <Avatar avatar={{ ...draft, kind }} small />
+                    </span>
+                    <span>{t(`voiceVisuals.kinds.${kind}`)}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="avatar-color-row">
+              {colorFields.map((field) => (
+                <label key={field} className="avatar-color">
+                  <input
+                    type="color"
+                    value={draft[field]}
+                    aria-labelledby={`${labelId}-${field}`}
+                    onChange={(e) =>
+                      update({ ...draft, [field]: e.target.value })
+                    }
+                  />
+                  <span id={`${labelId}-${field}`}>
+                    {t(`voiceVisuals.colors.${field}`)}
+                  </span>
+                </label>
+              ))}
+            </div>
+            <label className="block text-sm">
+              <span id={`${labelId}-accessory`} className="setting-label">
+                {t("voiceVisuals.accessory")}
               </span>
+              <select
+                className="studio-select mt-1"
+                aria-labelledby={`${labelId}-accessory`}
+                value={draft.accessory}
+                onChange={(e) =>
+                  update({ ...draft, accessory: e.target.value })
+                }
+              >
+                {avatarAccessories.map((accessory) => (
+                  <option key={accessory} value={accessory}>
+                    {t(`voiceVisuals.accessories.${accessory}`)}
+                  </option>
+                ))}
+              </select>
             </label>
-          ))}
-        </div>
-        <label className="block text-sm">
-          <span id={`${labelId}-accessory`} className="setting-label">
-            {t("voiceVisuals.accessory")}
-          </span>
-          <select
-            className="studio-select mt-1"
-            aria-labelledby={`${labelId}-accessory`}
-            value={draft.accessory}
-            onChange={(e) => update({ ...draft, accessory: e.target.value })}
-          >
-            {avatarAccessories.map((accessory) => (
-              <option key={accessory} value={accessory}>
-                {t(`voiceVisuals.accessories.${accessory}`)}
-              </option>
-            ))}
-          </select>
-        </label>
-        <p className="setting-description">{t("voiceVisuals.avatarNote")}</p>
+          </>
+        )}
+        <p className="setting-description">
+          {preset ? t("voiceVisuals.presetNote") : t("voiceVisuals.avatarNote")}
+        </p>
       </div>
     </div>
   );

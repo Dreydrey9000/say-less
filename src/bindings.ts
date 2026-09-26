@@ -1221,7 +1221,17 @@ export type AvailableAccelerators = { transcribe: string[]; ort: string[]; gpu_d
 /**
  * Flat SVG avatar used by the companion and the recording overlay.
  */
-export type AvatarSettings = { kind: string; body: string; accent: string; background: string; accessory: string }
+/**
+ * Talking avatar used by the companion and the recording overlay: either a
+ * painted character from the built-in pack (`preset`) or the flat SVG one
+ * built from `kind`, colors and `accessory`.
+ */
+export type AvatarSettings = { kind: string; body: string; accent: string; background: string; accessory: string; 
+/**
+ * A painted character from the pack in `public/avatars/`. `None` (or an
+ * id this version doesn't ship) means the custom SVG avatar.
+ */
+preset: string | null }
 export type BindingResponse = { success: boolean; binding: ShortcutBinding | null; error: string | null }
 export type ClipboardHandling = "dont_modify" | "copy_to_clipboard"
 export type CustomSounds = { start: boolean; stop: boolean }

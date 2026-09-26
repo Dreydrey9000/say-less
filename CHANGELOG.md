@@ -6,6 +6,15 @@
 
 - Home shows your numbers once you have dictated at least once: words dictated, time saved and a day streak, all computed from the history stored on this computer. Time saved is labelled as an estimate (your words divided by 40 words a minute, a typical typing speed) because we do not measure your typing, and a wrong number would cost trust.
 - The streak counts days in a row with at least one dictation and does not break while today is still in progress; the Rust streak math has its own tests.
+- Painted avatar pack: 16 characters (people, animals, a robot, an alien, two silver-chrome characters) in a "Pick a character" gallery beside "Make your own", because the flat SVG faces read as clip-art next to the chrome brand.
+- The paintings ship as static WebP files in public/avatars (256px and 128px, 144 KB in total), painted once for this project with the subpowers image skill, so the app stays offline and needs no image subscription; prompts and provenance live in docs/avatars.
+- Painted avatars keep talking: each painting has bead eyes and no mouth, and the live SVG mouth and blinking lids draw on top at per-character anchors (src/lib/avatarPresets.ts), because a painted open/closed crossfade gave only two mouth states and was unreadable at 40px.
+- scripts/build-avatar-pack.sh rebuilds the pack from the 512px masters with cwebp, so nobody has to repaint to change sizes.
+
+### Changed
+
+- AvatarSettings has a `preset` field; old saves load unchanged, and an unknown preset falls back to the custom avatar on load and save instead of failing.
+- Painted avatars take a ring color in place of the SVG colors and hats; the 40px pill loads the 128px image and the dock and preview load 256px.
 
 ## [2026-09-25]
 
