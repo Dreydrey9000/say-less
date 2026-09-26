@@ -1,5 +1,16 @@
 # Changelog
 
+## [2026-09-26]
+
+### Added
+
+- Bot avatar style: a glossy orb with pill eyes that become three voice bars while you talk (it has no mouth). Works with every color and accessory, because Drey wanted a Grokbot-style mascot as an option.
+- Picking the Bot starts it as a white orb on near-black, since skin tones made a muddy orb; all colors stay editable.
+
+### Changed
+
+- The avatar style picker is 5 across (was 4) so the Bot doesn't wrap onto its own row.
+
 ## [2026-09-25]
 
 ### Added

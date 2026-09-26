@@ -45,7 +45,7 @@ impl Default for AvatarSettings {
         }
     }
 }
-const AVATAR_KINDS: [&str; 4] = ["stick", "person", "cat", "dog"];
+const AVATAR_KINDS: [&str; 5] = ["stick", "person", "cat", "dog", "bot"];
 const AVATAR_ACCESSORIES: [&str; 6] =
     ["none", "cap", "beanie", "crown", "headphones", "sunglasses"];
 const OVERLAY_VISUALS: [&str; 3] = ["bars", "squiggle", "avatar"];
@@ -532,6 +532,9 @@ mod tests {
             ..StudioSettings::default()
         };
         assert!(validate(&s).is_ok());
+        let mut bot = s.clone();
+        bot.avatar.kind = "bot".into();
+        assert!(validate(&bot).is_ok());
         for bad in [
             ("kind", "dragon"),
             ("accessory", "<script>"),

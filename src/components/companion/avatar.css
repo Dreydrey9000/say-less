@@ -128,3 +128,8 @@
 .avatar.is-still .avatar-ring {
   transition: none;
 }
+/* Bot: pill eyes and voice bars cross-fade as talking starts and stops. */
+.avatar-bot-eye,
+.avatar-bot-bars {
+  transition: opacity 120ms ease-out;
+}

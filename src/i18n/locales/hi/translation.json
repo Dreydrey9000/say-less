@@ -1094,7 +1094,8 @@
       "stick": "Stick figure",
       "person": "Person",
       "cat": "Cat",
-      "dog": "Dog"
+      "dog": "Dog",
+      "bot": "Bot"
     },
     "colors": {
       "body": "Body or skin",

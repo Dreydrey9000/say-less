@@ -87,6 +87,35 @@ test("voice visuals default to bars and the avatar builder persists", async ({
   await page.screenshot({ path: "test-results/voice-visuals-builder.png" });
 });
 
+test("the bot avatar starts white and trades its eyes for voice bars", async ({
+  page,
+}) => {
+  await openAppearance(page);
+  await useAvatarIndicator(page);
+  await page.getByRole("button", { name: "Bot", exact: true }).click();
+  await expect
+    .poll(async () => (await studio(page))?.avatar)
+    .toMatchObject({ kind: "bot", body: "#ececef", background: "#141417" });
+  const preview = page.locator(".avatar-preview .avatar");
+  await expect(preview.locator(".avatar-bot-eye").first()).toHaveAttribute(
+    "opacity",
+    "1",
+  );
+  await page.getByRole("button", { name: "Preview animation" }).click();
+  await expect(preview.locator(".avatar-bot-bars")).toHaveAttribute(
+    "opacity",
+    "1",
+  );
+  // Still fully customizable: accessories and colors apply to the bot too.
+  await page
+    .getByLabel("Accessory", { exact: true })
+    .selectOption("headphones");
+  await page.getByLabel("Body or skin", { exact: true }).fill("#ff6a2b");
+  await expect
+    .poll(async () => (await studio(page))?.avatar)
+    .toMatchObject({ kind: "bot", accessory: "headphones", body: "#ff6a2b" });
+});
+
 test("Preview makes the avatar talk, then it closes its mouth", async ({
   page,
 }) => {
