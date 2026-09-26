@@ -6,6 +6,7 @@
 
 - Bot avatar style: a glossy orb with pill eyes that become three voice bars while you talk (it has no mouth). Works with every color and accessory, because Drey wanted a Grokbot-style mascot as an option.
 - Picking the Bot starts it as a white orb on near-black, since skin tones made a muddy orb; all colors stay editable.
+- Bot personality: it glances side to side with a head tilt, winks now and then, squints one eye while thinking, shows ^^ eyes and pink cheeks when you finish, and blushes when you talk loudly. Blinks and winks squash the glowing pill eye flat instead of drawing a lid, because a flat lid showed as a pale patch on the shiny orb.
 
 ### Changed
 
