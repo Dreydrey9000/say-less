@@ -208,10 +208,16 @@
       }
       .btn-silver:hover {
         transform: translateY(-1px);
-        filter: brightness(1.08);
+        background: linear-gradient(
+          180deg,
+          #ffffff,
+          var(--silver-hi) 45%,
+          var(--silver)
+        );
         box-shadow:
-          inset 0 1px 0 rgba(255, 255, 255, 0.9),
-          0 6px 18px rgba(201, 206, 214, 0.28);
+          inset 0 1px 0 rgba(255, 255, 255, 1),
+          0 0 0 3px rgba(201, 206, 214, 0.28),
+          0 8px 22px rgba(201, 206, 214, 0.3);
       }
       .btn-ghost {
         color: var(--text);
@@ -240,8 +246,17 @@
         margin: 12px 0 0;
       }
       .alt a {
+        display: inline-block;
         color: var(--text);
         text-underline-offset: 3px;
+        white-space: nowrap;
+        padding: 12px 0;
+        line-height: 20px;
+        margin: -12px 0;
+      }
+      .btn-ghost .tag {
+        background: var(--line-2);
+        color: var(--text);
       }
       .btn[aria-disabled="true"] {
         cursor: default;
@@ -460,17 +475,57 @@
       .pill.idle {
         opacity: 0;
       }
+      .pill.idle .bars b {
+        animation: none;
+      }
       .caret.still {
         animation: none;
       }
+      .hero-copy {
+        position: relative;
+      }
+      .hero-mark {
+        display: none;
+      }
       @media (max-width: 880px) {
         .demo-emblem {
-          width: 88px;
-          right: 14px;
-          top: -40px;
+          display: none;
         }
         .window {
-          margin-top: 44px;
+          margin-top: 0;
+        }
+        .hero-mark {
+          display: block;
+          position: absolute;
+          right: 0;
+          top: 44px;
+          width: 76px;
+          height: 76px;
+          filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.6));
+          pointer-events: none;
+        }
+      }
+
+      /* make it yours */
+      .yours {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 48px;
+        align-items: center;
+      }
+      .face {
+        width: 240px;
+        height: 240px;
+        filter: drop-shadow(0 24px 32px rgba(0, 0, 0, 0.55));
+      }
+      @media (max-width: 880px) {
+        .yours {
+          grid-template-columns: 1fr;
+          gap: 32px;
+        }
+        .face {
+          width: 180px;
+          height: 180px;
         }
       }
 
@@ -506,7 +561,7 @@
       /* steps */
       .steps {
         display: grid;
-        grid-template-columns: 1.3fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr;
         gap: 16px;
         margin-top: 48px;
         counter-reset: s;
@@ -553,13 +608,13 @@
       .keys {
         display: flex;
         gap: 6px;
-        margin-top: 14px;
+        margin: 4px 0 0;
       }
       .alt-key {
         display: block;
         color: var(--dim);
         font-size: 14px;
-        margin-top: 10px;
+        margin: 10px 0 14px;
       }
       @media (max-width: 880px) {
         .steps {
@@ -614,6 +669,18 @@
       }
       .arrow {
         color: var(--dim);
+      }
+      @media (max-width: 640px) {
+        .chain {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 6px;
+        }
+        .arrow {
+          display: inline-block;
+          transform: rotate(90deg);
+          margin-left: 18px;
+        }
       }
       .flow p {
         color: var(--dim);
@@ -874,7 +941,14 @@
     <main id="main">
       <header class="hero">
         <div class="wrap">
-          <div>
+          <div class="hero-copy">
+            <img
+              class="hero-mark"
+              src="/assets/emblem-640-alpha.webp"
+              alt=""
+              width="76"
+              height="76"
+            />
             <span class="eyebrow">Free dictation for Mac and Windows</span>
             <h1>Talk.<br /><span>It types.</span></h1>
             <p class="lede">
@@ -887,15 +961,15 @@
                 >Download for Mac <span class="tag">Free</span></a
               >
               <a class="btn btn-ghost" data-os="windows" href="#download"
-                >Download for Windows</a
+                >Download for Windows <span class="tag">Free</span></a
               >
             </div>
             <p class="alt">
-              Mac button is for Apple Silicon. Intel Mac:
+              Mac button is for Apple Silicon.
               <a
                 href="https://github.com/Dreydrey9000/say-less/releases/download/v0.13.1/Say.Less_0.13.1_x64.dmg"
-                >download here</a
-              >.
+                >Intel Mac? Get the Intel version.</a
+              >
             </p>
             <p class="status" data-status hidden>
               Downloads open soon. The first public release is being built and
@@ -939,13 +1013,12 @@
           <div class="steps">
             <div class="step">
               <span class="num">Step 1</span>
+              <h3>Hold your shortcut</h3>
               <span class="keys"><kbd>Option</kbd> <kbd>Space</kbd></span>
               <span class="alt-key">Windows: Ctrl + Space</span>
-              <h3>Hold your shortcut</h3>
               <p>
                 Click into any text box, anywhere on your computer, and hold the
-                keys down. Or tap once to keep it listening. You can change the
-                keys.
+                keys. Or tap once to keep it listening.
               </p>
             </div>
             <div class="step">
@@ -1101,13 +1174,68 @@
 
       <section id="make-it-yours">
         <div class="wrap">
-          <p class="kicker">Make it yours</p>
-          <h2>A little face that talks when you do.</h2>
-          <p class="sub">
-            Swap the audio bars for a squiggle that moves with your voice, or
-            build an avatar that mouths along while you talk. Stick figure,
-            person, or animal. Pick the colors. Add a hat.
-          </p>
+          <div class="yours">
+            <div>
+              <p class="kicker">Make it yours</p>
+              <h2>A little face that talks when you do.</h2>
+              <p class="sub">
+                Swap the audio bars for a squiggle that moves with your voice,
+                or build an avatar that mouths along while you talk. Stick
+                figure, person, or animal. Pick the colors. Add a hat.
+              </p>
+            </div>
+            <svg
+              class="face"
+              viewBox="0 0 240 240"
+              role="img"
+              aria-label="A round chrome avatar with voice bars for eyes, an open mouth and a small hat"
+            >
+              <defs>
+                <linearGradient id="chrome" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#f4f6f8" />
+                  <stop offset="0.5" stop-color="#c9ced6" />
+                  <stop offset="1" stop-color="#7d848f" />
+                </linearGradient>
+                <linearGradient id="hat" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#30333a" />
+                  <stop offset="1" stop-color="#111215" />
+                </linearGradient>
+              </defs>
+              <circle cx="120" cy="132" r="88" fill="url(#chrome)" />
+              <circle
+                cx="120"
+                cy="132"
+                r="88"
+                fill="none"
+                stroke="#f4f6f8"
+                stroke-opacity="0.5"
+              />
+              <g fill="#0a0a0b">
+                <rect x="78" y="112" width="6" height="22" rx="3" />
+                <rect x="88" y="102" width="6" height="42" rx="3" />
+                <rect x="98" y="116" width="6" height="14" rx="3" />
+                <rect x="136" y="116" width="6" height="14" rx="3" />
+                <rect x="146" y="102" width="6" height="42" rx="3" />
+                <rect x="156" y="112" width="6" height="22" rx="3" />
+              </g>
+              <ellipse cx="120" cy="170" rx="16" ry="11" fill="#0a0a0b" />
+              <ellipse cx="120" cy="176" rx="8" ry="4" fill="#7d848f" />
+              <rect
+                x="66"
+                y="52"
+                width="108"
+                height="10"
+                rx="5"
+                fill="url(#hat)"
+                stroke="#30333a"
+              />
+              <path
+                d="M84 54 L92 20 H148 L156 54 Z"
+                fill="url(#hat)"
+                stroke="#30333a"
+              />
+            </svg>
+          </div>
         </div>
       </section>
 
@@ -1115,7 +1243,11 @@
         <div class="wrap">
           <p class="kicker">The difference</p>
           <h2>Same job. None of the bill.</h2>
-          <div class="table-wrap" role="region" aria-label="Say Less compared with paid dictation apps">
+          <div
+            class="table-wrap"
+            role="region"
+            aria-label="Say Less compared with paid dictation apps"
+          >
             <table>
               <thead>
                 <tr>
@@ -1128,12 +1260,16 @@
                 <tr>
                   <th scope="row">Price</th>
                   <td class="us" data-label="Say Less">Free</td>
-                  <td class="them" data-label="Typical paid dictation">Monthly subscription</td>
+                  <td class="them" data-label="Typical paid dictation">
+                    Monthly subscription
+                  </td>
                 </tr>
                 <tr>
                   <th scope="row">Works without internet</th>
                   <td class="us" data-label="Say Less">Yes</td>
-                  <td class="them" data-label="Typical paid dictation">Usually no</td>
+                  <td class="them" data-label="Typical paid dictation">
+                    Usually no
+                  </td>
                 </tr>
                 <tr>
                   <th scope="row">Account required</th>
@@ -1195,10 +1331,13 @@
             <details>
               <summary>Mac or Windows?</summary>
               <p>
-                Both: Apple Silicon and Intel Macs, plus Windows 10 and 11. The Mac
-                button is for Apple Silicon. Intel Mac and Windows on ARM
+                Both: Apple Silicon and Intel Macs, plus Windows 10 and 11. The
+                Mac button is for Apple Silicon. Intel Mac and Windows on ARM
                 installers are on the
-                <a href="https://github.com/Dreydrey9000/say-less/releases/latest">releases page</a>.
+                <a
+                  href="https://github.com/Dreydrey9000/say-less/releases/latest"
+                  >releases page</a
+                >.
               </p>
             </details>
             <details>
@@ -1237,15 +1376,15 @@
                 >Download for Mac <span class="tag">Free</span></a
               >
               <a class="btn btn-ghost" data-os="windows" href="#download"
-                >Download for Windows</a
+                >Download for Windows <span class="tag">Free</span></a
               >
             </div>
             <p class="alt">
-              Mac button is for Apple Silicon. Intel Mac:
+              Mac button is for Apple Silicon.
               <a
                 href="https://github.com/Dreydrey9000/say-less/releases/download/v0.13.1/Say.Less_0.13.1_x64.dmg"
-                >download here</a
-              >.
+                >Intel Mac? Get the Intel version.</a
+              >
             </p>
             <p class="status" data-status hidden>
               Downloads open soon. The first public release is being built and
@@ -1276,7 +1415,11 @@
 
     <script>
       // Set these to the installer URLs once a release is published. null = "coming soon".
-      const DOWNLOADS = { mac: "https://github.com/Dreydrey9000/say-less/releases/download/v0.13.1/Say.Less_0.13.1_aarch64.dmg", windows: "https://github.com/Dreydrey9000/say-less/releases/download/v0.13.1/Say.Less_0.13.1_x64-setup.exe" };
+      const DOWNLOADS = {
+        mac: "https://github.com/Dreydrey9000/say-less/releases/download/v0.13.1/Say.Less_0.13.1_aarch64.dmg",
+        windows:
+          "https://github.com/Dreydrey9000/say-less/releases/download/v0.13.1/Say.Less_0.13.1_x64-setup.exe",
+      };
 
       document.querySelectorAll("[data-downloads]").forEach((group) => {
         let missing = false;
@@ -1299,6 +1442,7 @@
       const shareBtn = document.querySelector("[data-share]");
       const shareDone = document.querySelector("[data-share-done]");
       shareBtn.addEventListener("click", async () => {
+        shareDone.textContent = "";
         const data = {
           title: "Say Less",
           text: "Free dictation for Mac and Windows. Hold a key, talk, it types. Nothing leaves your computer.",
