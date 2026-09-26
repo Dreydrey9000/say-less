@@ -239,3 +239,118 @@ button:disabled {
 .dock-companion .companion {
   width: 48px;
 }
+
+/* Screen recording. Red means "the screen is being recorded", nothing else. */
+.floating-bar .dock-screen {
+  gap: 6px;
+  padding: 0 8px;
+  border: 1px solid color-mix(in srgb, var(--color-text), transparent 80%);
+}
+.floating-bar .dock-screen.is-live {
+  background: #ff5a5a;
+  border-color: #ff5a5a;
+  color: #151820;
+  font-weight: 650;
+  font-size: 13px;
+}
+.dock-screen[aria-disabled="true"],
+.compact-screen[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.rec-dot {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 50%;
+  background: currentColor;
+}
+.dock-screen:not(.is-live) .rec-dot {
+  background: #ff5a5a;
+}
+.rec-time {
+  font-variant-numeric: tabular-nums;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rec-dot {
+    animation: rec-pulse 1.6s ease-in-out infinite;
+  }
+}
+@keyframes rec-pulse {
+  50% {
+    opacity: 0.4;
+  }
+}
+.dock-screen-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 3px 0 0;
+  font-size: 11px;
+  line-height: 18px;
+  color: var(--color-text);
+  background: var(--color-background);
+  border-radius: 8px;
+}
+.dock-screen-note button {
+  border: 0;
+  padding: 0 4px;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 11px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.compact-dock .compact-screen-anchor {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+.compact-dock .compact-saved-anchor {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.compact-screen,
+.compact-saved {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: 2px solid #151820;
+  border-radius: 50%;
+  background: #2a2e35;
+  color: #e7eaee;
+}
+.compact-dock .compact-screen-live-anchor {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.compact-screen-live {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  padding: 0 9px;
+  border: 2px solid #151820;
+  border-radius: 13px;
+  background: #ff5a5a;
+  color: #151820;
+  font-size: 12px;
+  font-weight: 700;
+}
+.compact-screen:focus-visible,
+.compact-saved:focus-visible,
+.compact-screen-live:focus-visible {
+  outline: 2px solid var(--studio-accent);
+  outline-offset: 2px;
+}
+/* Corner controls sit above the companion disc. */
+.compact-dock .compact-screen-anchor,
+.compact-dock .compact-saved-anchor,
+.compact-dock .compact-screen-live-anchor {
+  z-index: 2;
+}

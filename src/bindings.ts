@@ -48,6 +48,48 @@ async testVoiceAction(cue: string) : Promise<Result<null, string>> {
     else return { status: "error", error: e  as any };
 }
 },
+async startScreenRecording() : Promise<Result<ScreenRecordingStatus, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("start_screen_recording") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async stopScreenRecording() : Promise<Result<ScreenRecordingStatus, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("stop_screen_recording") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async screenRecordingStatus() : Promise<ScreenRecordingStatus> {
+    return await TAURI_INVOKE("screen_recording_status");
+},
+/**
+ * Show the last recording in Finder (or Explorer). Only ever the file we
+ * wrote, never a path from the page.
+ */
+async showScreenRecordingInFolder() : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("show_screen_recording_in_folder") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+/**
+ * Open System Settings on Privacy & Security > Screen Recording.
+ */
+async openScreenRecordingSettings() : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("open_screen_recording_settings") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
 async dockToggleRecording() : Promise<Result<null, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("dock_toggle_recording") };
@@ -1250,7 +1292,35 @@ export type PaginatedHistory = { entries: HistoryEntry[]; has_more: boolean }
 export type PasteMethod = "ctrl_v" | "direct" | "none" | "shift_insert" | "ctrl_shift_v" | "external_script"
 export type PermissionAccess = "allowed" | "denied" | "unknown"
 export type PostProcessProvider = { id: string; label: string; base_url: string; allow_base_url_edit?: boolean; models_endpoint?: string | null; supports_structured_output?: boolean }
+/**
+ * What the recorder is doing right now.
+ */
+export type RecorderState = "idle" | "starting" | "recording" | "stopping"
 export type RecordingRetentionPeriod = "never" | "preserve_limit" | "days_3" | "weeks_2" | "months_3"
+/**
+ * Everything the UI needs to draw the record button.
+ */
+export type ScreenRecordingStatus = { state: RecorderState; 
+/**
+ * False on Windows/Linux for now, and on Macs older than macOS 15.
+ */
+supported: boolean; 
+/**
+ * "macos_too_old", "windows_soon" or "linux_unsupported" when not supported.
+ */
+unsupported_reason: string | null; 
+/**
+ * Milliseconds since recording started (0 when not recording).
+ */
+elapsed_ms: number; 
+/**
+ * Full path of the last finished recording.
+ */
+last_file: string | null; 
+/**
+ * Short error code from the last attempt, such as "permission_denied".
+ */
+error: string | null }
 export type SecretMap = Partial<{ [key in string]: string }>
 export type SecureInputStatus = { 
 /**
@@ -1336,7 +1406,12 @@ export type StreamTextEvent = { committed: string; tentative: string }
  * Semantic kind of "working" phase, used to localize the spinner label.
  */
 export type StreamWorkKind = "transcribing" | "polishing"
-export type StudioSettings = { accent: string; floating: boolean; actions_enabled: boolean; actions: VoiceAction[]; default_style: WritingStyle; app_styles: AppStyle[]; cleanup_on_dictation: boolean; dock_animation: string; dock_motion: boolean; dock_cycle: boolean; dock_edge: string; dock_compact: boolean; dock_character: string; learn_corrections: boolean; corrections: VoiceSnippet[]; overlay_visual: string; avatar: AvatarSettings }
+export type StudioSettings = { accent: string; floating: boolean; actions_enabled: boolean; actions: VoiceAction[]; default_style: WritingStyle; app_styles: AppStyle[]; cleanup_on_dictation: boolean; dock_animation: string; dock_motion: boolean; dock_cycle: boolean; dock_edge: string; dock_compact: boolean; dock_character: string; learn_corrections: boolean; corrections: VoiceSnippet[]; overlay_visual: string; avatar: AvatarSettings; 
+/**
+ * "Say less start recording" / "say less stop recording" control the
+ * screen recorder. Separate from custom actions and on by default.
+ */
+voice_recording: boolean }
 /**
  * UI appearance mode. `System` follows the OS `prefers-color-scheme`; `Light`
  * and `Dark` force one of the two palettes Handy already ships.

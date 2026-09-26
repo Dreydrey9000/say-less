@@ -11,6 +11,7 @@ import { useSettings } from "@/hooks/useSettings";
 import { useVoiceActivity } from "@/hooks/useVoiceActivity";
 import { useStudio } from "@/lib/studio";
 import { Companion } from "./companion/Companion";
+import { ScreenRecordingCard } from "./ScreenRecordingCard";
 import type { SidebarSection } from "./Sidebar";
 import { Button } from "./ui/Button";
 import { WorkingStatus } from "./ui/WorkingStatus";
@@ -170,6 +171,7 @@ export function Home({
           {error ? t("studio.error") : notice}
         </p>
       )}
+      <ScreenRecordingCard />
       <section className="home-tools" aria-label={t("home.tools")}>
         {(
           [

@@ -408,7 +408,7 @@ pub(crate) async fn process_transcription_output(
 ) -> ProcessedTranscription {
     // Recognized action cues never pass through snippet expansion or a text provider.
     if crate::studio::get_studio_settings(app.clone())
-        .map(|settings| crate::studio::matching_action(transcription, &settings).is_some())
+        .map(|settings| crate::studio::is_spoken_command(transcription, &settings))
         .unwrap_or(false)
     {
         return ProcessedTranscription {

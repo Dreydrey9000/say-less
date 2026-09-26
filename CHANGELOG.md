@@ -2,6 +2,19 @@
 
 ## [2026-09-25]
 
+### Added
+
+- Screen recording on Mac (macOS 15+): a Home card, a dock button, a tray item and the spoken cues "say less start recording" / "say less stop recording" save one MP4 (screen, microphone and system audio) to Movies/Say Less, because it is the feature Wispr Flow does not have.
+- Swift ScreenCaptureKit bridge (swift/screen_recorder.swift, SCRecordingOutput) built by build.rs like the Apple Intelligence bridge, with a stub for older SDKs, so no new crates were needed.
+- "Control recording with your voice" switch in Voice actions (on by default); "start recording" and "stop recording" are reserved so a custom action can't take them.
+- Release note 0.14.0 and the screen recording diagram (docs/diagrams/screen-recording.mmd and .svg).
+
+### Changed
+
+- The expanded floating dock is 400px wide (was 360px) to fit the screen record button.
+
+## [2026-09-25]
+
 ### Release
 
 - Version 0.13.1: the voice visuals, clarity, accessibility and final polish passes ship together.

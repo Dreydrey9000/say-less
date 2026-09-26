@@ -63,6 +63,9 @@ struct MenuInputs {
     downloaded_models: Vec<(String, String)>,
     locale: String,
     update_checks_enabled: bool,
+    /// None when this OS can't record the screen (the item is hidden),
+    /// otherwise whether a recording is running.
+    screen_recording: Option<bool>,
 }
 
 /// Complete description of what the tray should look like.
@@ -347,6 +350,8 @@ fn compute_desired(app: &AppHandle, icon_state: TrayIconState) -> TrayDesired {
             downloaded_models,
             locale: settings.app_language,
             update_checks_enabled: settings.update_checks_enabled,
+            screen_recording: crate::screen_recorder::is_supported()
+                .then(crate::screen_recorder::is_active),
         },
     }
 }
@@ -524,6 +529,32 @@ fn build_menu(app: &AppHandle, inputs: &MenuInputs) -> tauri::Result<(Menu<tauri
     )?;
     let quit_i = MenuItem::with_id(app, "quit", &strings.quit, true, quit_accelerator)?;
     let separator = || PredefinedMenuItem::separator(app);
+    let screen_recording_i = match inputs.screen_recording {
+        Some(active) => {
+            let english = get_tray_translations(Some("en".to_string()));
+            let (label, fallback) = if active {
+                (
+                    &strings.stop_screen_recording,
+                    english.stop_screen_recording,
+                )
+            } else {
+                (&strings.record_screen, english.record_screen)
+            };
+            let label = if label.is_empty() {
+                fallback
+            } else {
+                label.clone()
+            };
+            Some(MenuItem::with_id(
+                app,
+                "screen_recording_toggle",
+                &label,
+                true,
+                None::<&str>,
+            )?)
+        }
+        None => None,
+    };
 
     let menu = if inputs.busy {
         let cancel_i = MenuItem::with_id(app, "cancel", &strings.cancel, true, None::<&str>)?;
@@ -593,6 +624,13 @@ fn build_menu(app: &AppHandle, inputs: &MenuInputs) -> tauri::Result<(Menu<tauri
     // enabled flag.
     if settings::update_checks_forced_disabled() {
         menu.remove(&check_updates_i)?;
+    }
+
+    // Both layouts put "Copy last transcript" at index 2 (busy: index 4);
+    // the screen recording item sits right under it.
+    if let Some(item) = &screen_recording_i {
+        let copy_index = if inputs.busy { 4 } else { 2 };
+        menu.insert(item, copy_index + 1)?;
     }
 
     // Both layouts start with [version, separator, ...]; slot the warning in
@@ -707,6 +745,7 @@ mod tests {
             downloaded_models: vec![("small".to_string(), "Small".to_string())],
             locale: "en".to_string(),
             update_checks_enabled: true,
+            screen_recording: None,
         }
     }
 

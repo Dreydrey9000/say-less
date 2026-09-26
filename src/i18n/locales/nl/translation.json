@@ -61,7 +61,9 @@
     "model": "Model",
     "quit": "Afsluiten",
     "cancel": "Annuleren",
-    "secureInputWarning": "⚠ Sneltoetsen geblokkeerd door Secure Input"
+    "secureInputWarning": "⚠ Sneltoetsen geblokkeerd door Secure Input",
+    "recordScreen": "Record Screen",
+    "stopScreenRecording": "Stop Screen Recording"
   },
   "sidebar": {
     "general": "Algemeen",
@@ -1237,5 +1239,32 @@
     "analyzed_other": "Based on {{count}} dictations.",
     "mentionsUnit_one": "mention",
     "mentionsUnit_other": "mentions"
+  },
+  "screenRecording": {
+    "title": "Record your screen",
+    "description": "We record your screen, your voice and your computer's sound into one video. Say Less stays out of the shot.",
+    "start": "Record screen",
+    "stop": "Stop",
+    "stopLabel": "Stop screen recording",
+    "starting": "Starting",
+    "stopping": "Saving",
+    "recording": "Recording",
+    "saved": "Saved.",
+    "showInFinder": "Show in Finder",
+    "voiceHint": "Or press your shortcut and say “Say less, start recording.”",
+    "permissionDenied": "We need Screen Recording permission to record your screen.",
+    "permissionHint": "Turn on Say Less in System Settings, then quit and reopen Say Less.",
+    "openSettings": "Open System Settings",
+    "microphoneDenied": "We need microphone permission so your voice is in the video.",
+    "fixMicrophone": "Fix permissions",
+    "macosTooOld": "Screen recording needs macOS 15 or newer.",
+    "windowsSoon": "Screen recording is coming to Windows soon.",
+    "linuxUnsupported": "Screen recording isn't available on Linux yet.",
+    "failed": "We couldn't record your screen. Try again.",
+    "endedEarly": "The recording stopped early. We saved what we had.",
+    "revealFailed": "We couldn't open the folder. The video is in Movies, Say Less.",
+    "voiceTitle": "Control recording with your voice",
+    "voiceDescription": "Press your shortcut, then say “Say less, start recording” or “Say less, stop recording.” Works even when custom actions are off.",
+    "reservedCue": "That phrase is saved for screen recording. Pick different words."
   }
 }

@@ -23,6 +23,7 @@ const defaultStudio = {
   learn_corrections: false,
   corrections: [],
   overlay_visual: "bars",
+  voice_recording: true,
   avatar: {
     kind: "person",
     body: "#e2b48f",
@@ -38,10 +39,12 @@ let imported = false;
 let learned = query.has("learned")
   ? [{ trigger: "Louise", expansion: "Luis", observations: 1, active: false }]
   : [];
+// ?os=windows renders the Windows build (screen recording is disabled there).
+const osName = query.get("os") === "windows" ? "windows" : "macos";
 Object.assign(window, {
   __TAURI_OS_PLUGIN_INTERNALS__: {
-    platform: "macos",
-    os_type: "macos",
+    platform: osName,
+    os_type: osName,
     arch: "aarch64",
     family: "unix",
     eol: "\n",
@@ -109,6 +112,19 @@ const settings = {
   debug_mode: false,
 };
 let snippets = JSON.parse(localStorage.getItem("test-snippets") || "[]");
+// Screen recording: ?screen=recording starts mid-recording (65 s in),
+// ?screen=denied refuses with the permission error, ?os=windows is
+// unsupported. Otherwise start and stop succeed.
+let screenStatus = {
+  state: query.get("screen") === "recording" ? "recording" : "idle",
+  supported: osName === "macos",
+  unsupported_reason: osName === "macos" ? null : "windows_soon",
+  elapsed_ms: query.get("screen") === "recording" ? 65_000 : 0,
+  last_file: null as string | null,
+  error: null as string | null,
+};
+const screenFile =
+  "/Users/test/Movies/Say Less/Say Less 2026-09-25 at 14.03.07.mp4";
 mockWindows("main");
 const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
   const calls = ((
@@ -116,6 +132,38 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
   ).testCommands ??= []);
   calls.push(cmd);
   if (cmd === "get_dock_state") return "idle";
+  if (cmd === "screen_recording_status") return screenStatus;
+  if (cmd === "start_screen_recording") {
+    if (query.get("screen") === "denied") {
+      screenStatus = { ...screenStatus, error: "permission_denied" };
+      throw "permission_denied";
+    }
+    // A short delay, so tests can prove a second click is ignored.
+    return new Promise((resolve) =>
+      setTimeout(() => {
+        screenStatus = {
+          ...screenStatus,
+          state: "recording",
+          elapsed_ms: 0,
+          error: null,
+        };
+        resolve(screenStatus);
+      }, 150),
+    );
+  }
+  if (cmd === "stop_screen_recording") {
+    screenStatus = {
+      ...screenStatus,
+      state: "idle",
+      elapsed_ms: 0,
+      last_file: screenFile,
+    };
+    return screenStatus;
+  }
+  if (cmd === "show_screen_recording_in_folder") return null;
+  if (cmd === "open_screen_recording_settings") return null;
+  if (cmd.includes("screen_recording_permission"))
+    return query.get("screen") !== "denied";
   if (cmd === "list_learned_corrections") return learned;
   if (cmd === "review_learned_correction") {
     if (query.has("failLearning")) throw "storage";

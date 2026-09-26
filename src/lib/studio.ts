@@ -43,6 +43,7 @@ export const defaultStudio: StudioSettings = {
   corrections: [],
   overlay_visual: "bars",
   avatar: defaultAvatar,
+  voice_recording: true,
 };
 /** WCAG relative luminance of a #rrggbb color. */
 function luminance(hex: string) {
