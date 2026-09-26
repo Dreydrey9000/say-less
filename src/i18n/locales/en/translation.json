@@ -265,6 +265,10 @@
           "transcribe_with_post_process": {
             "name": "Talk + AI cleanup",
             "description": "Optional. Works like your Talk shortcut, but your words go through AI cleanup first. It sends text only, never audio, to the provider you set in AI cleanup."
+          },
+          "command_selection": {
+            "name": "Rewrite selected text",
+            "description": "Select text in any app, hold this shortcut and say what to do with it, like \"make this shorter\". A preview shows first: Enter replaces the selection, Esc keeps it. Sends the text, never audio, to the provider you set below."
           }
         },
         "errors": {
@@ -1047,6 +1051,7 @@
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
     "actionsHint": "Say a cue to open an app or a website",
+    "commandShortcut": "Rewrite selected text with your voice. You see a preview before anything changes.",
     "stats": {
       "title": "Your numbers",
       "words": "Words dictated",
@@ -1299,5 +1304,19 @@
     "voiceTitle": "Control recording with your voice",
     "voiceDescription": "Press your shortcut, then say “Say less, start recording” or “Say less, stop recording.” Works even when custom actions are off.",
     "reservedCue": "That phrase is saved for screen recording. Pick different words."
+  },
+  "voiceCommand": {
+    "title": "Rewrite preview",
+    "youSaid": "You said: {{instruction}}",
+    "apply": "Replace selection",
+    "keep": "Keep original",
+    "enter": "Enter",
+    "esc": "Esc",
+    "errors": {
+      "nothing_heard": "We did not hear an instruction. Select the text again and say what to do with it.",
+      "no_selection": "Nothing was selected. Select some text first, then hold the shortcut and speak.",
+      "no_provider": "Set up an AI provider on the AI cleanup page first. Rewrites run through that provider.",
+      "provider_failed": "The AI provider did not answer. Your text was not changed."
+    }
   }
 }

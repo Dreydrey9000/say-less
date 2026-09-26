@@ -69,6 +69,7 @@ export function Home({
   const aiKey = app?.post_process_enabled
     ? binding("transcribe_with_post_process")
     : "";
+  const commandKey = binding("command_selection");
   const cancelKey = binding("cancel");
   const modeCopy =
     app?.shortcut_activation === "push_to_talk"
@@ -122,6 +123,12 @@ export function Home({
                   </button>
                 )}
               </li>
+              {commandKey && (
+                <li>
+                  <kbd>{commandKey}</kbd>
+                  <span>{t("home.commandShortcut")}</span>
+                </li>
+              )}
               {cancelKey && (
                 <li>
                   <kbd>{cancelKey}</kbd>

@@ -1,0 +1,138 @@
+@import "../styles/theme.css";
+
+/* The same charcoal card as the recording overlay, sized for a paragraph. */
+:root {
+  --cmd-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --cmd-lift: 18px;
+}
+.cmd-stage {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: var(--cmd-lift);
+  box-sizing: border-box;
+  font-family: var(--cmd-font);
+}
+.cmd-card {
+  width: 444px;
+  max-width: calc(100vw - 2px);
+  max-height: calc(100vh - var(--cmd-lift) - 2px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px 14px;
+  box-sizing: border-box;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #1c1f24 0%, #111316 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -8px 14px rgba(0, 0, 0, 0.35),
+    0 6px 16px -4px rgba(0, 0, 0, 0.45);
+  color: #f4f6f8;
+  color-scheme: dark;
+  animation: cmd-pop 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes cmd-pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cmd-card {
+    animation: none;
+  }
+}
+.cmd-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.cmd-eyebrow {
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a3a09a;
+}
+.cmd-instruction {
+  font-size: 13px;
+  line-height: 18px;
+  color: #a3a09a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cmd-result {
+  margin: 0;
+  min-height: 0;
+  max-height: 132px;
+  overflow: auto;
+  font-size: 15px;
+  line-height: 22px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+.cmd-error {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+}
+.cmd-card[data-status="error"] {
+  border-color: rgba(255, 90, 90, 0.5);
+}
+.cmd-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 2px;
+}
+.cmd-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.cmd-actions button:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+.cmd-actions button:focus-visible {
+  outline: 2px solid #f4f6f8;
+  outline-offset: 2px;
+}
+.cmd-apply {
+  border-color: color-mix(
+    in srgb,
+    var(--studio-accent, #b8ff65) 60%,
+    transparent
+  );
+}
+.cmd-actions kbd {
+  padding: 1px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  color: #a3a09a;
+}

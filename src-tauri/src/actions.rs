@@ -56,6 +56,9 @@ pub trait ShortcutAction: Send + Sync {
 // Transcribe Action
 struct TranscribeAction {
     post_process: bool,
+    /// The transcript is a spoken instruction for the selected text, not
+    /// text to paste (see `voice_command`).
+    command: bool,
 }
 
 /// Field name for structured output JSON schema
@@ -156,6 +159,20 @@ async fn post_process_transcription(settings: &AppSettings, transcription: &str)
         return None;
     }
 
+    run_text_prompt(settings, &provider, &model, &prompt, transcription).await
+}
+
+/// Runs `prompt` over `text` with the user's configured cleanup provider
+/// (own key, Apple Intelligence or Ollama). `${output}` in the prompt stands
+/// for the text. Shared by AI cleanup and voice commands on selected text.
+pub(crate) async fn run_text_prompt(
+    settings: &AppSettings,
+    provider: &crate::settings::PostProcessProvider,
+    model: &str,
+    prompt: &str,
+    transcription: &str,
+) -> Option<String> {
+    let model = model.to_string();
     debug!(
         "Starting LLM post-processing with provider '{}' (model: {})",
         provider.id, model
@@ -236,7 +253,7 @@ async fn post_process_transcription(settings: &AppSettings, transcription: &str)
         });
 
         match crate::llm_client::send_chat_completion_with_schema(
-            &provider,
+            provider,
             api_key.clone(),
             &model,
             user_content,
@@ -294,7 +311,7 @@ async fn post_process_transcription(settings: &AppSettings, transcription: &str)
     debug!("Processed prompt length: {} chars", processed_prompt.len());
 
     match crate::llm_client::send_chat_completion(
-        &provider,
+        provider,
         api_key,
         &model,
         processed_prompt,
@@ -679,6 +696,7 @@ impl ShortcutAction for TranscribeAction {
         play_feedback_sound(app, SoundType::Stop);
 
         let binding_id = binding_id.to_string(); // Clone binding_id for the async task
+        let command = self.command;
         let post_process = self.post_process
             || (get_settings(app).post_process_enabled
                 && crate::studio::get_studio_settings(app.clone())
@@ -781,6 +799,39 @@ impl ShortcutAction for TranscribeAction {
                                 transcription_time.elapsed(),
                                 utils::redact_text(&transcription)
                             );
+
+                            if command {
+                                // The transcript is an instruction for the
+                                // selected text. Nothing is pasted until the
+                                // user accepts the preview.
+                                if use_streaming_overlay {
+                                    tm.emit_stream_working(StreamWorkKind::Polishing);
+                                } else {
+                                    show_processing_overlay(&ah);
+                                }
+                                let outcome = crate::voice_command::run(&ah, &transcription).await;
+                                if rm.was_cancelled_since(cancel_generation) {
+                                    debug!("Voice command cancelled before preview");
+                                    utils::hide_recording_overlay(&ah);
+                                    set_tray_state(&ah, TrayIconState::Idle);
+                                    return;
+                                }
+                                if wav_saved {
+                                    if let Err(err) = hm.save_entry(
+                                        file_name,
+                                        transcription.clone(),
+                                        true,
+                                        outcome.as_ref().ok().map(|p| p.result.clone()),
+                                        Some(crate::voice_command::history_prompt(&transcription)),
+                                    ) {
+                                        error!("Failed to save history entry: {}", err);
+                                    }
+                                }
+                                utils::hide_recording_overlay(&ah);
+                                set_tray_state(&ah, TrayIconState::Idle);
+                                crate::voice_command::present(&ah, outcome);
+                                return;
+                            }
 
                             if post_process {
                                 if use_streaming_overlay {
@@ -935,6 +986,28 @@ impl ShortcutAction for CancelAction {
     }
 }
 
+// Voice command preview: Enter pastes the rewrite over the selection.
+struct VoiceCommandApplyAction;
+
+impl ShortcutAction for VoiceCommandApplyAction {
+    fn start(&self, app: &AppHandle, _binding_id: &str, _shortcut_str: &str) {
+        crate::voice_command::apply(app);
+    }
+
+    fn stop(&self, _app: &AppHandle, _binding_id: &str, _shortcut_str: &str) {}
+}
+
+// Voice command preview: Esc keeps the original text.
+struct VoiceCommandDismissAction;
+
+impl ShortcutAction for VoiceCommandDismissAction {
+    fn start(&self, app: &AppHandle, _binding_id: &str, _shortcut_str: &str) {
+        crate::voice_command::dismiss(app);
+    }
+
+    fn stop(&self, _app: &AppHandle, _binding_id: &str, _shortcut_str: &str) {}
+}
+
 // Test Action
 struct TestAction;
 
@@ -965,17 +1038,37 @@ pub static ACTION_MAP: Lazy<HashMap<String, Arc<dyn ShortcutAction>>> = Lazy::ne
         "transcribe".to_string(),
         Arc::new(TranscribeAction {
             post_process: false,
+            command: false,
         }) as Arc<dyn ShortcutAction>,
     );
     map.insert(
         "transcribe_fn".to_string(),
         Arc::new(TranscribeAction {
             post_process: false,
+            command: false,
         }) as Arc<dyn ShortcutAction>,
     );
     map.insert(
         "transcribe_with_post_process".to_string(),
-        Arc::new(TranscribeAction { post_process: true }) as Arc<dyn ShortcutAction>,
+        Arc::new(TranscribeAction {
+            post_process: true,
+            command: false,
+        }) as Arc<dyn ShortcutAction>,
+    );
+    map.insert(
+        "command_selection".to_string(),
+        Arc::new(TranscribeAction {
+            post_process: false,
+            command: true,
+        }) as Arc<dyn ShortcutAction>,
+    );
+    map.insert(
+        crate::voice_command::APPLY_BINDING_ID.to_string(),
+        Arc::new(VoiceCommandApplyAction) as Arc<dyn ShortcutAction>,
+    );
+    map.insert(
+        crate::voice_command::DISMISS_BINDING_ID.to_string(),
+        Arc::new(VoiceCommandDismissAction) as Arc<dyn ShortcutAction>,
     );
     map.insert(
         "cancel".to_string(),

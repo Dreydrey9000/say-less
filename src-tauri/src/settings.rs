@@ -911,6 +911,24 @@ pub fn get_default_settings() -> AppSettings {
             current_binding: default_post_process_shortcut.to_string(),
         },
     );
+    // Voice command on selected text: select, hold, say "make this shorter",
+    // preview, Enter. Ctrl is added so it never collides with the two talk
+    // shortcuts above.
+    #[cfg(target_os = "macos")]
+    let default_command_shortcut = "ctrl+option+space";
+    #[cfg(not(target_os = "macos"))]
+    let default_command_shortcut = "ctrl+alt+space";
+    bindings.insert(
+        "command_selection".to_string(),
+        ShortcutBinding {
+            id: "command_selection".to_string(),
+            name: "Rewrite selected text".to_string(),
+            description: "Select text, say what to do with it, and preview the rewrite before it replaces the selection."
+                .to_string(),
+            default_binding: default_command_shortcut.to_string(),
+            current_binding: default_command_shortcut.to_string(),
+        },
+    );
     bindings.insert(
         "cancel".to_string(),
         ShortcutBinding {

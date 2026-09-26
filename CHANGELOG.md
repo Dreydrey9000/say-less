@@ -4,6 +4,8 @@
 
 ### Added
 
+- Voice commands on selected text: select text in any app, hold the new "Rewrite selected text" shortcut (Ctrl+Option+Space on Mac, Ctrl+Alt+Space elsewhere) and say what to do with it, like "make this shorter". A small preview shows the rewrite first: Enter replaces the selection, Esc keeps the original. The rewrite runs through the AI provider you already set up for cleanup (your own key, Apple Intelligence or Ollama), sending the text and never audio.
+- The shortcut sits under the AI cleanup shortcut on the AI cleanup page and is listed under "Other recording shortcuts" on Home. Each command is saved to History with the instruction and the result.
 - Home shows your numbers once you have dictated at least once: words dictated, time saved and a day streak, all computed from the history stored on this computer. Time saved is labelled as an estimate (your words divided by 40 words a minute, a typical typing speed) because we do not measure your typing, and a wrong number would cost trust.
 - The streak counts days in a row with at least one dictation and does not break while today is still in progress; the Rust streak math has its own tests.
 - Painted avatar pack: 16 characters (people, animals, a robot, an alien, two silver-chrome characters) in a "Pick a character" gallery beside "Make your own", because the flat SVG faces read as clip-art next to the chrome brand.
