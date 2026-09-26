@@ -125,6 +125,57 @@ let screenStatus = {
 };
 const screenFile =
   "/Users/test/Movies/Say Less/Say Less 2026-09-25 at 14.03.07.mp4";
+// Recording setup, saved in localStorage like the real store. ?displays=2
+// adds a second screen, ?camera=denied refuses Camera permission,
+// ?screen=window makes Record fail because the saved window closed.
+const defaultRecording = {
+  source: "display",
+  display_id: null,
+  window_id: null,
+  window_label: null,
+  microphone: true,
+  microphone_name: null,
+  system_audio: true,
+  webcam: false,
+  camera_id: null,
+  webcam_corner: "bottom_right",
+  webcam_size: "medium",
+  quality: "p1080",
+  fps: 30,
+};
+let recordingOptions = JSON.parse(
+  localStorage.getItem("test-recording") || JSON.stringify(defaultRecording),
+);
+const recordingSources = {
+  displays: [
+    {
+      id: 1,
+      name: "Built-in Display",
+      width: 1512,
+      height: 982,
+      is_main: true,
+    },
+    ...(query.get("displays") === "2"
+      ? [
+          {
+            id: 2,
+            name: "Studio Display",
+            width: 2560,
+            height: 1440,
+            is_main: false,
+          },
+        ]
+      : []),
+  ],
+  windows: [
+    { id: 11, app: "Safari", title: "Start page" },
+    { id: 12, app: "Notes", title: "" },
+  ],
+  cameras: [{ id: "cam-1", name: "FaceTime HD Camera" }],
+  windows_need_permission: false,
+};
+const cameraFrame =
+  "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='8'><rect width='8' height='8' fill='%23c98'/></svg>";
 mockWindows("main");
 const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
   const calls = ((
@@ -133,7 +184,34 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
   calls.push(cmd);
   if (cmd === "get_dock_state") return "idle";
   if (cmd === "screen_recording_status") return screenStatus;
+  if (cmd === "get_recording_options") return recordingOptions;
+  if (cmd === "save_recording_options") {
+    const next = payload?.options as typeof recordingOptions;
+    if (next.source === "window" && next.window_id === null)
+      throw "window_required";
+    recordingOptions = next;
+    localStorage.setItem("test-recording", JSON.stringify(next));
+    return next;
+  }
+  if (cmd === "list_recording_sources") {
+    if (osName !== "macos") throw "windows_soon";
+    return recordingSources;
+  }
+  if (cmd === "start_camera_preview") {
+    if (query.get("camera") === "denied") throw "camera_denied";
+    return null;
+  }
+  if (cmd === "camera_preview_frame") return cameraFrame;
+  if (cmd === "stop_camera_preview") return null;
+  if (cmd === "open_camera_settings") return null;
+  if (cmd.includes("check_camera_permission"))
+    return query.get("camera") !== "denied";
+  if (cmd.includes("request_camera_permission")) return null;
   if (cmd === "start_screen_recording") {
+    if (query.get("screen") === "window") {
+      screenStatus = { ...screenStatus, error: "window_missing" };
+      throw "window_missing";
+    }
     if (query.get("screen") === "denied") {
       screenStatus = { ...screenStatus, error: "permission_denied" };
       throw "permission_denied";

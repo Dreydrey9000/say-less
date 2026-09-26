@@ -90,6 +90,59 @@ async openScreenRecordingSettings() : Promise<Result<null, string>> {
     else return { status: "error", error: e  as any };
 }
 },
+async getRecordingOptions() : Promise<RecordingOptions> {
+    return await TAURI_INVOKE("get_recording_options");
+},
+async saveRecordingOptions(options: RecordingOptions) : Promise<Result<RecordingOptions, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("save_recording_options", { options }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+/**
+ * Displays, open windows and cameras. Never shows a permission prompt.
+ */
+async listRecordingSources() : Promise<Result<RecordingSources, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("list_recording_sources") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+/**
+ * Start the live camera thumbnail for the setup panel.
+ */
+async startCameraPreview(cameraId: string | null) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("start_camera_preview", { cameraId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+/**
+ * The newest thumbnail frame as a `data:image/jpeg` URL, if any.
+ */
+async cameraPreviewFrame() : Promise<string | null> {
+    return await TAURI_INVOKE("camera_preview_frame");
+},
+async stopCameraPreview() : Promise<void> {
+    await TAURI_INVOKE("stop_camera_preview");
+},
+/**
+ * Open System Settings on Privacy & Security > Camera.
+ */
+async openCameraSettings() : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("open_camera_settings") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
 async dockToggleRecording() : Promise<Result<null, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("dock_toggle_recording") };
@@ -1226,8 +1279,10 @@ export type AvatarSettings = { kind: string; body: string; accent: string; backg
  */
 preset: string | null }
 export type BindingResponse = { success: boolean; binding: ShortcutBinding | null; error: string | null }
+export type CameraInfo = { id: string; name: string }
 export type ClipboardHandling = "dont_modify" | "copy_to_clipboard"
 export type CustomSounds = { start: boolean; stop: boolean }
+export type DisplayInfo = { id: number; name: string; width: number; height: number; is_main: boolean }
 export type EngineType = 
 /**
  * Any GGML/GGUF model loaded through transcribe-cpp (Whisper, Parakeet,
@@ -1306,7 +1361,44 @@ export type PostProcessProvider = { id: string; label: string; base_url: string;
  * What the recorder is doing right now.
  */
 export type RecorderState = "idle" | "starting" | "recording" | "stopping"
+export type RecordingOptions = { source: RecordingSource; 
+/**
+ * Which display (macOS display id). None records the main display.
+ */
+display_id: number | null; 
+/**
+ * Which window when `source` is `window`.
+ */
+window_id: number | null; 
+/**
+ * A label for the chosen window ("Safari: Start page"), so the panel can
+ * name it even after the window closes.
+ */
+window_label: string | null; microphone: boolean; 
+/**
+ * Microphone by name, from the same list dictation uses. None follows
+ * the dictation microphone.
+ */
+microphone_name: string | null; system_audio: boolean; webcam: boolean; 
+/**
+ * Camera unique id. None uses the default camera.
+ */
+camera_id: string | null; webcam_corner: WebcamCorner; webcam_size: WebcamSize; quality: RecordingQuality; 
+/**
+ * 30 or 60.
+ */
+fps: number }
+export type RecordingQuality = "p720" | "p1080" | "native"
 export type RecordingRetentionPeriod = "never" | "preserve_limit" | "days_3" | "weeks_2" | "months_3"
+export type RecordingSource = "display" | "window"
+/**
+ * What the setup panel can offer on this computer right now.
+ */
+export type RecordingSources = { displays: DisplayInfo[]; windows: WindowInfo[]; cameras: CameraInfo[]; 
+/**
+ * True when windows can't be listed until Screen Recording is allowed.
+ */
+windows_need_permission: boolean }
 /**
  * Everything the UI needs to draw the record button.
  */
@@ -1436,6 +1528,9 @@ export type TypingTool = "auto" | "wtype" | "kwtype" | "dotool" | "ydotool" | "x
 export type VadBackend = "silero" | "earshot"
 export type VoiceAction = { cue: string; kind: string; target: string }
 export type VoiceSnippet = { trigger: string; expansion: string }
+export type WebcamCorner = "top_left" | "top_right" | "bottom_left" | "bottom_right"
+export type WebcamSize = "small" | "medium" | "large"
+export type WindowInfo = { id: number; app: string; title: string }
 export type WindowsMicrophonePermissionStatus = { supported: boolean; overall_access: PermissionAccess; device_access: PermissionAccess; app_access: PermissionAccess; desktop_app_access: PermissionAccess }
 export type WritingStyle = "original" | "formal" | "casual" | "lowercase"
 

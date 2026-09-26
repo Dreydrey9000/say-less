@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom/client";
 import { useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { listen } from "@tauri-apps/api/event";
+import { emit, listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import {
   checkMicrophonePermission,
@@ -18,7 +18,9 @@ import {
   ChevronDown,
   MonitorPlay,
   FolderOpen,
+  SlidersHorizontal,
 } from "lucide-react";
+import { OPEN_RECORDING_SETUP_EVENT } from "@/lib/recordingOptions";
 import { Companion, formations } from "@/components/companion/Companion";
 import { useVoiceActivity } from "@/hooks/useVoiceActivity";
 import { startStudioSync, useStudio } from "@/lib/studio";
@@ -71,7 +73,13 @@ function useDockScreenRecording() {
       await rec.toggle();
       const notice = useScreenRecording.getState().notice;
       // The dock is too small to explain permissions; the main window does.
-      if (notice === "permission_denied" || notice === "microphone_denied")
+      if (
+        notice === "permission_denied" ||
+        notice === "microphone_denied" ||
+        notice === "camera_denied" ||
+        notice === "camera_failed" ||
+        notice === "window_missing"
+      )
         await invoke("show_main_window_command").catch(() => undefined);
     },
   };
@@ -318,6 +326,23 @@ function Dock() {
           </span>
         </button>
         <ScreenButton compact={false} />
+        <Tooltip
+          label={t("recordingSetup.open")}
+          placement="bottom"
+          align="end"
+        >
+          {/* The dock never takes keyboard focus from the app you're in, so
+              the setup lives in the main window, where it can. */}
+          <button
+            className="dock-screen-setup"
+            onClick={async () => {
+              await invoke("show_main_window_command").catch(() => undefined);
+              await emit(OPEN_RECORDING_SETUP_EVENT).catch(() => undefined);
+            }}
+          >
+            <SlidersHorizontal size={16} aria-hidden="true" />
+          </button>
+        </Tooltip>
         <Tooltip label={t("dock.settings")} placement="bottom" align="end">
           <button onClick={() => void invoke("show_main_window_command")}>
             <Settings size={19} />

@@ -32,6 +32,10 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Sidebar, SidebarSection, SECTIONS_CONFIG } from "./components/Sidebar";
 import { NavigateContext } from "./components/navigation";
 import { NAVIGATE_EVENT } from "./lib/navigation";
+import {
+  OPEN_RECORDING_SETUP_EVENT,
+  useRecordingOptions,
+} from "./lib/recordingOptions";
 import { WhatsNewGate } from "./components/whats-new";
 import { useSettings } from "./hooks/useSettings";
 import { useSettingsStore } from "./stores/settingsStore";
@@ -177,6 +181,17 @@ function App() {
       void pending.then((fn) => fn());
     };
   }, [t]);
+
+  // The dock's Recording setup button: open Home with the setup panel.
+  useEffect(() => {
+    const pending = listen(OPEN_RECORDING_SETUP_EVENT, () => {
+      setCurrentSection("home");
+      useRecordingOptions.setState({ setupRequested: true });
+    });
+    return () => {
+      void pending.then((fn) => fn());
+    };
+  }, []);
 
   // Other parts of the window (e.g. the footer model popover) can ask to open a
   // section without prop drilling.

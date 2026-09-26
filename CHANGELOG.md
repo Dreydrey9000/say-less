@@ -8,11 +8,20 @@
 - The paintings ship as static WebP files in public/avatars (256px and 128px, 144 KB in total), painted once for this project with the subpowers image skill, so the app stays offline and needs no image subscription; prompts and provenance live in docs/avatars.
 - Painted avatars keep talking: each painting has bead eyes and no mouth, and the live SVG mouth and blinking lids draw on top at per-character anchors (src/lib/avatarPresets.ts), because a painted open/closed crossfade gave only two mouth states and was unreadable at 40px.
 - scripts/build-avatar-pack.sh rebuilds the pack from the 512px masters with cwebp, so nobody has to repaint to change sizes.
+- Recording setup on Mac, opened from the Setup button next to Record on Home or the new setup button on the dock: record the whole screen (pick the display) or one window, turn the microphone on or off and pick which mic, turn computer sound on or off, and pick 720p, 1080p or full size at 30 or 60 fps, because people asked to customize what goes into the video.
+- Webcam bubble: a round, draggable camera window in the corner and size you pick (small, medium, large), burned into the video by the same ScreenCaptureKit recording, so your face is in the file with no editing step. The recording still leaves out every other Say Less window.
+- Live camera thumbnail in the setup panel, so you see what the bubble will show before you record.
+- Camera permission: NSCameraUsageDescription, the camera entitlement, a request only when you turn the webcam on, and a plain message with Open System Settings if it's off.
+- Recording options saved in their own recording.json with safe defaults (whole screen, mic and computer sound, 1080p30 for 8GB laptops); a broken or old value falls back to its default without resetting the rest.
+- swift/record_check.swift, a hand-run check of the real recorder with the webcam bubble (cargo test can't host a window).
 
 ### Changed
 
 - AvatarSettings has a `preset` field; old saves load unchanged, and an unknown preset falls back to the custom avatar on load and save instead of failing.
 - Painted avatars take a ring color in place of the SVG colors and hats; the 40px pill loads the 128px image and the dock and preview load 256px.
+- Start only asks for the permissions the saved setup uses: no microphone permission needed with the mic off, no camera permission with the webcam off.
+- The one-click Record button, the tray item and "Say less, start recording" all use the saved setup.
+- Windows and Linux show the same setup, disabled, with the same plain reason as the Record button.
 
 ## [2026-09-25]
 

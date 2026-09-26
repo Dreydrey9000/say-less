@@ -103,11 +103,15 @@ In **Appearance → Recording indicator**, switch the animation between Bars (de
 
 ## Screen recording
 
-On a Mac with macOS 15 or newer, click **Record screen** on Home, on the floating dock, or in the tray menu. Or press your dictation shortcut and say "Say less, start recording." We save one MP4 with your screen, your voice and your computer's sound to `~/Movies/Say Less/`. Say Less hides its own windows from the video. macOS asks for Screen Recording permission the first time. Windows support is planned (phase 2); until then the button is disabled there with a plain reason.
+On a Mac with macOS 15 or newer, click **Record screen** on Home, on the floating dock, or in the tray menu. Or press your dictation shortcut and say "Say less, start recording." We save one MP4 with your screen, your voice and your computer's sound to `~/Movies/Say Less/`. Say Less hides its own windows from the video. macOS asks for Screen Recording permission the first time. Windows support is planned (phase 2); until then the button and the setup are disabled there with a plain reason.
+
+Click **Setup** next to the Record button (or the setup button on the dock) to pick what gets recorded: the whole screen or one window, the microphone and which mic, computer sound, your webcam, and quality (720p, 1080p or full size at 30 or 60 fps; default 1080p30). With the webcam on, your face shows in a round, draggable bubble in the corner and size you pick, and the recording captures it, so it's burned into the video. The setup is saved in `recording.json`. macOS asks for Camera permission the first time you turn the webcam on.
+
+To check the real recorder by hand on a Mac: `cargo test real_recording -- --ignored --nocapture` in `src-tauri` (mic and system audio), and `src-tauri/swift/record_check.swift` for the webcam bubble (build and run steps are at the top of that file).
 
 ![Screen recording flow](docs/diagrams/screen-recording.svg)
 
-[Editable diagram](docs/diagrams/screen-recording.mmd) · Code: `src-tauri/src/screen_recorder.rs`, `src-tauri/swift/screen_recorder.swift`
+[Editable diagram](docs/diagrams/screen-recording.mmd) · Code: `src-tauri/src/screen_recorder.rs`, `src-tauri/src/capture_options.rs`, `src-tauri/swift/screen_recorder.swift`, `src/components/RecordingSetup.tsx`
 
 ## Say less, stress less
 
