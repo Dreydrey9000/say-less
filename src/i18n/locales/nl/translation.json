@@ -1046,7 +1046,17 @@
     },
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
-    "actionsHint": "Say a cue to open an app or a website"
+    "actionsHint": "Say a cue to open an app or a website",
+    "stats": {
+      "title": "Your numbers",
+      "words": "Words dictated",
+      "saved": "Time saved, estimated",
+      "streak": "Day streak",
+      "minutes": "{{n}} min",
+      "hours": "{{h}} h",
+      "hoursMinutes": "{{h}} h {{m}} min",
+      "note": "From {{dictations}} dictations stored on this computer. Time saved is an estimate: your words divided by {{wpm}} words a minute, a typical typing speed. We do not measure your typing. The streak counts days in a row with at least one dictation."
+    }
   },
   "companion": {
     "title": "Particle pattern",

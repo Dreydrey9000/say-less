@@ -11,6 +11,7 @@ import { useSettings } from "@/hooks/useSettings";
 import { useVoiceActivity } from "@/hooks/useVoiceActivity";
 import { useStudio } from "@/lib/studio";
 import { Companion } from "./companion/Companion";
+import { HomeStats } from "./HomeStats";
 import { ScreenRecordingCard } from "./ScreenRecordingCard";
 import type { SidebarSection } from "./Sidebar";
 import { Button } from "./ui/Button";
@@ -200,6 +201,7 @@ export function Home({
           </button>
         ))}
       </section>
+      <HomeStats />
       <section className="home-history">
         <header>
           <h2>{t("home.recent")}</h2>

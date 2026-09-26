@@ -1,5 +1,12 @@
 # Changelog
 
+## [2026-09-26]
+
+### Added
+
+- Home shows your numbers once you have dictated at least once: words dictated, time saved and a day streak, all computed from the history stored on this computer. Time saved is labelled as an estimate (your words divided by 40 words a minute, a typical typing speed) because we do not measure your typing, and a wrong number would cost trust.
+- The streak counts days in a row with at least one dictation and does not break while today is still in progress; the Rust streak math has its own tests.
+
 ## [2026-09-25]
 
 ### Added

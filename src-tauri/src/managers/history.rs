@@ -1,10 +1,11 @@
 use anyhow::{anyhow, Result};
-use chrono::{DateTime, Local, Utc};
+use chrono::{DateTime, Local, NaiveDate, Utc};
 use log::{debug, error, info};
 use rusqlite::{params, Connection, OptionalExtension};
 use rusqlite_migration::{Migrations, M};
 use serde::{Deserialize, Serialize};
 use specta::Type;
+use std::collections::BTreeSet;
 use std::fs;
 use std::path::PathBuf;
 use tauri::AppHandle;
@@ -63,6 +64,59 @@ pub struct HistoryEntry {
     pub post_processed_text: Option<String>,
     pub post_process_prompt: Option<String>,
     pub post_process_requested: bool,
+}
+
+/// Totals computed from the local history database for the Home screen.
+///
+/// Every number here is a count, not a measurement of typing. The front end
+/// turns `words` into a time estimate and labels it as one.
+#[derive(Clone, Debug, Serialize, Deserialize, Type)]
+pub struct UsageStats {
+    /// Words across every dictation, counted on the text that was pasted
+    /// (the cleaned text when AI cleanup ran, the raw transcript otherwise).
+    pub words: i64,
+    /// Dictations that produced text. Failed or empty recordings do not count.
+    pub dictations: i64,
+    /// Calendar days in a row (local time) with at least one dictation, ending
+    /// today or, when today has none yet, yesterday.
+    pub streak_days: u32,
+    /// Distinct local days with at least one dictation.
+    pub active_days: u32,
+}
+
+/// Words in a dictation: runs of non-whitespace, the same rule a word counter
+/// in a text editor uses.
+pub(crate) fn count_words(text: &str) -> i64 {
+    text.split_whitespace().count() as i64
+}
+
+/// The local calendar day a Unix timestamp (seconds) falls on.
+pub(crate) fn local_day(timestamp: i64) -> Option<NaiveDate> {
+    DateTime::from_timestamp(timestamp, 0).map(|utc| utc.with_timezone(&Local).date_naive())
+}
+
+/// Consecutive days with a dictation, counted back from `today`. A day that is
+/// not over yet must not break the streak, so when `today` has nothing the
+/// count starts from yesterday instead. Two days of silence end it.
+pub(crate) fn streak_days(days: &BTreeSet<NaiveDate>, today: NaiveDate) -> u32 {
+    let start = if days.contains(&today) {
+        today
+    } else {
+        match today.pred_opt() {
+            Some(yesterday) if days.contains(&yesterday) => yesterday,
+            _ => return 0,
+        }
+    };
+    let mut streak = 0;
+    let mut cursor = Some(start);
+    while let Some(day) = cursor {
+        if !days.contains(&day) {
+            break;
+        }
+        streak += 1;
+        cursor = day.pred_opt();
+    }
+    streak
 }
 
 pub struct HistoryManager {
@@ -554,6 +608,49 @@ impl HistoryManager {
         Ok(entry)
     }
 
+    /// Totals for the Home screen, computed from every stored dictation.
+    pub fn get_usage_stats(&self) -> Result<UsageStats> {
+        let conn = self.get_connection()?;
+        Self::usage_stats_with_conn(&conn, Local::now().date_naive())
+    }
+
+    fn usage_stats_with_conn(conn: &Connection, today: NaiveDate) -> Result<UsageStats> {
+        let mut stmt = conn.prepare(
+            "SELECT timestamp, transcription_text, post_processed_text
+             FROM transcription_history
+             WHERE transcription_text != ''",
+        )?;
+        let rows = stmt.query_map([], |row| {
+            Ok((
+                row.get::<_, i64>(0)?,
+                row.get::<_, String>(1)?,
+                row.get::<_, Option<String>>(2)?,
+            ))
+        })?;
+
+        let mut words = 0;
+        let mut dictations = 0;
+        let mut days = BTreeSet::new();
+        for row in rows {
+            let (timestamp, transcription, post_processed) = row?;
+            let pasted = post_processed
+                .filter(|text| !text.trim().is_empty())
+                .unwrap_or(transcription);
+            words += count_words(&pasted);
+            dictations += 1;
+            if let Some(day) = local_day(timestamp) {
+                days.insert(day);
+            }
+        }
+
+        Ok(UsageStats {
+            words,
+            dictations,
+            streak_days: streak_days(&days, today),
+            active_days: days.len() as u32,
+        })
+    }
+
     pub async fn toggle_saved_status(&self, id: i64) -> Result<()> {
         let conn = self.get_connection()?;
 
@@ -719,6 +816,90 @@ mod tests {
         assert_eq!(entry.timestamp, 200);
         assert_eq!(entry.transcription_text, "second");
         assert_eq!(entry.post_processed_text.as_deref(), Some("processed"));
+    }
+
+    fn day(y: i32, m: u32, d: u32) -> NaiveDate {
+        NaiveDate::from_ymd_opt(y, m, d).expect("valid date")
+    }
+
+    fn days(list: &[NaiveDate]) -> BTreeSet<NaiveDate> {
+        list.iter().copied().collect()
+    }
+
+    #[test]
+    fn streak_is_zero_with_no_dictations() {
+        assert_eq!(streak_days(&BTreeSet::new(), day(2026, 9, 26)), 0);
+    }
+
+    #[test]
+    fn streak_counts_consecutive_days_ending_today() {
+        let set = days(&[day(2026, 9, 24), day(2026, 9, 25), day(2026, 9, 26)]);
+        assert_eq!(streak_days(&set, day(2026, 9, 26)), 3);
+    }
+
+    #[test]
+    fn streak_survives_a_day_that_is_not_over_yet() {
+        // Nothing dictated today so far; yesterday and the day before count.
+        let set = days(&[day(2026, 9, 24), day(2026, 9, 25)]);
+        assert_eq!(streak_days(&set, day(2026, 9, 26)), 2);
+    }
+
+    #[test]
+    fn streak_ends_after_two_quiet_days() {
+        let set = days(&[day(2026, 9, 20), day(2026, 9, 21), day(2026, 9, 24)]);
+        assert_eq!(streak_days(&set, day(2026, 9, 26)), 0);
+    }
+
+    #[test]
+    fn streak_stops_at_the_first_gap() {
+        let set = days(&[
+            day(2026, 9, 22),
+            day(2026, 9, 24),
+            day(2026, 9, 25),
+            day(2026, 9, 26),
+        ]);
+        assert_eq!(streak_days(&set, day(2026, 9, 26)), 3);
+    }
+
+    #[test]
+    fn streak_crosses_a_month_boundary() {
+        let set = days(&[day(2026, 8, 30), day(2026, 8, 31), day(2026, 9, 1)]);
+        assert_eq!(streak_days(&set, day(2026, 9, 1)), 3);
+    }
+
+    #[test]
+    fn words_are_whitespace_separated() {
+        assert_eq!(count_words(""), 0);
+        assert_eq!(count_words("   "), 0);
+        assert_eq!(count_words("one"), 1);
+        assert_eq!(count_words("Hello,  world.\nNew line"), 4);
+    }
+
+    #[test]
+    fn usage_stats_count_pasted_text_and_skip_empty_entries() {
+        let conn = setup_conn();
+        // The raw transcript is 3 words; cleanup made it 4, and 4 were pasted.
+        insert_entry(
+            &conn,
+            100,
+            "hello there friend",
+            Some("Hello there, my friend."),
+        );
+        insert_entry(&conn, 200, "one two", None);
+        // Cleanup that returned nothing falls back to the transcript.
+        insert_entry(&conn, 300, "a b c", Some("   "));
+        // A failed recording has no text and must not count.
+        insert_entry(&conn, 400, "", None);
+
+        let stats = HistoryManager::usage_stats_with_conn(&conn, day(2026, 9, 26))
+            .expect("compute usage stats");
+
+        assert_eq!(stats.words, 9);
+        assert_eq!(stats.dictations, 3);
+        // Timestamps 100..300 are all 1970-01-01, so one active day and no
+        // streak reaching 2026.
+        assert_eq!(stats.active_days, 1);
+        assert_eq!(stats.streak_days, 0);
     }
 
     #[test]
