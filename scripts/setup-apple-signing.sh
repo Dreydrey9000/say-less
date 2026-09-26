@@ -41,22 +41,43 @@ echo "  Exported only the Developer ID certificate."
 echo
 echo "Step 2 of 2: notarization login (Apple scans the app so Macs trust it)."
 echo "  Make an app-specific password at https://account.apple.com > Sign-In and Security > App-Specific Passwords > +"
-read -r -p "Team ID [$TEAM_ID_DEFAULT]: " TEAM_ID
-TEAM_ID=${TEAM_ID:-$TEAM_ID_DEFAULT}
+TEAM_ID="${APPLE_TEAM_ID:-$TEAM_ID_DEFAULT}"
+echo "  Team ID: $TEAM_ID"
 # Check the login with Apple before saving anything, so a typo fails here in
 # seconds instead of at the end of a 30-minute release build.
+# Easiest path: keep the login in ~/.secrets/say-less.env (made with
+# `secret-file say-less APPLE_ID APPLE_APP_PASSWORD`), so nothing is typed here.
+SECRETS_FILE="$HOME/.secrets/say-less.env"
+if [ -f "$SECRETS_FILE" ]; then
+  FILE_ID=$(grep -m1 '^APPLE_ID=' "$SECRETS_FILE" | cut -d= -f2- || true)
+  FILE_PW=$(grep -m1 '^APPLE_APP_PASSWORD=' "$SECRETS_FILE" | cut -d= -f2- || true)
+  [ -n "$FILE_ID" ] && [ -z "${APPLE_ID:-}" ] && APPLE_ID="$FILE_ID"
+fi
+APPLE_ID_PRESET="${APPLE_ID:-}"
 for attempt in 1 2 3; do
-  read -r -p "Apple ID email (the one that owns the developer account): " APPLE_ID
-  read -r -s -p "App-specific password (paste, then Enter): " APPLE_APP_PW; echo
+  if [ -n "$APPLE_ID_PRESET" ]; then
+    APPLE_ID="$APPLE_ID_PRESET"
+    echo "  Apple ID: $APPLE_ID"
+  else
+    read -r -p "Apple ID email (the one that owns the developer account): " APPLE_ID
+  fi
+  if [ -n "${FILE_PW:-}" ] && [ "$attempt" = 1 ]; then
+    APPLE_APP_PW="$FILE_PW"
+    echo "  Using the password saved in $SECRETS_FILE"
+  else
+    read -r -s -p "App-specific password (paste, then Enter): " APPLE_APP_PW; echo
+  fi
   APPLE_ID=$(printf '%s' "$APPLE_ID" | tr -d '[:space:]')
   APPLE_APP_PW=$(printf '%s' "$APPLE_APP_PW" | tr -d '[:space:]')
   echo "  Checking that login with Apple..."
-  if xcrun notarytool history --apple-id "$APPLE_ID" --password "$APPLE_APP_PW" \
-      --team-id "$TEAM_ID" >/dev/null 2>&1; then
+  if CHECK_OUT=$(xcrun notarytool history --apple-id "$APPLE_ID" --password "$APPLE_APP_PW" \
+      --team-id "$TEAM_ID" 2>&1); then
     echo "  Apple accepted it."
     break
   fi
-  echo "  Apple said no. Check the email, or make a fresh app-specific password and paste it."
+  echo "  Apple said no: $(printf '%s' "$CHECK_OUT" | grep -m1 -i 'error' || printf '%s' "$CHECK_OUT" | tail -1)"
+  echo "  (Password was ${#APPLE_APP_PW} characters. An app-specific password is 16 letters, shown as xxxx-xxxx-xxxx-xxxx.)"
+  echo "  Make a fresh app-specific password, copy it, and paste it here."
   if [ "$attempt" = 3 ]; then echo "Nothing was saved."; exit 1; fi
 done
 
