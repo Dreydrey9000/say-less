@@ -152,6 +152,19 @@ export function IndicatorAnimation({ preview }: { preview: AnimationPreview }) {
 }
 
 /**
+ * Switching into the bot starts it as a white orb on near-black, the look it
+ * was drawn for; skin tones make a muddy orb. Every color stays editable.
+ */
+export function switchKind(
+  draft: AvatarSettings,
+  kind: AvatarSettings["kind"],
+): AvatarSettings {
+  if (kind === "bot" && draft.kind !== "bot")
+    return { ...draft, kind, body: "#ececef", background: "#141417" };
+  return { ...draft, kind };
+}
+
+/**
  * Pick a painted character from the pack, or make your own flat avatar
  * (style, colors and accessory). Shown only when an avatar is in use.
  */
@@ -285,10 +298,10 @@ export function AvatarBuilder({ preview }: { preview: AnimationPreview }) {
                     type="button"
                     key={kind}
                     aria-pressed={draft.kind === kind}
-                    onClick={() => update({ ...draft, kind })}
+                    onClick={() => update(switchKind(draft, kind))}
                   >
                     <span className="avatar-kind-thumb" aria-hidden="true">
-                      <Avatar avatar={{ ...draft, kind }} small />
+                      <Avatar avatar={switchKind(draft, kind)} small />
                     </span>
                     <span>{t(`voiceVisuals.kinds.${kind}`)}</span>
                   </button>

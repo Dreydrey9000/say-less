@@ -16,7 +16,7 @@ export const defaultAvatar: AvatarSettings = {
   accessory: "none",
   preset: null,
 };
-export const avatarKinds = ["stick", "person", "cat", "dog"] as const;
+export const avatarKinds = ["stick", "person", "cat", "dog", "bot"] as const;
 export const avatarAccessories = [
   "none",
   "cap",
