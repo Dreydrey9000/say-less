@@ -253,6 +253,14 @@ button:disabled {
   font-weight: 650;
   font-size: 13px;
 }
+/* Recording setup: a slim button right next to the screen button. */
+.floating-bar .dock-screen-setup {
+  min-width: 26px;
+  width: 26px;
+  margin-inline-start: -2px;
+  padding: 0;
+  border-radius: 10px;
+}
 .dock-screen[aria-disabled="true"],
 .compact-screen[aria-disabled="true"] {
   opacity: 0.5;

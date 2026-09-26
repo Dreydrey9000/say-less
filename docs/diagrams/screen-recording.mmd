@@ -5,13 +5,18 @@ flowchart LR
         Tray[Tray: Record Screen]
         Voice["Shortcut + 'say less start recording'"]
     end
+    Setup["Recording setup (Home panel, or the dock's setup button)<br/>screen or one window, mic + which mic, computer sound,<br/>webcam + camera, corner, size, 720p/1080p/native, 30/60 fps"]
+    Setup -->|save_recording_options| Store[(recording.json<br/>defaults: whole screen, mic, sound, 1080p30)]
     Voice --> Match[studio.rs recording_cue, checked before custom actions, nothing pasted]
     Home --> Cmd
     Dock --> Cmd
     Tray --> Cmd
     Match --> Cmd[Rust screen_recorder: start / stop / status]
-    Cmd -->|Screen Recording or mic permission missing| Denied[Plain message + Open System Settings]
+    Store --> Cmd
+    Cmd -->|a permission the setup needs is missing: screen, mic, camera| Denied[Plain message + Open System Settings]
     Cmd -->|macOS 15+| Swift[Swift bridge: ScreenCaptureKit SCRecordingOutput]
-    Cmd -->|Windows, Linux, macOS below 15| Off[Button disabled with a reason. Windows is phase 2]
-    Swift --> File["~/Movies/Say Less/Say Less YYYY-MM-DD at HH.MM.SS.mp4<br/>H.264 1080p30 + AAC: mic mixed with system audio"]
+    Swift -->|webcam on| Bubble[Round camera window, always on top, draggable.<br/>The filter leaves out Say Less windows except this one]
+    Cmd -->|Windows, Linux, macOS below 15| Off[Button and setup disabled with a reason. Windows is phase 2]
+    Swift --> File["~/Movies/Say Less/Say Less YYYY-MM-DD at HH.MM.SS.mp4<br/>H.264 + AAC (mic mixed with system audio), face burned in"]
+    Bubble --> File
     Cmd -->|screen-recording-changed event| UI[Every window and the tray update: red dot, mm:ss, Saved, Show in Finder]

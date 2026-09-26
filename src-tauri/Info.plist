@@ -4,5 +4,7 @@
 <dict>
   <key>NSMicrophoneUsageDescription</key>
   <string>Say Less uses your microphone to transcribe your voice locally on this computer.</string>
+  <key>NSCameraUsageDescription</key>
+  <string>Say Less shows your camera in a small circle so your face can be part of your screen recordings. Nothing leaves this computer.</string>
 </dict>
 </plist>
