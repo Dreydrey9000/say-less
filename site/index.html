@@ -79,6 +79,7 @@
       }
       html {
         scroll-behavior: smooth;
+        scroll-padding-top: 80px;
       }
       body {
         margin: 0;
@@ -132,7 +133,7 @@
         position: sticky;
         top: 0;
         z-index: 5;
-        background: rgba(10, 10, 11, 0.8);
+        background: rgba(10, 10, 11, 0.94);
         backdrop-filter: blur(12px);
         border-bottom: 1px solid var(--line);
       }
@@ -188,7 +189,10 @@
         cursor: pointer;
         transition:
           transform 0.15s ease,
-          background 0.15s ease;
+          background 0.15s ease,
+          box-shadow 0.15s ease,
+          filter 0.15s ease,
+          border-color 0.15s ease;
       }
       .btn-silver {
         color: #0b0c0e;
@@ -204,6 +208,10 @@
       }
       .btn-silver:hover {
         transform: translateY(-1px);
+        filter: brightness(1.08);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.9),
+          0 6px 18px rgba(201, 206, 214, 0.28);
       }
       .btn-ghost {
         color: var(--text);
@@ -211,7 +219,29 @@
         border-color: var(--line-2);
       }
       .btn-ghost:hover {
-        background: var(--bg-2);
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--silver-lo);
+      }
+      .tag {
+        display: inline-block;
+        background: #0b0c0e;
+        color: var(--silver-hi);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 4px 8px;
+        border-radius: 999px;
+        line-height: 1;
+      }
+      .alt {
+        color: var(--muted);
+        font-size: 14px;
+        margin: 12px 0 0;
+      }
+      .alt a {
+        color: var(--text);
+        text-underline-offset: 3px;
       }
       .btn[aria-disabled="true"] {
         cursor: default;
@@ -247,7 +277,7 @@
       }
       .eyebrow {
         display: block;
-        color: var(--silver-lo);
+        color: var(--silver);
         font-size: 14px;
         font-weight: 600;
         letter-spacing: 0.08em;
@@ -310,10 +340,16 @@
       @media (max-width: 880px) {
         .hero .wrap {
           grid-template-columns: 1fr;
-          gap: 40px;
+          gap: 36px;
         }
         .hero {
-          padding: 48px 0 64px;
+          padding: 40px 0 44px;
+        }
+      }
+      @media (max-width: 640px) {
+        .ctas .btn {
+          flex: 1 1 100%;
+          justify-content: center;
         }
       }
 
@@ -424,12 +460,17 @@
       .pill.idle {
         opacity: 0;
       }
+      .caret.still {
+        animation: none;
+      }
       @media (max-width: 880px) {
         .demo-emblem {
-          display: none;
+          width: 88px;
+          right: 14px;
+          top: -40px;
         }
         .window {
-          margin-top: 0;
+          margin-top: 44px;
         }
       }
 
@@ -437,6 +478,11 @@
       section {
         padding: 88px 0;
         border-top: 1px solid var(--line);
+      }
+      @media (max-width: 640px) {
+        section {
+          padding: 48px 0;
+        }
       }
       .kicker {
         color: var(--silver-lo);
@@ -473,7 +519,6 @@
         box-shadow: var(--elev-1);
       }
       .step:first-child {
-        padding: 32px;
         border-color: var(--line-2);
         background: linear-gradient(180deg, #16181c, #111215);
         box-shadow: var(--elev-2);
@@ -501,8 +546,20 @@
         box-shadow: 0 3px 0 #050506;
       }
       .num {
+        display: block;
         color: var(--dim);
         font-size: 14px;
+      }
+      .keys {
+        display: flex;
+        gap: 6px;
+        margin-top: 14px;
+      }
+      .alt-key {
+        display: block;
+        color: var(--dim);
+        font-size: 14px;
+        margin-top: 10px;
       }
       @media (max-width: 880px) {
         .steps {
@@ -654,6 +711,50 @@
       td.them {
         color: var(--dim);
       }
+      @media (max-width: 640px) {
+        .table-wrap {
+          overflow: visible;
+          border: 0;
+          border-radius: 0;
+          margin-top: 32px;
+        }
+        table {
+          min-width: 0;
+        }
+        thead {
+          position: absolute;
+          left: -9999px;
+        }
+        tbody tr {
+          display: block;
+          background: var(--bg-2);
+          border: 1px solid var(--line);
+          border-radius: 14px;
+          box-shadow: var(--elev-1);
+          padding: 14px 16px 6px;
+          margin-bottom: 10px;
+        }
+        tbody th {
+          display: block;
+          padding: 0 0 10px;
+          border: 0;
+          font-size: 16px;
+        }
+        tbody td {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          padding: 8px 0;
+          border: 0;
+          border-top: 1px solid var(--line);
+          font-size: 15px;
+        }
+        tbody td::before {
+          content: attr(data-label);
+          color: var(--dim);
+          font-weight: 500;
+        }
+      }
 
       /* faq */
       .faq {
@@ -783,12 +884,19 @@
             </p>
             <div class="ctas" data-downloads>
               <a class="btn btn-silver" data-os="mac" href="#download"
-                >Download for Mac</a
+                >Download for Mac <span class="tag">Free</span></a
               >
               <a class="btn btn-ghost" data-os="windows" href="#download"
                 >Download for Windows</a
               >
             </div>
+            <p class="alt">
+              Mac button is for Apple Silicon. Intel Mac:
+              <a
+                href="https://github.com/Dreydrey9000/say-less/releases/download/v0.13.1/Say.Less_0.13.1_x64.dmg"
+                >download here</a
+              >.
+            </p>
             <p class="status" data-status hidden>
               Downloads open soon. The first public release is being built and
               signed right now.
@@ -803,10 +911,10 @@
           <div class="demo" aria-hidden="true">
             <img
               class="demo-emblem"
-              src="/assets/emblem-640.webp"
+              src="/assets/emblem-640-alpha.webp"
               alt=""
-              width="260"
-              height="260"
+              width="176"
+              height="176"
             />
             <div class="window">
               <div class="window-bar"><i></i><i></i><i></i></div>
@@ -830,8 +938,9 @@
           <h2>Three steps. The first one is the whole trick.</h2>
           <div class="steps">
             <div class="step">
-              <kbd>Option</kbd> <kbd>Space</kbd>
-              <span class="num">&nbsp; Ctrl + Space on Windows</span>
+              <span class="num">Step 1</span>
+              <span class="keys"><kbd>Option</kbd> <kbd>Space</kbd></span>
+              <span class="alt-key">Windows: Ctrl + Space</span>
               <h3>Hold your shortcut</h3>
               <p>
                 Click into any text box, anywhere on your computer, and hold the
@@ -1006,7 +1115,7 @@
         <div class="wrap">
           <p class="kicker">The difference</p>
           <h2>Same job. None of the bill.</h2>
-          <div class="table-wrap">
+          <div class="table-wrap" role="region" aria-label="Say Less compared with paid dictation apps">
             <table>
               <thead>
                 <tr>
@@ -1018,28 +1127,28 @@
               <tbody>
                 <tr>
                   <th scope="row">Price</th>
-                  <td class="us">Free</td>
-                  <td class="them">Monthly subscription</td>
+                  <td class="us" data-label="Say Less">Free</td>
+                  <td class="them" data-label="Typical paid dictation">Monthly subscription</td>
                 </tr>
                 <tr>
                   <th scope="row">Works without internet</th>
-                  <td class="us">Yes</td>
-                  <td class="them">Usually no</td>
+                  <td class="us" data-label="Say Less">Yes</td>
+                  <td class="them" data-label="Typical paid dictation">Usually no</td>
                 </tr>
                 <tr>
                   <th scope="row">Account required</th>
-                  <td class="us">No</td>
-                  <td class="them">Yes</td>
+                  <td class="us" data-label="Say Less">No</td>
+                  <td class="them" data-label="Typical paid dictation">Yes</td>
                 </tr>
                 <tr>
                   <th scope="row">Audio leaves your computer</th>
-                  <td class="us">Never</td>
-                  <td class="them">Yes</td>
+                  <td class="us" data-label="Say Less">Never</td>
+                  <td class="them" data-label="Typical paid dictation">Yes</td>
                 </tr>
                 <tr>
                   <th scope="row">Open source</th>
-                  <td class="us">Yes</td>
-                  <td class="them">No</td>
+                  <td class="us" data-label="Say Less">Yes</td>
+                  <td class="them" data-label="Typical paid dictation">No</td>
                 </tr>
               </tbody>
             </table>
@@ -1115,7 +1224,7 @@
       <section id="download" class="final">
         <div class="wrap">
           <img
-            src="/assets/emblem-640.webp"
+            src="/assets/emblem-640-alpha.webp"
             alt="Say Less logo, a silver S shaped like a speech bubble"
             width="180"
             height="180"
@@ -1125,12 +1234,19 @@
             <p class="sub">Download Say Less, hold a key, and talk.</p>
             <div class="ctas" style="margin-top: 28px" data-downloads>
               <a class="btn btn-silver" data-os="mac" href="#download"
-                >Download for Mac</a
+                >Download for Mac <span class="tag">Free</span></a
               >
               <a class="btn btn-ghost" data-os="windows" href="#download"
                 >Download for Windows</a
               >
             </div>
+            <p class="alt">
+              Mac button is for Apple Silicon. Intel Mac:
+              <a
+                href="https://github.com/Dreydrey9000/say-less/releases/download/v0.13.1/Say.Less_0.13.1_x64.dmg"
+                >download here</a
+              >.
+            </p>
             <p class="status" data-status hidden>
               Downloads open soon. The first public release is being built and
               signed right now.
@@ -1191,6 +1307,7 @@
         try {
           if (navigator.share) {
             await navigator.share(data);
+            shareDone.textContent = "Sent.";
             return;
           }
           await navigator.clipboard.writeText(data.url);
@@ -1209,25 +1326,46 @@
       ];
       const out = document.querySelector("[data-typed]");
       const pill = document.querySelector("[data-pill]");
+      const caret = document.querySelector(".caret");
+      const demoWindow = document.querySelector(".window");
       const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
       const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      // Pause the demo while it is off screen, and stop for good after 2 full cycles.
+      let onScreen = true;
+      if ("IntersectionObserver" in window) {
+        new IntersectionObserver((entries) => {
+          onScreen = entries[0].isIntersecting;
+        }).observe(demoWindow);
+      }
+      const whenVisible = async () => {
+        while (!onScreen) await wait(400);
+      };
+      function finish() {
+        pill.classList.add("idle");
+        caret.classList.add("still");
+      }
       async function loop() {
         if (reduced) {
           out.textContent = lines[0];
+          finish();
           return;
         }
-        for (let i = 0; ; i = (i + 1) % lines.length) {
+        const total = lines.length * 2;
+        for (let n = 0; n < total; n++) {
+          const line = lines[n % lines.length];
+          await whenVisible();
           out.textContent = "";
           pill.classList.remove("idle");
           await wait(1800);
           pill.classList.add("idle");
-          const words = lines[i].split(" ");
-          for (const w of words) {
+          for (const w of line.split(" ")) {
+            await whenVisible();
             out.textContent += (out.textContent ? " " : "") + w;
             await wait(55);
           }
           await wait(2600);
         }
+        finish();
       }
       loop();
     </script>
