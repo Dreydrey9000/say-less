@@ -4,6 +4,7 @@ mod apple_intelligence;
 mod audio_feedback;
 pub mod audio_toolkit;
 mod autostart;
+mod capture_options;
 mod catalog;
 pub mod cli;
 mod clipboard;
@@ -682,6 +683,13 @@ pub fn run(cli_args: CliArgs) {
             screen_recorder::screen_recording_status,
             screen_recorder::show_screen_recording_in_folder,
             screen_recorder::open_screen_recording_settings,
+            capture_options::get_recording_options,
+            capture_options::save_recording_options,
+            capture_options::list_recording_sources,
+            capture_options::start_camera_preview,
+            capture_options::camera_preview_frame,
+            capture_options::stop_camera_preview,
+            capture_options::open_camera_settings,
             floating::dock_toggle_recording,
             floating::get_dock_state,
             correction_learning::list_learned_corrections,

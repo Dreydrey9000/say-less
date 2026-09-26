@@ -1,18 +1,60 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 420" role="img" aria-labelledby="title desc"><title id="title">Say Less screen recording</title><desc id="desc">The Home card, dock, tray and a spoken cue all call the Rust screen recorder. It checks permissions, then the Swift ScreenCaptureKit bridge writes one MP4 with screen, microphone and system audio to Movies, Say Less.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 500" role="img" aria-labelledby="title desc"><title id="title">Say Less screen recording</title><desc id="desc">The Home card, dock, tray and a spoken cue call the Rust screen recorder, which reads the saved recording setup. It checks only the permissions that setup needs, then the Swift ScreenCaptureKit bridge records the screen or one window with the microphone and system audio. When the webcam is on, a round camera window floats on screen and is included in the recording while other Say Less windows stay out. One MP4 lands in Movies, Say Less.</desc>
 <style>rect{fill:#1b1e24;stroke:#8796ab;stroke-width:1.5;rx:10}text{fill:#e7eaee;font:14px system-ui,sans-serif}.s{font-size:12px;fill:#aab3bf}.a{stroke:#b8ff65;stroke-width:2;fill:none;marker-end:url(#m)}.w{fill:#ff5a5a;stroke:none}</style>
 <defs><marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#b8ff65"/></marker></defs>
-<rect x="0" y="0" width="1080" height="420" style="fill:#111317;stroke:none"/>
-<rect x="20" y="30" width="210" height="50"/><text x="36" y="60">Home card: Record screen</text>
-<rect x="20" y="100" width="210" height="50"/><text x="36" y="130">Floating dock button</text>
-<rect x="20" y="170" width="210" height="50"/><text x="36" y="200">Tray: Record Screen</text>
-<rect x="20" y="240" width="210" height="64"/><text x="36" y="266">Shortcut, then say</text><text x="36" y="288" class="s">"say less start recording"</text>
-<rect x="290" y="240" width="200" height="64"/><text x="304" y="266">recording_cue</text><text x="304" y="288" class="s">before custom actions, no paste</text>
-<rect x="540" y="110" width="220" height="80"/><text x="556" y="140">Rust screen_recorder</text><text x="556" y="162" class="s">start, stop, status</text><text x="556" y="180" class="s">checks both permissions first</text>
-<rect x="820" y="20" width="240" height="64"/><text x="836" y="46">Permission missing</text><text x="836" y="68" class="s">plain message + System Settings</text>
-<rect x="820" y="110" width="240" height="80"/><text x="836" y="138">Swift bridge (macOS 15+)</text><text x="836" y="160" class="s">ScreenCaptureKit</text><text x="836" y="178" class="s">SCRecordingOutput, own windows hidden</text>
-<rect x="820" y="220" width="240" height="90"/><text x="836" y="248">One MP4 file</text><text x="836" y="270" class="s">~/Movies/Say Less/</text><text x="836" y="288" class="s">H.264 1080p30 + AAC</text><text x="836" y="304" class="s">mic mixed with system audio</text>
-<rect x="540" y="330" width="520" height="64"/><text x="556" y="356">Every window and the tray update</text><text x="556" y="378" class="s">red dot, mm:ss timer, Saved, Show in Finder</text>
-<rect x="290" y="330" width="200" height="64"/><text x="304" y="356">Windows, Linux, old macOS</text><text x="304" y="378" class="s">disabled with a reason</text>
-<path class="a" d="M230 55H520V130H538"/><path class="a" d="M230 125H538"/><path class="a" d="M230 195H520V165H538"/><path class="a" d="M230 272H288"/><path class="a" d="M490 272H650V192"/>
-<path class="a" d="M760 125H790V52H818"/><path class="a" d="M760 150H818"/><path class="a" d="M940 190V218"/><path class="a" d="M650 190V328"/><path class="a" d="M540 180H390V328"/>
+<rect x="0" y="0" width="1180" height="500" style="fill:#111317;stroke:none"/>
+<rect x="20" y="30" width="230" height="230"/>
+<text x="36" y="56">Ways to start or stop</text>
+<text x="36" y="92" class="s">Home card: Record screen</text>
+<text x="36" y="122" class="s">Floating dock button</text>
+<text x="36" y="152" class="s">Tray: Record Screen</text>
+<text x="36" y="182" class="s">Shortcut, then say</text>
+<text x="36" y="200" class="s">"say less start recording"</text>
+<text x="36" y="236" class="s">(voice: nothing is pasted)</text>
+<rect x="20" y="300" width="330" height="170"/>
+<text x="36" y="326">Recording setup</text>
+<text x="36" y="350" class="s">Home panel, or the dock's setup button</text>
+<text x="36" y="376" class="s">Whole screen (which display) or one window</text>
+<text x="36" y="398" class="s">Microphone on/off + which mic, computer sound</text>
+<text x="36" y="420" class="s">Webcam + camera, corner, small/medium/large</text>
+<text x="36" y="442" class="s">720p / 1080p / native, 30 / 60 fps</text>
+<text x="36" y="462" class="s">Saved in recording.json (default 1080p30)</text>
+<rect x="330" y="110" width="250" height="90"/>
+<text x="346" y="138">Rust screen_recorder</text>
+<text x="346" y="162" class="s">start / stop / status</text>
+<text x="346" y="184" class="s">reads the saved setup</text>
+<path class="a" d="M250 145H326"/>
+<path class="a" d="M200 300C200 260 380 250 420 204"/>
+<rect x="660" y="30" width="250" height="80"/>
+<text x="676" y="58">Permission missing</text>
+<text x="676" y="82" class="s">only what the setup needs: screen,</text>
+<text x="676" y="100" class="s">mic, camera. Open System Settings</text>
+<path class="a" d="M580 135C620 110 630 80 656 72"/>
+<rect x="660" y="150" width="250" height="80"/>
+<text x="676" y="178">Swift bridge (macOS 15+)</text>
+<text x="676" y="202" class="s">ScreenCaptureKit SCRecordingOutput</text>
+<text x="676" y="220" class="s">Apple's hardware encoder</text>
+<path class="a" d="M580 165H656"/>
+<rect x="660" y="270" width="250" height="100"/>
+<circle cx="880" cy="340" r="18" style="fill:#e2b48f;stroke:#fff;stroke-width:2"/>
+<text x="676" y="298">Webcam bubble</text>
+<text x="676" y="322" class="s">round window, on top, drag it</text>
+<text x="676" y="340" class="s">recorded; other Say Less</text>
+<text x="676" y="358" class="s">windows stay out</text>
+<path class="a" d="M785 230V266"/>
+<rect x="950" y="150" width="210" height="130"/>
+<text x="966" y="178">One MP4</text>
+<text x="966" y="202" class="s">Movies/Say Less/</text>
+<text x="966" y="222" class="s">H.264 + AAC (mic mixed</text>
+<text x="966" y="240" class="s">with system audio)</text>
+<text x="966" y="260" class="s">face burned into the video</text>
+<path class="a" d="M910 190H946"/>
+<path class="a" d="M910 320C930 320 940 280 950 270"/>
+<rect x="380" y="420" width="370" height="60"/>
+<text x="396" y="446">screen-recording-changed event</text>
+<text x="396" y="466" class="s">every window and the tray: red dot, mm:ss, Saved, Show in Finder</text>
+<path class="a" d="M455 200V416"/>
+<rect x="800" y="420" width="360" height="60"/>
+<text x="816" y="446">Windows, Linux, macOS below 15</text>
+<text x="816" y="466" class="s">button and setup disabled with a reason (Windows: phase 2)</text>
+<path class="a" d="M560 200V395H980V416"/>
 </svg>

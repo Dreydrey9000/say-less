@@ -18,6 +18,9 @@ export type { ScreenRecordingStatus } from "@/bindings";
 export type RecordingNotice =
   | "permission_denied"
   | "microphone_denied"
+  | "camera_denied"
+  | "camera_failed"
+  | "window_missing"
   | "failed"
   | "ended_early"
   | "reveal_failed";
@@ -38,7 +41,15 @@ export function noticeFor(
   hasFile: boolean,
 ): RecordingNotice | null {
   if (!code) return null;
-  if (code === "permission_denied" || code === "microphone_denied") return code;
+  if (
+    code === "permission_denied" ||
+    code === "microphone_denied" ||
+    code === "camera_denied" ||
+    code === "window_missing"
+  )
+    return code;
+  if (code === "camera_failed" || code === "camera_missing")
+    return "camera_failed";
   if (hasFile) return "ended_early";
   return "failed";
 }
