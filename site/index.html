@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Say Less — Free dictation for Mac and Windows</title>
+    <title>Say Less: Free dictation for Mac and Windows</title>
     <meta
       name="description"
       content="Hold a key, talk, and your words get typed into any app. Free, works offline, no account. Built for everyday laptops."
@@ -23,7 +23,7 @@
     />
     <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Say Less — Talk. It types." />
+    <meta property="og:title" content="Say Less: Talk. It types." />
     <meta
       property="og:description"
       content="Free dictation for Mac and Windows. Runs on your laptop. No account."
@@ -1048,8 +1048,7 @@
               <p>
                 It is built for everyday laptops, including ones with 8GB of
                 RAM. The recommended speech models are small (about 600 MB) and
-                run on the processor you already have. We are testing on 8GB
-                Macs and PCs before downloads open.
+                run on the processor you already have.
               </p>
             </details>
             <details>
@@ -1071,9 +1070,10 @@
             <details>
               <summary>Mac or Windows?</summary>
               <p>
-                Both: Apple Silicon and Intel Macs, plus Windows 10 and 11. The
-                installers are being tested now, and the download buttons turn
-                on when they pass.
+                Both: Apple Silicon and Intel Macs, plus Windows 10 and 11. The Mac
+                button is for Apple Silicon. Intel Mac and Windows on ARM
+                installers are on the
+                <a href="https://github.com/Dreydrey9000/say-less/releases/latest">releases page</a>.
               </p>
             </details>
             <details>
@@ -1144,7 +1144,7 @@
 
     <script>
       // Set these to the installer URLs once a release is published. null = "coming soon".
-      const DOWNLOADS = { mac: null, windows: null };
+      const DOWNLOADS = { mac: "https://github.com/Dreydrey9000/say-less/releases/download/v0.13.1/Say.Less_0.13.1_aarch64.dmg", windows: "https://github.com/Dreydrey9000/say-less/releases/download/v0.13.1/Say.Less_0.13.1_x64-setup.exe" };
 
       document.querySelectorAll("[data-downloads]").forEach((group) => {
         let missing = false;
