@@ -4,12 +4,18 @@
 
 ### Added
 
+- Painted avatar pack: 16 characters (people, animals, a robot, an alien, two silver-chrome characters) in a "Pick a character" gallery beside "Make your own", because the flat SVG faces read as clip-art next to the chrome brand.
+- The paintings ship as static WebP files in public/avatars (256px and 128px, 144 KB in total), painted once for this project with the subpowers image skill, so the app stays offline and needs no image subscription; prompts and provenance live in docs/avatars.
+- Painted avatars keep talking: each painting has bead eyes and no mouth, and the live SVG mouth and blinking lids draw on top at per-character anchors (src/lib/avatarPresets.ts), because a painted open/closed crossfade gave only two mouth states and was unreadable at 40px.
+- scripts/build-avatar-pack.sh rebuilds the pack from the 512px masters with cwebp, so nobody has to repaint to change sizes.
 - Bot avatar style: a glossy orb with pill eyes that become three voice bars while you talk (it has no mouth). Works with every color and accessory, because Drey wanted a Grokbot-style mascot as an option.
 - Picking the Bot starts it as a white orb on near-black, since skin tones made a muddy orb; all colors stay editable.
 - Bot personality: it glances side to side with a head tilt, winks now and then, squints one eye while thinking, shows ^^ eyes and pink cheeks when you finish, and blushes when you talk loudly. Blinks and winks squash the glowing pill eye flat instead of drawing a lid, because a flat lid showed as a pale patch on the shiny orb.
 
 ### Changed
 
+- AvatarSettings has a `preset` field; old saves load unchanged, and an unknown preset falls back to the custom avatar on load and save instead of failing.
+- Painted avatars take a ring color in place of the SVG colors and hats; the 40px pill loads the 128px image and the dock and preview load 256px.
 - The avatar style picker is 5 across (was 4) so the Bot doesn't wrap onto its own row.
 
 ## [2026-09-25]

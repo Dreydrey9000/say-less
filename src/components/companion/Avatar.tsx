@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import { prefersDarkInk, type AvatarSettings } from "@/lib/studio";
+import { findPreset, presetImage } from "@/lib/avatarPresets";
 import "./avatar.css";
 
 // Head geometry per style, in a 100x100 viewBox. Accessories and the mouth are
@@ -11,7 +12,9 @@ const heads = {
   dog: { cx: 50, cy: 54, r: 25, eyeY: 48, eyeDx: 10, mouthY: 70 },
   bot: { cx: 50, cy: 51, r: 29, eyeY: 50, eyeDx: 7.5, mouthY: 66 },
 } as const;
-type Head = (typeof heads)[keyof typeof heads];
+type Head = { cx: number; mouthY: number; r: number };
+/** A drawn (non-painted) head, which also knows where its eyes sit. */
+type SvgHead = (typeof heads)[keyof typeof heads];
 
 /** Volume below this is treated as silence so breathing/room noise keeps the mouth shut. */
 const GATE = 0.06;
@@ -33,7 +36,7 @@ function Accessory({
   accent,
 }: {
   kind: string;
-  head: Head;
+  head: (typeof heads)[keyof typeof heads];
   accent: string;
 }) {
   const { cx, cy, r, eyeY, eyeDx } = head;
@@ -270,7 +273,7 @@ const BOT_EYE = { w: 6, h: 13 };
  * The bot has no mouth. While you talk its eyes become three voice bars whose
  * height follows the same `open` value that drives the other mouths.
  */
-function BotBars({ head, open }: { head: Head; open: number }) {
+function BotBars({ head, open }: { head: SvgHead; open: number }) {
   const w = 4.6;
   const gap = 2.4;
   const x0 = head.cx - (w * 3 + gap * 2) / 2;
@@ -302,7 +305,7 @@ function BotFeelings({
   ink,
   open,
 }: {
-  head: Head;
+  head: SvgHead;
   ink: string;
   open: number;
 }) {
@@ -361,10 +364,11 @@ export function mouthPath(head: Head, open: number) {
 }
 
 /**
- * Flat SVG talking avatar. The mouth follows voice volume (not words); the
- * eyes blink on a random timer and drift a little; it breathes while
- * listening, looks up while thinking, and squashes when listening starts or
- * ends. Everything holds still with Reduce Motion or Pause.
+ * Talking avatar: a painted character from the pack, or the flat SVG one. The
+ * mouth follows voice volume (not words); the eyes blink on a random timer
+ * (and the SVG pupils drift a little); it breathes while listening, looks up
+ * while thinking, and squashes when listening starts or ends. Everything holds
+ * still with Reduce Motion or Pause.
  */
 export function Avatar({
   avatar,
@@ -373,6 +377,7 @@ export function Avatar({
   state = "idle",
   rings = 0,
   label,
+  small = false,
   className = "",
 }: {
   avatar: AvatarSettings;
@@ -382,6 +387,8 @@ export function Avatar({
   /** Faint voice-reactive rings behind the face (0 to 2). */
   rings?: number;
   label?: string;
+  /** Drawn at 64px or less, so a painted avatar loads its 128px image. */
+  small?: boolean;
   className?: string;
 }) {
   const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
@@ -477,12 +484,19 @@ export function Avatar({
     return () => group.removeEventListener("animationend", done);
   }, [state, moving]);
 
+  const preset = findPreset(avatar.preset);
   const kind = avatar.kind in heads ? avatar.kind : "person";
-  const head = heads[kind as keyof typeof heads];
+  const svgHead = heads[kind as keyof typeof heads];
+  const face = preset?.face;
+  const head: Head = face
+    ? { cx: face.cx, mouthY: face.mouthY, r: face.mouthR }
+    : svgHead;
   // Stick figures draw their face in the line color; filled faces pick
   // whichever ink contrasts with the skin/fur color.
-  const ink =
-    kind === "stick"
+  // Painted faces always take a dark mouth line.
+  const ink = face
+    ? "#15181e"
+    : kind === "stick"
       ? avatar.body
       : prefersDarkInk(avatar.body)
         ? "#15181e"
@@ -490,7 +504,8 @@ export function Avatar({
   // Eyelids match the skin, so a blink reads as a lid closing.
   const lid = kind === "stick" ? avatar.background : avatar.body;
   const eyeR = kind === "stick" ? 2.4 : 2.8;
-  const bot = kind === "bot";
+  // A painted character is never the bot, even if an old save says "bot".
+  const bot = !preset && kind === "bot";
   botRef.current = bot;
   const mouth = mouthPath(head, open);
   const mouthW = head.r * 0.22 * (1 + open * 0.2);
@@ -498,7 +513,7 @@ export function Avatar({
   const tongueRy = 1 + open * head.r * 0.13;
   return (
     <svg
-      className={`avatar avatar-${kind} state-${state} ${moving ? "is-moving" : "is-still"} ${open > 0 ? "is-talking" : ""} ${className}`}
+      className={`avatar ${preset ? `avatar-preset preset-${preset.id}` : `avatar-${kind}`} state-${state} ${moving ? "is-moving" : "is-still"} ${open > 0 ? "is-talking" : ""} ${className}`}
       viewBox="0 0 100 100"
       focusable="false"
       data-mouth={open}
@@ -530,7 +545,12 @@ export function Avatar({
       )}
       <g className="avatar-body" ref={body}>
         <g className="avatar-breath">
-          <circle cx="50" cy="50" r="50" fill={avatar.background} />
+          <circle
+            cx="50"
+            cy="50"
+            r="50"
+            fill={preset ? "#22262e" : avatar.background}
+          />
           <g
             clipPath={`url(#${clip})`}
             style={
@@ -538,69 +558,93 @@ export function Avatar({
             }
           >
             <g className="avatar-glance" ref={glance}>
-              <Figure
-                kind={kind}
-                ink={ink}
-                uid={uid}
-                colors={{
-                  body: avatar.body,
-                  accent: avatar.accent,
-                  bg: avatar.background,
-                }}
-              />
-              <g className="avatar-eyes" ref={eyes}>
-                <g className="avatar-look" fill={ink}>
-                  {bot && <BotBars head={head} open={open} />}
-                  {[-1, 1].map((side) =>
-                    bot ? (
-                      <rect
-                        key={side}
-                        className={`avatar-bot-eye bot-eye-${side < 0 ? "l" : "r"}`}
-                        x={head.cx + side * head.eyeDx - BOT_EYE.w / 2}
-                        y={head.eyeY - BOT_EYE.h / 2}
-                        width={BOT_EYE.w}
-                        height={BOT_EYE.h}
-                        rx={BOT_EYE.w / 2}
-                        opacity={open > 0 ? 0 : 1}
-                      />
-                    ) : kind === "cat" ? (
-                      <ellipse
-                        key={side}
-                        cx={head.cx + side * head.eyeDx}
-                        cy={head.eyeY}
-                        rx="2.8"
-                        ry="4"
-                      />
-                    ) : (
-                      <circle
-                        key={side}
-                        cx={head.cx + side * head.eyeDx}
-                        cy={head.eyeY}
-                        r={eyeR}
-                      />
-                    ),
-                  )}
-                </g>
-                {/* ponytail: the bot squashes its glowing pill instead of drawing a lid over it */}
-                {!bot &&
-                  [-1, 1].map((side) => (
+              {preset ? (
+                <image
+                  className="avatar-painting"
+                  href={presetImage(preset.id, small ? 128 : 256)}
+                  x="0"
+                  y="0"
+                  width="100"
+                  height="100"
+                  preserveAspectRatio="xMidYMid slice"
+                />
+              ) : (
+                <Figure
+                  kind={kind}
+                  ink={ink}
+                  uid={uid}
+                  colors={{
+                    body: avatar.body,
+                    accent: avatar.accent,
+                    bg: avatar.background,
+                  }}
+                />
+              )}
+              {face ? (
+                // The painted bead eyes stay put; only the lids move over them.
+                <g className="avatar-eyes" ref={eyes}>
+                  {[-1, 1].map((side) => (
                     <ellipse
                       key={side}
                       className="avatar-lid"
-                      cx={head.cx + side * head.eyeDx}
-                      cy={head.eyeY}
-                      rx={
-                        (bot ? BOT_EYE.w / 2 : kind === "cat" ? 2.8 : eyeR) +
-                        1.4
-                      }
-                      ry={
-                        (bot ? BOT_EYE.h / 2 : kind === "cat" ? 4 : eyeR) + 1.4
-                      }
-                      fill={lid}
+                      cx={face.cx + side * face.eyeDx}
+                      cy={face.eyeY}
+                      rx={face.lidR}
+                      ry={face.lidR * 1.08}
+                      fill={face.lids[side < 0 ? 0 : 1]}
                     />
                   ))}
-                {bot && <BotFeelings head={head} ink={ink} open={open} />}
-              </g>
+                </g>
+              ) : (
+                <g className="avatar-eyes" ref={eyes}>
+                  <g className="avatar-look" fill={ink}>
+                    {bot && <BotBars head={svgHead} open={open} />}
+                    {[-1, 1].map((side) =>
+                      bot ? (
+                        <rect
+                          key={side}
+                          className={`avatar-bot-eye bot-eye-${side < 0 ? "l" : "r"}`}
+                          x={svgHead.cx + side * svgHead.eyeDx - BOT_EYE.w / 2}
+                          y={svgHead.eyeY - BOT_EYE.h / 2}
+                          width={BOT_EYE.w}
+                          height={BOT_EYE.h}
+                          rx={BOT_EYE.w / 2}
+                          opacity={open > 0 ? 0 : 1}
+                        />
+                      ) : kind === "cat" ? (
+                        <ellipse
+                          key={side}
+                          cx={svgHead.cx + side * svgHead.eyeDx}
+                          cy={svgHead.eyeY}
+                          rx="2.8"
+                          ry="4"
+                        />
+                      ) : (
+                        <circle
+                          key={side}
+                          cx={svgHead.cx + side * svgHead.eyeDx}
+                          cy={svgHead.eyeY}
+                          r={eyeR}
+                        />
+                      ),
+                    )}
+                  </g>
+                  {/* ponytail: the bot squashes its glowing pill instead of drawing a lid over it */}
+                  {!bot &&
+                    [-1, 1].map((side) => (
+                      <ellipse
+                        key={side}
+                        className="avatar-lid"
+                        cx={svgHead.cx + side * svgHead.eyeDx}
+                        cy={svgHead.eyeY}
+                        rx={(kind === "cat" ? 2.8 : eyeR) + 1.4}
+                        ry={(kind === "cat" ? 4 : eyeR) + 1.4}
+                        fill={lid}
+                      />
+                    ))}
+                  {bot && <BotFeelings head={svgHead} ink={ink} open={open} />}
+                </g>
+              )}
               <g
                 className="avatar-mouth-group"
                 display={bot ? "none" : undefined}
@@ -608,8 +652,14 @@ export function Avatar({
                 <path
                   className="avatar-mouth"
                   d={mouth}
-                  fill={ink === "#15181e" ? ink : "#2b1418"}
-                  stroke={ink}
+                  fill={
+                    face
+                      ? (face.mouth ?? "#3b1a1d")
+                      : ink === "#15181e"
+                        ? ink
+                        : "#2b1418"
+                  }
+                  stroke={face ? (face.mouth ?? "#2a1214") : ink}
                   strokeWidth="1.3"
                   strokeLinejoin="round"
                 />
@@ -621,16 +671,34 @@ export function Avatar({
                   rx={mouthW * 0.62}
                   ry={tongueRy}
                   fill="#e8737f"
-                  opacity={Math.min(1, Math.max(0, (open - 0.12) / 0.3))}
+                  opacity={
+                    face?.mouth
+                      ? 0
+                      : Math.min(1, Math.max(0, (open - 0.12) / 0.3))
+                  }
                 />
               </g>
-              <Accessory
-                kind={avatar.accessory}
-                head={head}
-                accent={avatar.accent}
-              />
+              {!preset && (
+                <Accessory
+                  kind={avatar.accessory}
+                  head={svgHead}
+                  accent={avatar.accent}
+                />
+              )}
             </g>
           </g>
+          {preset && (
+            // A thin ring in the avatar's accent color frames the painting.
+            <circle
+              className="avatar-frame"
+              cx="50"
+              cy="50"
+              r="48.5"
+              fill="none"
+              stroke={avatar.accent}
+              strokeWidth="3"
+            />
+          )}
         </g>
       </g>
     </svg>

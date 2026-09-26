@@ -1,0 +1,23 @@
+PROMPT (as given):
+Square avatar portrait for a desktop app icon. Subject: a friendly woman in her thirties with warm brown skin and short natural curly hair, wearing a plain charcoal crewneck sweater. Framing: centered head-and-shoulders bust, facing the camera straight on, head filling the middle 60 percent of the frame, shoulders cut off by the bottom edge. Face: two simple dark eyes, calm friendly expression, and NO mouth at all: the lower half of the face is smooth and blank, because a talking mouth is animated on top of it later. Lighting: soft key light from the upper left and a gentle rim light. Style: stylized 3D animated-film character render: smooth surfaces, soft studio lighting, appealing simplified proportions, high polish. Background: one flat solid charcoal color (#22262E) filling the whole frame, no gradient, no floor, no props. No text, letters, numbers, logos or watermark anywhere; plain clothing without prints.
+
+PROMPT (as the generate_image tool received it):
+Square avatar portrait for a desktop app icon. Subject: a friendly woman in her thirties with warm brown skin and short natural curly hair, wearing a plain charcoal crewneck sweater. Framing: centered head-and-shoulders bust, facing the camera straight on, head filling the middle 60 percent of the frame, shoulders cut off by the bottom edge. Face: two simple dark eyes, calm friendly expression, and NO mouth at all: the lower half of the face is smooth and blank, because a talking mouth is animated on top of it later. Lighting: soft key light from the upper left and a gentle rim light. Style: stylized 3D animated-film character render: smooth surfaces, soft studio lighting, appealing simplified proportions, high polish. Background: one flat solid charcoal color (#22262E) filling the whole frame, no gradient, no floor, no props. No text, letters, numbers, logos or watermark anywhere; plain clothing without prints.
+
+provenance:
+  door: antigravity-image (~/.claude/skills/subpowers/bin)
+  date: 2026-09-26 00:40:45 -0400
+  agy: 1.2.11
+  auth: Antigravity OAuth subscription, isolated profile, zero MCP servers, no API key
+  driver model: gemini-3.8-flash-high (chain: gemini-3.8-flash-high:gemini-3.7-flash-high:default; effort high)
+  image model: gemini-3.1-flash-image (Gemini 3.1 Flash Image = Nano Banana 2), chosen server-side by Antigravity; recorded in the step record
+  C2PA: Google C2PA Core Generator Library; actions: Created by Google Generative AI + Applied imperceptible SynthID watermark (signed by Google LLC)
+  generate_image calls: 1; tool time: 7.518282s; door wall: 19s
+  aspect requested: 1:1; aspect passed: 1:1
+  references: 0; passed ImagePaths: none
+  requested size: 1024x1024
+  painter size: 1024x1024 (jpg)
+  delivered size: 1024x1024
+  signed original: ~/worktrees/say-less/avatar-pack/docs/avatars/council/film-antigravity.original.jpg
+  agy conversation: cf46dbd6-6a2f-48a3-8916-0c6808074af9
+  bytes: 837515

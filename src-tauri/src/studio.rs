@@ -24,7 +24,9 @@ pub struct VoiceAction {
     pub kind: String,
     pub target: String,
 }
-/// Flat SVG avatar used by the companion and the recording overlay.
+/// Talking avatar used by the companion and the recording overlay: either a
+/// painted character from the built-in pack (`preset`) or the flat SVG one
+/// built from `kind`, colors and `accessory`.
 #[derive(Clone, Debug, Serialize, Deserialize, Type, PartialEq)]
 #[serde(default)]
 pub struct AvatarSettings {
@@ -33,6 +35,9 @@ pub struct AvatarSettings {
     pub accent: String,
     pub background: String,
     pub accessory: String,
+    /// A painted character from the pack in `public/avatars/`. `None` (or an
+    /// id this version doesn't ship) means the custom SVG avatar.
+    pub preset: Option<String>,
 }
 impl Default for AvatarSettings {
     fn default() -> Self {
@@ -42,6 +47,40 @@ impl Default for AvatarSettings {
             accent: "#8796ab".into(),
             background: "#22262e".into(),
             accessory: "none".into(),
+            preset: None,
+        }
+    }
+}
+/// Painted avatars that ship in `public/avatars/`. Keep in sync with
+/// `avatarPresets` in `src/lib/avatarPresets.ts`.
+pub const AVATAR_PRESETS: [&str; 16] = [
+    "woman-curls",
+    "man-beard",
+    "silver-bob",
+    "fade",
+    "hijab",
+    "grey-hair",
+    "cat",
+    "dog",
+    "fox",
+    "frog",
+    "bear",
+    "owl",
+    "robot",
+    "alien",
+    "chrome-bubble",
+    "chrome-bot",
+];
+impl AvatarSettings {
+    /// A preset this version doesn't know (a newer save, a hand-edited file)
+    /// falls back to the custom avatar instead of failing to load or save.
+    fn sanitize(&mut self) {
+        if self
+            .preset
+            .as_deref()
+            .is_some_and(|id| !AVATAR_PRESETS.contains(&id))
+        {
+            self.preset = None;
         }
     }
 }
@@ -230,13 +269,22 @@ pub fn get_studio_settings(app: AppHandle) -> Result<StudioSettings, String> {
         .store(crate::portable::store_path("studio.json"))
         .map_err(|_| "storage")?;
     match store.get("settings") {
-        Some(value) => serde_json::from_value(value).map_err(|_| "storage".into()),
+        Some(value) => {
+            let mut settings: StudioSettings =
+                serde_json::from_value(value).map_err(|_| "storage")?;
+            settings.avatar.sanitize();
+            Ok(settings)
+        }
         None => Ok(StudioSettings::default()),
     }
 }
 #[tauri::command]
 #[specta::specta]
-pub async fn save_studio_settings(app: AppHandle, settings: StudioSettings) -> Result<(), String> {
+pub async fn save_studio_settings(
+    app: AppHandle,
+    mut settings: StudioSettings,
+) -> Result<(), String> {
+    settings.avatar.sanitize();
     validate(&settings)?;
     let store = app
         .store(crate::portable::store_path("studio.json"))
@@ -554,6 +602,47 @@ mod tests {
             }
             assert!(validate(&s).is_err(), "{bad:?} should be rejected");
         }
+    }
+    #[test]
+    fn avatar_presets_load_and_unknown_ones_fall_back() {
+        // Saves from before the pack have no preset and keep the SVG avatar.
+        let old: StudioSettings = serde_json::from_value(serde_json::json!({
+            "avatar": { "kind": "dog", "accessory": "cap" }
+        }))
+        .unwrap();
+        assert_eq!(old.avatar.preset, None);
+        assert!(validate(&old).is_ok());
+        let mut s: StudioSettings = serde_json::from_value(serde_json::json!({
+            "avatar": { "preset": "fox" }
+        }))
+        .unwrap();
+        s.avatar.sanitize();
+        assert_eq!(s.avatar.preset.as_deref(), Some("fox"));
+        assert_eq!(s.avatar.kind, "person");
+        assert!(validate(&s).is_ok());
+        for unknown in ["dragon", "../../etc/passwd", "", "FOX"] {
+            let mut a = AvatarSettings {
+                preset: Some(unknown.into()),
+                kind: "cat".into(),
+                ..AvatarSettings::default()
+            };
+            a.sanitize();
+            assert_eq!(a.preset, None, "{unknown:?} should fall back");
+            // The rest of the custom avatar is kept.
+            assert_eq!(a.kind, "cat");
+        }
+        let mut none = AvatarSettings::default();
+        none.sanitize();
+        assert_eq!(none.preset, None);
+    }
+    #[test]
+    fn avatar_preset_ids_are_safe_file_names() {
+        for id in AVATAR_PRESETS {
+            assert!(!id.is_empty());
+            assert!(id.bytes().all(|b| b.is_ascii_lowercase() || b == b'-'));
+        }
+        let unique: std::collections::HashSet<_> = AVATAR_PRESETS.iter().collect();
+        assert_eq!(unique.len(), AVATAR_PRESETS.len());
     }
     #[test]
     fn styles_are_deterministic() {

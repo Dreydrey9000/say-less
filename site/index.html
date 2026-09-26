@@ -772,6 +772,13 @@
                 >Download for Windows</a
               >
             </div>
+            <p class="status" data-intel>
+              Mac button is for Apple Silicon (M1 and newer). Intel Mac:
+              <a
+                href="https://github.com/Dreydrey9000/say-less/releases/download/v0.13.1/Say.Less_0.13.1_x64.dmg"
+                >download here</a
+              >.
+            </p>
             <p class="status" data-status hidden>
               Downloads open soon. The first public release is being built and
               signed right now.
@@ -1070,10 +1077,13 @@
             <details>
               <summary>Mac or Windows?</summary>
               <p>
-                Both: Apple Silicon and Intel Macs, plus Windows 10 and 11. The Mac
-                button is for Apple Silicon. Intel Mac and Windows on ARM
+                Both: Apple Silicon and Intel Macs, plus Windows 10 and 11. The
+                Mac button is for Apple Silicon. Intel Mac and Windows on ARM
                 installers are on the
-                <a href="https://github.com/Dreydrey9000/say-less/releases/latest">releases page</a>.
+                <a
+                  href="https://github.com/Dreydrey9000/say-less/releases/latest"
+                  >releases page</a
+                >.
               </p>
             </details>
             <details>
@@ -1115,6 +1125,13 @@
                 >Download for Windows</a
               >
             </div>
+            <p class="status" data-intel>
+              Mac button is for Apple Silicon (M1 and newer). Intel Mac:
+              <a
+                href="https://github.com/Dreydrey9000/say-less/releases/download/v0.13.1/Say.Less_0.13.1_x64.dmg"
+                >download here</a
+              >.
+            </p>
             <p class="status" data-status hidden>
               Downloads open soon. The first public release is being built and
               signed right now.
@@ -1144,7 +1161,11 @@
 
     <script>
       // Set these to the installer URLs once a release is published. null = "coming soon".
-      const DOWNLOADS = { mac: "https://github.com/Dreydrey9000/say-less/releases/download/v0.13.1/Say.Less_0.13.1_aarch64.dmg", windows: "https://github.com/Dreydrey9000/say-less/releases/download/v0.13.1/Say.Less_0.13.1_x64-setup.exe" };
+      const DOWNLOADS = {
+        mac: "https://github.com/Dreydrey9000/say-less/releases/download/v0.13.1/Say.Less_0.13.1_aarch64.dmg",
+        windows:
+          "https://github.com/Dreydrey9000/say-less/releases/download/v0.13.1/Say.Less_0.13.1_x64-setup.exe",
+      };
 
       document.querySelectorAll("[data-downloads]").forEach((group) => {
         let missing = false;
