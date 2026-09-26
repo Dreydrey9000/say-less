@@ -69,6 +69,9 @@ pub struct StudioSettings {
     pub corrections: Vec<crate::snippets::VoiceSnippet>,
     pub overlay_visual: String,
     pub avatar: AvatarSettings,
+    /// "Say less start recording" / "say less stop recording" control the
+    /// screen recorder. Separate from custom actions and on by default.
+    pub voice_recording: bool,
 }
 impl Default for StudioSettings {
     fn default() -> Self {
@@ -90,8 +93,34 @@ impl Default for StudioSettings {
             corrections: vec![],
             overlay_visual: "bars".into(),
             avatar: AvatarSettings::default(),
+            voice_recording: true,
         }
     }
+}
+/// Built-in spoken commands. These words are reserved: a custom action
+/// can't use them, so "say less start recording" always means the recorder.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RecordingCue {
+    Start,
+    Stop,
+}
+pub const RESERVED_CUES: [&str; 2] = ["start recording", "stop recording"];
+/// Checked before custom actions. Needs the "say less" prefix and the exact
+/// phrase, like custom cues.
+pub fn recording_cue(text: &str, settings: &StudioSettings) -> Option<RecordingCue> {
+    if !settings.voice_recording {
+        return None;
+    }
+    match cue_key(text).strip_prefix("say less ")? {
+        "start recording" => Some(RecordingCue::Start),
+        "stop recording" => Some(RecordingCue::Stop),
+        _ => None,
+    }
+}
+/// True when the transcript is a spoken command (built-in or custom), so it
+/// must not be pasted, expanded or sent to a text provider.
+pub fn is_spoken_command(text: &str, settings: &StudioSettings) -> bool {
+    recording_cue(text, settings).is_some() || matching_action(text, settings).is_some()
 }
 pub fn cue_key(text: &str) -> String {
     text.split(|c: char| !c.is_alphanumeric())
@@ -135,6 +164,9 @@ fn validate(settings: &StudioSettings) -> Result<(), String> {
     let mut seen = std::collections::HashSet::new();
     for action in &settings.actions {
         let key = cue_key(&action.cue);
+        if RESERVED_CUES.contains(&key.as_str()) {
+            return Err("reserved_cue".into());
+        }
         if key.is_empty()
             || key.starts_with("say less")
             || action.cue.chars().count() > 80
@@ -263,6 +295,15 @@ pub fn matching_action<'a>(text: &str, settings: &'a StudioSettings) -> Option<&
 /// Only the original transcript can launch an action, never AI output or snippet text.
 pub fn execute_spoken_action(app: &AppHandle, text: &str) -> Result<bool, String> {
     let settings = get_studio_settings(app.clone()).unwrap_or_default();
+    if let Some(cue) = recording_cue(text, &settings) {
+        if !crate::screen_recorder::is_supported() {
+            return Err("unsupported_platform".into());
+        }
+        // Runs in the background: this is called on the main thread.
+        crate::screen_recorder::toggle_in_background(app, Some(cue == RecordingCue::Start));
+        let _ = app.emit("voice-action-result", true);
+        return Ok(true);
+    }
     let Some(action) = matching_action(text, &settings) else {
         return Ok(false);
     };
@@ -367,6 +408,41 @@ mod tests {
         assert!(matching_action("SAY LESS, open notes!", &s).is_some());
         assert!(matching_action("Please say less open notes", &s).is_none());
         assert!(matching_action("Say less open notes and delete it", &s).is_none());
+    }
+    #[test]
+    fn recording_cues_win_and_are_reserved() {
+        let mut s = StudioSettings::default();
+        assert_eq!(
+            recording_cue("Say less, start recording.", &s),
+            Some(RecordingCue::Start)
+        );
+        assert_eq!(
+            recording_cue("SAY LESS stop recording!", &s),
+            Some(RecordingCue::Stop)
+        );
+        assert_eq!(recording_cue("start recording", &s), None);
+        assert_eq!(recording_cue("say less start recording now", &s), None);
+        assert_eq!(recording_cue("please say less stop recording", &s), None);
+        // Works without custom actions turned on, and is a spoken command.
+        assert!(!s.actions_enabled);
+        assert!(is_spoken_command("say less start recording", &s));
+        // Its own switch turns it off.
+        s.voice_recording = false;
+        assert_eq!(recording_cue("say less start recording", &s), None);
+        assert!(!is_spoken_command("say less start recording", &s));
+        // A custom cue can't take the reserved words, in any spelling.
+        for cue in ["start recording", "Stop Recording!", "stop, recording"] {
+            let mut s = StudioSettings::default();
+            s.actions.push(VoiceAction {
+                cue: cue.into(),
+                kind: "website".into(),
+                target: "https://example.com".into(),
+            });
+            assert_eq!(validate(&s).unwrap_err(), "reserved_cue", "{cue}");
+        }
+        // Old saved settings turn the voice commands on.
+        let old: StudioSettings = serde_json::from_value(serde_json::json!({})).unwrap();
+        assert!(old.voice_recording);
     }
     #[test]
     fn rejects_executable_urls_and_credentials() {

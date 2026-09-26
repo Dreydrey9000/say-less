@@ -19,6 +19,7 @@ mod memory;
 mod overlay;
 mod paste_tx;
 pub mod portable;
+mod screen_recorder;
 mod secure_input;
 mod settings;
 mod shortcut;
@@ -98,6 +99,12 @@ fn build_console_filter() -> env_filter::Filter {
     }
 
     builder.build()
+}
+
+/// Bring the settings window forward (used by the screen recorder when a
+/// permission needs explaining).
+pub(crate) fn show_main_window_for(app: &AppHandle) {
+    show_main_window(app);
 }
 
 fn show_main_window(app: &AppHandle) {
@@ -307,6 +314,9 @@ fn initialize_core_logic(app_handle: &AppHandle) {
             }
             "copy_last_transcript" => {
                 tray::copy_last_transcript(app);
+            }
+            "screen_recording_toggle" => {
+                screen_recorder::toggle_in_background(app, None);
             }
             "unload_model" => {
                 let transcription_manager = app.state::<Arc<TranscriptionManager>>();
@@ -667,6 +677,11 @@ pub fn run(cli_args: CliArgs) {
             studio::save_studio_settings,
             studio::list_launchable_apps,
             studio::test_voice_action,
+            screen_recorder::start_screen_recording,
+            screen_recorder::stop_screen_recording,
+            screen_recorder::screen_recording_status,
+            screen_recorder::show_screen_recording_in_folder,
+            screen_recorder::open_screen_recording_settings,
             floating::dock_toggle_recording,
             floating::get_dock_state,
             correction_learning::list_learned_corrections,

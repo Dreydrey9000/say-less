@@ -101,6 +101,14 @@ In **Appearance → Recording indicator**, switch the animation between Bars (de
 
 ![Voice visuals workflow](docs/diagrams/voice-visuals.svg)
 
+## Screen recording
+
+On a Mac with macOS 15 or newer, click **Record screen** on Home, on the floating dock, or in the tray menu. Or press your dictation shortcut and say "Say less, start recording." We save one MP4 with your screen, your voice and your computer's sound to `~/Movies/Say Less/`. Say Less hides its own windows from the video. macOS asks for Screen Recording permission the first time. Windows support is planned (phase 2); until then the button is disabled there with a plain reason.
+
+![Screen recording flow](docs/diagrams/screen-recording.svg)
+
+[Editable diagram](docs/diagrams/screen-recording.mmd) · Code: `src-tauri/src/screen_recorder.rs`, `src-tauri/swift/screen_recorder.swift`
+
 ## Say less, stress less
 
 Open **Insights** to see what you keep saying: recurring problems, recurring ideas, and your most-mentioned topic, each with dated quotes from your own dictations. It is worked out on this computer from your history; nothing leaves your computer unless you use Summarize with AI or connect Claude. Optional extras, all off until you choose them: **Summarize with AI** (uses your AI cleanup provider and sends only topic labels and a few short quotes), **Read digest aloud** (system voices), nightly **Obsidian-friendly notes export**, and **Use with Claude**, a local read-only MCP server (`handy --mcp`).

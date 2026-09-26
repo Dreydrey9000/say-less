@@ -80,7 +80,7 @@ pub fn set_visible(app: &AppHandle, visible: bool) -> Result<(), String> {
             let (width, height) = if compact {
                 (104.0, 104.0)
             } else {
-                (360.0, 112.0)
+                (400.0, 112.0)
             };
             let _ = window.set_size(tauri::LogicalSize::new(width, height));
             let _ = snap_to_edge(&handle);

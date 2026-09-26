@@ -1,0 +1,17 @@
+flowchart LR
+    subgraph Start[Ways to start or stop]
+        Home[Home card: Record screen]
+        Dock[Floating dock button]
+        Tray[Tray: Record Screen]
+        Voice["Shortcut + 'say less start recording'"]
+    end
+    Voice --> Match[studio.rs recording_cue, checked before custom actions, nothing pasted]
+    Home --> Cmd
+    Dock --> Cmd
+    Tray --> Cmd
+    Match --> Cmd[Rust screen_recorder: start / stop / status]
+    Cmd -->|Screen Recording or mic permission missing| Denied[Plain message + Open System Settings]
+    Cmd -->|macOS 15+| Swift[Swift bridge: ScreenCaptureKit SCRecordingOutput]
+    Cmd -->|Windows, Linux, macOS below 15| Off[Button disabled with a reason. Windows is phase 2]
+    Swift --> File["~/Movies/Say Less/Say Less YYYY-MM-DD at HH.MM.SS.mp4<br/>H.264 1080p30 + AAC: mic mixed with system audio"]
+    Cmd -->|screen-recording-changed event| UI[Every window and the tray update: red dot, mm:ss, Saved, Show in Finder]

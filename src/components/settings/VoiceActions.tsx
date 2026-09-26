@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useStudio, type VoiceAction } from "@/lib/studio";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
+import { ToggleSwitch } from "../ui/ToggleSwitch";
 import { WorkingStatus } from "../ui/WorkingStatus";
 
 /**
@@ -27,6 +28,17 @@ export function normalizeWebsite(input: string): string | null {
   } catch {
     return null;
   }
+}
+
+/** Spoken words reserved for the built-in screen recording commands. */
+const RESERVED_CUES = ["start recording", "stop recording"];
+export function isReservedCue(cue: string) {
+  const key = cue
+    .toLowerCase()
+    .split(/[^\p{L}\p{N}]+/u)
+    .filter(Boolean)
+    .join(" ");
+  return RESERVED_CUES.includes(key);
 }
 
 export function VoiceActions() {
@@ -60,6 +72,10 @@ export function VoiceActions() {
     }
   }
   function add() {
+    if (isReservedCue(cue)) {
+      setStatus(t("screenRecording.reservedCue"));
+      return;
+    }
     const destination =
       kind === "website" ? normalizeWebsite(target) : target.trim();
     if (!destination) {
@@ -130,6 +146,17 @@ export function VoiceActions() {
           {t(settings.actions_enabled ? "actions.disable" : "actions.enable")}
         </Button>
       </div>
+      <ToggleSwitch
+        checked={settings.voice_recording}
+        disabled={!loaded}
+        isUpdating={busy}
+        label={t("screenRecording.voiceTitle")}
+        description={t("screenRecording.voiceDescription")}
+        descriptionMode="inline"
+        onChange={(voice_recording) =>
+          void save({ ...settings, voice_recording })
+        }
+      />
       {error && <p role="alert">{t("actions.invalid")}</p>}
       {status && <p role="status">{status}</p>}
       {removed && (

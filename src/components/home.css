@@ -232,3 +232,102 @@
     border-top: 1px solid #80808040;
   }
 }
+/* Screen recording: one wide card between the hero and the tools row. */
+.home-record {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px 24px;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 20px;
+  border: 1px solid #80808040;
+  border-radius: 16px;
+}
+.home-record[data-state="recording"],
+.home-record[data-state="stopping"] {
+  border-color: color-mix(in srgb, #ff5a5a, transparent 40%);
+}
+.home-record-text h2 {
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+}
+.home-record-text p {
+  max-width: 56ch;
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--color-text-muted);
+}
+.home-record-text .home-record-hint {
+  font-size: 13px;
+}
+.home-record-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+.home-record-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 148px;
+  justify-content: center;
+}
+.home-record-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.rec-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ff5a5a;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #ff5a5a, transparent 75%);
+}
+.rec-time {
+  font-variant-numeric: tabular-nums;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rec-dot {
+    animation: rec-pulse 1.6s ease-in-out infinite;
+  }
+}
+@keyframes rec-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+.home-record-notice {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  font-size: 14px;
+  line-height: 20px;
+}
+.home-record-notice p {
+  flex: 1 1 280px;
+}
+.home-record-notice button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.home-record-file {
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+@media (max-width: 640px) {
+  .home-record {
+    grid-template-columns: 1fr;
+  }
+  .home-record-controls {
+    align-items: stretch;
+  }
+}
