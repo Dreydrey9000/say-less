@@ -693,7 +693,96 @@
         }
       }
 
+      /* proof strip */
+      .proof-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 16px;
+        margin-top: 40px;
+      }
+      .proof-tile {
+        background: var(--bg-2);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 24px 26px;
+        box-shadow: var(--elev-1);
+        min-height: 140px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 2px;
+      }
+      .proof-tile[hidden] {
+        display: none;
+      }
+      .proof-tile .big {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 44px;
+        letter-spacing: -0.03em;
+        line-height: 1;
+        color: var(--silver-hi);
+        font-variant-numeric: tabular-nums;
+      }
+      .proof-tile .big.small {
+        font-size: 22px;
+        line-height: 1.15;
+      }
+      .proof-tile .label {
+        color: var(--muted);
+        font-size: 15px;
+        margin-top: 10px;
+      }
+      .proof-tile .label a {
+        color: var(--muted);
+        text-decoration-color: var(--line-2);
+      }
+      .proof-tile .label a:hover {
+        color: var(--text);
+      }
+      .proof-note {
+        color: var(--dim);
+        font-size: 14px;
+        margin: 18px 0 0;
+      }
+      @media (max-width: 880px) {
+        .proof-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .proof-tile {
+          padding: 20px;
+          min-height: 120px;
+        }
+        .proof-tile .big {
+          font-size: 36px;
+        }
+        .proof-tile .big.small {
+          font-size: 20px;
+        }
+        .proof-grid.odd .proof-tile:last-child {
+          grid-column: span 2;
+        }
+      }
+
       /* features */
+      .feature-icon {
+        width: 40px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 11px;
+        color: var(--silver);
+        background: linear-gradient(180deg, #1d1f24, #141519);
+        border: 1px solid var(--line-2);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        margin-bottom: 16px;
+      }
+      .feature-icon svg {
+        width: 24px;
+        height: 24px;
+        display: block;
+      }
       .features {
         display: grid;
         grid-template-columns: repeat(6, 1fr);
@@ -1035,6 +1124,47 @@
         </div>
       </section>
 
+      <section id="proof" aria-labelledby="proof-h">
+        <div class="wrap">
+          <p class="kicker">Proof</p>
+          <h2 id="proof-h">Numbers, live from GitHub.</h2>
+          <p class="sub">
+            Say Less is brand new, so there are no reviews yet. Here is what can
+            be checked instead.
+          </p>
+          <div class="proof-grid" data-proof>
+            <div class="proof-tile" data-live hidden>
+              <span class="big" data-downloads-count>&nbsp;</span>
+              <span class="label">downloads so far</span>
+            </div>
+            <div class="proof-tile" data-live hidden>
+              <span class="big" data-stars-count>&nbsp;</span>
+              <span class="label">GitHub stars</span>
+            </div>
+            <div class="proof-tile" data-live hidden>
+              <span class="big" data-version>&nbsp;</span>
+              <span class="label">latest version</span>
+            </div>
+            <div class="proof-tile">
+              <span class="big small">Open source, MIT</span>
+              <span class="label"
+                >Read every line in the
+                <a href="https://github.com/Dreydrey9000/say-less"
+                  >public repo</a
+                ></span
+              >
+            </div>
+            <div class="proof-tile">
+              <span class="big small">Signed and notarized by Apple</span>
+              <span class="label">The Mac build passes Gatekeeper</span>
+            </div>
+          </div>
+          <p class="proof-note" data-proof-note hidden>
+            Numbers update as people download.
+          </p>
+        </div>
+      </section>
+
       <section id="private">
         <div class="wrap">
           <p class="kicker">Privacy</p>
@@ -1081,6 +1211,20 @@
           <h2>Small app. Does the job.</h2>
           <div class="features">
             <div class="feature wide">
+              <span class="feature-icon" aria-hidden="true"
+                ><svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 4v-4H6.5A2.5 2.5 0 0 1 4 13.5z"
+                  />
+                  <path d="M8 8.5h8M8 12h5" /></svg
+              ></span>
               <h3>Voice snippets</h3>
               <p>
                 Save text you type all the time and trigger it with a short
@@ -1092,6 +1236,19 @@
               </p>
             </div>
             <div class="feature wide">
+              <span class="feature-icon" aria-hidden="true"
+                ><svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="6.5" cy="6.5" r="2.5" />
+                  <circle cx="6.5" cy="17.5" r="2.5" />
+                  <path d="M8.5 8.2 20 18M8.5 15.8 20 6" /></svg
+              ></span>
               <h3>Cleaner writing</h3>
               <p>
                 Filler words get cut, and your own vocabulary (names, brands,
@@ -1103,10 +1260,45 @@
               </p>
             </div>
             <div class="feature">
+              <span class="feature-icon" aria-hidden="true"
+                ><svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="4" y="4" width="6.5" height="6.5" rx="1.5" />
+                  <rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5" />
+                  <rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5" />
+                  <rect
+                    x="13.5"
+                    y="13.5"
+                    width="6.5"
+                    height="6.5"
+                    rx="1.5"
+                  /></svg
+              ></span>
               <h3>Works in every app</h3>
               <p>If you can type there, you can talk there.</p>
             </div>
             <div class="feature">
+              <span class="feature-icon" aria-hidden="true"
+                ><svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="4" y="5" width="16" height="10.5" rx="1.5" />
+                  <path d="M2.5 18.5h19" />
+                  <path
+                    d="M9.5 12.5c0-3 2.5-4.5 5.5-4.5-.5 3-2.5 4.5-5.5 4.5z"
+                  /></svg
+              ></span>
               <h3>Light on your laptop</h3>
               <p>
                 The recommended speech models are small, about a 600 MB
@@ -1114,6 +1306,18 @@
               </p>
             </div>
             <div class="feature">
+              <span class="feature-icon" aria-hidden="true"
+                ><svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M12 3v10M8.5 9.5 12 13l3.5-3.5" />
+                  <path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4" /></svg
+              ></span>
               <h3>Bring your old words</h3>
               <p>
                 Coming from another dictation app? Import your saved word list.
@@ -1134,6 +1338,20 @@
           </p>
           <div class="features">
             <div class="feature wide">
+              <span class="feature-icon" aria-hidden="true"
+                ><svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M12 4 4.5 17.5a1 1 0 0 0 .9 1.5h13.2a1 1 0 0 0 .9-1.5z"
+                  />
+                  <path d="M12 9.5v4M12 16.2v.3" /></svg
+              ></span>
               <h3>Fix this first</h3>
               <p>Your most repeated problem, with what you said and when.</p>
               <p class="example">
@@ -1142,6 +1360,20 @@
               </p>
             </div>
             <div class="feature wide">
+              <span class="feature-icon" aria-hidden="true"
+                ><svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M9 18h6M10 21h4" />
+                  <path
+                    d="M8.5 14.5A5.5 5.5 0 1 1 15.5 14.5c-.7.7-1 1.5-1 2.5h-5c0-1-.3-1.8-1-2.5z"
+                  /></svg
+              ></span>
               <h3>Ideas you forgot you had</h3>
               <p>
                 Every "what if we..." you said out loud, in one list with the
@@ -1149,12 +1381,40 @@
               </p>
             </div>
             <div class="feature">
+              <span class="feature-icon" aria-hidden="true"
+                ><svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z" />
+                  <path
+                    d="M15.5 9.5a3.5 3.5 0 0 1 0 5M18 7a7 7 0 0 1 0 10"
+                  /></svg
+              ></span>
               <h3>Read it to me</h3>
               <p>
                 Hear your daily digest out loud, with voices on your computer.
               </p>
             </div>
             <div class="feature">
+              <span class="feature-icon" aria-hidden="true"
+                ><svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M7 3.5h7l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-9.5A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5z"
+                  />
+                  <path d="M14 3.5v4h4M8.5 11.5h7M8.5 15h5" /></svg
+              ></span>
               <h3>Notes that write themselves</h3>
               <p>
                 Turn on nightly notes and your day lands in Obsidian-style
@@ -1162,6 +1422,20 @@
               </p>
             </div>
             <div class="feature">
+              <span class="feature-icon" aria-hidden="true"
+                ><svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M5 5.5h14v9.5H11l-4.5 3.5V15H5z" />
+                  <path
+                    d="M12 8.2l.8 1.8 1.8.8-1.8.8-.8 1.8-.8-1.8-1.8-.8 1.8-.8z"
+                  /></svg
+              ></span>
               <h3>Ask Claude</h3>
               <p>
                 Connect Claude or any AI tool to search your own history,
@@ -1512,6 +1786,74 @@
         finish();
       }
       loop();
+
+      // Proof strip: live numbers from GitHub. If the fetch fails, the live
+      // tiles stay hidden. An unknown must never show as a zero.
+      (async () => {
+        const REPO = "https://api.github.com/repos/Dreydrey9000/say-less";
+        const KEY = "sayless-proof";
+        const TEN_MIN = 10 * 60 * 1000;
+        const fmt = (n) => new Intl.NumberFormat("en-US").format(n);
+        let data = null;
+        try {
+          const cached = JSON.parse(sessionStorage.getItem(KEY) || "null");
+          if (cached && Date.now() - cached.at < TEN_MIN) data = cached;
+        } catch (e) {}
+        if (!data) {
+          try {
+            const [repoRes, relRes] = await Promise.all([
+              fetch(REPO),
+              fetch(REPO + "/releases"),
+            ]);
+            if (!repoRes.ok || !relRes.ok) return;
+            const repo = await repoRes.json();
+            const rels = await relRes.json();
+            if (!Array.isArray(rels) || !rels.length) return;
+            const downloads = rels
+              .flatMap((r) => r.assets || [])
+              .reduce((sum, a) => sum + (a.download_count || 0), 0);
+            const latest =
+              rels.find((r) => !r.draft && !r.prerelease) || rels[0];
+            data = {
+              at: Date.now(),
+              downloads,
+              stars: repo.stargazers_count,
+              version: latest.tag_name,
+            };
+            try {
+              sessionStorage.setItem(KEY, JSON.stringify(data));
+            } catch (e) {}
+          } catch (e) {
+            return;
+          }
+        }
+        if (
+          typeof data.downloads !== "number" ||
+          typeof data.stars !== "number"
+        )
+          return;
+        document.querySelector("[data-downloads-count]").textContent = fmt(
+          data.downloads,
+        );
+        document.querySelector("[data-stars-count]").textContent = fmt(
+          data.stars,
+        );
+        document.querySelector("[data-version]").textContent = String(
+          data.version || "",
+        ).replace(/^v/, "");
+        document
+          .querySelectorAll("[data-live]")
+          .forEach((el) => el.removeAttribute("hidden"));
+        // A real zero, but 0 stars says nothing yet, so that tile waits.
+        if (data.stars === 0)
+          document
+            .querySelector("[data-stars-count]")
+            .closest("[data-live]").hidden = true;
+        const grid = document.querySelector("[data-proof]");
+        const shown = grid.querySelectorAll(".proof-tile:not([hidden])").length;
+        grid.classList.toggle("odd", shown % 2 === 1);
+        document.querySelector("[data-proof-note]").hidden = false;
+      })();
     </script>
   </body>
 </html>
