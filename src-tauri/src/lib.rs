@@ -30,6 +30,7 @@ mod transcription_coordinator;
 mod tray;
 mod tray_i18n;
 mod utils;
+mod voice_command;
 mod wispr_import;
 
 pub use cli::CliArgs;
@@ -384,6 +385,10 @@ fn initialize_core_logic(app_handle: &AppHandle) {
 
     // Create the recording overlay window (hidden by default)
     utils::create_recording_overlay(app_handle);
+
+    // The voice command preview (hidden until a rewrite is ready)
+    app_handle.manage(voice_command::VoiceCommandState::new());
+    voice_command::create_preview_window(app_handle);
 }
 
 #[tauri::command]
@@ -805,6 +810,8 @@ pub fn run(cli_args: CliArgs) {
             commands::history::retry_history_entry_transcription,
             commands::history::update_history_limit,
             commands::history::update_recording_retention_period,
+            voice_command::apply_voice_command,
+            voice_command::dismiss_voice_command,
             helpers::clamshell::is_laptop,
             insights::get_insights,
             insights::search_history_text,

@@ -14,7 +14,7 @@ use tauri_plugin_clipboard_manager::ClipboardExt;
 #[cfg(target_os = "linux")]
 use crate::utils::{is_gnome_wayland, is_kde_wayland, is_wayland};
 
-fn with_enigo<T>(
+pub(crate) fn with_enigo<T>(
     app_handle: &AppHandle,
     f: impl FnOnce(&mut Enigo) -> Result<T, String>,
 ) -> Result<T, String> {
@@ -28,7 +28,7 @@ fn with_enigo<T>(
     f(&mut enigo)
 }
 
-fn write_text_to_clipboard(app_handle: &AppHandle, text: &str) -> Result<(), String> {
+pub(crate) fn write_text_to_clipboard(app_handle: &AppHandle, text: &str) -> Result<(), String> {
     #[cfg(target_os = "linux")]
     if is_wayland() && is_wl_copy_available() {
         info!("Using wl-copy for clipboard write on Wayland");
@@ -49,6 +49,63 @@ fn finish_clipboard_paste(
     std::thread::sleep(Duration::from_millis(paste_delay_after_ms));
     restore_clipboard();
     paste_result
+}
+
+/// How long to wait for the target app to answer the copy chord. Editors
+/// usually publish within a few milliseconds; a slow Electron app takes
+/// longer, and an app with nothing selected never does.
+const COPY_WAIT: Duration = Duration::from_millis(600);
+const COPY_POLL: Duration = Duration::from_millis(20);
+
+/// Reads what the user has selected in the front app by sending the copy
+/// chord and watching the clipboard, then puts the user's own clipboard back
+/// the same way the clipboard paste path does (text first, then an image,
+/// otherwise cleared). Returns `Ok(None)` when nothing arrived, which is what
+/// an empty selection looks like from here.
+///
+/// Must run on the main thread on macOS (the layout-aware keycode lookup).
+pub(crate) fn copy_selection(app_handle: &AppHandle) -> Result<Option<String>, String> {
+    let clipboard = app_handle.clipboard();
+    let saved_text = clipboard.read_text().ok().filter(|t| !t.is_empty());
+    let saved_image = if saved_text.is_none() {
+        clipboard.read_image().ok().map(|image| image.to_owned())
+    } else {
+        None
+    };
+
+    // Start from an empty clipboard so an unchanged clipboard cannot be
+    // mistaken for the selection.
+    clipboard
+        .clear()
+        .map_err(|e| format!("Failed to clear clipboard before copy: {}", e))?;
+
+    let copy_result = with_enigo(app_handle, |enigo| input::send_copy(enigo, 100));
+
+    let mut selection = None;
+    if copy_result.is_ok() {
+        let deadline = std::time::Instant::now() + COPY_WAIT;
+        while std::time::Instant::now() < deadline {
+            std::thread::sleep(COPY_POLL);
+            if let Ok(text) = clipboard.read_text() {
+                if !text.is_empty() {
+                    selection = Some(text);
+                    break;
+                }
+            }
+        }
+    }
+
+    if let Some(text) = saved_text {
+        let _ = write_text_to_clipboard(app_handle, &text);
+    } else if let Some(image) = saved_image {
+        info!("Restoring image to clipboard after copying the selection");
+        let _ = clipboard.write_image(&image);
+    } else {
+        let _ = clipboard.clear();
+    }
+
+    copy_result?;
+    Ok(selection)
 }
 
 /// Pastes text using the clipboard: saves current content, writes text, sends paste keystroke, restores clipboard.

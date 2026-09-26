@@ -448,6 +448,11 @@ export const PostProcessingSettings: React.FC = () => {
             descriptionMode="inline"
             grouped={true}
           />
+          <ShortcutInput
+            shortcutId="command_selection"
+            descriptionMode="inline"
+            grouped={true}
+          />
         </SettingsGroup>
       ) : (
         <p className="setting-description">

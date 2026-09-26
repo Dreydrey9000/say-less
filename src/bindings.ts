@@ -1003,6 +1003,12 @@ async getHistoryEntries(cursor: number | null, limit: number | null) : Promise<R
     else return { status: "error", error: e  as any };
 }
 },
+async applyVoiceCommand() : Promise<void> {
+    await TAURI_INVOKE("apply_voice_command");
+},
+async dismissVoiceCommand() : Promise<void> {
+    await TAURI_INVOKE("dismiss_voice_command");
+},
 async toggleHistoryEntrySaved(id: number) : Promise<Result<null, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("toggle_history_entry_saved", { id }) };

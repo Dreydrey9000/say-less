@@ -1,5 +1,12 @@
 # Changelog
 
+## [2026-09-26]
+
+### Added
+
+- Voice commands on selected text: select text in any app, hold the new "Rewrite selected text" shortcut (Ctrl+Option+Space on Mac, Ctrl+Alt+Space elsewhere) and say what to do with it, like "make this shorter". A small preview shows the rewrite first: Enter replaces the selection, Esc keeps the original. The rewrite runs through the AI provider you already set up for cleanup (your own key, Apple Intelligence or Ollama), sending the text and never audio.
+- The shortcut sits under the AI cleanup shortcut on the AI cleanup page and is listed under "Other recording shortcuts" on Home. Each command is saved to History with the instruction and the result.
+
 ## [2026-09-25]
 
 ### Added

@@ -24,6 +24,7 @@ export default defineConfig(async () => ({
         main: resolve(__dirname, "index.html"),
         dock: resolve(__dirname, "src/dock/index.html"),
         overlay: resolve(__dirname, "src/overlay/index.html"),
+        command: resolve(__dirname, "src/command/index.html"),
       },
     },
   },
