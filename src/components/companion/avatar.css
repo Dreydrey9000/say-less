@@ -128,3 +128,67 @@
 .avatar.is-still .avatar-ring {
   transition: none;
 }
+/* Bot: pill eyes and voice bars cross-fade as talking starts and stops. */
+.avatar-bot-eye,
+.avatar-bot-bars {
+  transition: opacity 120ms ease-out;
+}
+/* Bot personality: glances, winks, a curious tilt, happy eyes and blushing. */
+.avatar-glance {
+  transform-box: view-box;
+  transform-origin: 50px 80px;
+  transition: transform 420ms var(--avatar-spring);
+}
+.avatar-glance .avatar-eyes {
+  transition: transform 260ms var(--avatar-spring);
+}
+.avatar-glance.glance-left {
+  transform: rotate(-6deg);
+}
+.avatar-glance.glance-right {
+  transform: rotate(6deg);
+}
+.avatar-glance.glance-left .avatar-eyes {
+  transform: translate(-2.6px, -0.4px);
+}
+.avatar-glance.glance-right .avatar-eyes {
+  transform: translate(2.6px, -0.4px);
+}
+/* Bot blinks by squashing its pill eyes flat, like the original Grokbot. */
+.avatar-bot-eye {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  transition:
+    opacity 120ms ease-out,
+    transform 90ms ease-in;
+}
+.avatar-eyes.is-blinking .avatar-bot-eye,
+.avatar-eyes.is-winking .bot-eye-r {
+  transform: scaleY(0.12);
+  transition-duration: 70ms;
+}
+/* Thinking: head cocked, one eye squinted, like it's working something out. */
+.avatar-bot.state-thinking .avatar-glance {
+  transform: rotate(-8deg);
+}
+.avatar-bot.state-thinking .bot-eye-r {
+  transform: scaleY(0.4);
+  transition: transform 420ms var(--avatar-spring);
+}
+.avatar-bot-happy {
+  opacity: 0;
+  transition: opacity 120ms ease-out;
+}
+.avatar-bot-blush {
+  transition: opacity 160ms ease-out;
+}
+/* Done: the pill eyes turn to ^^ and the cheeks flush. */
+.avatar-bot .avatar-body.is-happy .avatar-bot-eye {
+  opacity: 0;
+}
+.avatar-bot .avatar-body.is-happy .avatar-bot-happy {
+  opacity: 1;
+}
+.avatar-bot .avatar-body.is-happy .avatar-bot-blush {
+  opacity: 0.55;
+}
