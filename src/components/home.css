@@ -159,6 +159,50 @@
 .home-tools button:hover {
   background: color-mix(in srgb, var(--studio-accent), transparent 93%);
 }
+/* Your numbers: three tiles on the shared type scale (28 number, 13 label). */
+.home-stats {
+  padding-top: 28px;
+}
+.home-stats h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+.home-stats dl {
+  display: flex;
+  margin-top: 12px;
+  border: 1px solid #80808040;
+  border-radius: 16px;
+}
+.home-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 18px 20px;
+}
+.home-stat + .home-stat {
+  border-inline-start: 1px solid #80808040;
+}
+.home-stat dd {
+  font-size: 28px;
+  line-height: 32px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.home-stat dt {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--color-text-muted);
+}
+.home-stats-note {
+  max-width: 64ch;
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--color-text-muted);
+}
 .home-history {
   padding-top: 28px;
 }
@@ -228,6 +272,13 @@
     flex-direction: column;
   }
   .home-tools button + button {
+    border-inline-start: 0;
+    border-top: 1px solid #80808040;
+  }
+  .home-stats dl {
+    flex-direction: column;
+  }
+  .home-stat + .home-stat {
     border-inline-start: 0;
     border-top: 1px solid #80808040;
   }

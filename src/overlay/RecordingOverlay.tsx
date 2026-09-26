@@ -245,6 +245,7 @@ const RecordingOverlay: React.FC = () => {
           moving={moving}
           state={captureReady ? "listening" : "idle"}
           rings={1}
+          small
         />
       </span>
     ) : (
