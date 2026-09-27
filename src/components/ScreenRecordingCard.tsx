@@ -71,7 +71,7 @@ export function ScreenRecordingCard() {
         )}
         {status && !supported && (
           <p id="home-record-reason" className="home-record-hint">
-            {t(unsupportedKey(status.unsupported_reason))}
+            {t(unsupportedKey(status.unsupported_reason, { detailed: true }))}
           </p>
         )}
       </div>
@@ -141,7 +141,7 @@ export function ScreenRecordingCard() {
           recording={recording}
           unsupportedReason={
             status && !supported
-              ? t(unsupportedKey(status.unsupported_reason))
+              ? t(unsupportedKey(status.unsupported_reason, { detailed: true }))
               : null
           }
         />
