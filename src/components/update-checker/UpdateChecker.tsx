@@ -5,6 +5,7 @@ import { relaunch } from "@tauri-apps/plugin-process";
 import { listen } from "@tauri-apps/api/event";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { arch, platform } from "@tauri-apps/plugin-os";
+import { toast } from "sonner";
 import { ProgressBar } from "../shared";
 import { useSettings } from "../../hooks/useSettings";
 import { commands } from "../../bindings";
@@ -12,6 +13,15 @@ import {
   resolvePortableInstallerUrl,
   PORTABLE_RELEASES_URL,
 } from "./portableInstaller";
+
+// Closing the window only hides it, so this page can stay open for days while
+// the app sits in the menu bar. Check again every few hours so a running copy
+// still finds new versions.
+const UPDATE_RECHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;
+// Fixed ids so repeat checks replace one toast instead of stacking new ones.
+const UPDATE_READY_TOAST_ID = "update-ready";
+const UPDATE_FAILED_TOAST_ID = "update-failed";
+const DOWNLOAD_PAGE_URL = "https://saylessvoice.com/#download";
 
 interface UpdateCheckerProps {
   className?: string;
@@ -46,6 +56,7 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
   const isManualCheckRef = useRef(false);
   const downloadedBytesRef = useRef(0);
   const contentLengthRef = useRef(0);
+  const notifiedVersionRef = useRef<string | null>(null);
 
   useEffect(() => {
     // Wait for settings to load before doing anything
@@ -58,10 +69,12 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
       setIsChecking(false);
       setUpdateAvailable(false);
       setShowUpToDate(false);
+      toast.dismiss(UPDATE_READY_TOAST_ID);
       return;
     }
 
     checkForUpdates();
+    const recheck = setInterval(checkForUpdates, UPDATE_RECHECK_INTERVAL_MS);
 
     // Listen for update check events
     const updateUnlisten = listen("check-for-updates", () => {
@@ -72,6 +85,7 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
       if (upToDateTimeoutRef.current) {
         clearTimeout(upToDateTimeoutRef.current);
       }
+      clearInterval(recheck);
       updateUnlisten.then((fn) => fn());
     };
   }, [settingsLoaded, updateChecksEnabled]);
@@ -92,6 +106,29 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
         setPortableInstallerUrl(
           resolvePortableInstallerUrl(update.rawJson, platform(), arch()),
         );
+        // The footer label is small and easy to miss, so also say it in a
+        // toast: once per version, and again on every manual check.
+        if (
+          isManualCheckRef.current ||
+          notifiedVersionRef.current !== update.version
+        ) {
+          notifiedVersionRef.current = update.version;
+          toast(t("footer.updateReady", { version: update.version }), {
+            id: UPDATE_READY_TOAST_ID,
+            duration: Infinity,
+            cancel: { label: t("footer.updateLater"), onClick: () => {} },
+            action: {
+              label: t("footer.updateNow"),
+              onClick: () => {
+                void installUpdate();
+              },
+            },
+            classNames: {
+              cancelButton:
+                "px-2 py-1 text-xs rounded-lg text-text/60 hover:text-text/80 cursor-pointer whitespace-nowrap",
+            },
+          });
+        }
       } else {
         setUpdateAvailable(false);
 
@@ -121,6 +158,9 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
 
   const installUpdate = async () => {
     if (!updateChecksEnabled) return;
+    // Starting from the footer label must not leave a second "Update now"
+    // button on screen that would start another download.
+    toast.dismiss(UPDATE_READY_TOAST_ID);
 
     const portable = await commands.isPortable();
     if (portable) {
@@ -162,6 +202,21 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
       await relaunch();
     } catch (error) {
       console.error("Failed to install update:", error);
+      // Otherwise the label just snaps back to "Update available" with no
+      // reason. On a Mac this usually means the app is running from the disk
+      // image instead of Applications, so point at a fresh download.
+      toast.error(t("footer.updateFailed"), {
+        id: UPDATE_FAILED_TOAST_ID,
+        description:
+          platform() === "macos"
+            ? t("footer.updateFailedMacDescription")
+            : t("footer.updateFailedDescription"),
+        duration: 15000,
+        action: {
+          label: t("footer.updateFailedAction"),
+          onClick: () => openUrl(DOWNLOAD_PAGE_URL),
+        },
+      });
     } finally {
       setIsInstalling(false);
       setDownloadProgress(0);
