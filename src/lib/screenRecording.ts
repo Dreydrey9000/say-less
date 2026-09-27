@@ -20,6 +20,7 @@ export type RecordingNotice =
   | "microphone_denied"
   | "camera_denied"
   | "camera_failed"
+  | "camera_missing"
   | "window_missing"
   | "failed"
   | "ended_early"
@@ -45,11 +46,11 @@ export function noticeFor(
     code === "permission_denied" ||
     code === "microphone_denied" ||
     code === "camera_denied" ||
+    code === "camera_missing" ||
     code === "window_missing"
   )
     return code;
-  if (code === "camera_failed" || code === "camera_missing")
-    return "camera_failed";
+  if (code === "camera_failed") return "camera_failed";
   if (hasFile) return "ended_early";
   return "failed";
 }
@@ -155,6 +156,11 @@ export const useScreenRecording = create<RecordingStore>((set, get) => ({
   },
   openSettings: async () => {
     try {
+      if (platform() === "macos" && !(await checkScreenRecordingPermission())) {
+        // Puts Say Less in the Screen Recording list (macOS asks only once),
+        // even when the failed start came from the menu bar or a voice cue.
+        await requestScreenRecordingPermission().catch(() => undefined);
+      }
       await invoke("open_screen_recording_settings");
     } catch {
       set({ notice: "permission_denied" });

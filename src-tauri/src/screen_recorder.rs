@@ -572,6 +572,8 @@ pub fn toggle_in_background(app: &AppHandle, want_recording: Option<bool>) {
                     | "macos_too_old"
             ) {
                 crate::show_main_window_for(&app);
+                // Open Home, where the recording card shows the explanation.
+                let _ = app.emit("open-recording-home", ());
             }
         }
     });
@@ -595,18 +597,24 @@ pub fn screen_recording_status() -> ScreenRecordingStatus {
     current_status()
 }
 
-/// Show the last recording in Finder (or Explorer). Only ever the file we
-/// wrote, never a path from the page.
+/// Show the last recording in Finder (or Explorer), or open the recordings
+/// folder when there is none yet. Only ever paths we chose, never a path from
+/// the page.
 #[tauri::command]
 #[specta::specta]
 pub fn show_screen_recording_in_folder(app: AppHandle) -> Result<(), String> {
     use tauri_plugin_opener::OpenerExt;
-    let path = machine().last_file.clone().ok_or("no_recording")?;
-    if !path.is_file() {
-        return Err("file_missing".into());
+    let last_file = machine().last_file.clone();
+    if let Some(path) = last_file.filter(|p| p.is_file()) {
+        return app
+            .opener()
+            .reveal_item_in_dir(path)
+            .map_err(|_| "reveal_failed".into());
     }
+    let dir = recordings_dir()?;
+    std::fs::create_dir_all(&dir).map_err(|_| "folder_failed")?;
     app.opener()
-        .reveal_item_in_dir(path)
+        .open_path(dir.to_string_lossy(), None::<&str>)
         .map_err(|_| "reveal_failed".into())
 }
 

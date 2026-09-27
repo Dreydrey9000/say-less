@@ -32,7 +32,9 @@ test("Home records, shows a ticking timer, stops and offers the file", async ({
   await page.clock.fastForward(65_000);
   await expect(timer).toHaveText("01:05");
   await stop.click();
-  await expect(home.getByRole("status")).toContainText("Saved.");
+  await expect(home.getByRole("status")).toContainText(
+    "Saved in Movies, Say Less.",
+  );
   await expect(home.getByRole("status")).toContainText(
     "Say Less 2026-09-25 at 14.03.07.mp4",
   );
