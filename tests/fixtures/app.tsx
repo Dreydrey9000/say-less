@@ -58,7 +58,8 @@ const settings = {
   selected_model: "test-model",
   app_language: "en",
   theme: query.get("theme") || "dark",
-  show_whats_new_on_update: false,
+  // `?whatsNew` turns on the What's New dialog for the current release.
+  show_whats_new_on_update: query.has("whatsNew"),
   bindings: Object.fromEntries(
     [
       "transcribe",
@@ -117,8 +118,14 @@ let snippets = JSON.parse(localStorage.getItem("test-snippets") || "[]");
 // unsupported. Otherwise start and stop succeed.
 let screenStatus = {
   state: query.get("screen") === "recording" ? "recording" : "idle",
-  supported: osName === "macos",
-  unsupported_reason: osName === "macos" ? null : "windows_soon",
+  // ?macos=old is a Mac older than macOS 15, which cannot record.
+  supported: osName === "macos" && query.get("macos") !== "old",
+  unsupported_reason:
+    osName !== "macos"
+      ? "windows_soon"
+      : query.get("macos") === "old"
+        ? "macos_too_old"
+        : null,
   elapsed_ms: query.get("screen") === "recording" ? 65_000 : 0,
   last_file: null as string | null,
   error: null as string | null,
@@ -174,6 +181,20 @@ const recordingSources = {
   cameras: [{ id: "cam-1", name: "FaceTime HD Camera" }],
   windows_need_permission: false,
 };
+// What macOS says about the camera. ?camera=denied: refused before, so macOS
+// shows no prompt. ?camera=ask: macOS hasn't asked yet, and its prompt waits
+// until the test calls testCameraAnswer(true or false).
+let cameraStatus =
+  query.get("camera") === "denied"
+    ? "denied"
+    : query.get("camera") === "ask"
+      ? "not_asked"
+      : "allowed";
+(
+  window as unknown as { testCameraAnswer: (allow: boolean) => void }
+).testCameraAnswer = (allow) => {
+  cameraStatus = allow ? "allowed" : "denied";
+};
 const cameraFrame =
   "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='8'><rect width='8' height='8' fill='%23c98'/></svg>";
 mockWindows("main");
@@ -198,14 +219,15 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
     return recordingSources;
   }
   if (cmd === "start_camera_preview") {
-    if (query.get("camera") === "denied") throw "camera_denied";
+    if (cameraStatus !== "allowed") throw "camera_denied";
     return null;
   }
   if (cmd === "camera_preview_frame") return cameraFrame;
   if (cmd === "stop_camera_preview") return null;
   if (cmd === "open_camera_settings") return null;
+  if (cmd === "camera_permission_status") return cameraStatus;
   if (cmd.includes("check_camera_permission"))
-    return query.get("camera") !== "denied";
+    return cameraStatus === "allowed";
   if (cmd.includes("request_camera_permission")) return null;
   if (cmd === "start_screen_recording") {
     if (query.get("screen") === "window") {
@@ -215,6 +237,11 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
     if (query.get("screen") === "denied") {
       screenStatus = { ...screenStatus, error: "permission_denied" };
       throw "permission_denied";
+    }
+    // Like the backend: Show your face on and no Camera permission won't start.
+    if (recordingOptions.webcam && cameraStatus !== "allowed") {
+      screenStatus = { ...screenStatus, error: "camera_denied" };
+      throw "camera_denied";
     }
     // A short delay, so tests can prove a second click is ignored.
     return new Promise((resolve) =>
@@ -230,16 +257,33 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
     );
   }
   if (cmd === "stop_screen_recording") {
-    screenStatus = {
-      ...screenStatus,
-      state: "idle",
-      elapsed_ms: 0,
-      last_file: screenFile,
+    const save = () => {
+      screenStatus = {
+        ...screenStatus,
+        state: "idle",
+        elapsed_ms: 0,
+        last_file: screenFile,
+      };
+      return screenStatus;
     };
-    return screenStatus;
+    // ?holdStop keeps the video saving until the test calls testFinishStop().
+    if (query.has("holdStop"))
+      return new Promise((resolve) => {
+        (window as unknown as { testFinishStop: () => void }).testFinishStop =
+          () => resolve(save());
+      });
+    return save();
   }
   if (cmd === "show_screen_recording_in_folder") return null;
   if (cmd === "open_screen_recording_settings") return null;
+  // ?update=fail: Software Update doesn't open.
+  if (cmd === "open_software_update") {
+    if (query.get("update") === "fail") throw "open_failed";
+    return null;
+  }
+  // ?reopen=fail makes Reopen Say Less fail.
+  if (cmd === "reopen_app" && query.get("reopen") === "fail")
+    throw "reopen_failed";
   if (cmd.includes("screen_recording_permission"))
     return query.get("screen") !== "denied";
   if (cmd === "list_learned_corrections") return learned;
@@ -290,7 +334,8 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
       : [];
   if (cmd.startsWith("plugin:event|")) return 1;
   if (cmd === "plugin:os|locale") return "en-US";
-  if (cmd === "plugin:app|version") return "0.12.0";
+  if (cmd === "plugin:app|version")
+    return query.has("whatsNew") ? "0.14.1" : "0.12.0";
   if (
     cmd.includes("check_accessibility_permission") ||
     cmd.includes("check_microphone_permission")
@@ -505,7 +550,8 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
   return null;
 };
 // The overlay listens for backend events; tests drive it with `testEmit`.
-mockIPC(ipc, { shouldMockEvents: query.has("overlay") });
+// `?events` does the same for the main window and the dock.
+mockIPC(ipc, { shouldMockEvents: query.has("overlay") || query.has("events") });
 // Count live event listeners per event (listen minus unlisten), so tests can
 // catch listeners that leak across React Strict Mode's double mount.
 {
@@ -535,6 +581,11 @@ await import("../../src/i18n");
 const { applyTheme } = await import("../../src/lib/utils/theme");
 applyTheme(settings.theme as "dark" | "light");
 if (query.has("dock")) {
+  // `?dock&events` lets tests send the dock backend events too.
+  if (query.has("events")) {
+    const { emit } = await import("@tauri-apps/api/event");
+    Object.assign(window, { testEmit: emit });
+  }
   await import("../../src/dock/main");
 } else if (query.has("overlay")) {
   const { emit } = await import("@tauri-apps/api/event");
@@ -545,5 +596,9 @@ if (query.has("dock")) {
   // from this store.
   const { useModelStore } = await import("../../src/stores/modelStore");
   void useModelStore.getState().initialize();
+  if (query.has("events")) {
+    const { emit } = await import("@tauri-apps/api/event");
+    Object.assign(window, { testEmit: emit });
+  }
   ReactDOM.createRoot(document.getElementById("root")!).render(<App />);
 }

@@ -11,6 +11,9 @@ interface SettingContainerProps {
   layout?: "horizontal" | "stacked";
   disabled?: boolean;
   tooltipPosition?: "top" | "bottom";
+  /** Id of the control this title names. The title becomes its label, so
+   * clicking the words works like clicking the control. */
+  labelFor?: string;
 }
 
 export function SettingContainer({
@@ -21,6 +24,7 @@ export function SettingContainer({
   grouped = false,
   layout = "horizontal",
   disabled = false,
+  labelFor,
 }: SettingContainerProps) {
   const { t } = useTranslation();
   const titleId = useId();
@@ -33,7 +37,16 @@ export function SettingContainer({
       >
         <div className={`min-w-0 ${disabled ? "opacity-60" : ""}`}>
           <h3 id={titleId} className="setting-label">
-            {title}
+            {labelFor ? (
+              <label
+                htmlFor={labelFor}
+                className={disabled ? undefined : "cursor-pointer"}
+              >
+                {title}
+              </label>
+            ) : (
+              title
+            )}
           </h3>
           {description &&
             (descriptionMode === "inline" ? (

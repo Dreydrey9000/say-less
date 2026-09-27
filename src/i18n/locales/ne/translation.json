@@ -754,10 +754,19 @@
     "portableUpdateMessage": "पोर्टेबल इन्स्टलहरू स्वतः अपडेट गर्न सकिँदैन। तलबाट आफ्नो प्रणालीका लागि इन्स्टलर डाउनलोड गर्नुहोस्, चलाउनुहोस् र उही फोल्डरमा इन्स्टल गर्नुहोस् — तपाईंको Data/ फोल्डर (सेटिङ, मोडेल, रेकर्डिङ) जस्ताको तस्तै रहन्छ।",
     "portableUpdateButton": "इन्स्टलर डाउनलोड गर्नुहोस्",
     "portableUpdateBrowseMessage": "पोर्टेबल इन्स्टलहरू स्वतः अपडेट गर्न सकिँदैन। GitHub Releases बाट आफ्नो प्रणालीका लागि पछिल्लो संस्करण डाउनलोड गर्नुहोस् र उही फोल्डरमा इन्स्टल गर्नुहोस् — तपाईंको Data/ फोल्डर (सेटिङ, मोडेल, रेकर्डिङ) जस्ताको तस्तै रहन्छ।",
-    "portableUpdateBrowseButton": "GitHub Releases खोल्नुहोस्"
+    "portableUpdateBrowseButton": "GitHub Releases खोल्नुहोस्",
+    "updateReady": "Say Less v{{version}} तयार छ",
+    "updateNow": "अहिले अपडेट गर्नुहोस्",
+    "updateLater": "पछि",
+    "updateFailed": "हामीले Say Less अपडेट गर्न सकेनौं",
+    "updateFailedMacDescription": "नयाँ संस्करण डाउनलोड गर्नुहोस् र यसलाई आफ्नो Applications फोल्डरमा तान्नुहोस्।",
+    "updateFailedDescription": "हाम्रो वेबसाइटबाट नयाँ संस्करण डाउनलोड गरी इन्स्टल गर्नुहोस्।",
+    "updateFailedAction": "डाउनलोड गर्नुहोस्"
   },
   "whatsNew": {
-    "title": "Say Less v{{version}} मा नयाँ"
+    "title": "Say Less v{{version}} मा नयाँ",
+    "tryRecording": "स्क्रिन रेकर्डिङ चलाएर हेर्नुहोस्",
+    "gotIt": "बुझें"
   },
   "common": {
     "loading": "लोड गरिँदैछ...",
@@ -993,17 +1002,25 @@
   "dock": {
     "drag": "Drag floating dock",
     "stop": "Stop",
-    "record": "Record",
+    "record": "बोल्नुहोस्",
     "processing": "Working",
     "settings": "Open settings",
     "hide": "Hide floating dock",
     "error": "Check permissions or open settings to retry.",
-    "idle": "Click Record, or use your dictation shortcut",
-    "recording": "Recording — click Stop when finished",
+    "idle": "आवाजले टाइप गर्न 'बोल्नुहोस्' मा, वा भिडियो रेकर्ड गर्न 'स्क्रिन' मा क्लिक गर्नुहोस्",
+    "recording": "सुनिरहेको छ। सकिएपछि 'Stop' मा क्लिक गर्नुहोस्।",
     "transcribing": "Turning your voice into text…",
     "arming": "Starting microphone…",
     "expand": "Expand dock",
-    "collapse": "Shrink dock"
+    "collapse": "Shrink dock",
+    "screen": "स्क्रिन",
+    "idleTalkOnly": "आवाजले टाइप गर्न 'बोल्नुहोस्' मा क्लिक गर्नुहोस्, वा आफ्नो डिक्टेसन सर्टकट प्रयोग गर्नुहोस्",
+    "talkHint": "बोल्नुहोस्: आवाजले टाइप गर्नुहोस्",
+    "recordingSetup": "Recording setup: क्यामेरा र आवाज",
+    "recordingSetupFaceOn": "Recording setup: क्यामेरा र आवाज, तपाईंको अनुहार देखिन्छ",
+    "recordingSetupFaceOff": "Recording setup: क्यामेरा र आवाज, तपाईंको अनुहार देखिँदैन",
+    "hideWhileRecording": "डक लुकाउन पहिले रेकर्डिङ रोक्नुहोस्।",
+    "closeSaved": "यो सन्देश बन्द गर्नुहोस्"
   },
   "home": {
     "title": "Home",
@@ -1011,7 +1028,7 @@
     "headline": "Speak. We'll type.",
     "description": "Click where you want to type, then use your shortcut. Your words appear there when you finish.",
     "openDock": "Show floating dock",
-    "dockOpened": "The floating dock is showing. Click into the app you want to type in, then use Record or your shortcut.",
+    "dockOpened": "फ्लोटिङ डक देखिइरहेको छ। टाइप गर्न चाहेको एपमा क्लिक गर्नुहोस्, त्यसपछि 'बोल्नुहोस्' वा आफ्नो सर्टकट प्रयोग गर्नुहोस्।",
     "shortcut": "Hold to talk, let go to finish. For a long thought, tap once to go hands-free and tap again to stop.",
     "fnShortcut": "or hold Fn to talk",
     "aiShortcut": "Talk + AI cleanup. Sends your text to your AI provider.",
@@ -1031,9 +1048,9 @@
     "toggleShortcut": "Press to start. Press again to finish.",
     "slogan": "Big thoughts. Less typing.",
     "fnTip": "If the emoji picker opens, go to System Settings > Keyboard and set “Press Globe key to” to “Do Nothing.”",
-    "otherShortcuts": "Other recording shortcuts",
+    "otherShortcuts": "थप डिक्टेसन सर्टकटहरू",
     "setAiShortcut": "Set up AI cleanup",
-    "cancelShortcut": "Cancel a recording",
+    "cancelShortcut": "डिक्टेसन रद्द गर्नुहोस्",
     "share": "Share Say Less",
     "shareCopied": "Link copied: saylessvoice.com",
     "shareFailed": "Could not copy. The link is saylessvoice.com",
@@ -1046,7 +1063,9 @@
     },
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
-    "actionsHint": "Say a cue to open an app or a website"
+    "actionsHint": "Say a cue to open an app or a website",
+    "recordJump": "आफ्नो स्क्रिन रेकर्ड गर्नुहोस्",
+    "recordingJump": "रेकर्ड हुँदैछ {{time}}। 'Stop' मा जानुहोस्"
   },
   "companion": {
     "title": "Particle pattern",
@@ -1276,11 +1295,13 @@
     "showInFinder": "Show in Finder",
     "voiceHint": "Or press your shortcut and say “Say less, start recording.”",
     "permissionDenied": "We need Screen Recording permission to record your screen.",
-    "permissionHint": "Turn on Say Less in System Settings, then quit and reopen Say Less.",
+    "permissionHint": "System Settings मा Say Less अन गर्नुहोस्, त्यसपछि 'Say Less फेरि खोल्नुहोस्' मा क्लिक गर्नुहोस्।",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "Software Update खोल्नुहोस्",
+    "softwareUpdateFailed": "हामीले Software Update खोल्न सकेनौं। आफैं खोल्न माथिका चरणहरू पालना गर्नुहोस्।",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
-    "macosTooOld": "Screen recording needs macOS 15 or newer.",
+    "macosTooOld": "स्क्रिन रेकर्डिङका लागि macOS 15 (Sequoia) वा नयाँ संस्करण चाहिन्छ।",
     "windowsSoon": "Screen recording is coming to Windows soon.",
     "linuxUnsupported": "Screen recording isn't available on Linux yet.",
     "failed": "We couldn't record your screen. Try again.",
@@ -1291,7 +1312,29 @@
     "reservedCue": "That phrase is saved for screen recording. Pick different words.",
     "cameraDenied": "We need Camera permission to show your face in the video.",
     "cameraFailed": "We couldn't start your camera. Close other apps that use it, or turn the camera off in Recording setup.",
-    "windowMissing": "The window you picked is closed. Pick another one in Recording setup."
+    "windowMissing": "The window you picked is closed. Pick another one in Recording setup.",
+    "dockCaption": "तपाईंको स्क्रिन रेकर्ड हुँदैछ। सकिएपछि रातो 'Stop' बटनमा क्लिक गर्नुहोस्।",
+    "savedIn": "{{parent}} भित्रको {{folder}} फोल्डरमा सेभ गरियो।",
+    "openFolder": "रेकर्डिङ फोल्डर खोल्नुहोस्",
+    "cameraOffHint": "हामी भिडियोमा तपाईंको अनुहार देखाउने छैनौं।",
+    "reopenApp": "Say Less फेरि खोल्नुहोस्",
+    "macosTooOldHelp": "स्क्रिन रेकर्डिङका लागि macOS 15 (Sequoia) वा नयाँ संस्करण चाहिन्छ। आफ्नो संस्करण जाँच्न Apple मेनु खोल्नुहोस् र About This Mac छान्नुहोस्। अपडेट गर्न System Settings, General, Software Update मा जानुहोस्। कुनै अपडेट देखिएन भने हामी यो Mac मा स्क्रिन रेकर्ड गर्न सक्दैनौं, तर डिक्टेसन अझै पनि काम गर्छ।",
+    "cameraMissing": "हामीले क्यामेरा फेला पार्न सकेनौं। आफ्नो ल्यापटपको ढकनी खोल्नुहोस् वा क्यामेरा जोड्नुहोस्, वा 'Recording setup' मा 'Show your face' अफ गर्नुहोस्।",
+    "stopHint": "सकिएपछि 'Stop' मा क्लिक गर्नुहोस् वा “Say less, stop recording” भन्नुहोस्।",
+    "startedAnnouncement": "रेकर्डिङ सुरु भयो।",
+    "savedAnnouncement": "रेकर्डिङ सेभ भयो।",
+    "showMyFace": "मेरो अनुहार देखाउनुहोस्",
+    "cameraBlocked": "तपाईंको क्यामेरा ब्लक गरिएको छ, त्यसैले 'Show your face' अन हुँदा रेकर्डिङ सुरु हुँदैन।",
+    "faceCorner": {
+      "top_left": "तपाईंको अनुहार माथिल्लो बायाँ कुनामा देखिनेछ।",
+      "top_right": "तपाईंको अनुहार माथिल्लो दायाँ कुनामा देखिनेछ।",
+      "bottom_left": "तपाईंको अनुहार तल्लो बायाँ कुनामा देखिनेछ।",
+      "bottom_right": "तपाईंको अनुहार तल्लो दायाँ कुनामा देखिनेछ।"
+    },
+    "reopening": "फेरि खोल्दै…",
+    "reopenFailed": "हामीले Say Less फेरि खोल्न सकेनौं। मेनु बारबाट यसलाई बन्द गर्नुहोस्, त्यसपछि फेरि खोल्नुहोस्।",
+    "macosTooOldSteps": "आफ्नो संस्करण जाँच्न Apple मेनु खोल्नुहोस् र About This Mac छान्नुहोस्। अपडेट गर्न System Settings, General, Software Update मा जानुहोस्। कुनै अपडेट देखिएन भने हामी यो Mac मा स्क्रिन रेकर्ड गर्न सक्दैनौं, तर डिक्टेसन अझै पनि काम गर्छ।",
+    "recordWithoutFace": "मेरो अनुहार बिना रेकर्ड गर्नुहोस्"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1313,8 +1356,8 @@
     "windowsNeedPermission": "We can list your windows once Say Less has Screen Recording permission.",
     "noWindows": "Open the window you want to record, then pick it here.",
     "soundTitle": "Sound",
-    "microphone": "Your microphone",
-    "whichMicrophone": "Microphone",
+    "microphone": "आफ्नो आवाज रेकर्ड गर्नुहोस्",
+    "whichMicrophone": "कुन माइक्रोफोन",
     "sameAsDictation": "Same as dictation",
     "systemAudio": "Computer sound",
     "cameraTitle": "Camera",
@@ -1336,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "तपाईंको अनुहार देखाउन हामीलाई क्यामेरा अनुमति चाहिन्छ। System Settings मा Say Less अन गर्नुहोस्, वा आफ्नो अनुहार बिना रेकर्ड गर्नुहोस्।",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",
@@ -1347,6 +1390,7 @@
     "fps30": "30 (recommended)",
     "fps60": "60 (smoother, bigger file)",
     "qualityHint": "1080p at 30 frames looks sharp and stays light on 8GB laptops.",
-    "saveFailed": "We couldn't save that change. Try again."
+    "saveFailed": "We couldn't save that change. Try again.",
+    "webcamHintWindow": "तपाईंको अनुहार स्क्रिनमा र भिडियोमा सानो गोलोभित्र देखिन्छ। रेकर्ड गर्दा विन्डो नचलाउनुहोस् र गोलोलाई विन्डोभित्रै राख्नुहोस्।"
   }
 }

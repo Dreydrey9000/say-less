@@ -1,5 +1,58 @@
 # Changelog
 
+## [2026-09-27]
+
+### Release
+
+- Version 0.14.1: a first-run clarity pass on screen recording, because a new user could not easily find or understand it. The What's New note for 0.14.1 repeats the full screen recording intro, because a fresh install only shows the newest note.
+
+### Changed
+
+- The dock's dictation button says Talk instead of Record, and the screen button has a visible Screen label, because "Record" meant two different things on the same screen. While recording, the red pill says Stop and the caption says the screen is recording.
+- The 0.14.1 What's New note opens with a picture of the recording card's buttons, three short steps and the permission line, all in the first view at the smallest window, because the old note was a wall of text. Mac-only and Windows-only parts are picked before the note shows in What's New and About, so Windows users no longer read Mac steps.
+- Every switch fills with the accent color when on, because on and off looked almost the same.
+- Tooltips hide after the click that used their control, and Escape hides a tooltip that is only hovered, because the tip covered what the click had just opened. Keyboard focus brings a hidden tip back, so keyboard users still see the name.
+- On a Mac older than macOS 15 the recording card explains how to check the version and update, instead of a short grey reason with no next step.
+- The site says screen recording needs macOS 15 or newer and explains how to tell an Apple Silicon Mac from an Intel one before picking a download.
+
+### Fixed
+
+- Home has a "Record your screen" link next to Share (Mac only) that scrolls to the recording card, because at the default 680x570 window the card starts below the fold.
+- The Record your screen link on Home is now a real button, first in the row, because a small underlined link was easy to miss. While a recording runs it shows a red dot and the time and takes you to Stop, so a running recording is never hidden below the fold.
+- The sidebar list scrolls on its own, with a fade while more items sit below, because at the 680x570 window About was cut off and tabbing to it moved the whole window.
+- The recording card stacks its text above its buttons at the same 580px content-width breakpoint as the rest of Home, because the old 640px window breakpoint never fired on a window that can't be narrower than 680px, leaving the text in a thin column.
+- What's New has "Got it" and "Try screen recording", which closes the dialog and brings Home forward with the recording card in view, because a first-time user had no button to reach the feature the note describes. The second button shows only on the 0.14 notes and only when this computer can record (macOS 15 or newer), so it never leads to a faded Record button or sits under an unrelated note.
+- The main window listens for "open-recording-home" and shows Home with the recording card in view, so the dock and recording problems can send people straight to it. The name is shared as OPEN_RECORDING_HOME_EVENT in src/lib/recordingOptions.ts, so a typo on either side can't make it fail silently.
+- The 0.14.0 note says up front that screen recording needs macOS 15 or newer, and explains how to turn on the floating dock it mentions, because both were missing or buried at the end. It also names the save folder in words instead of an arrow, to match the rest of the note.
+- The recording card's permission buttons ask macOS first when access was never requested, so Say Less appears in the System Settings list, and the screen, camera and microphone buttons open the matching privacy page instead of doing nothing after one "Don't Allow".
+- A Reopen Say Less button sits next to Open System Settings in the permission notice, because macOS only applies Screen Recording access after a restart and closing the window only hides the app.
+- When the window comes forward for a recording problem (from the dock, the menu bar or the voice command), it opens on Home where the explanation is, instead of whichever page was last open.
+- No camera found (lid closed, no webcam) shows its own message with a fix, instead of the generic camera error.
+- The card says when your face is off and where to turn it on, names the save folder in the Saved line, and keeps an Open recordings folder button, because there was no lasting way to find videos.
+- In "one window" mode the setup panel explains that the window and the face circle should stay put, because the video does not follow a moved window.
+- Saying "Say less, start recording" on a Mac that cannot record opens the explanation on Home instead of a misleading permissions error.
+- The app checks for updates every few hours while open and shows an Update now toast, because a copy left open never learned about 0.14.0. A failed update now says so and links to the download.
+- Double-clicking Stop, on Home or the dock, saves once and no longer starts a new recording, because the second click landed on the Record button that replaced Stop. Record ignores clicks for about 0.7 seconds after a stop.
+- Pressing Enter on Record screen keeps keyboard focus on the button and announces "Recording started" and "Recording saved", because focus fell to the page and nothing said the recording began.
+- With Show your face on and the camera blocked, the card says so and offers the fix, because the switch looked on while the recording could not start with the camera.
+- The face hint has a Show my face button that opens Setup right on the Show your face switch, and Setup now lists the camera before sound, because the switch sat below the fold at the default window.
+- The Record button stays in place when it turns into Stop, the permission notice sits above the buttons, Open recordings folder has its own row, and while recording the card says how to stop.
+- On an older Mac or Windows the Record button looks clearly unavailable and the reason uses the same notice style as a permission problem. Windows no longer shows a Setup panel for a feature it does not have yet.
+- Reopen Say Less says "Reopening" and ignores a second click, and says what to do if it fails.
+- In light mode the lime Record button has a darker edge so it does not melt into the white card.
+- The dock's Talk button keeps a tooltip while a recording runs, the Stop glyph is a filled square, the camera button is named "Recording setup: camera and sound", and its tooltip no longer covers Show in Finder after you stop.
+- Clicking a setting's title in Recording setup toggles its switch, and the sound switches read "Record your voice" and "Which microphone".
+- The Saved line, Show in Finder and every start problem (permission, blocked camera, missing camera, closed window) now show right under the Record button, above the Setup panel, and focus moves to the fix, because with Setup open they appeared far below the fold and a failed start looked like nothing happened.
+- Say Less asks macOS for the real camera permission status, so a camera you refused earlier shows the blocked warning right away, and the warning stays visible while Setup is open.
+- Show my face turns the camera on through the same steps as the Setup switch, then opens Setup at the corner and size controls. With your face on, the card says which corner it will appear in, instead of leaving a blank space.
+- The Recording button at the top of Home takes you straight to Stop while a recording runs, and the Record your screen button hides when the card is already on screen.
+- On an older Mac the notice has an Open Software Update button, with the right pane for older and newer macOS. On Windows the card is one plain line with no dead button.
+- The dock keeps Saved and Show in Finder until the next recording or dictation (or until you close it), shows a lime ring on the camera button when your face is on, turns Talk secondary while the screen records so Stop leads, uses the same red for Stop as Home, and cannot be hidden in the middle of a recording.
+- What's New moves focus to Got it when it opens, shows the picture as a framed screenshot with a caption so it does not look like a button, and gives Windows its own picture of the Talk button.
+- With the camera blocked, the warning now says recording won't start with Show your face on, and the notice under Record has a Record without my face button that turns the face off and starts, because the old wording made it sound like the recording would go ahead without the face.
+- The Saved line starts with a check mark, the file name gets its own line that never breaks inside the date, and Open recordings folder steps aside while Show in Finder is showing, so there is one clear path to the new video.
+- The What's New picture is muted so the dialog's real buttons stay the loudest thing, and step 2 points at the one-click Show my face button.
+
 ## [2026-09-26]
 
 ### Release

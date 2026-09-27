@@ -163,7 +163,8 @@ fn apply_startup_activation_policy(app: &mut tauri::App, headless_mode: bool) {
     let cli_args = app.state::<CliArgs>().inner().clone();
     let settings = settings::get_settings(app.handle());
 
-    let should_hide = settings.start_hidden || cli_args.start_hidden;
+    let should_hide =
+        (settings.start_hidden || cli_args.start_hidden) && !screen_recorder::launched_to_show();
     let tray_available = settings.show_tray_icon && !cli_args.no_tray;
 
     if should_hide && tray_available {
@@ -656,6 +657,10 @@ pub fn run(cli_args: CliArgs) {
         std::env::set_var("GGML_METAL_NO_RESIDENCY", "1");
     }
 
+    // Read the one-time "show the window" flag from Reopen Say Less while
+    // this is still the only thread (it clears an environment variable).
+    screen_recorder::launched_to_show();
+
     // Pin glibc's dynamic mmap threshold before the first large allocation,
     // so per-dictation transient buffers are returned to the OS on free
     // instead of accumulating in malloc arenas (#1792). No-op off Linux/glibc.
@@ -688,6 +693,9 @@ pub fn run(cli_args: CliArgs) {
             screen_recorder::screen_recording_status,
             screen_recorder::show_screen_recording_in_folder,
             screen_recorder::open_screen_recording_settings,
+            screen_recorder::open_software_update,
+            screen_recorder::camera_permission_status,
+            screen_recorder::reopen_app,
             capture_options::get_recording_options,
             capture_options::save_recording_options,
             capture_options::list_recording_sources,
@@ -1114,7 +1122,9 @@ pub fn run(cli_args: CliArgs) {
             // Show main window only if not starting hidden.
             // CLI --start-hidden flag overrides the setting.
             // But if permission onboarding is required, always show the window.
-            let should_hide = settings.start_hidden || cli_args.start_hidden;
+            // So does a relaunch from the Reopen Say Less button.
+            let should_hide = (settings.start_hidden || cli_args.start_hidden)
+                && !screen_recorder::launched_to_show();
             let should_force_show = should_force_show_permissions_window(&app_handle);
 
             // If start_hidden but tray is disabled, we must show the window

@@ -754,7 +754,14 @@
     "portableUpdateMessage": "Les installations portables ne peuvent pas être mises à jour automatiquement. Téléchargez ci-dessous l’installateur correspondant à votre système, exécutez-le et installez-le dans le même dossier : votre dossier Data/ (paramètres, modèles, enregistrements) est conservé.",
     "portableUpdateButton": "Télécharger l’installateur",
     "portableUpdateBrowseMessage": "Les installations portables ne peuvent pas être mises à jour automatiquement. Téléchargez la dernière version correspondant à votre système depuis GitHub Releases et installez-la dans le même dossier : votre dossier Data/ (paramètres, modèles, enregistrements) est conservé.",
-    "portableUpdateBrowseButton": "Ouvrir GitHub Releases"
+    "portableUpdateBrowseButton": "Ouvrir GitHub Releases",
+    "updateReady": "Say Less v{{version}} est prêt",
+    "updateNow": "Mettre à jour",
+    "updateLater": "Plus tard",
+    "updateFailed": "Nous n’avons pas pu mettre à jour Say Less",
+    "updateFailedMacDescription": "Téléchargez la nouvelle version et faites-la glisser dans votre dossier Applications.",
+    "updateFailedDescription": "Téléchargez la nouvelle version depuis notre site web et installez-la.",
+    "updateFailedAction": "Télécharger"
   },
   "common": {
     "loading": "Chargement...",
@@ -805,7 +812,9 @@
     "processing": "Traitement..."
   },
   "whatsNew": {
-    "title": "Nouveautés de Say Less v{{version}}"
+    "title": "Nouveautés de Say Less v{{version}}",
+    "tryRecording": "Essayer l’enregistrement d’écran",
+    "gotIt": "J’ai compris"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} bloque peut-être 1 raccourci",
@@ -993,17 +1002,25 @@
   "dock": {
     "drag": "Drag floating dock",
     "stop": "Stop",
-    "record": "Record",
+    "record": "Parler",
     "processing": "Working",
     "settings": "Open settings",
     "hide": "Hide floating dock",
     "error": "Check permissions or open settings to retry.",
-    "idle": "Click Record, or use your dictation shortcut",
-    "recording": "Recording — click Stop when finished",
+    "idle": "Cliquez sur « Parler » pour écrire avec votre voix, ou sur « Écran » pour enregistrer une vidéo",
+    "recording": "À l’écoute. Cliquez sur « Stop » quand vous avez terminé.",
     "transcribing": "Turning your voice into text…",
     "arming": "Starting microphone…",
     "expand": "Expand dock",
-    "collapse": "Shrink dock"
+    "collapse": "Shrink dock",
+    "screen": "Écran",
+    "idleTalkOnly": "Cliquez sur « Parler » pour écrire avec votre voix, ou utilisez votre raccourci de dictée",
+    "talkHint": "Parler : écrire avec votre voix",
+    "recordingSetup": "Recording setup : caméra et son",
+    "recordingSetupFaceOn": "Recording setup : caméra et son, votre visage est affiché",
+    "recordingSetupFaceOff": "Recording setup : caméra et son, votre visage est masqué",
+    "hideWhileRecording": "Pour masquer le dock, arrêtez d’abord l’enregistrement.",
+    "closeSaved": "Fermer ce message"
   },
   "home": {
     "title": "Home",
@@ -1011,7 +1028,7 @@
     "headline": "Speak. We'll type.",
     "description": "Click where you want to type, then use your shortcut. Your words appear there when you finish.",
     "openDock": "Show floating dock",
-    "dockOpened": "The floating dock is showing. Click into the app you want to type in, then use Record or your shortcut.",
+    "dockOpened": "Le dock flottant est affiché. Cliquez dans l’application où vous voulez écrire, puis utilisez « Parler » ou votre raccourci.",
     "shortcut": "Hold to talk, let go to finish. For a long thought, tap once to go hands-free and tap again to stop.",
     "fnShortcut": "or hold Fn to talk",
     "aiShortcut": "Talk + AI cleanup. Sends your text to your AI provider.",
@@ -1031,9 +1048,9 @@
     "toggleShortcut": "Press to start. Press again to finish.",
     "slogan": "Big thoughts. Less typing.",
     "fnTip": "If the emoji picker opens, go to System Settings > Keyboard and set “Press Globe key to” to “Do Nothing.”",
-    "otherShortcuts": "Other recording shortcuts",
+    "otherShortcuts": "Autres raccourcis pour parler",
     "setAiShortcut": "Set up AI cleanup",
-    "cancelShortcut": "Cancel a recording",
+    "cancelShortcut": "Annuler la dictée",
     "share": "Share Say Less",
     "shareCopied": "Link copied: saylessvoice.com",
     "shareFailed": "Could not copy. The link is saylessvoice.com",
@@ -1046,7 +1063,9 @@
     },
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
-    "actionsHint": "Say a cue to open an app or a website"
+    "actionsHint": "Say a cue to open an app or a website",
+    "recordJump": "Enregistrer votre écran",
+    "recordingJump": "Enregistrement {{time}}. Aller à « Stop »"
   },
   "companion": {
     "title": "Particle pattern",
@@ -1276,11 +1295,13 @@
     "showInFinder": "Show in Finder",
     "voiceHint": "Or press your shortcut and say “Say less, start recording.”",
     "permissionDenied": "We need Screen Recording permission to record your screen.",
-    "permissionHint": "Turn on Say Less in System Settings, then quit and reopen Say Less.",
+    "permissionHint": "Activez Say Less dans Réglages Système, puis cliquez sur « Rouvrir Say Less ».",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "Ouvrir Mise à jour logicielle",
+    "softwareUpdateFailed": "Nous n’avons pas pu ouvrir Mise à jour logicielle. Suivez les étapes ci-dessus pour l’ouvrir vous-même.",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
-    "macosTooOld": "Screen recording needs macOS 15 or newer.",
+    "macosTooOld": "L’enregistrement d’écran nécessite macOS 15 (Sequoia) ou une version ultérieure.",
     "windowsSoon": "Screen recording is coming to Windows soon.",
     "linuxUnsupported": "Screen recording isn't available on Linux yet.",
     "failed": "We couldn't record your screen. Try again.",
@@ -1291,7 +1312,29 @@
     "reservedCue": "That phrase is saved for screen recording. Pick different words.",
     "cameraDenied": "We need Camera permission to show your face in the video.",
     "cameraFailed": "We couldn't start your camera. Close other apps that use it, or turn the camera off in Recording setup.",
-    "windowMissing": "The window you picked is closed. Pick another one in Recording setup."
+    "windowMissing": "The window you picked is closed. Pick another one in Recording setup.",
+    "dockCaption": "Enregistrement de votre écran. Cliquez sur le bouton rouge « Stop » quand vous avez terminé.",
+    "savedIn": "Enregistré dans le dossier {{folder}} de {{parent}}.",
+    "openFolder": "Ouvrir le dossier des enregistrements",
+    "cameraOffHint": "Nous n’afficherons pas votre visage dans la vidéo.",
+    "reopenApp": "Rouvrir Say Less",
+    "macosTooOldHelp": "L’enregistrement d’écran nécessite macOS 15 (Sequoia) ou une version ultérieure. Pour vérifier votre version, ouvrez le menu Apple et choisissez À propos de ce Mac. Pour mettre à jour, allez dans Réglages Système, Général, Mise à jour logicielle. Si aucune mise à jour n’apparaît, nous ne pouvons pas enregistrer l’écran sur ce Mac, mais la dictée fonctionne toujours.",
+    "cameraMissing": "Nous ne trouvons aucune caméra. Ouvrez votre ordinateur portable ou branchez une caméra, ou désactivez « Show your face » dans « Recording setup ».",
+    "stopHint": "Quand vous avez terminé, cliquez sur « Stop » ou dites « Say less, stop recording. »",
+    "startedAnnouncement": "Enregistrement démarré.",
+    "savedAnnouncement": "Enregistrement sauvegardé.",
+    "showMyFace": "Afficher mon visage",
+    "cameraBlocked": "Votre caméra est bloquée, l’enregistrement ne démarrera donc pas tant que « Show your face » est activé.",
+    "faceCorner": {
+      "top_left": "Votre visage apparaîtra dans le coin supérieur gauche.",
+      "top_right": "Votre visage apparaîtra dans le coin supérieur droit.",
+      "bottom_left": "Votre visage apparaîtra dans le coin inférieur gauche.",
+      "bottom_right": "Votre visage apparaîtra dans le coin inférieur droit."
+    },
+    "reopening": "Réouverture…",
+    "reopenFailed": "Nous n’avons pas pu rouvrir Say Less. Quittez-le depuis la barre des menus, puis rouvrez-le.",
+    "macosTooOldSteps": "Pour vérifier votre version, ouvrez le menu Apple et choisissez À propos de ce Mac. Pour mettre à jour, allez dans Réglages Système, Général, Mise à jour logicielle. Si aucune mise à jour n’apparaît, nous ne pouvons pas enregistrer l’écran sur ce Mac, mais la dictée fonctionne toujours.",
+    "recordWithoutFace": "Enregistrer sans mon visage"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1313,8 +1356,8 @@
     "windowsNeedPermission": "We can list your windows once Say Less has Screen Recording permission.",
     "noWindows": "Open the window you want to record, then pick it here.",
     "soundTitle": "Sound",
-    "microphone": "Your microphone",
-    "whichMicrophone": "Microphone",
+    "microphone": "Enregistrer votre voix",
+    "whichMicrophone": "Quel microphone",
     "sameAsDictation": "Same as dictation",
     "systemAudio": "Computer sound",
     "cameraTitle": "Camera",
@@ -1336,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "Nous avons besoin de l’autorisation d’accès à la caméra pour afficher votre visage. Activez Say Less dans « System Settings » ou enregistrez sans votre visage.",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",
@@ -1347,6 +1390,7 @@
     "fps30": "30 (recommended)",
     "fps60": "60 (smoother, bigger file)",
     "qualityHint": "1080p at 30 frames looks sharp and stays light on 8GB laptops.",
-    "saveFailed": "We couldn't save that change. Try again."
+    "saveFailed": "We couldn't save that change. Try again.",
+    "webcamHintWindow": "Votre visage apparaît dans un petit cercle à l’écran et dans la vidéo. Pendant l’enregistrement, ne déplacez pas la fenêtre et gardez le cercle à l’intérieur."
   }
 }

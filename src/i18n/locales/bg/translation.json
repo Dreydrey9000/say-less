@@ -754,7 +754,14 @@
     "portableUpdateMessage": "Преносимите инсталации не могат да бъдат актуализирани автоматично. Изтеглете инсталатора за вашата система от бутона по-долу, стартирайте го и инсталирайте в същата папка — папката Data/ (настройки, модели, записи) остава на мястото си.",
     "portableUpdateButton": "Изтегляне на инсталатора",
     "portableUpdateBrowseMessage": "Преносимите инсталации не могат да бъдат актуализирани автоматично. Изтеглете най-новата версия за вашата система от GitHub Releases и я инсталирайте в същата папка — папката Data/ (настройки, модели, записи) остава на мястото си.",
-    "portableUpdateBrowseButton": "Отвори GitHub Releases"
+    "portableUpdateBrowseButton": "Отвори GitHub Releases",
+    "updateReady": "Say Less v{{version}} е готов",
+    "updateNow": "Актуализирай сега",
+    "updateLater": "По-късно",
+    "updateFailed": "Не успяхме да актуализираме Say Less",
+    "updateFailedMacDescription": "Изтеглете новата версия и я плъзнете в папката „Applications“.",
+    "updateFailedDescription": "Изтеглете новата версия от нашия уебсайт и я инсталирайте.",
+    "updateFailedAction": "Изтегляне"
   },
   "common": {
     "loading": "Зареждане...",
@@ -805,7 +812,9 @@
     "processing": "Обработка..."
   },
   "whatsNew": {
-    "title": "Ново в Say Less v{{version}}"
+    "title": "Ново в Say Less v{{version}}",
+    "tryRecording": "Изпробвайте записа на екрана",
+    "gotIt": "Разбрах"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} може да блокира 1 бърз клавиш",
@@ -993,17 +1002,25 @@
   "dock": {
     "drag": "Drag floating dock",
     "stop": "Stop",
-    "record": "Record",
+    "record": "Говори",
     "processing": "Working",
     "settings": "Open settings",
     "hide": "Hide floating dock",
     "error": "Check permissions or open settings to retry.",
-    "idle": "Click Record, or use your dictation shortcut",
-    "recording": "Recording — click Stop when finished",
+    "idle": "Натиснете „Говори“, за да пишете с гласа си, или „Екран“, за да запишете видео",
+    "recording": "Слушам. Натиснете „Stop“, когато приключите.",
     "transcribing": "Turning your voice into text…",
     "arming": "Starting microphone…",
     "expand": "Expand dock",
-    "collapse": "Shrink dock"
+    "collapse": "Shrink dock",
+    "screen": "Екран",
+    "idleTalkOnly": "Натиснете „Говори“, за да пишете с гласа си, или използвайте клавишната комбинация за диктовка",
+    "talkHint": "Говори: пишете с гласа си",
+    "recordingSetup": "Recording setup: камера и звук",
+    "recordingSetupFaceOn": "Recording setup: камера и звук, лицето ви се вижда",
+    "recordingSetupFaceOff": "Recording setup: камера и звук, лицето ви не се вижда",
+    "hideWhileRecording": "За да скриете панела, първо спрете записа.",
+    "closeSaved": "Затваряне на това съобщение"
   },
   "home": {
     "title": "Home",
@@ -1011,7 +1028,7 @@
     "headline": "Speak. We'll type.",
     "description": "Click where you want to type, then use your shortcut. Your words appear there when you finish.",
     "openDock": "Show floating dock",
-    "dockOpened": "The floating dock is showing. Click into the app you want to type in, then use Record or your shortcut.",
+    "dockOpened": "Плаващият панел е видим. Щракнете в приложението, в което искате да пишете, и използвайте „Говори“ или вашата клавишна комбинация.",
     "shortcut": "Hold to talk, let go to finish. For a long thought, tap once to go hands-free and tap again to stop.",
     "fnShortcut": "or hold Fn to talk",
     "aiShortcut": "Talk + AI cleanup. Sends your text to your AI provider.",
@@ -1031,9 +1048,9 @@
     "toggleShortcut": "Press to start. Press again to finish.",
     "slogan": "Big thoughts. Less typing.",
     "fnTip": "If the emoji picker opens, go to System Settings > Keyboard and set “Press Globe key to” to “Do Nothing.”",
-    "otherShortcuts": "Other recording shortcuts",
+    "otherShortcuts": "Още клавишни комбинации за диктовка",
     "setAiShortcut": "Set up AI cleanup",
-    "cancelShortcut": "Cancel a recording",
+    "cancelShortcut": "Отмяна на диктовката",
     "share": "Share Say Less",
     "shareCopied": "Link copied: saylessvoice.com",
     "shareFailed": "Could not copy. The link is saylessvoice.com",
@@ -1046,7 +1063,9 @@
     },
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
-    "actionsHint": "Say a cue to open an app or a website"
+    "actionsHint": "Say a cue to open an app or a website",
+    "recordJump": "Запишете екрана си",
+    "recordingJump": "Запис {{time}}. Отидете на „Stop“"
   },
   "companion": {
     "title": "Particle pattern",
@@ -1276,11 +1295,13 @@
     "showInFinder": "Show in Finder",
     "voiceHint": "Or press your shortcut and say “Say less, start recording.”",
     "permissionDenied": "We need Screen Recording permission to record your screen.",
-    "permissionHint": "Turn on Say Less in System Settings, then quit and reopen Say Less.",
+    "permissionHint": "Включете Say Less в „System Settings“, след което натиснете „Отвори Say Less отново“.",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "Отваряне на „Software Update“",
+    "softwareUpdateFailed": "Не успяхме да отворим „Software Update“. Следвайте стъпките по-горе, за да го отворите сами.",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
-    "macosTooOld": "Screen recording needs macOS 15 or newer.",
+    "macosTooOld": "Записът на екрана изисква macOS 15 (Sequoia) или по-нова версия.",
     "windowsSoon": "Screen recording is coming to Windows soon.",
     "linuxUnsupported": "Screen recording isn't available on Linux yet.",
     "failed": "We couldn't record your screen. Try again.",
@@ -1291,7 +1312,29 @@
     "reservedCue": "That phrase is saved for screen recording. Pick different words.",
     "cameraDenied": "We need Camera permission to show your face in the video.",
     "cameraFailed": "We couldn't start your camera. Close other apps that use it, or turn the camera off in Recording setup.",
-    "windowMissing": "The window you picked is closed. Pick another one in Recording setup."
+    "windowMissing": "The window you picked is closed. Pick another one in Recording setup.",
+    "dockCaption": "Записваме екрана ви. Натиснете червения бутон „Stop“, когато приключите.",
+    "savedIn": "Запазено в папката {{folder}} в {{parent}}.",
+    "openFolder": "Отваряне на папката със записи",
+    "cameraOffHint": "Няма да показваме лицето ви във видеото.",
+    "reopenApp": "Отвори Say Less отново",
+    "macosTooOldHelp": "Записът на екрана изисква macOS 15 (Sequoia) или по-нова версия. За да проверите версията си, отворете менюто Apple и изберете „About This Mac“. За да актуализирате, отидете в „System Settings“, „General“, „Software Update“. Ако не се покаже актуализация, не можем да записваме екрана на този Mac, но диктовката продължава да работи.",
+    "cameraMissing": "Не можем да намерим камера. Отворете капака на лаптопа или включете камера, или изключете „Show your face“ в „Recording setup“.",
+    "stopHint": "Когато приключите, натиснете „Stop“ или кажете „Say less, stop recording.“",
+    "startedAnnouncement": "Записът започна.",
+    "savedAnnouncement": "Записът е запазен.",
+    "showMyFace": "Покажи лицето ми",
+    "cameraBlocked": "Камерата ви е блокирана, затова записът няма да започне, докато опцията „Show your face“ е включена.",
+    "faceCorner": {
+      "top_left": "Лицето ви ще се вижда в горния ляв ъгъл.",
+      "top_right": "Лицето ви ще се вижда в горния десен ъгъл.",
+      "bottom_left": "Лицето ви ще се вижда в долния ляв ъгъл.",
+      "bottom_right": "Лицето ви ще се вижда в долния десен ъгъл."
+    },
+    "reopening": "Отваря се отново…",
+    "reopenFailed": "Не успяхме да отворим Say Less отново. Затворете приложението от лентата с менюта и го отворете отново.",
+    "macosTooOldSteps": "За да проверите версията си, отворете менюто Apple и изберете „About This Mac“. За да актуализирате, отидете в „System Settings“, „General“, „Software Update“. Ако не се покаже актуализация, не можем да записваме екрана на този Mac, но диктовката продължава да работи.",
+    "recordWithoutFace": "Запиши без лицето ми"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1313,8 +1356,8 @@
     "windowsNeedPermission": "We can list your windows once Say Less has Screen Recording permission.",
     "noWindows": "Open the window you want to record, then pick it here.",
     "soundTitle": "Sound",
-    "microphone": "Your microphone",
-    "whichMicrophone": "Microphone",
+    "microphone": "Запис на гласа ви",
+    "whichMicrophone": "Кой микрофон",
     "sameAsDictation": "Same as dictation",
     "systemAudio": "Computer sound",
     "cameraTitle": "Camera",
@@ -1336,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "Нуждаем се от разрешение за камерата, за да покажем лицето ви. Включете Say Less в „System Settings“ или запишете без лицето си.",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",
@@ -1347,6 +1390,7 @@
     "fps30": "30 (recommended)",
     "fps60": "60 (smoother, bigger file)",
     "qualityHint": "1080p at 30 frames looks sharp and stays light on 8GB laptops.",
-    "saveFailed": "We couldn't save that change. Try again."
+    "saveFailed": "We couldn't save that change. Try again.",
+    "webcamHintWindow": "Лицето ви се показва в малък кръг на екрана и във видеото. Докато записвате, дръжте прозореца неподвижен и кръга вътре в него."
   }
 }

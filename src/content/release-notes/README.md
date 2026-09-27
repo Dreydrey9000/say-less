@@ -21,3 +21,24 @@ Markdown with absolute paths:
 ```md
 ![Streaming transcription preview](/release-notes/0.9.0/streaming-transcription.webp)
 ```
+
+A picture cut from a Retina screenshot goes in a file ending in `@2x`, like
+`dock-talk@2x.png`. It then shows at its real size, half its pixel width.
+
+Wrap lines that only make sense on one platform in marker comments. Lines
+between `<!-- mac -->` and `<!-- /mac -->` show only on macOS; lines between
+`<!-- windows -->` and `<!-- /windows -->` show everywhere else. The markers
+themselves never show, and each one goes on its own line:
+
+```md
+<!-- mac -->
+
+Click **Record screen** on Home.
+
+<!-- /mac -->
+<!-- windows -->
+
+Screen recording is coming to Windows soon.
+
+<!-- /windows -->
+```

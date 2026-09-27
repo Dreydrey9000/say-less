@@ -754,10 +754,19 @@
     "portableUpdateMessage": "Instalasi portabel tidak dapat diperbarui secara otomatis. Unduh penginstal untuk sistem Anda di bawah ini, jalankan, lalu instal ke folder yang sama — folder Data/ Anda (pengaturan, model, rekaman) tetap dipertahankan.",
     "portableUpdateButton": "Unduh penginstal",
     "portableUpdateBrowseMessage": "Instalasi portabel tidak dapat diperbarui secara otomatis. Unduh versi terbaru untuk sistem Anda dari GitHub Releases dan instal ke folder yang sama — folder Data/ Anda (pengaturan, model, rekaman) tetap dipertahankan.",
-    "portableUpdateBrowseButton": "Buka GitHub Releases"
+    "portableUpdateBrowseButton": "Buka GitHub Releases",
+    "updateReady": "Say Less v{{version}} sudah siap",
+    "updateNow": "Perbarui sekarang",
+    "updateLater": "Nanti",
+    "updateFailed": "Kami tidak dapat memperbarui Say Less",
+    "updateFailedMacDescription": "Unduh versi baru, lalu seret ke folder Aplikasi Anda.",
+    "updateFailedDescription": "Unduh versi baru dari situs web kami, lalu instal.",
+    "updateFailedAction": "Unduh"
   },
   "whatsNew": {
-    "title": "Baru di Say Less v{{version}}"
+    "title": "Baru di Say Less v{{version}}",
+    "tryRecording": "Coba rekam layar",
+    "gotIt": "Mengerti"
   },
   "common": {
     "loading": "Memuat...",
@@ -993,17 +1002,25 @@
   "dock": {
     "drag": "Drag floating dock",
     "stop": "Stop",
-    "record": "Record",
+    "record": "Bicara",
     "processing": "Working",
     "settings": "Open settings",
     "hide": "Hide floating dock",
     "error": "Check permissions or open settings to retry.",
-    "idle": "Click Record, or use your dictation shortcut",
-    "recording": "Recording — click Stop when finished",
+    "idle": "Klik 'Bicara' untuk mengetik dengan suara Anda, atau 'Layar' untuk merekam video",
+    "recording": "Mendengarkan. Klik 'Stop' setelah selesai.",
     "transcribing": "Turning your voice into text…",
     "arming": "Starting microphone…",
     "expand": "Expand dock",
-    "collapse": "Shrink dock"
+    "collapse": "Shrink dock",
+    "screen": "Layar",
+    "idleTalkOnly": "Klik 'Bicara' untuk mengetik dengan suara Anda, atau gunakan pintasan dikte Anda",
+    "talkHint": "Bicara: ketik dengan suara Anda",
+    "recordingSetup": "Recording setup: kamera dan suara",
+    "recordingSetupFaceOn": "Recording setup: kamera dan suara, wajah Anda terlihat",
+    "recordingSetupFaceOff": "Recording setup: kamera dan suara, wajah Anda tidak terlihat",
+    "hideWhileRecording": "Untuk menyembunyikan dock, hentikan rekaman terlebih dahulu.",
+    "closeSaved": "Tutup pesan ini"
   },
   "home": {
     "title": "Home",
@@ -1011,7 +1028,7 @@
     "headline": "Speak. We'll type.",
     "description": "Click where you want to type, then use your shortcut. Your words appear there when you finish.",
     "openDock": "Show floating dock",
-    "dockOpened": "The floating dock is showing. Click into the app you want to type in, then use Record or your shortcut.",
+    "dockOpened": "Dock mengambang sedang ditampilkan. Klik di aplikasi tempat Anda ingin mengetik, lalu gunakan 'Bicara' atau pintasan Anda.",
     "shortcut": "Hold to talk, let go to finish. For a long thought, tap once to go hands-free and tap again to stop.",
     "fnShortcut": "or hold Fn to talk",
     "aiShortcut": "Talk + AI cleanup. Sends your text to your AI provider.",
@@ -1031,9 +1048,9 @@
     "toggleShortcut": "Press to start. Press again to finish.",
     "slogan": "Big thoughts. Less typing.",
     "fnTip": "If the emoji picker opens, go to System Settings > Keyboard and set “Press Globe key to” to “Do Nothing.”",
-    "otherShortcuts": "Other recording shortcuts",
+    "otherShortcuts": "Pintasan dikte lainnya",
     "setAiShortcut": "Set up AI cleanup",
-    "cancelShortcut": "Cancel a recording",
+    "cancelShortcut": "Batalkan dikte",
     "share": "Share Say Less",
     "shareCopied": "Link copied: saylessvoice.com",
     "shareFailed": "Could not copy. The link is saylessvoice.com",
@@ -1046,7 +1063,9 @@
     },
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
-    "actionsHint": "Say a cue to open an app or a website"
+    "actionsHint": "Say a cue to open an app or a website",
+    "recordJump": "Rekam layar Anda",
+    "recordingJump": "Merekam {{time}}. Ke tombol 'Stop'"
   },
   "companion": {
     "title": "Particle pattern",
@@ -1276,11 +1295,13 @@
     "showInFinder": "Show in Finder",
     "voiceHint": "Or press your shortcut and say “Say less, start recording.”",
     "permissionDenied": "We need Screen Recording permission to record your screen.",
-    "permissionHint": "Turn on Say Less in System Settings, then quit and reopen Say Less.",
+    "permissionHint": "Aktifkan Say Less di Pengaturan Sistem, lalu klik 'Buka ulang Say Less'.",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "Buka Pembaruan Perangkat Lunak",
+    "softwareUpdateFailed": "Kami tidak dapat membuka Pembaruan Perangkat Lunak. Ikuti langkah di atas untuk membukanya sendiri.",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
-    "macosTooOld": "Screen recording needs macOS 15 or newer.",
+    "macosTooOld": "Perekaman layar memerlukan macOS 15 (Sequoia) atau yang lebih baru.",
     "windowsSoon": "Screen recording is coming to Windows soon.",
     "linuxUnsupported": "Screen recording isn't available on Linux yet.",
     "failed": "We couldn't record your screen. Try again.",
@@ -1291,7 +1312,29 @@
     "reservedCue": "That phrase is saved for screen recording. Pick different words.",
     "cameraDenied": "We need Camera permission to show your face in the video.",
     "cameraFailed": "We couldn't start your camera. Close other apps that use it, or turn the camera off in Recording setup.",
-    "windowMissing": "The window you picked is closed. Pick another one in Recording setup."
+    "windowMissing": "The window you picked is closed. Pick another one in Recording setup.",
+    "dockCaption": "Merekam layar Anda. Klik tombol merah 'Stop' setelah selesai.",
+    "savedIn": "Disimpan di folder {{folder}} dalam {{parent}}.",
+    "openFolder": "Buka folder rekaman",
+    "cameraOffHint": "Kami tidak akan menampilkan wajah Anda di video.",
+    "reopenApp": "Buka ulang Say Less",
+    "macosTooOldHelp": "Perekaman layar memerlukan macOS 15 (Sequoia) atau yang lebih baru. Untuk memeriksa versi Anda, buka menu Apple dan pilih Tentang Mac Ini. Untuk memperbarui, buka Pengaturan Sistem, Umum, Pembaruan Perangkat Lunak. Jika tidak ada pembaruan yang muncul, kami tidak dapat merekam layar di Mac ini, tetapi dikte tetap berfungsi.",
+    "cameraMissing": "Kami tidak menemukan kamera. Buka laptop Anda atau colokkan kamera, atau matikan 'Show your face' di 'Recording setup'.",
+    "stopHint": "Setelah selesai, klik 'Stop' atau ucapkan “Say less, stop recording.”",
+    "startedAnnouncement": "Perekaman dimulai.",
+    "savedAnnouncement": "Rekaman disimpan.",
+    "showMyFace": "Tampilkan wajah saya",
+    "cameraBlocked": "Kamera Anda diblokir, jadi perekaman tidak akan dimulai selama 'Show your face' aktif.",
+    "faceCorner": {
+      "top_left": "Wajah Anda akan tampil di sudut kiri atas.",
+      "top_right": "Wajah Anda akan tampil di sudut kanan atas.",
+      "bottom_left": "Wajah Anda akan tampil di sudut kiri bawah.",
+      "bottom_right": "Wajah Anda akan tampil di sudut kanan bawah."
+    },
+    "reopening": "Membuka ulang…",
+    "reopenFailed": "Kami tidak dapat membuka ulang Say Less. Tutup aplikasinya dari bilah menu, lalu buka lagi.",
+    "macosTooOldSteps": "Untuk memeriksa versi Anda, buka menu Apple dan pilih Tentang Mac Ini. Untuk memperbarui, buka Pengaturan Sistem, Umum, Pembaruan Perangkat Lunak. Jika tidak ada pembaruan yang muncul, kami tidak dapat merekam layar di Mac ini, tetapi dikte tetap berfungsi.",
+    "recordWithoutFace": "Rekam tanpa wajah saya"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1313,8 +1356,8 @@
     "windowsNeedPermission": "We can list your windows once Say Less has Screen Recording permission.",
     "noWindows": "Open the window you want to record, then pick it here.",
     "soundTitle": "Sound",
-    "microphone": "Your microphone",
-    "whichMicrophone": "Microphone",
+    "microphone": "Rekam suara Anda",
+    "whichMicrophone": "Mikrofon yang digunakan",
     "sameAsDictation": "Same as dictation",
     "systemAudio": "Computer sound",
     "cameraTitle": "Camera",
@@ -1336,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "Kami memerlukan izin Kamera untuk menampilkan wajah Anda. Aktifkan Say Less di System Settings, atau rekam tanpa wajah Anda.",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",
@@ -1347,6 +1390,7 @@
     "fps30": "30 (recommended)",
     "fps60": "60 (smoother, bigger file)",
     "qualityHint": "1080p at 30 frames looks sharp and stays light on 8GB laptops.",
-    "saveFailed": "We couldn't save that change. Try again."
+    "saveFailed": "We couldn't save that change. Try again.",
+    "webcamHintWindow": "Wajah Anda muncul dalam lingkaran kecil di layar dan di video. Selama merekam, jangan pindahkan jendela dan pastikan lingkaran tetap di dalamnya."
   }
 }

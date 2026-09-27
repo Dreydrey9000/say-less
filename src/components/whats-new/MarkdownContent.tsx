@@ -83,17 +83,33 @@ const components: Components = {
   ),
   br: () => <br />,
   hr: () => <hr className="border-mid-gray/20" />,
-  img: ({ alt, src }) => {
+  img: ({ alt, src, title }) => {
     if (!src || !isSafeImageSrc(src)) return null;
 
+    // A file named like name@2x.png holds twice the pixels it shows at. Given
+    // only as a 2x source, it shows at its real size on every screen and
+    // stays sharp on a Retina one.
+    const doubleDensity = /@2x\.\w+$/.test(src);
+
+    // A picture, not controls: framed on a darker panel, narrower than the
+    // text and deaf to clicks, so a screenshot of buttons never reads as
+    // live buttons. The Markdown title is the caption under it.
     return (
-      <img
-        src={src}
-        alt={alt ?? ""}
-        loading="lazy"
-        decoding="async"
-        className="mx-auto block max-h-72 max-w-full object-contain"
-      />
+      <span className="pointer-events-none mx-auto block w-fit max-w-[80%] select-none rounded-xl border border-mid-gray/20 bg-black/15 p-2">
+        <img
+          src={doubleDensity ? undefined : src}
+          srcSet={doubleDensity ? `${src} 2x` : undefined}
+          alt={alt ?? ""}
+          loading="lazy"
+          decoding="async"
+          className="mx-auto block max-h-72 max-w-full rounded-md object-contain opacity-80 saturate-[0.45]"
+        />
+        {title && (
+          <span className="mt-1.5 block text-center text-xs text-text-muted">
+            {title}
+          </span>
+        )}
+      </span>
     );
   },
   blockquote: ({ children }) => (

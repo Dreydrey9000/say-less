@@ -25,7 +25,7 @@ test("setup opens from the Record button and shows the 8GB-friendly defaults", a
     panel.getByRole("combobox", { name: "Record", exact: true }),
   ).toHaveValue("display");
   await expect(
-    panel.getByRole("switch", { name: "Your microphone" }),
+    panel.getByRole("switch", { name: "Record your voice" }),
   ).toBeChecked();
   await expect(
     panel.getByRole("switch", { name: "Computer sound" }),
@@ -69,12 +69,12 @@ test("changes save right away and survive a reload", async ({ page }) => {
   ).toHaveValue("60");
   // The microphone picker hides with the microphone.
   await expect(
-    panel.getByRole("combobox", { name: "Microphone" }),
+    panel.getByRole("combobox", { name: "Which microphone" }),
   ).toBeVisible();
-  await panel.getByRole("switch", { name: "Your microphone" }).uncheck();
-  await expect(panel.getByRole("combobox", { name: "Microphone" })).toHaveCount(
-    0,
-  );
+  await panel.getByRole("switch", { name: "Record your voice" }).uncheck();
+  await expect(
+    panel.getByRole("combobox", { name: "Which microphone" }),
+  ).toHaveCount(0);
 });
 
 test("webcam shows a live preview and remembers its corner and size", async ({
@@ -113,6 +113,44 @@ test("webcam shows a live preview and remembers its corner and size", async ({
   expect(await commands(page)).toContain("stop_camera_preview");
 });
 
+test("clicking a switch's title flips the switch", async ({ page }) => {
+  const panel = await openSetup(page);
+  const face = panel.getByRole("switch", { name: "Show your face" });
+  // The card's Show my face falls back to this switch by its id.
+  await expect(face).toHaveAttribute("id", "rec-setup-webcam");
+  await panel.getByText("Show your face", { exact: true }).click();
+  await expect(face).toBeChecked();
+  await panel.getByText("Computer sound", { exact: true }).click();
+  await expect(
+    panel.getByRole("switch", { name: "Computer sound" }),
+  ).not.toBeChecked();
+});
+
+test("wide setup stacks Camera right under What we record", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1100, height: 900 });
+  const panel = await openSetup(page);
+  const box = async (name: string) => {
+    const found = await panel
+      .getByRole("group", { name, exact: true })
+      .boundingBox();
+    if (!found) throw new Error(`${name} is not on screen`);
+    return found;
+  };
+  const what = await box("What we record");
+  const camera = await box("Camera");
+  const sound = await box("Sound");
+  const quality = await box("Quality");
+  // Two columns: Sound sits to the right of What we record.
+  expect(sound.x).toBeGreaterThan(what.x + what.width);
+  // Each column stacks with only the normal 16px gap, no hole.
+  expect(camera.x).toBe(what.x);
+  expect(camera.y - (what.y + what.height)).toBeLessThanOrEqual(17);
+  expect(quality.x).toBe(sound.x);
+  expect(quality.y - (sound.y + sound.height)).toBeLessThanOrEqual(17);
+});
+
 test("one window: picks an open window and names it", async ({ page }) => {
   const panel = await openSetup(page);
   await panel
@@ -144,9 +182,14 @@ test("denied camera explains the fix and opens System Settings", async ({
   const panel = await openSetup(page, "/tests/fixtures/app.html?camera=denied");
   await panel.getByRole("switch", { name: "Show your face" }).check();
   const alert = panel.getByRole("alert");
-  await expect(alert).toContainText("System Settings");
+  // Refused before, so macOS shows no prompt: straight to the fix.
+  await expect(alert).toContainText(
+    "We need Camera permission to show your face. Turn on Say Less in System Settings",
+  );
   await alert.getByRole("button", { name: "Open System Settings" }).click();
-  expect(await commands(page)).toContain("open_camera_settings");
+  await expect
+    .poll(async () => (await commands(page)).includes("open_camera_settings"))
+    .toBe(true);
   expect(await commands(page)).not.toContain("start_camera_preview");
 });
 
@@ -161,32 +204,14 @@ test("a closed window says so and offers the setup", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("Windows shows the setup, disabled, with the same plain reason", async ({
-  page,
-}) => {
-  const panel = await openSetup(page, "/tests/fixtures/app.html?os=windows");
-  await expect(panel).toContainText(
-    "Screen recording is coming to Windows soon.",
-  );
-  await expect(
-    panel.getByRole("switch", { name: "Your microphone" }),
-  ).toBeDisabled();
-  await expect(
-    panel.getByRole("switch", { name: "Show your face" }),
-  ).toBeDisabled();
-  await expect(
-    panel.getByRole("combobox", { name: "Picture size" }),
-  ).toBeDisabled();
-  expect(await commands(page)).not.toContain("save_recording_options");
-});
-
 test("dock opens Recording setup in the main window", async ({ page }) => {
   await page.goto("/tests/fixtures/app.html?dock=1");
-  const setup = page.getByRole("button", { name: "Recording setup" });
+  // The camera icon says what it opens, so it doesn't read as "record video",
+  // and whether your face is on.
+  const label = "Recording setup: camera and sound, your face is off";
+  const setup = page.getByRole("button", { name: label, exact: true });
   await setup.focus();
-  await expect(
-    page.getByRole("tooltip", { name: "Recording setup" }),
-  ).toBeVisible();
+  await expect(page.getByRole("tooltip", { name: label })).toBeVisible();
   await setup.click();
   await expect
     .poll(async () =>

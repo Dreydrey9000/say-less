@@ -4,11 +4,22 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { type } from "@tauri-apps/plugin-os";
-import { Copy, ArrowRight, ArrowUpRight, Share2 } from "lucide-react";
+import {
+  Copy,
+  ArrowRight,
+  ArrowUpRight,
+  MonitorPlay,
+  Share2,
+} from "lucide-react";
 import { formatKeyCombination } from "@/lib/utils/keyboard";
 import type { HistoryEntry, PaginatedHistory } from "@/bindings";
 import { useSettings } from "@/hooks/useSettings";
 import { useVoiceActivity } from "@/hooks/useVoiceActivity";
+import {
+  formatElapsed,
+  useElapsed,
+  useScreenRecording,
+} from "@/lib/screenRecording";
 import { useStudio } from "@/lib/studio";
 import { Companion } from "./companion/Companion";
 import { HomeStats } from "./HomeStats";
@@ -18,6 +29,74 @@ import { Button } from "./ui/Button";
 import { WorkingStatus } from "./ui/WorkingStatus";
 import { Tooltip } from "./ui/Tooltip";
 import "./home.css";
+
+/** Scroll the screen recording card into view and move focus to its title,
+ *  so keyboard and screen reader users land on it too. */
+export function revealRecordingCard() {
+  const title = document.getElementById("home-record-title");
+  const card = title?.closest("section");
+  if (!title || !card) return;
+  if (!title.hasAttribute("tabindex")) title.setAttribute("tabindex", "-1");
+  title.focus({ preventScroll: true });
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  card.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+}
+
+/** Top of Home: a way down to the recording card, which sits below the fold
+ *  at the default window size. While a recording runs it shows the timer and
+ *  leads to Stop, so a recording started by voice or the dock is never
+ *  invisible here. Hidden while the whole card is on screen, where it would
+ *  go nowhere. Its own component, so the ticking timer re-renders only this
+ *  button. */
+function RecordJump() {
+  const { t } = useTranslation();
+  const recording = useScreenRecording(
+    (state) => state.status?.state === "recording",
+  );
+  const startedAt = useScreenRecording((state) => state.startedAt);
+  const elapsed = useElapsed(recording ? startedAt : null);
+  const [cardInView, setCardInView] = useState(false);
+  useEffect(() => {
+    const card = document
+      .getElementById("home-record-title")
+      ?.closest("section");
+    if (!card || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setCardInView(entry.intersectionRatio >= 0.99),
+      { threshold: 0.99 },
+    );
+    observer.observe(card);
+    return () => observer.disconnect();
+  }, []);
+  if (cardInView) return null;
+  return (
+    <Button
+      variant="secondary"
+      className={recording ? "home-jump-live" : undefined}
+      onClick={() => {
+        revealRecordingCard();
+        // "Go to Stop": land on Stop itself, not the card's title.
+        if (recording)
+          document
+            .querySelector<HTMLElement>(".home-record-button")
+            ?.focus({ preventScroll: true });
+      }}
+    >
+      {recording ? (
+        <>
+          <span className="rec-dot" aria-hidden="true" />
+          <span className="rec-time">
+            {t("home.recordingJump", { time: formatElapsed(elapsed) })}
+          </span>
+        </>
+      ) : (
+        <>
+          <MonitorPlay size={16} aria-hidden="true" /> {t("home.recordJump")}
+        </>
+      )}
+    </Button>
+  );
+}
 
 export function Home({
   onNavigate,
@@ -138,6 +217,9 @@ export function Home({
             </ul>
           </details>
           <div className="home-actions">
+            {/* The recording card sits below the fold at the default window
+                size, so this keeps it one click away. Mac only for now. */}
+            {isMac && <RecordJump />}
             {!settings.floating && (
               <Button
                 variant="secondary"

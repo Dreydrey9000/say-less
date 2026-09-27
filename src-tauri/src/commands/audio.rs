@@ -148,9 +148,24 @@ pub fn open_microphone_privacy_settings() -> Result<(), String> {
         return Ok(());
     }
 
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(target_os = "macos")]
     {
-        Err("Opening microphone privacy settings is only supported on Windows".to_string())
+        let status = std::process::Command::new("/usr/bin/open")
+            .arg("x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone")
+            .status()
+            .map_err(|_| "open_failed")?;
+        if status.success() {
+            return Ok(());
+        }
+        Err("open_failed".into())
+    }
+
+    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
+    {
+        Err(
+            "Opening microphone privacy settings is only supported on Windows and macOS"
+                .to_string(),
+        )
     }
 }
 

@@ -754,7 +754,14 @@
     "portableUpdateMessage": "התקנות ניידות אינן מתעדכנות אוטומטית. הורד למטה את המתקין המתאים למערכת שלך, הפעל אותו והתקן לאותה תיקייה — תיקיית Data/ (הגדרות, מודלים, הקלטות) נשמרת במקומה.",
     "portableUpdateButton": "הורדת המתקין",
     "portableUpdateBrowseMessage": "התקנות ניידות אינן מתעדכנות אוטומטית. הורד את הגרסה האחרונה המתאימה למערכת שלך מ-GitHub Releases והתקן אותה לאותה תיקייה — תיקיית Data/ (הגדרות, מודלים, הקלטות) נשמרת במקומה.",
-    "portableUpdateBrowseButton": "פתח את GitHub Releases"
+    "portableUpdateBrowseButton": "פתח את GitHub Releases",
+    "updateReady": "גרסה {{version}} של Say Less מוכנה",
+    "updateNow": "עדכן עכשיו",
+    "updateLater": "אחר כך",
+    "updateFailed": "לא הצלחנו לעדכן את Say Less",
+    "updateFailedMacDescription": "הורד את הגרסה החדשה וגרור אותה לתיקייה 'יישומים'.",
+    "updateFailedDescription": "הורד את הגרסה החדשה מהאתר שלנו והתקן אותה.",
+    "updateFailedAction": "הורד"
   },
   "common": {
     "loading": "טוען...",
@@ -805,7 +812,9 @@
     "processing": "מעבד..."
   },
   "whatsNew": {
-    "title": "חדש ב-Say Less v{{version}}"
+    "title": "חדש ב-Say Less v{{version}}",
+    "tryRecording": "נסה הקלטת מסך",
+    "gotIt": "הבנתי"
   },
   "secureInput": {
     "blockedWithCulprit_one": "ייתכן ש-{{name}} חוסם קיצור דרך אחד",
@@ -993,17 +1002,25 @@
   "dock": {
     "drag": "Drag floating dock",
     "stop": "Stop",
-    "record": "Record",
+    "record": "דיבור",
     "processing": "Working",
     "settings": "Open settings",
     "hide": "Hide floating dock",
     "error": "Check permissions or open settings to retry.",
-    "idle": "Click Record, or use your dictation shortcut",
-    "recording": "Recording — click Stop when finished",
+    "idle": "לחץ על 'דיבור' כדי להקליד בעזרת הקול, או על 'מסך' כדי להקליט וידאו",
+    "recording": "מקשיבים. לחץ על 'Stop' כשתסיים.",
     "transcribing": "Turning your voice into text…",
     "arming": "Starting microphone…",
     "expand": "Expand dock",
-    "collapse": "Shrink dock"
+    "collapse": "Shrink dock",
+    "screen": "מסך",
+    "idleTalkOnly": "לחץ על 'דיבור' כדי להקליד בעזרת הקול, או השתמש בקיצור הדרך להכתבה",
+    "talkHint": "דיבור: הקלדה בעזרת הקול",
+    "recordingSetup": "Recording setup: מצלמה וקול",
+    "recordingSetupFaceOn": "Recording setup: מצלמה וקול, הפנים שלך מוצגות",
+    "recordingSetupFaceOff": "Recording setup: מצלמה וקול, הפנים שלך מוסתרות",
+    "hideWhileRecording": "כדי להסתיר את ה-Dock, עצור קודם את ההקלטה.",
+    "closeSaved": "סגור את ההודעה הזו"
   },
   "home": {
     "title": "Home",
@@ -1011,7 +1028,7 @@
     "headline": "Speak. We'll type.",
     "description": "Click where you want to type, then use your shortcut. Your words appear there when you finish.",
     "openDock": "Show floating dock",
-    "dockOpened": "The floating dock is showing. Click into the app you want to type in, then use Record or your shortcut.",
+    "dockOpened": "ה-Dock הצף מוצג. לחץ בתוך האפליקציה שבה אתה רוצה להקליד, ואז השתמש בכפתור 'דיבור' או בקיצור הדרך שלך.",
     "shortcut": "Hold to talk, let go to finish. For a long thought, tap once to go hands-free and tap again to stop.",
     "fnShortcut": "or hold Fn to talk",
     "aiShortcut": "Talk + AI cleanup. Sends your text to your AI provider.",
@@ -1031,9 +1048,9 @@
     "toggleShortcut": "Press to start. Press again to finish.",
     "slogan": "Big thoughts. Less typing.",
     "fnTip": "If the emoji picker opens, go to System Settings > Keyboard and set “Press Globe key to” to “Do Nothing.”",
-    "otherShortcuts": "Other recording shortcuts",
+    "otherShortcuts": "קיצורי דרך נוספים לדיבור",
     "setAiShortcut": "Set up AI cleanup",
-    "cancelShortcut": "Cancel a recording",
+    "cancelShortcut": "ביטול הכתבה",
     "share": "Share Say Less",
     "shareCopied": "Link copied: saylessvoice.com",
     "shareFailed": "Could not copy. The link is saylessvoice.com",
@@ -1046,7 +1063,9 @@
     },
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
-    "actionsHint": "Say a cue to open an app or a website"
+    "actionsHint": "Say a cue to open an app or a website",
+    "recordJump": "הקלט את המסך",
+    "recordingJump": "מקליטים {{time}}. עבור אל 'Stop'"
   },
   "companion": {
     "title": "Particle pattern",
@@ -1276,11 +1295,13 @@
     "showInFinder": "Show in Finder",
     "voiceHint": "Or press your shortcut and say “Say less, start recording.”",
     "permissionDenied": "We need Screen Recording permission to record your screen.",
-    "permissionHint": "Turn on Say Less in System Settings, then quit and reopen Say Less.",
+    "permissionHint": "הפעל את Say Less בהגדרות המערכת, ואז לחץ על 'פתח מחדש את Say Less'.",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "פתח את 'עדכון תוכנה'",
+    "softwareUpdateFailed": "לא הצלחנו לפתוח את 'עדכון תוכנה'. בצע את השלבים שלמעלה כדי לפתוח אותו בעצמך.",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
-    "macosTooOld": "Screen recording needs macOS 15 or newer.",
+    "macosTooOld": "הקלטת מסך דורשת macOS 15 (Sequoia) ומעלה.",
     "windowsSoon": "Screen recording is coming to Windows soon.",
     "linuxUnsupported": "Screen recording isn't available on Linux yet.",
     "failed": "We couldn't record your screen. Try again.",
@@ -1291,7 +1312,29 @@
     "reservedCue": "That phrase is saved for screen recording. Pick different words.",
     "cameraDenied": "We need Camera permission to show your face in the video.",
     "cameraFailed": "We couldn't start your camera. Close other apps that use it, or turn the camera off in Recording setup.",
-    "windowMissing": "The window you picked is closed. Pick another one in Recording setup."
+    "windowMissing": "The window you picked is closed. Pick another one in Recording setup.",
+    "dockCaption": "המסך שלך מוקלט. לחץ על הכפתור האדום 'Stop' כשתסיים.",
+    "savedIn": "נשמר בתיקייה {{folder}} בתוך {{parent}}.",
+    "openFolder": "פתח את תיקיית ההקלטות",
+    "cameraOffHint": "לא נציג את הפנים שלך בווידאו.",
+    "reopenApp": "פתח מחדש את Say Less",
+    "macosTooOldHelp": "הקלטת מסך דורשת macOS 15 (Sequoia) ומעלה. כדי לבדוק את הגרסה שלך, פתח את תפריט Apple ובחר 'אודות Mac זה'. כדי לעדכן, עבור אל 'הגדרות המערכת', 'כללי', 'עדכון תוכנה'. אם לא מופיע עדכון, לא נוכל להקליט את המסך ב-Mac הזה, אבל ההכתבה עדיין עובדת.",
+    "cameraMissing": "לא מצאנו מצלמה. פתח את מכסה המחשב הנייד או חבר מצלמה, או כבה את 'Show your face' תחת 'Recording setup'.",
+    "stopHint": "כשתסיים, לחץ על 'Stop' או אמור \"Say less, stop recording.\"",
+    "startedAnnouncement": "ההקלטה התחילה.",
+    "savedAnnouncement": "ההקלטה נשמרה.",
+    "showMyFace": "הצג את הפנים שלי",
+    "cameraBlocked": "המצלמה שלך חסומה, ולכן ההקלטה לא תתחיל כל עוד 'Show your face' מופעל.",
+    "faceCorner": {
+      "top_left": "הפנים שלך יופיעו בפינה השמאלית העליונה.",
+      "top_right": "הפנים שלך יופיעו בפינה הימנית העליונה.",
+      "bottom_left": "הפנים שלך יופיעו בפינה השמאלית התחתונה.",
+      "bottom_right": "הפנים שלך יופיעו בפינה הימנית התחתונה."
+    },
+    "reopening": "פותחים מחדש…",
+    "reopenFailed": "לא הצלחנו לפתוח מחדש את Say Less. צא מהאפליקציה דרך שורת התפריטים, ואז פתח אותה שוב.",
+    "macosTooOldSteps": "כדי לבדוק את הגרסה שלך, פתח את תפריט Apple ובחר 'אודות Mac זה'. כדי לעדכן, עבור אל 'הגדרות המערכת', 'כללי', 'עדכון תוכנה'. אם לא מופיע עדכון, לא נוכל להקליט את המסך ב-Mac הזה, אבל ההכתבה עדיין עובדת.",
+    "recordWithoutFace": "הקלט ללא הפנים שלי"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1313,8 +1356,8 @@
     "windowsNeedPermission": "We can list your windows once Say Less has Screen Recording permission.",
     "noWindows": "Open the window you want to record, then pick it here.",
     "soundTitle": "Sound",
-    "microphone": "Your microphone",
-    "whichMicrophone": "Microphone",
+    "microphone": "הקלטת הקול שלך",
+    "whichMicrophone": "איזה מיקרופון",
     "sameAsDictation": "Same as dictation",
     "systemAudio": "Computer sound",
     "cameraTitle": "Camera",
@@ -1336,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "כדי להציג את הפנים שלך, אנחנו צריכים הרשאה למצלמה. הפעל את Say Less ב-System Settings, או הקלט ללא הפנים שלך.",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",
@@ -1347,6 +1390,7 @@
     "fps30": "30 (recommended)",
     "fps60": "60 (smoother, bigger file)",
     "qualityHint": "1080p at 30 frames looks sharp and stays light on 8GB laptops.",
-    "saveFailed": "We couldn't save that change. Try again."
+    "saveFailed": "We couldn't save that change. Try again.",
+    "webcamHintWindow": "הפנים שלך מופיעות בעיגול קטן על המסך ובווידאו. בזמן ההקלטה, אל תזיז את החלון והשאר את העיגול בתוכו."
   }
 }

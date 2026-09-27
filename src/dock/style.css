@@ -102,6 +102,50 @@ button:disabled {
   min-height: 44px;
   padding: 0 8px;
 }
+/* The Talk pill sits in a tooltip anchor, which takes its place in the row. */
+.floating-bar .dock-record-anchor {
+  flex: 1;
+  min-width: 32px;
+}
+/* A tooltip that must not show right now: the Talk pill already shows its
+   word, or the pointer is still on Screen right after Stop, where the tip
+   would cover the Saved line. */
+.floating-shell .sl-tip-anchor.tip-hidden > .sl-tip,
+.compact-dock .sl-tip-anchor.tip-hidden > .sl-tip {
+  visibility: hidden;
+  opacity: 0;
+}
+/* The Talk pill is the only control that shrinks, so its word clips instead
+   of painting over the Screen pill. */
+.floating-bar .dock-record span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* While the screen records, the Talk word shows only if it fits whole. If it
+   doesn't, it wraps onto a second row that the pill clips away, so just the
+   mic shows and the tooltip says what it does. 44px is the pill's height. */
+.floating-bar .dock-record.word-if-room {
+  flex-wrap: wrap;
+  align-content: flex-start;
+  overflow: hidden;
+}
+.floating-bar .dock-record.word-if-room > * {
+  flex: none;
+  max-width: 100%;
+  height: 44px;
+  line-height: 44px;
+}
+/* While the screen records, Stop leads, so Talk steps back to the same thin
+   outline as the idle Screen pill. An inset shadow, not a border, so the
+   pill keeps its size. */
+.floating-bar .dock-record.is-secondary {
+  background: transparent;
+  color: var(--color-text);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--color-text), transparent 80%);
+}
 /* Icon buttons stay at least 32px wide so they're easy to hit. */
 .floating-bar button {
   min-width: 32px;
@@ -245,24 +289,56 @@ button:disabled {
   gap: 6px;
   padding: 0 8px;
   border: 1px solid color-mix(in srgb, var(--color-text), transparent 80%);
-}
-.floating-bar .dock-screen.is-live {
-  background: #ff5a5a;
-  border-color: #ff5a5a;
-  color: #151820;
   font-weight: 650;
   font-size: 13px;
 }
-/* Recording setup: a slim button right next to the screen button. */
+/* Stop uses the same red as Stop on Home (the danger button's Tailwind
+   red-600). The dock loads no Tailwind, so the fallback is that value. */
+.floating-bar .dock-screen.is-live {
+  background: var(--color-red-600, oklch(57.7% 0.245 27.325));
+  border-color: var(--color-red-600, oklch(57.7% 0.245 27.325));
+  color: #fff;
+  font-weight: 650;
+  font-size: 13px;
+}
+/* Recording setup: a slim button right next to the screen button, outlined
+   the same way so the two read as one pair. */
 .floating-bar .dock-screen-setup {
   min-width: 32px;
   width: 32px;
   margin-inline-start: -2px;
   padding: 0;
+  border: 1px solid color-mix(in srgb, var(--color-text), transparent 80%);
   border-radius: 10px;
 }
-.dock-screen[aria-disabled="true"],
-.compact-screen[aria-disabled="true"] {
+/* Thin marks in your color, as in App.css: the darker twin on the light
+   theme, where lime would vanish. */
+:root {
+  --studio-accent-mark: var(--studio-accent-on-light, #729e3f);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --studio-accent-mark: var(--studio-accent, #b8ff65);
+  }
+}
+:root[data-theme="dark"] {
+  --studio-accent-mark: var(--studio-accent, #b8ff65);
+}
+/* Show your face is on: a 2px ring in your color. A ring, not a fill, so
+   while the screen records the red Stop stays the only filled pill. */
+.floating-bar .dock-screen-setup[data-face="on"] {
+  border-color: var(--studio-accent-mark);
+  box-shadow: inset 0 0 0 1px var(--studio-accent-mark);
+}
+/* Hide waits while the screen records (see main.tsx). */
+.floating-bar .dock-hide[aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+/* Only the "can't record here" button looks off. The short pause after Stop
+   keeps aria-disabled for screen readers but looks like a normal button. */
+.dock-screen[data-unsupported="true"],
+.compact-screen[data-unsupported="true"] {
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -301,7 +377,11 @@ button:disabled {
   background: var(--color-background);
   border-radius: 8px;
 }
+/* The note's buttons are 24px tall to hit, but the line stays 18px: the
+   negative margins let them reach past it. */
 .dock-screen-note button {
+  height: 24px;
+  margin-block: -3px;
   border: 0;
   padding: 0 4px;
   background: transparent;
@@ -309,6 +389,11 @@ button:disabled {
   font-size: 11px;
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+.dock-screen-note .dock-screen-note-close {
+  display: grid;
+  place-items: center;
+  min-width: 24px;
 }
 .compact-dock .compact-screen-anchor {
   position: absolute;
@@ -345,8 +430,8 @@ button:disabled {
   padding: 0 9px;
   border: 2px solid #151820;
   border-radius: 13px;
-  background: #ff5a5a;
-  color: #151820;
+  background: var(--color-red-600, oklch(57.7% 0.245 27.325));
+  color: #fff;
   font-size: 12px;
   font-weight: 700;
 }

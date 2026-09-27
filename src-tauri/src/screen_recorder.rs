@@ -298,6 +298,11 @@ mod platform {
         unsafe { sl_screen_recorder_camera_status() == 3 }
     }
 
+    /// macOS's camera answer as a word for the page. Never shows a prompt.
+    pub fn camera_status() -> &'static str {
+        super::camera_word(unsafe { sl_screen_recorder_camera_status() })
+    }
+
     /// The caller has already checked every permission `options` needs, so
     /// nothing the user turned on is silently dropped from the file.
     pub fn start(path: &str, options: &super::BridgeOptions) -> Result<(), String> {
@@ -572,6 +577,8 @@ pub fn toggle_in_background(app: &AppHandle, want_recording: Option<bool>) {
                     | "macos_too_old"
             ) {
                 crate::show_main_window_for(&app);
+                // Open Home, where the recording card shows the explanation.
+                let _ = app.emit("open-recording-home", ());
             }
         }
     });
@@ -595,18 +602,24 @@ pub fn screen_recording_status() -> ScreenRecordingStatus {
     current_status()
 }
 
-/// Show the last recording in Finder (or Explorer). Only ever the file we
-/// wrote, never a path from the page.
+/// Show the last recording in Finder (or Explorer), or open the recordings
+/// folder when there is none yet. Only ever paths we chose, never a path from
+/// the page.
 #[tauri::command]
 #[specta::specta]
 pub fn show_screen_recording_in_folder(app: AppHandle) -> Result<(), String> {
     use tauri_plugin_opener::OpenerExt;
-    let path = machine().last_file.clone().ok_or("no_recording")?;
-    if !path.is_file() {
-        return Err("file_missing".into());
+    let last_file = machine().last_file.clone();
+    if let Some(path) = last_file.filter(|p| p.is_file()) {
+        return app
+            .opener()
+            .reveal_item_in_dir(path)
+            .map_err(|_| "reveal_failed".into());
     }
+    let dir = recordings_dir()?;
+    std::fs::create_dir_all(&dir).map_err(|_| "folder_failed")?;
     app.opener()
-        .reveal_item_in_dir(path)
+        .open_path(dir.to_string_lossy(), None::<&str>)
         .map_err(|_| "reveal_failed".into())
 }
 
@@ -631,6 +644,101 @@ pub fn open_screen_recording_settings() -> Result<(), String> {
     }
 }
 
+/// AVAuthorizationStatus as a word: 0 is "not_asked" (macOS hasn't asked
+/// yet), 3 is "allowed", and refused (2) or blocked by whoever manages the
+/// Mac (1) are both "denied".
+#[cfg_attr(not(target_os = "macos"), allow(dead_code))]
+fn camera_word(status: i32) -> &'static str {
+    match status {
+        0 => "not_asked",
+        3 => "allowed",
+        _ => "denied",
+    }
+}
+
+/// Camera permission for Show your face: "allowed", "denied" or "not_asked".
+/// "not_asked" means macOS has no answer yet: its prompt is up, or it never
+/// asked. The page reads this instead of guessing from window focus. Never
+/// shows a prompt.
+#[tauri::command]
+#[specta::specta]
+pub fn camera_permission_status() -> Result<String, String> {
+    #[cfg(target_os = "macos")]
+    {
+        Ok(platform::camera_status().to_string())
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        Err("unsupported_platform".into())
+    }
+}
+
+/// Software Update's address. macOS 13 turned System Preferences into System
+/// Settings and gave the pane a new ID, so each version gets its own first,
+/// and the other one as the fallback.
+#[cfg_attr(not(target_os = "macos"), allow(dead_code))]
+fn software_update_urls(macos_major: Option<u64>) -> [&'static str; 2] {
+    const SETTINGS: &str = "x-apple.systempreferences:com.apple.Software-Update-Settings.extension";
+    const PREFERENCES: &str = "x-apple.systempreferences:com.apple.preferences.softwareupdate";
+    match macos_major {
+        Some(major) if major < 13 => [PREFERENCES, SETTINGS],
+        _ => [SETTINGS, PREFERENCES],
+    }
+}
+
+/// Open Software Update in System Settings (System Preferences before macOS
+/// 13), for the notice on a Mac too old to record.
+#[tauri::command]
+#[specta::specta]
+pub fn open_software_update() -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    {
+        let major = match tauri_plugin_os::version() {
+            tauri_plugin_os::Version::Semantic(major, _, _) => Some(major),
+            _ => None,
+        };
+        for url in software_update_urls(major) {
+            let opened = std::process::Command::new("/usr/bin/open")
+                .arg(url)
+                .status()
+                .is_ok_and(|status| status.success());
+            if opened {
+                return Ok(());
+            }
+        }
+        Err("open_failed".into())
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        Err("unsupported_platform".into())
+    }
+}
+
+/// Tells the next launch to show the window even with "start hidden" on.
+/// Tauri's restart spawns the new process from this one, so it inherits it.
+const SHOW_ON_LAUNCH_ENV: &str = "SAY_LESS_SHOW_ON_LAUNCH";
+
+/// "Reopen Say Less" on the permission notice. macOS applies a new Screen
+/// Recording grant only after a restart, and the window comes back on Home.
+#[tauri::command]
+#[specta::specta]
+pub fn reopen_app(app: AppHandle) {
+    std::env::set_var(SHOW_ON_LAUNCH_ENV, "1");
+    app.request_restart();
+}
+
+/// True when "Reopen Say Less" started this launch. The first call (at the
+/// top of `run`, before other threads) reads and clears the flag, so a later
+/// restart such as an update starts hidden again.
+pub(crate) fn launched_to_show() -> bool {
+    static SHOW: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *SHOW.get_or_init(|| {
+        let show = std::env::var_os(SHOW_ON_LAUNCH_ENV).is_some();
+        std::env::remove_var(SHOW_ON_LAUNCH_ENV);
+        show
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -641,6 +749,38 @@ mod tests {
             .unwrap()
             .and_hms_opt(14, 3, 7)
             .unwrap()
+    }
+
+    #[test]
+    fn reopen_flag_shows_the_window_for_that_launch_only() {
+        // Nothing in this test binary calls `run`, so this is the first read.
+        std::env::set_var(SHOW_ON_LAUNCH_ENV, "1");
+        assert!(launched_to_show());
+        // Cleared, so a later restart (like an update) starts hidden again.
+        assert!(std::env::var_os(SHOW_ON_LAUNCH_ENV).is_none());
+        // The window checks later in startup still get the same answer.
+        assert!(launched_to_show());
+    }
+
+    #[test]
+    fn camera_status_words() {
+        assert_eq!(camera_word(0), "not_asked");
+        assert_eq!(camera_word(1), "denied");
+        assert_eq!(camera_word(2), "denied");
+        assert_eq!(camera_word(3), "allowed");
+    }
+
+    #[test]
+    fn software_update_opens_the_pane_for_each_macos() {
+        let settings = "x-apple.systempreferences:com.apple.Software-Update-Settings.extension";
+        let preferences = "x-apple.systempreferences:com.apple.preferences.softwareupdate";
+        // macOS 10.15 to 12: System Preferences first.
+        assert_eq!(software_update_urls(Some(10)), [preferences, settings]);
+        assert_eq!(software_update_urls(Some(12)), [preferences, settings]);
+        // macOS 13 and later, or an unknown version: System Settings first.
+        assert_eq!(software_update_urls(Some(13)), [settings, preferences]);
+        assert_eq!(software_update_urls(Some(14)), [settings, preferences]);
+        assert_eq!(software_update_urls(None), [settings, preferences]);
     }
 
     #[test]

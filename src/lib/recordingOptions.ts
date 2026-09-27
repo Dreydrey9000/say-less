@@ -132,3 +132,7 @@ export function startRecordingOptionsSync() {
 
 /** Window event: the dock asks the main window to open Recording setup. */
 export const OPEN_RECORDING_SETUP_EVENT = "open-recording-setup";
+
+/** Window event: bring the main window to Home with the recording card (and
+ * any notice on it) in view. Sent by the dock and by recording problems. */
+export const OPEN_RECORDING_HOME_EVENT = "open-recording-home";

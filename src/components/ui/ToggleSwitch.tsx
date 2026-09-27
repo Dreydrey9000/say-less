@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 import { SettingContainer } from "./SettingContainer";
 
 interface ToggleSwitchProps {
@@ -11,6 +11,8 @@ interface ToggleSwitchProps {
   descriptionMode?: "inline" | "tooltip";
   grouped?: boolean;
   tooltipPosition?: "top" | "bottom";
+  /** Id for the switch itself, for code that needs to focus it. */
+  id?: string;
 }
 
 export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
@@ -23,7 +25,10 @@ export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
   descriptionMode = "tooltip",
   grouped = false,
   tooltipPosition = "top",
+  id,
 }) => {
+  const generatedId = useId();
+  const inputId = id ?? generatedId;
   return (
     <SettingContainer
       title={label}
@@ -32,11 +37,13 @@ export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
       grouped={grouped}
       disabled={disabled}
       tooltipPosition={tooltipPosition}
+      labelFor={inputId}
     >
       <label
         className={`relative inline-flex min-h-11 min-w-11 items-center ${disabled || isUpdating ? "cursor-not-allowed" : "cursor-pointer"}`}
       >
         <input
+          id={inputId}
           type="checkbox"
           role="switch"
           aria-label={label}
@@ -50,7 +57,7 @@ export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
         <div
           aria-hidden="true"
           style={{ pointerEvents: "none" }}
-          className="relative w-11 h-6 border border-mid-gray/50 bg-mid-gray/30 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-text rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:content-[''] after:absolute after:top-[1px] after:start-[1px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 motion-safe:after:transition-transform peer-checked:bg-background-ui peer-disabled:opacity-50"
+          className="relative w-11 h-6 border border-mid-gray/50 bg-mid-gray/30 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-text rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:content-[''] after:absolute after:top-[1px] after:start-[1px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 motion-safe:after:transition-transform peer-checked:border-transparent peer-checked:bg-[var(--studio-accent-mark)] peer-checked:after:border-transparent peer-checked:after:bg-[var(--studio-on-accent)] peer-disabled:opacity-50"
         />
       </label>
       {isUpdating && (

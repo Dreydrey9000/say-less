@@ -754,10 +754,19 @@
     "portableUpdateMessage": "Flytbare installationer kan ikke opdateres automatisk. Download installeren til dit system nedenfor, kør den, og installer i den samme mappe — din Data/-mappe (indstillinger, modeller, optagelser) bliver bevaret.",
     "portableUpdateButton": "Download installer",
     "portableUpdateBrowseMessage": "Flytbare installationer kan ikke opdateres automatisk. Download den nyeste version til dit system fra GitHub Releases, og installer den i den samme mappe — din Data/-mappe (indstillinger, modeller, optagelser) bliver bevaret.",
-    "portableUpdateBrowseButton": "Åbn GitHub Releases"
+    "portableUpdateBrowseButton": "Åbn GitHub Releases",
+    "updateReady": "Say Less v{{version}} er klar",
+    "updateNow": "Opdater nu",
+    "updateLater": "Senere",
+    "updateFailed": "Vi kunne ikke opdatere Say Less",
+    "updateFailedMacDescription": "Download den nye version, og træk den til mappen Programmer.",
+    "updateFailedDescription": "Download den nye version fra vores hjemmeside, og installer den.",
+    "updateFailedAction": "Download"
   },
   "whatsNew": {
-    "title": "Nyt i Say Less v{{version}}"
+    "title": "Nyt i Say Less v{{version}}",
+    "tryRecording": "Prøv skærmoptagelse",
+    "gotIt": "Forstået"
   },
   "common": {
     "loading": "Indlæser...",
@@ -993,17 +1002,25 @@
   "dock": {
     "drag": "Drag floating dock",
     "stop": "Stop",
-    "record": "Record",
+    "record": "Tal",
     "processing": "Working",
     "settings": "Open settings",
     "hide": "Hide floating dock",
     "error": "Check permissions or open settings to retry.",
-    "idle": "Click Record, or use your dictation shortcut",
-    "recording": "Recording — click Stop when finished",
+    "idle": "Klik på \"Tal\" for at skrive med din stemme, eller \"Skærm\" for at optage en video",
+    "recording": "Lytter. Klik på \"Stop\", når du er færdig.",
     "transcribing": "Turning your voice into text…",
     "arming": "Starting microphone…",
     "expand": "Expand dock",
-    "collapse": "Shrink dock"
+    "collapse": "Shrink dock",
+    "screen": "Skærm",
+    "idleTalkOnly": "Klik på \"Tal\" for at skrive med din stemme, eller brug din dikteringsgenvej",
+    "talkHint": "Tal: skriv med din stemme",
+    "recordingSetup": "Recording setup: kamera og lyd",
+    "recordingSetupFaceOn": "Recording setup: kamera og lyd, dit ansigt vises",
+    "recordingSetupFaceOff": "Recording setup: kamera og lyd, dit ansigt vises ikke",
+    "hideWhileRecording": "Stop optagelsen først for at skjule docken.",
+    "closeSaved": "Luk denne besked"
   },
   "home": {
     "title": "Home",
@@ -1011,7 +1028,7 @@
     "headline": "Speak. We'll type.",
     "description": "Click where you want to type, then use your shortcut. Your words appear there when you finish.",
     "openDock": "Show floating dock",
-    "dockOpened": "The floating dock is showing. Click into the app you want to type in, then use Record or your shortcut.",
+    "dockOpened": "Den flydende dock vises nu. Klik i den app, du vil skrive i, og brug derefter \"Tal\" eller din genvej.",
     "shortcut": "Hold to talk, let go to finish. For a long thought, tap once to go hands-free and tap again to stop.",
     "fnShortcut": "or hold Fn to talk",
     "aiShortcut": "Talk + AI cleanup. Sends your text to your AI provider.",
@@ -1031,9 +1048,9 @@
     "toggleShortcut": "Press to start. Press again to finish.",
     "slogan": "Big thoughts. Less typing.",
     "fnTip": "If the emoji picker opens, go to System Settings > Keyboard and set “Press Globe key to” to “Do Nothing.”",
-    "otherShortcuts": "Other recording shortcuts",
+    "otherShortcuts": "Flere genveje til diktering",
     "setAiShortcut": "Set up AI cleanup",
-    "cancelShortcut": "Cancel a recording",
+    "cancelShortcut": "Annuller diktering",
     "share": "Share Say Less",
     "shareCopied": "Link copied: saylessvoice.com",
     "shareFailed": "Could not copy. The link is saylessvoice.com",
@@ -1046,7 +1063,9 @@
     },
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
-    "actionsHint": "Say a cue to open an app or a website"
+    "actionsHint": "Say a cue to open an app or a website",
+    "recordJump": "Optag din skærm",
+    "recordingJump": "Optager {{time}}. Gå til \"Stop\""
   },
   "companion": {
     "title": "Particle pattern",
@@ -1276,11 +1295,13 @@
     "showInFinder": "Show in Finder",
     "voiceHint": "Or press your shortcut and say “Say less, start recording.”",
     "permissionDenied": "We need Screen Recording permission to record your screen.",
-    "permissionHint": "Turn on Say Less in System Settings, then quit and reopen Say Less.",
+    "permissionHint": "Slå Say Less til i Systemindstillinger, og klik derefter på \"Genåbn Say Less\".",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "Åbn Softwareopdatering",
+    "softwareUpdateFailed": "Vi kunne ikke åbne Softwareopdatering. Følg trinnene ovenfor for selv at åbne den.",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
-    "macosTooOld": "Screen recording needs macOS 15 or newer.",
+    "macosTooOld": "Skærmoptagelse kræver macOS 15 (Sequoia) eller nyere.",
     "windowsSoon": "Screen recording is coming to Windows soon.",
     "linuxUnsupported": "Screen recording isn't available on Linux yet.",
     "failed": "We couldn't record your screen. Try again.",
@@ -1291,7 +1312,29 @@
     "reservedCue": "That phrase is saved for screen recording. Pick different words.",
     "cameraDenied": "We need Camera permission to show your face in the video.",
     "cameraFailed": "We couldn't start your camera. Close other apps that use it, or turn the camera off in Recording setup.",
-    "windowMissing": "The window you picked is closed. Pick another one in Recording setup."
+    "windowMissing": "The window you picked is closed. Pick another one in Recording setup.",
+    "dockCaption": "Din skærm bliver optaget. Klik på den røde knap \"Stop\", når du er færdig.",
+    "savedIn": "Gemt i mappen {{folder}} i {{parent}}.",
+    "openFolder": "Åbn mappen med optagelser",
+    "cameraOffHint": "Vi viser ikke dit ansigt i videoen.",
+    "reopenApp": "Genåbn Say Less",
+    "macosTooOldHelp": "Skærmoptagelse kræver macOS 15 (Sequoia) eller nyere. Du kan tjekke din version ved at åbne Apple-menuen og vælge Om denne Mac. Du opdaterer ved at gå til Systemindstillinger, Generelt, Softwareopdatering. Hvis der ikke vises nogen opdatering, kan vi ikke optage skærmen på denne Mac, men diktering virker stadig.",
+    "cameraMissing": "Vi kan ikke finde et kamera. Åbn låget på din bærbare, sæt et kamera til, eller slå \"Show your face\" fra i \"Recording setup\".",
+    "stopHint": "Når du er færdig, skal du klikke på \"Stop\" eller sige \"Say less, stop recording.\"",
+    "startedAnnouncement": "Optagelsen er startet.",
+    "savedAnnouncement": "Optagelsen er gemt.",
+    "showMyFace": "Vis mit ansigt",
+    "cameraBlocked": "Dit kamera er blokeret, så optagelsen starter ikke, mens \"Show your face\" er slået til.",
+    "faceCorner": {
+      "top_left": "Dit ansigt vises i øverste venstre hjørne.",
+      "top_right": "Dit ansigt vises i øverste højre hjørne.",
+      "bottom_left": "Dit ansigt vises i nederste venstre hjørne.",
+      "bottom_right": "Dit ansigt vises i nederste højre hjørne."
+    },
+    "reopening": "Genåbner…",
+    "reopenFailed": "Vi kunne ikke genåbne Say Less. Afslut appen fra menulinjen, og åbn den derefter igen.",
+    "macosTooOldSteps": "Du kan tjekke din version ved at åbne Apple-menuen og vælge Om denne Mac. Du opdaterer ved at gå til Systemindstillinger, Generelt, Softwareopdatering. Hvis der ikke vises nogen opdatering, kan vi ikke optage skærmen på denne Mac, men diktering virker stadig.",
+    "recordWithoutFace": "Optag uden mit ansigt"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1313,8 +1356,8 @@
     "windowsNeedPermission": "We can list your windows once Say Less has Screen Recording permission.",
     "noWindows": "Open the window you want to record, then pick it here.",
     "soundTitle": "Sound",
-    "microphone": "Your microphone",
-    "whichMicrophone": "Microphone",
+    "microphone": "Optag din stemme",
+    "whichMicrophone": "Hvilken mikrofon",
     "sameAsDictation": "Same as dictation",
     "systemAudio": "Computer sound",
     "cameraTitle": "Camera",
@@ -1336,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "Vi skal have tilladelse til kameraet for at vise dit ansigt. Slå Say Less til i \"System Settings\", eller optag uden dit ansigt.",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",
@@ -1347,6 +1390,7 @@
     "fps30": "30 (recommended)",
     "fps60": "60 (smoother, bigger file)",
     "qualityHint": "1080p at 30 frames looks sharp and stays light on 8GB laptops.",
-    "saveFailed": "We couldn't save that change. Try again."
+    "saveFailed": "We couldn't save that change. Try again.",
+    "webcamHintWindow": "Dit ansigt vises i en lille cirkel på skærmen og i videoen. Hold vinduet stille og cirklen inden for det, mens du optager."
   }
 }

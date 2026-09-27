@@ -344,19 +344,39 @@ pub fn matching_action<'a>(text: &str, settings: &'a StudioSettings) -> Option<&
 pub fn execute_spoken_action(app: &AppHandle, text: &str) -> Result<bool, String> {
     let settings = get_studio_settings(app.clone()).unwrap_or_default();
     if let Some(cue) = recording_cue(text, &settings) {
-        if !crate::screen_recorder::is_supported() {
-            return Err("unsupported_platform".into());
-        }
-        // Runs in the background: this is called on the main thread.
-        crate::screen_recorder::toggle_in_background(app, Some(cue == RecordingCue::Start));
-        let _ = app.emit("voice-action-result", true);
-        return Ok(true);
+        return run_recording_cue(
+            crate::screen_recorder::is_supported(),
+            || {
+                // Runs in the background: this is called on the main thread.
+                crate::screen_recorder::toggle_in_background(app, Some(cue == RecordingCue::Start));
+                let _ = app.emit("voice-action-result", true);
+            },
+            || {
+                crate::show_main_window_for(app);
+                let _ = app.emit("open-recording-home", ());
+            },
+        );
     }
     let Some(action) = matching_action(text, &settings) else {
         return Ok(false);
     };
     launch(action)?;
     let _ = app.emit("voice-action-result", true);
+    Ok(true)
+}
+/// A recording cue is always handled, so its words are never pasted. When this
+/// machine can't record, open Home so the recording card explains why, instead
+/// of failing (the dock would wrongly say to check permissions).
+fn run_recording_cue(
+    supported: bool,
+    toggle: impl FnOnce(),
+    explain: impl FnOnce(),
+) -> Result<bool, String> {
+    if supported {
+        toggle();
+    } else {
+        explain();
+    }
     Ok(true)
 }
 fn launch(action: &VoiceAction) -> Result<(), String> {
@@ -491,6 +511,21 @@ mod tests {
         // Old saved settings turn the voice commands on.
         let old: StudioSettings = serde_json::from_value(serde_json::json!({})).unwrap();
         assert!(old.voice_recording);
+    }
+    #[test]
+    fn unsupported_recording_cue_explains_instead_of_failing() {
+        let mut explained = false;
+        let result = run_recording_cue(
+            false,
+            || panic!("must not try to record on an unsupported machine"),
+            || explained = true,
+        );
+        assert_eq!(result, Ok(true));
+        assert!(explained);
+        let mut toggled = false;
+        let result = run_recording_cue(true, || toggled = true, || panic!("must not explain"));
+        assert_eq!(result, Ok(true));
+        assert!(toggled);
     }
     #[test]
     fn rejects_executable_urls_and_credentials() {

@@ -1,5 +1,6 @@
 import {
   cloneElement,
+  useEffect,
   useId,
   useState,
   type ReactElement,
@@ -24,9 +25,11 @@ interface TooltipProps {
 
 /**
  * A small tooltip for icon-only controls. It shows on hover and on keyboard
- * focus, hides on Escape, and names the control through aria-labelledby, so
- * sighted and screen-reader users get the same words. Pure CSS positioning:
- * no portal, so it works in the tiny dock and overlay windows too.
+ * focus, hides on Escape (focused or just hovered) and after a click on the
+ * control until the pointer leaves or keyboard focus returns, and names the
+ * control through aria-labelledby, so sighted and screen-reader users get
+ * the same words. Pure CSS positioning: no portal, so it works in the tiny
+ * dock and overlay windows too.
  */
 export function Tooltip({
   label,
@@ -37,6 +40,17 @@ export function Tooltip({
 }: TooltipProps) {
   const id = `tip-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   const [dismissed, setDismissed] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  // Escape while only hovering: the control has no focus, so listen on the
+  // document until the pointer leaves.
+  useEffect(() => {
+    if (!hovered) return;
+    const onKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape") setDismissed(true);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [hovered]);
   const child = children as ReactElement<{
     onKeyDown?: (event: KeyboardEvent<HTMLElement>) => void;
   }>;
@@ -46,8 +60,24 @@ export function Tooltip({
       data-placement={placement}
       data-align={align}
       data-dismissed={dismissed || undefined}
-      onMouseLeave={() => setDismissed(false)}
-      onBlur={() => setDismissed(false)}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => {
+        setHovered(false);
+        setDismissed(false);
+      }}
+      // The click that uses the control is not a request to read its name,
+      // and the tip would cover what the click just showed.
+      onPointerDown={() => setDismissed(true)}
+      onFocus={(event) => {
+        // Keyboard focus asks for the name again, even with the pointer
+        // still resting on the control.
+        if (event.target.matches(":focus-visible")) setDismissed(false);
+      }}
+      onBlur={(event) => {
+        // Still under the pointer (e.g. the control went disabled after a
+        // click): keep a click's dismissal until the pointer leaves.
+        if (!event.currentTarget.matches(":hover")) setDismissed(false);
+      }}
     >
       {cloneElement(child, {
         "aria-labelledby": id,

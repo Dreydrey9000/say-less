@@ -83,10 +83,14 @@
   align-items: center;
   gap: 16px;
 }
-.home-actions > button:first-child {
+.home-actions > button:not(.home-link) {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+}
+/* A recording is running: the red dot plus a red edge, so it reads as live. */
+.home-jump-live {
+  border-color: color-mix(in srgb, #ff5a5a, transparent 45%);
 }
 .home-link {
   display: inline-flex;
@@ -293,10 +297,19 @@
   padding: 20px;
   border: 1px solid #80808040;
   border-radius: 16px;
+  scroll-margin-top: 16px;
 }
 .home-record[data-state="recording"],
 .home-record[data-state="stopping"] {
   border-color: color-mix(in srgb, #ff5a5a, transparent 40%);
+}
+/* Can't record (older Mac, Windows): one column, with the notice above the
+   buttons. */
+.home-record[data-blocked] {
+  grid-template-columns: minmax(0, 1fr);
+}
+.home-record[data-blocked] .home-record-controls {
+  align-items: flex-start;
 }
 .home-record-text h2 {
   font-size: 18px;
@@ -313,6 +326,35 @@
 .home-record-text .home-record-hint {
   font-size: 13px;
 }
+/* A hint slot keeps its idle line and its recording line in one cell, so the
+   card is the same height in both states and the buttons stay put. */
+.home-record-slot {
+  display: grid;
+  min-height: 24px;
+}
+.home-record-slot > * {
+  grid-area: 1 / 1;
+}
+.home-record-slot > [data-off] {
+  visibility: hidden;
+}
+/* The face line holds a small button (32px plus the line's 4px top margin), so
+   it keeps that height even while the button is gone (Setup open) or the line
+   is hidden (the camera check still running, or the macOS camera prompt up). */
+.home-record-face-slot {
+  min-height: 36px;
+}
+.home-record-text .home-record-face {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+.home-record-text .home-record-warn,
+.home-record-text .home-record-live,
+.home-record-text .home-record-face button {
+  color: var(--color-text);
+}
 .home-record-controls {
   display: flex;
   flex-direction: column;
@@ -323,8 +365,29 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  min-width: 148px;
+  min-width: 160px;
   justify-content: center;
+}
+/* Light theme: the accent's darker twin as an edge, so lime doesn't melt into
+   the white card. In dark it is the fill color, so nothing changes there. */
+.home-record-button.accent-action {
+  border-color: var(--studio-accent-mark);
+}
+/* This computer can't record: flat grey, not a dimmed lime that still looks
+   clickable. */
+.home-record-button:disabled {
+  opacity: 1;
+  color: var(--color-text-muted);
+  background: color-mix(in srgb, var(--color-mid-gray) 16%, transparent);
+  border-color: transparent;
+}
+/* aria-disabled: clicks are ignored while it works, but focus stays. */
+.home-record [aria-disabled="true"] {
+  cursor: default;
+}
+.home-record-button[aria-busy="true"],
+.home-record-notice button[aria-disabled="true"] {
+  opacity: 0.6;
 }
 .home-record-live {
   display: inline-flex;
@@ -365,18 +428,68 @@
 .home-record-notice p {
   flex: 1 1 280px;
 }
+/* A warning: the icon beside the first line of text, and the buttons under
+   the text starting at the same left edge. */
+.home-record-notice > svg {
+  align-self: flex-start;
+  margin-top: 2px;
+}
+.home-record-notice-body {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.home-record-notice-body > p {
+  flex-basis: 100%;
+}
+/* The one slot for what the last Record or Stop brought back, right under
+   the buttons. */
+.home-record-result {
+  grid-column: 1 / -1;
+}
+.home-record-notice .home-record-error {
+  flex-basis: 100%;
+}
 .home-record-notice button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
+.home-record-saved {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+.home-record-saved-icon {
+  flex: none;
+  color: var(--studio-accent-mark, currentColor);
+}
+/* One line, never split inside the date; the full name is in the tooltip. */
 .home-record-file {
   color: var(--color-text-muted);
-  overflow-wrap: anywhere;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.home-record-notice-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 .home-record-buttons {
   display: flex;
   gap: 8px;
+}
+/* Its own row under the buttons, text lined up with the card's left edge. */
+.home-record-folder {
+  grid-column: 1 / -1;
+  justify-self: start;
+  margin-inline-start: -0.75rem;
 }
 .home-record-setup {
   display: inline-flex;
@@ -398,7 +511,7 @@
 .rec-setup {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px 24px;
   padding-top: 16px;
   border-top: 1px solid #80808040;
@@ -412,6 +525,20 @@
 .rec-setup > .rec-setup-note,
 .rec-setup > .rec-setup-alert {
   grid-column: 1 / -1;
+}
+/* Two columns when there is room: What we record and Camera on the left,
+   Sound and Quality on the right. Each column stacks on its own, so Camera
+   sits right under What we record instead of lining up with Quality. */
+.rec-setup-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px 24px;
+}
+.rec-setup-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
 }
 .rec-setup-group {
   min-width: 0;
@@ -593,7 +720,9 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
-@media (max-width: 640px) {
+/* Same breakpoint as the rest of Home: the content area, not the window, so
+   the card stacks at the default 680px window too. */
+@container (max-width: 580px) {
   .home-record {
     grid-template-columns: 1fr;
   }
@@ -603,7 +732,7 @@
   .home-record-buttons > :first-child {
     flex: 1;
   }
-  .rec-setup {
+  .rec-setup-grid {
     grid-template-columns: 1fr;
   }
 }

@@ -5,7 +5,11 @@ import { findReleaseNoteToShow } from "./releaseNotes";
 import type { ReleaseNote } from "./releaseNotes";
 import { WhatsNewModal } from "./WhatsNewModal";
 
-export const WhatsNewGate: React.FC = () => {
+export const WhatsNewGate: React.FC<{
+  /** Shown as "Try screen recording" in the dialog, only on the notes that
+   * introduce screen recording and only when this computer can record. */
+  onTryRecording?: () => void;
+}> = ({ onTryRecording }) => {
   const { settings, isLoading, updateSetting } = useSettings();
   const [note, setNote] = useState<ReleaseNote | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -68,5 +72,15 @@ export const WhatsNewGate: React.FC = () => {
 
   if (!note) return null;
 
-  return <WhatsNewModal note={note} open={isOpen} onDismiss={dismiss} />;
+  // Screen recording arrived in 0.14, so only those notes offer to try it.
+  const offersRecording = note.version.startsWith("0.14.");
+
+  return (
+    <WhatsNewModal
+      note={note}
+      open={isOpen}
+      onDismiss={dismiss}
+      onTryRecording={offersRecording ? onTryRecording : undefined}
+    />
+  );
 };
