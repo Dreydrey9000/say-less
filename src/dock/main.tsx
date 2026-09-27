@@ -46,6 +46,9 @@ startScreenRecordingSync();
 
 /** How long the dock offers "Show in Finder" after a recording is saved. */
 const SAVED_NOTE_MS = 12_000;
+/** After Stop, Record takes its place under the pointer. Clicks are ignored
+ * this long, so a double-click saves the video and doesn't start a new one. */
+const AFTER_STOP_MS = 700;
 
 /** Screen recording controls shared by the compact and expanded dock. */
 function useDockScreenRecording() {
@@ -99,6 +102,37 @@ function ScreenButton({
 }) {
   const { t } = useTranslation();
   const rec = useDockScreenRecording();
+  // A ref, not state: the second click of a double-click can arrive before
+  // React re-renders.
+  const ignoreUntil = useRef(0);
+  const [settling, setSettling] = useState(false);
+  // After a Stop click the pointer is still on the button, and its tooltip
+  // would cover the Saved line. It stays hidden until the pointer leaves.
+  const [quietTip, setQuietTip] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!settling) return;
+    const id = window.setTimeout(() => setSettling(false), AFTER_STOP_MS);
+    return () => window.clearTimeout(id);
+  }, [settling]);
+  // WebKit sends no pointer events to a disabled button, so a pointer that
+  // left while the video was saving was never seen leaving. Once the button
+  // works again, ask whether the pointer is still on it.
+  useEffect(() => {
+    const idle = !settling && !rec.busy;
+    if (quietTip && idle && !buttonRef.current?.matches(":hover"))
+      setQuietTip(false);
+  }, [quietTip, settling, rec.busy]);
+  async function press(byPointer: boolean) {
+    if (Date.now() < ignoreUntil.current) return;
+    const stopping = rec.recording;
+    if (stopping && byPointer) setQuietTip(true);
+    await rec.toggleFromDock();
+    if (stopping) {
+      ignoreUntil.current = Date.now() + AFTER_STOP_MS;
+      setSettling(true);
+    }
+  }
   if (!rec.status) return null;
   if (!rec.supported) {
     const reason = t(unsupportedKey(rec.status.unsupported_reason));
@@ -129,10 +163,12 @@ function ScreenButton({
         className={compact ? "compact-screen-live-anchor" : ""}
       >
         <button
+          ref={buttonRef}
           className={compact ? "compact-screen-live" : "dock-screen is-live"}
           disabled={rec.busy}
           aria-busy={rec.busy || undefined}
-          onClick={() => void rec.toggleFromDock()}
+          onPointerLeave={() => setQuietTip(false)}
+          onClick={(event) => void press(event.detail > 0)}
         >
           <span className="rec-dot" aria-hidden="true" />
           <span className="rec-time" role="timer">
@@ -140,7 +176,7 @@ function ScreenButton({
           </span>
           {!compact && (
             <>
-              <Square size={14} aria-hidden="true" />
+              <Square size={14} fill="currentColor" aria-hidden="true" />
               {/* While dictating, the Talk pill owns the word Stop. */}
               {!dictating && <span>{t("dock.stop")}</span>}
             </>
@@ -157,13 +193,17 @@ function ScreenButton({
       )}
       placement="bottom"
       align="end"
-      className={compact ? "compact-screen-anchor" : ""}
+      className={`${compact ? "compact-screen-anchor" : ""} ${quietTip ? "tip-hidden" : ""}`}
     >
       <button
+        ref={buttonRef}
         className={compact ? "compact-screen" : "dock-screen"}
         disabled={rec.busy}
         aria-busy={rec.busy || undefined}
-        onClick={() => void rec.toggleFromDock()}
+        // aria-disabled, not disabled, so keyboard focus stays put.
+        aria-disabled={settling || undefined}
+        onPointerLeave={() => setQuietTip(false)}
+        onClick={(event) => void press(event.detail > 0)}
       >
         <MonitorPlay size={compact ? 15 : 18} aria-hidden="true" />
         {!compact && <span>{t("dock.screen")}</span>}
@@ -185,6 +225,7 @@ function Dock() {
     state === "idle" && !screen.supported
       ? "dock.idleTalkOnly"
       : `dock.${state}`;
+  const talkHint = screen.recording && state !== "recording";
   // Expanding or collapsing swaps the whole dock, which would drop keyboard
   // focus to <body>. When the user toggled it here, land focus on the control
   // that undoes the change.
@@ -276,7 +317,7 @@ function Dock() {
             className="compact-action-anchor"
           >
             <button className="compact-action" onClick={() => void record()}>
-              <Square size={14} />
+              <Square size={14} fill="currentColor" />
             </button>
           </Tooltip>
         ) : (
@@ -332,17 +373,31 @@ function Dock() {
             />
           </button>
         </Tooltip>
-        <button
-          className="dock-record"
-          disabled={pending || state === "transcribing"}
-          onClick={() => void record()}
-          aria-label={t(state === "recording" ? "dock.stop" : "dock.record")}
+        {/* While the screen records, the red Stop pill takes room, so this
+            pill keeps its word only if the word fits whole (.word-if-room)
+            and says what it does in a tooltip. While dictating too, it keeps
+            Stop instead, so the caption's "Click Stop" points here. */}
+        <Tooltip
+          label={t(
+            talkHint
+              ? "dock.talkHint"
+              : state === "recording"
+                ? "dock.stop"
+                : "dock.record",
+          )}
+          placement="bottom"
+          className={`dock-record-anchor ${talkHint ? "" : "tip-hidden"}`}
         >
-          {state === "recording" ? <Square size={20} /> : <Mic size={20} />}
-          {/* While the screen records, the red Stop pill needs the room.
-              While dictating too, this pill keeps Stop instead, so the
-              caption's "Click Stop" points here. */}
-          {(!screen.recording || state === "recording") && (
+          <button
+            className={`dock-record ${talkHint ? "word-if-room" : ""}`}
+            disabled={pending || state === "transcribing"}
+            onClick={() => void record()}
+          >
+            {state === "recording" ? (
+              <Square size={20} fill="currentColor" />
+            ) : (
+              <Mic size={20} />
+            )}
             <span>
               {t(
                 state === "recording"
@@ -352,11 +407,11 @@ function Dock() {
                     : "dock.record",
               )}
             </span>
-          )}
-        </button>
+          </button>
+        </Tooltip>
         <ScreenButton compact={false} dictating={state === "recording"} />
         <Tooltip
-          label={t("recordingSetup.open")}
+          label={t("dock.recordingSetup")}
           placement="bottom"
           align="end"
         >
@@ -364,6 +419,7 @@ function Dock() {
               the setup lives in the main window, where it can. */}
           <button
             className="dock-screen-setup"
+            aria-label={t("dock.recordingSetup")}
             onClick={async () => {
               await invoke("show_main_window_command").catch(() => undefined);
               await emit(OPEN_RECORDING_SETUP_EVENT).catch(() => undefined);

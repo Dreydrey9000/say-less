@@ -470,7 +470,7 @@
 .rec-setup {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px 24px;
   padding-top: 16px;
   border-top: 1px solid #80808040;
@@ -484,6 +484,20 @@
 .rec-setup > .rec-setup-note,
 .rec-setup > .rec-setup-alert {
   grid-column: 1 / -1;
+}
+/* Two columns when there is room: What we record and Camera on the left,
+   Sound and Quality on the right. Each column stacks on its own, so Camera
+   sits right under What we record instead of lining up with Quality. */
+.rec-setup-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px 24px;
+}
+.rec-setup-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
 }
 .rec-setup-group {
   min-width: 0;
@@ -677,7 +691,7 @@
   .home-record-buttons > :first-child {
     flex: 1;
   }
-  .rec-setup {
+  .rec-setup-grid {
     grid-template-columns: 1fr;
   }
 }

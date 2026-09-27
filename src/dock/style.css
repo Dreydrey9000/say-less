@@ -102,6 +102,19 @@ button:disabled {
   min-height: 44px;
   padding: 0 8px;
 }
+/* The Talk pill sits in a tooltip anchor, which takes its place in the row. */
+.floating-bar .dock-record-anchor {
+  flex: 1;
+  min-width: 32px;
+}
+/* A tooltip that must not show right now: the Talk pill already shows its
+   word, or the pointer is still on Screen right after Stop, where the tip
+   would cover the Saved line. */
+.floating-shell .sl-tip-anchor.tip-hidden > .sl-tip,
+.compact-dock .sl-tip-anchor.tip-hidden > .sl-tip {
+  visibility: hidden;
+  opacity: 0;
+}
 /* The Talk pill is the only control that shrinks, so its word clips instead
    of painting over the Screen pill. */
 .floating-bar .dock-record span {
@@ -109,6 +122,20 @@ button:disabled {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+/* While the screen records, the Talk word shows only if it fits whole. If it
+   doesn't, it wraps onto a second row that the pill clips away, so just the
+   mic shows and the tooltip says what it does. 44px is the pill's height. */
+.floating-bar .dock-record.word-if-room {
+  flex-wrap: wrap;
+  align-content: flex-start;
+  overflow: hidden;
+}
+.floating-bar .dock-record.word-if-room > * {
+  flex: none;
+  max-width: 100%;
+  height: 44px;
+  line-height: 44px;
 }
 /* Icon buttons stay at least 32px wide so they're easy to hit. */
 .floating-bar button {
@@ -273,8 +300,10 @@ button:disabled {
   border: 1px solid color-mix(in srgb, var(--color-text), transparent 80%);
   border-radius: 10px;
 }
-.dock-screen[aria-disabled="true"],
-.compact-screen[aria-disabled="true"] {
+/* Only the "can't record here" button looks off. The short pause after Stop
+   keeps aria-disabled for screen readers but looks like a normal button. */
+.dock-screen[data-unsupported="true"],
+.compact-screen[data-unsupported="true"] {
   opacity: 0.5;
   cursor: not-allowed;
 }

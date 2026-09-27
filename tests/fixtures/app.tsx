@@ -242,13 +242,22 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
     );
   }
   if (cmd === "stop_screen_recording") {
-    screenStatus = {
-      ...screenStatus,
-      state: "idle",
-      elapsed_ms: 0,
-      last_file: screenFile,
+    const save = () => {
+      screenStatus = {
+        ...screenStatus,
+        state: "idle",
+        elapsed_ms: 0,
+        last_file: screenFile,
+      };
+      return screenStatus;
     };
-    return screenStatus;
+    // ?holdStop keeps the video saving until the test calls testFinishStop().
+    if (query.has("holdStop"))
+      return new Promise((resolve) => {
+        (window as unknown as { testFinishStop: () => void }).testFinishStop =
+          () => resolve(save());
+      });
+    return save();
   }
   if (cmd === "show_screen_recording_in_folder") return null;
   if (cmd === "open_screen_recording_settings") return null;
