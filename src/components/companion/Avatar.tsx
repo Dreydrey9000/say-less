@@ -12,7 +12,13 @@ const heads = {
   dog: { cx: 50, cy: 54, r: 25, eyeY: 48, eyeDx: 10, mouthY: 70 },
   bot: { cx: 50, cy: 51, r: 29, eyeY: 50, eyeDx: 7.5, mouthY: 66 },
 } as const;
-type Head = { cx: number; eyeY?: number; eyeDx?: number; mouthY: number; r: number };
+type Head = {
+  cx: number;
+  eyeY?: number;
+  eyeDx?: number;
+  mouthY: number;
+  r: number;
+};
 
 /** Volume below this is treated as silence so breathing/room noise keeps the mouth shut. */
 const GATE = 0.06;
@@ -330,7 +336,11 @@ function BotFeelings({
   ink: string;
   open: number;
 }) {
-  const { cx, eyeY, eyeDx } = head as { cx: number; eyeY: number; eyeDx: number };
+  const { cx, eyeY, eyeDx } = head as {
+    cx: number;
+    eyeY: number;
+    eyeDx: number;
+  };
   const loud = Math.min(1, Math.max(0, (open - 0.55) / 0.3));
   return (
     <>
@@ -568,18 +578,18 @@ export function Avatar({
                 preserveAspectRatio="xMidYMid slice"
               />
             ) : (
-            <g className="avatar-glance" ref={glance}>
-              <Figure
-                kind={kind}
-                ink={ink}
-                uid={uid}
-                colors={{
-                  body: avatar.body,
-                  accent: avatar.accent,
-                  bg: avatar.background,
-                }}
-              />
-            </g>
+              <g className="avatar-glance" ref={glance}>
+                <Figure
+                  kind={kind}
+                  ink={ink}
+                  uid={uid}
+                  colors={{
+                    body: avatar.body,
+                    accent: avatar.accent,
+                    bg: avatar.background,
+                  }}
+                />
+              </g>
             )}
             {face ? (
               // The painted bead eyes stay put; only the lids move over them.
