@@ -1324,7 +1324,7 @@
     "startedAnnouncement": "ההקלטה התחילה.",
     "savedAnnouncement": "ההקלטה נשמרה.",
     "showMyFace": "הצג את הפנים שלי",
-    "cameraBlocked": "המצלמה שלך חסומה, ולכן לא נוכל להקליט את הפנים שלך.",
+    "cameraBlocked": "המצלמה שלך חסומה, ולכן ההקלטה לא תתחיל כל עוד 'Show your face' מופעל.",
     "faceCorner": {
       "top_left": "הפנים שלך יופיעו בפינה השמאלית העליונה.",
       "top_right": "הפנים שלך יופיעו בפינה הימנית העליונה.",
@@ -1333,7 +1333,8 @@
     },
     "reopening": "פותחים מחדש…",
     "reopenFailed": "לא הצלחנו לפתוח מחדש את Say Less. צא מהאפליקציה דרך שורת התפריטים, ואז פתח אותה שוב.",
-    "macosTooOldSteps": "כדי לבדוק את הגרסה שלך, פתח את תפריט Apple ובחר 'אודות Mac זה'. כדי לעדכן, עבור אל 'הגדרות המערכת', 'כללי', 'עדכון תוכנה'. אם לא מופיע עדכון, לא נוכל להקליט את המסך ב-Mac הזה, אבל ההכתבה עדיין עובדת."
+    "macosTooOldSteps": "כדי לבדוק את הגרסה שלך, פתח את תפריט Apple ובחר 'אודות Mac זה'. כדי לעדכן, עבור אל 'הגדרות המערכת', 'כללי', 'עדכון תוכנה'. אם לא מופיע עדכון, לא נוכל להקליט את המסך ב-Mac הזה, אבל ההכתבה עדיין עובדת.",
+    "recordWithoutFace": "הקלט ללא הפנים שלי"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1378,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "כדי להציג את הפנים שלך, אנחנו צריכים הרשאה למצלמה. הפעל את Say Less ב-System Settings, או הקלט ללא הפנים שלך.",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",

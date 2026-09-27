@@ -6,6 +6,7 @@ import {
   FolderOpen,
   ChevronDown,
   TriangleAlert,
+  CircleCheck,
 } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 import {
@@ -412,13 +413,31 @@ export function ScreenRecordingCard() {
           {notice === "camera_denied" && (
             <div className="home-record-notice" role="alert">
               <p>{t("recordingSetup.cameraDenied")}</p>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => void openPrivacyPane("camera")}
-              >
-                {t("screenRecording.openSettings")}
-              </Button>
+              <div className="home-record-notice-actions">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => void openPrivacyPane("camera")}
+                >
+                  {t("screenRecording.openSettings")}
+                </Button>
+                {/* The backend won't start with a blocked camera, so offer
+                    the recording without the face in one click. */}
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={async () => {
+                    if (
+                      await useRecordingOptions
+                        .getState()
+                        .update({ webcam: false })
+                    )
+                      void useScreenRecording.getState().start();
+                  }}
+                >
+                  {t("screenRecording.recordWithoutFace")}
+                </Button>
+              </div>
             </div>
           )}
           {(notice === "window_missing" ||
@@ -456,7 +475,14 @@ export function ScreenRecordingCard() {
           )}
           {showSaved && (
             <div className="home-record-notice" role="status">
-              <p>
+              <p className="home-record-saved">
+                {notice !== "ended_early" && (
+                  <CircleCheck
+                    size={16}
+                    className="home-record-saved-icon"
+                    aria-hidden="true"
+                  />
+                )}
                 {t(
                   notice === "ended_early"
                     ? "screenRecording.endedEarly"
@@ -464,11 +490,13 @@ export function ScreenRecordingCard() {
                       ? "screenRecording.savedIn"
                       : "screenRecording.saved",
                   { folder, parent },
-                )}{" "}
-                {fileName && (
-                  <span className="home-record-file">{fileName}</span>
                 )}
               </p>
+              {fileName && (
+                <p className="home-record-file" title={fileName}>
+                  {fileName}
+                </p>
+              )}
               <Button
                 variant="secondary"
                 size="sm"
@@ -481,7 +509,8 @@ export function ScreenRecordingCard() {
           )}
         </div>
       )}
-      {supported && state === "idle" && (
+      {/* Show in Finder already leads to the new video, so one path at a time. */}
+      {supported && state === "idle" && !showSaved && (
         <Button
           variant="ghost"
           size="sm"

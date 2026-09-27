@@ -49,6 +49,9 @@
 - On an older Mac the notice has an Open Software Update button, with the right pane for older and newer macOS. On Windows the card is one plain line with no dead button.
 - The dock keeps Saved and Show in Finder until the next recording or dictation (or until you close it), shows a lime ring on the camera button when your face is on, turns Talk secondary while the screen records so Stop leads, uses the same red for Stop as Home, and cannot be hidden in the middle of a recording.
 - What's New moves focus to Got it when it opens, shows the picture as a framed screenshot with a caption so it does not look like a button, and gives Windows its own picture of the Talk button.
+- With the camera blocked, the warning now says recording won't start with Show your face on, and the notice under Record has a Record without my face button that turns the face off and starts, because the old wording made it sound like the recording would go ahead without the face.
+- The Saved line starts with a check mark, the file name gets its own line that never breaks inside the date, and Open recordings folder steps aside while Show in Finder is showing, so there is one clear path to the new video.
+- The What's New picture is muted so the dialog's real buttons stay the loudest thing, and step 2 points at the one-click Show my face button.
 
 ## [2026-09-26]
 

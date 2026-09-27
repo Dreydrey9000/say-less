@@ -1324,7 +1324,7 @@
     "startedAnnouncement": "Đã bắt đầu quay.",
     "savedAnnouncement": "Đã lưu bản quay.",
     "showMyFace": "Hiện khuôn mặt của tôi",
-    "cameraBlocked": "Camera của bạn đang bị chặn, nên chúng tôi không thể quay khuôn mặt của bạn.",
+    "cameraBlocked": "Camera của bạn đang bị chặn, nên không thể bắt đầu quay khi “Show your face” đang bật.",
     "faceCorner": {
       "top_left": "Khuôn mặt của bạn sẽ hiện ở góc trên bên trái.",
       "top_right": "Khuôn mặt của bạn sẽ hiện ở góc trên bên phải.",
@@ -1333,7 +1333,8 @@
     },
     "reopening": "Đang mở lại…",
     "reopenFailed": "Chúng tôi không thể mở lại Say Less. Hãy thoát ứng dụng từ thanh menu, rồi mở lại.",
-    "macosTooOldSteps": "Để kiểm tra phiên bản, hãy mở menu Apple và chọn Giới thiệu về máy Mac này. Để cập nhật, hãy mở Cài đặt hệ thống, chọn Cài đặt chung, rồi chọn Cập nhật phần mềm. Nếu không thấy bản cập nhật nào, chúng tôi không thể quay màn hình trên máy Mac này, nhưng tính năng đọc chính tả vẫn hoạt động."
+    "macosTooOldSteps": "Để kiểm tra phiên bản, hãy mở menu Apple và chọn Giới thiệu về máy Mac này. Để cập nhật, hãy mở Cài đặt hệ thống, chọn Cài đặt chung, rồi chọn Cập nhật phần mềm. Nếu không thấy bản cập nhật nào, chúng tôi không thể quay màn hình trên máy Mac này, nhưng tính năng đọc chính tả vẫn hoạt động.",
+    "recordWithoutFace": "Quay không hiện khuôn mặt của tôi"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1378,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "Chúng tôi cần quyền truy cập camera để hiển thị khuôn mặt của bạn. Hãy bật Say Less trong Cài đặt hệ thống, hoặc quay mà không hiện khuôn mặt của bạn.",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",

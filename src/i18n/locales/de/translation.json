@@ -1324,7 +1324,7 @@
     "startedAnnouncement": "Aufnahme gestartet.",
     "savedAnnouncement": "Aufnahme gespeichert.",
     "showMyFace": "Mein Gesicht zeigen",
-    "cameraBlocked": "Deine Kamera ist blockiert, deshalb können wir dein Gesicht nicht aufnehmen.",
+    "cameraBlocked": "Deine Kamera ist blockiert, deshalb startet die Aufnahme nicht, solange „Show your face“ eingeschaltet ist.",
     "faceCorner": {
       "top_left": "Dein Gesicht erscheint in der oberen linken Ecke.",
       "top_right": "Dein Gesicht erscheint in der oberen rechten Ecke.",
@@ -1333,7 +1333,8 @@
     },
     "reopening": "Wird erneut geöffnet…",
     "reopenFailed": "Wir konnten Say Less nicht erneut öffnen. Beende es über die Menüleiste und öffne es dann wieder.",
-    "macosTooOldSteps": "Um deine Version zu prüfen, öffne das Apple-Menü und wähle „Über diesen Mac“. Zum Aktualisieren gehe zu „Systemeinstellungen“, „Allgemein“, „Softwareupdate“. Wenn kein Update angezeigt wird, können wir auf diesem Mac den Bildschirm nicht aufnehmen, aber das Diktieren funktioniert weiterhin."
+    "macosTooOldSteps": "Um deine Version zu prüfen, öffne das Apple-Menü und wähle „Über diesen Mac“. Zum Aktualisieren gehe zu „Systemeinstellungen“, „Allgemein“, „Softwareupdate“. Wenn kein Update angezeigt wird, können wir auf diesem Mac den Bildschirm nicht aufnehmen, aber das Diktieren funktioniert weiterhin.",
+    "recordWithoutFace": "Ohne mein Gesicht aufnehmen"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1378,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "Wir brauchen die Berechtigung für die Kamera, um dein Gesicht zu zeigen. Aktiviere Say Less in „System Settings“ oder nimm ohne dein Gesicht auf.",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",

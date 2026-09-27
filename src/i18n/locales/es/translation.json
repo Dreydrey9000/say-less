@@ -1324,7 +1324,7 @@
     "startedAnnouncement": "Grabación iniciada.",
     "savedAnnouncement": "Grabación guardada.",
     "showMyFace": "Mostrar mi cara",
-    "cameraBlocked": "Tu cámara está bloqueada, así que no podemos grabar tu cara.",
+    "cameraBlocked": "Tu cámara está bloqueada, así que la grabación no empezará con “Show your face” activado.",
     "faceCorner": {
       "top_left": "Tu cara aparecerá en la esquina superior izquierda.",
       "top_right": "Tu cara aparecerá en la esquina superior derecha.",
@@ -1333,7 +1333,8 @@
     },
     "reopening": "Volviendo a abrir…",
     "reopenFailed": "No pudimos volver a abrir Say Less. Ciérralo desde la barra de menús y luego ábrelo de nuevo.",
-    "macosTooOldSteps": "Para ver tu versión, abre el menú Apple y elige Acerca de este Mac. Para actualizar, ve a Ajustes del Sistema, General, Actualización de Software. Si no aparece ninguna actualización, no podemos grabar la pantalla en este Mac, pero el dictado sigue funcionando."
+    "macosTooOldSteps": "Para ver tu versión, abre el menú Apple y elige Acerca de este Mac. Para actualizar, ve a Ajustes del Sistema, General, Actualización de Software. Si no aparece ninguna actualización, no podemos grabar la pantalla en este Mac, pero el dictado sigue funcionando.",
+    "recordWithoutFace": "Grabar sin mi cara"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1378,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "Necesitamos el permiso de la cámara para mostrar tu cara. Activa Say Less en “System Settings” o graba sin tu cara.",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",

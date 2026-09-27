@@ -458,9 +458,28 @@
   align-items: center;
   gap: 6px;
 }
+.home-record-saved {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+.home-record-saved-icon {
+  flex: none;
+  color: var(--studio-accent-mark, currentColor);
+}
+/* One line, never split inside the date; the full name is in the tooltip. */
 .home-record-file {
   color: var(--color-text-muted);
-  overflow-wrap: anywhere;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.home-record-notice-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 .home-record-buttons {
   display: flex;

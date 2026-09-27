@@ -1324,7 +1324,7 @@
     "startedAnnouncement": "Nagrywanie rozpoczęte.",
     "savedAnnouncement": "Nagranie zapisane.",
     "showMyFace": "Pokaż moją twarz",
-    "cameraBlocked": "Twoja kamera jest zablokowana, więc nie możemy nagrać Twojej twarzy.",
+    "cameraBlocked": "Twoja kamera jest zablokowana, więc nagrywanie nie rozpocznie się z włączoną opcją „Show your face”.",
     "faceCorner": {
       "top_left": "Twoja twarz pojawi się w lewym górnym rogu.",
       "top_right": "Twoja twarz pojawi się w prawym górnym rogu.",
@@ -1333,7 +1333,8 @@
     },
     "reopening": "Ponowne otwieranie…",
     "reopenFailed": "Nie udało się ponownie otworzyć Say Less. Zamknij aplikację z paska menu, a potem otwórz ją ponownie.",
-    "macosTooOldSteps": "Aby sprawdzić swoją wersję, otwórz menu Apple i wybierz Ten Mac. Aby zaktualizować system, otwórz Ustawienia systemowe, kliknij Ogólne, a potem Uaktualnienia. Jeśli nie pojawi się żadna aktualizacja, nie możemy nagrywać ekranu na tym Macu, ale dyktowanie nadal działa."
+    "macosTooOldSteps": "Aby sprawdzić swoją wersję, otwórz menu Apple i wybierz Ten Mac. Aby zaktualizować system, otwórz Ustawienia systemowe, kliknij Ogólne, a potem Uaktualnienia. Jeśli nie pojawi się żadna aktualizacja, nie możemy nagrywać ekranu na tym Macu, ale dyktowanie nadal działa.",
+    "recordWithoutFace": "Nagraj bez mojej twarzy"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1378,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "Potrzebujemy uprawnienia do kamery, aby pokazać Twoją twarz. Włącz Say Less w Ustawieniach systemowych albo nagraj bez swojej twarzy.",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",

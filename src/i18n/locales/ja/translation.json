@@ -1324,7 +1324,7 @@
     "startedAnnouncement": "収録を開始しました。",
     "savedAnnouncement": "録画を保存しました。",
     "showMyFace": "顔を表示する",
-    "cameraBlocked": "カメラがブロックされているため、顔を収録できません。",
+    "cameraBlocked": "カメラがブロックされているため、「Show your face」がオンのままでは収録を開始できません。",
     "faceCorner": {
       "top_left": "顔は左上の隅に表示されます。",
       "top_right": "顔は右上の隅に表示されます。",
@@ -1333,7 +1333,8 @@
     },
     "reopening": "再度開いています…",
     "reopenFailed": "Say Less を再度開けませんでした。メニューバーから終了して、もう一度開いてください。",
-    "macosTooOldSteps": "バージョンを確認するには、Appleメニューを開いて「このMacについて」を選択してください。アップデートするには、「システム設定」、「一般」、「ソフトウェアアップデート」の順に開いてください。アップデートが表示されない場合、このMacでは画面を収録できませんが、音声入力は引き続き使えます。"
+    "macosTooOldSteps": "バージョンを確認するには、Appleメニューを開いて「このMacについて」を選択してください。アップデートするには、「システム設定」、「一般」、「ソフトウェアアップデート」の順に開いてください。アップデートが表示されない場合、このMacでは画面を収録できませんが、音声入力は引き続き使えます。",
+    "recordWithoutFace": "顔を表示せずに収録する"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1378,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "顔を表示するにはカメラの権限が必要です。「System Settings」で Say Less をオンにするか、顔を表示せずに収録してください。",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",

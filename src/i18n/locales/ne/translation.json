@@ -1324,7 +1324,7 @@
     "startedAnnouncement": "रेकर्डिङ सुरु भयो।",
     "savedAnnouncement": "रेकर्डिङ सेभ भयो।",
     "showMyFace": "मेरो अनुहार देखाउनुहोस्",
-    "cameraBlocked": "तपाईंको क्यामेरा ब्लक गरिएको छ, त्यसैले हामी तपाईंको अनुहार रेकर्ड गर्न सक्दैनौं।",
+    "cameraBlocked": "तपाईंको क्यामेरा ब्लक गरिएको छ, त्यसैले 'Show your face' अन हुँदा रेकर्डिङ सुरु हुँदैन।",
     "faceCorner": {
       "top_left": "तपाईंको अनुहार माथिल्लो बायाँ कुनामा देखिनेछ।",
       "top_right": "तपाईंको अनुहार माथिल्लो दायाँ कुनामा देखिनेछ।",
@@ -1333,7 +1333,8 @@
     },
     "reopening": "फेरि खोल्दै…",
     "reopenFailed": "हामीले Say Less फेरि खोल्न सकेनौं। मेनु बारबाट यसलाई बन्द गर्नुहोस्, त्यसपछि फेरि खोल्नुहोस्।",
-    "macosTooOldSteps": "आफ्नो संस्करण जाँच्न Apple मेनु खोल्नुहोस् र About This Mac छान्नुहोस्। अपडेट गर्न System Settings, General, Software Update मा जानुहोस्। कुनै अपडेट देखिएन भने हामी यो Mac मा स्क्रिन रेकर्ड गर्न सक्दैनौं, तर डिक्टेसन अझै पनि काम गर्छ।"
+    "macosTooOldSteps": "आफ्नो संस्करण जाँच्न Apple मेनु खोल्नुहोस् र About This Mac छान्नुहोस्। अपडेट गर्न System Settings, General, Software Update मा जानुहोस्। कुनै अपडेट देखिएन भने हामी यो Mac मा स्क्रिन रेकर्ड गर्न सक्दैनौं, तर डिक्टेसन अझै पनि काम गर्छ।",
+    "recordWithoutFace": "मेरो अनुहार बिना रेकर्ड गर्नुहोस्"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1378,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "तपाईंको अनुहार देखाउन हामीलाई क्यामेरा अनुमति चाहिन्छ। System Settings मा Say Less अन गर्नुहोस्, वा आफ्नो अनुहार बिना रेकर्ड गर्नुहोस्।",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",

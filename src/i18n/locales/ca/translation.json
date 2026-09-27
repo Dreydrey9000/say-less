@@ -1324,7 +1324,7 @@
     "startedAnnouncement": "Ha començat l'enregistrament.",
     "savedAnnouncement": "S'ha desat l'enregistrament.",
     "showMyFace": "Mostra la meva cara",
-    "cameraBlocked": "La vostra càmera està bloquejada, així que no podem enregistrar la vostra cara.",
+    "cameraBlocked": "La vostra càmera està bloquejada, així que l'enregistrament no començarà amb «Show your face» activat.",
     "faceCorner": {
       "top_left": "La vostra cara sortirà a l'angle superior esquerre.",
       "top_right": "La vostra cara sortirà a l'angle superior dret.",
@@ -1333,7 +1333,8 @@
     },
     "reopening": "S'està tornant a obrir…",
     "reopenFailed": "No hem pogut tornar a obrir el Say Less. Tanqueu-lo des de la barra de menús i torneu-lo a obrir.",
-    "macosTooOldSteps": "Per comprovar la vostra versió, obriu el menú Apple i trieu «Sobre aquest Mac». Per actualitzar, aneu a Configuració del sistema, General, Actualització de programari. Si no hi apareix cap actualització, no podem enregistrar la pantalla en aquest Mac, però el dictat continua funcionant."
+    "macosTooOldSteps": "Per comprovar la vostra versió, obriu el menú Apple i trieu «Sobre aquest Mac». Per actualitzar, aneu a Configuració del sistema, General, Actualització de programari. Si no hi apareix cap actualització, no podem enregistrar la pantalla en aquest Mac, però el dictat continua funcionant.",
+    "recordWithoutFace": "Enregistra sense la meva cara"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1378,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "Necessitem el permís de la càmera per mostrar la vostra cara. Activeu el Say Less a «System Settings» o enregistreu sense la vostra cara.",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",

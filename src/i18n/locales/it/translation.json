@@ -1324,7 +1324,7 @@
     "startedAnnouncement": "Registrazione avviata.",
     "savedAnnouncement": "Registrazione salvata.",
     "showMyFace": "Mostra il mio viso",
-    "cameraBlocked": "La tua videocamera è bloccata, quindi non possiamo registrare il tuo viso.",
+    "cameraBlocked": "La tua videocamera è bloccata, quindi la registrazione non partirà con 'Show your face' attivo.",
     "faceCorner": {
       "top_left": "Il tuo viso apparirà nell'angolo in alto a sinistra.",
       "top_right": "Il tuo viso apparirà nell'angolo in alto a destra.",
@@ -1333,7 +1333,8 @@
     },
     "reopening": "Riapertura…",
     "reopenFailed": "Non siamo riusciti a riaprire Say Less. Chiudilo dalla barra dei menu, poi riaprilo.",
-    "macosTooOldSteps": "Per controllare la tua versione, apri il menu Apple e scegli Informazioni su questo Mac. Per aggiornare, vai in Impostazioni di Sistema, Generali, Aggiornamento software. Se non compare nessun aggiornamento, non possiamo registrare lo schermo su questo Mac, ma la dettatura funziona comunque."
+    "macosTooOldSteps": "Per controllare la tua versione, apri il menu Apple e scegli Informazioni su questo Mac. Per aggiornare, vai in Impostazioni di Sistema, Generali, Aggiornamento software. Se non compare nessun aggiornamento, non possiamo registrare lo schermo su questo Mac, ma la dettatura funziona comunque.",
+    "recordWithoutFace": "Registra senza il mio viso"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1378,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "Per mostrare il tuo viso ci serve il permesso di accedere alla videocamera. Attiva Say Less in 'System Settings' oppure registra senza il tuo viso.",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",

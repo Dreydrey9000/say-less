@@ -1324,7 +1324,7 @@
     "startedAnnouncement": "Inspelningen har startat.",
     "savedAnnouncement": "Inspelningen har sparats.",
     "showMyFace": "Visa mitt ansikte",
-    "cameraBlocked": "Din kamera är blockerad, så vi kan inte spela in ditt ansikte.",
+    "cameraBlocked": "Din kamera är blockerad, så inspelningen startar inte med ”Show your face” påslaget.",
     "faceCorner": {
       "top_left": "Ditt ansikte visas i det övre vänstra hörnet.",
       "top_right": "Ditt ansikte visas i det övre högra hörnet.",
@@ -1333,7 +1333,8 @@
     },
     "reopening": "Öppnar igen…",
     "reopenFailed": "Vi kunde inte öppna Say Less igen. Avsluta appen från menyraden och öppna den sedan igen.",
-    "macosTooOldSteps": "Om du vill se din version öppnar du Apple-menyn och väljer Om den här datorn. Om du vill uppdatera går du till Systeminställningar, Allmänt, Programuppdatering. Om ingen uppdatering visas kan vi inte spela in skärmen på den här datorn, men diktering fungerar fortfarande."
+    "macosTooOldSteps": "Om du vill se din version öppnar du Apple-menyn och väljer Om den här datorn. Om du vill uppdatera går du till Systeminställningar, Allmänt, Programuppdatering. Om ingen uppdatering visas kan vi inte spela in skärmen på den här datorn, men diktering fungerar fortfarande.",
+    "recordWithoutFace": "Spela in utan mitt ansikte"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1378,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "Vi behöver kameratillstånd för att visa ditt ansikte. Slå på Say Less i Systeminställningar, eller spela in utan ditt ansikte.",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",

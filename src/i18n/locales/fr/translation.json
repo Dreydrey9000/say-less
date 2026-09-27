@@ -1324,7 +1324,7 @@
     "startedAnnouncement": "Enregistrement démarré.",
     "savedAnnouncement": "Enregistrement sauvegardé.",
     "showMyFace": "Afficher mon visage",
-    "cameraBlocked": "Votre caméra est bloquée, nous ne pouvons donc pas enregistrer votre visage.",
+    "cameraBlocked": "Votre caméra est bloquée, l’enregistrement ne démarrera donc pas tant que « Show your face » est activé.",
     "faceCorner": {
       "top_left": "Votre visage apparaîtra dans le coin supérieur gauche.",
       "top_right": "Votre visage apparaîtra dans le coin supérieur droit.",
@@ -1333,7 +1333,8 @@
     },
     "reopening": "Réouverture…",
     "reopenFailed": "Nous n’avons pas pu rouvrir Say Less. Quittez-le depuis la barre des menus, puis rouvrez-le.",
-    "macosTooOldSteps": "Pour vérifier votre version, ouvrez le menu Apple et choisissez À propos de ce Mac. Pour mettre à jour, allez dans Réglages Système, Général, Mise à jour logicielle. Si aucune mise à jour n’apparaît, nous ne pouvons pas enregistrer l’écran sur ce Mac, mais la dictée fonctionne toujours."
+    "macosTooOldSteps": "Pour vérifier votre version, ouvrez le menu Apple et choisissez À propos de ce Mac. Pour mettre à jour, allez dans Réglages Système, Général, Mise à jour logicielle. Si aucune mise à jour n’apparaît, nous ne pouvons pas enregistrer l’écran sur ce Mac, mais la dictée fonctionne toujours.",
+    "recordWithoutFace": "Enregistrer sans mon visage"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1378,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "Nous avons besoin de l’autorisation d’accès à la caméra pour afficher votre visage. Activez Say Less dans « System Settings » ou enregistrez sans votre visage.",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",

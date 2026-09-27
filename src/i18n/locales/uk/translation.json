@@ -1324,7 +1324,7 @@
     "startedAnnouncement": "Запис почато.",
     "savedAnnouncement": "Запис збережено.",
     "showMyFace": "Показати моє обличчя",
-    "cameraBlocked": "Вашу камеру заблоковано, тому ми не можемо записати ваше обличчя.",
+    "cameraBlocked": "Вашу камеру заблоковано, тому запис не почнеться, поки ввімкнено параметр «Show your face».",
     "faceCorner": {
       "top_left": "Ваше обличчя з’явиться в лівому верхньому куті.",
       "top_right": "Ваше обличчя з’явиться в правому верхньому куті.",
@@ -1333,7 +1333,8 @@
     },
     "reopening": "Перезапускаємо…",
     "reopenFailed": "Не вдалося перезапустити Say Less. Вийдіть із програми через рядок меню, а потім відкрийте її знову.",
-    "macosTooOldSteps": "Щоб дізнатися свою версію, відкрийте меню Apple і виберіть «Про цей комп’ютер». Щоб оновити, відкрийте «Системні параметри», виберіть «Загальні», а потім «Оновлення ПЗ». Якщо оновлення не з’являється, ми не зможемо записувати екран на цьому Mac, але диктування працюватиме."
+    "macosTooOldSteps": "Щоб дізнатися свою версію, відкрийте меню Apple і виберіть «Про цей комп’ютер». Щоб оновити, відкрийте «Системні параметри», виберіть «Загальні», а потім «Оновлення ПЗ». Якщо оновлення не з’являється, ми не зможемо записувати екран на цьому Mac, але диктування працюватиме.",
+    "recordWithoutFace": "Записати без мого обличчя"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1378,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "Нам потрібен дозвіл на доступ до камери, щоб показати ваше обличчя. Увімкніть Say Less у «Системних параметрах» або запишіть відео без обличчя.",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",

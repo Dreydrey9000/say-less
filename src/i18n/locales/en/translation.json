@@ -1302,7 +1302,8 @@
     "savedAnnouncement": "Recording saved.",
     "cameraOffHint": "We won't show your face in the video.",
     "showMyFace": "Show my face",
-    "cameraBlocked": "Your camera is blocked, so we can't record your face.",
+    "recordWithoutFace": "Record without my face",
+    "cameraBlocked": "Your camera is blocked, so recording won't start with Show your face on.",
     "faceCorner": {
       "top_left": "Your face will show in the top left corner.",
       "top_right": "Your face will show in the top right corner.",
@@ -1379,7 +1380,7 @@
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "webcamHintWindow": "Your face shows in a small circle on screen and in the video. Keep the window still and the circle inside it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings, or record without your face.",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",

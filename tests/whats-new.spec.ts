@@ -44,7 +44,7 @@ test("What's New on a Mac opens with the card picture and three steps", async ({
   const steps = dialog.locator("ol > li");
   await expect(steps).toHaveCount(3);
   await expect(steps.nth(0)).toContainText("Start");
-  await expect(steps.nth(1)).toContainText("Show your face");
+  await expect(steps.nth(1)).toContainText("Show my face");
   await expect(steps.nth(2)).toContainText("Open recordings folder");
   // The permission line is last, so if it is in view, so is all of the above.
   const permission = dialog.getByText("Reopen Say Less");

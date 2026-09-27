@@ -285,9 +285,12 @@ test("a blocked camera warns on the card and opens the fix once", async ({
   await page.goto("/tests/fixtures/app.html?camera=denied");
   const home = card(page);
   await expect(
-    home.getByText("Your camera is blocked, so we can't record your face.", {
-      exact: true,
-    }),
+    home.getByText(
+      "Your camera is blocked, so recording won't start with Show your face on.",
+      {
+        exact: true,
+      },
+    ),
   ).toBeVisible();
   await expect(home.getByText("We won't show your face")).toHaveCount(0);
   // A double-click opens System Settings once.
@@ -401,7 +404,7 @@ test("a camera refused before warns on the card right after Show my face", async
     panel.getByRole("switch", { name: "Show your face" }),
   ).toBeChecked();
   const warning = home.getByText(
-    "Your camera is blocked, so we can't record your face.",
+    "Your camera is blocked, so recording won't start with Show your face on.",
     { exact: true },
   );
   await expect(warning).toBeVisible({ timeout: 2000 });
@@ -428,9 +431,12 @@ test("with the face on and no answer from macOS yet, the fix raises the prompt",
   await page.goto("/tests/fixtures/app.html?camera=ask");
   const home = card(page);
   await expect(
-    home.getByText("Your camera is blocked, so we can't record your face.", {
-      exact: true,
-    }),
+    home.getByText(
+      "Your camera is blocked, so recording won't start with Show your face on.",
+      {
+        exact: true,
+      },
+    ),
   ).toBeVisible();
   await home.getByRole("button", { name: "Open System Settings" }).click();
   await expect.poll(() => count(page, "open_camera_settings")).toBe(1);
@@ -482,7 +488,7 @@ test("saying no to the camera after Show my face warns on the card", async ({
     )
     .toBe(1);
   const warning = home.getByText(
-    "Your camera is blocked, so we can't record your face.",
+    "Your camera is blocked, so recording won't start with Show your face on.",
     { exact: true },
   );
   await expect(warning).toBeHidden();
@@ -560,13 +566,14 @@ test("with Setup open, the saved video shows right under Stop", async ({
   await expect(
     home.getByRole("button", { name: "Show in Finder" }),
   ).toBeInViewport({ ratio: 1 });
-  // Above Setup, not under it, and the folder link is still there.
+  // Above Setup, not under it. Show in Finder is the one path to the new
+  // video, so the folder link steps aside until the next recording.
   const savedBox = (await saved.boundingBox())!;
   const panelBox = (await panel.boundingBox())!;
   expect(savedBox.y + savedBox.height).toBeLessThanOrEqual(panelBox.y);
   await expect(
     home.getByRole("button", { name: "Open recordings folder" }),
-  ).toBeVisible();
+  ).toHaveCount(0);
 });
 
 test("a camera problem at Record shows under the button with focus on the fix, even with Setup open", async ({
@@ -596,6 +603,24 @@ test("a camera problem at Record shows under the button with focus on the fix, e
   expect(noticeBox.y + noticeBox.height).toBeLessThanOrEqual(panelBox.y);
   // Nothing started.
   await expect(home.getByRole("timer")).toHaveCount(0);
+});
+
+test("a blocked camera offers Record without my face, which starts the recording", async ({
+  page,
+}) => {
+  await withFaceOn(page);
+  await page.goto("/tests/fixtures/app.html?camera=denied");
+  const home = card(page);
+  await home.getByRole("button", { name: "Record screen" }).click();
+  const notice = home.locator(".home-record-result").getByRole("alert");
+  await notice.getByRole("button", { name: "Record without my face" }).click();
+  await expect(
+    home.getByRole("button", { name: "Stop screen recording" }),
+  ).toBeVisible();
+  const saved = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem("test-recording") || "{}"),
+  );
+  expect(saved.webcam).toBe(false);
 });
 
 test("closing Setup forgets Show my face, so a plain open stays put", async ({

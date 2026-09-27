@@ -1324,7 +1324,7 @@
     "startedAnnouncement": "रिकॉर्डिंग शुरू हो गई.",
     "savedAnnouncement": "रिकॉर्डिंग सेव हो गई.",
     "showMyFace": "मेरा चेहरा दिखाएँ",
-    "cameraBlocked": "आपका कैमरा ब्लॉक है, इसलिए हम आपका चेहरा रिकॉर्ड नहीं कर सकते.",
+    "cameraBlocked": "आपका कैमरा ब्लॉक है, इसलिए 'Show your face' चालू रहने पर रिकॉर्डिंग शुरू नहीं होगी.",
     "faceCorner": {
       "top_left": "आपका चेहरा ऊपर बाएँ कोने में दिखेगा.",
       "top_right": "आपका चेहरा ऊपर दाएँ कोने में दिखेगा.",
@@ -1333,7 +1333,8 @@
     },
     "reopening": "फिर से खोल रहे हैं…",
     "reopenFailed": "हम Say Less को फिर से नहीं खोल सके. मेनू बार से इसे बंद करें, फिर इसे दोबारा खोलें.",
-    "macosTooOldSteps": "अपना वर्शन देखने के लिए, Apple मेनू खोलें और 'यह Mac का परिचय' चुनें. अपडेट करने के लिए, 'सिस्टम सेटिंग', 'सामान्य', 'सॉफ़्टवेयर अपडेट' पर जाएँ. अगर कोई अपडेट नहीं दिखता, तो हम इस Mac पर स्क्रीन रिकॉर्ड नहीं कर सकते, लेकिन डिक्टेशन फिर भी काम करता है."
+    "macosTooOldSteps": "अपना वर्शन देखने के लिए, Apple मेनू खोलें और 'यह Mac का परिचय' चुनें. अपडेट करने के लिए, 'सिस्टम सेटिंग', 'सामान्य', 'सॉफ़्टवेयर अपडेट' पर जाएँ. अगर कोई अपडेट नहीं दिखता, तो हम इस Mac पर स्क्रीन रिकॉर्ड नहीं कर सकते, लेकिन डिक्टेशन फिर भी काम करता है.",
+    "recordWithoutFace": "मेरे चेहरे के बिना रिकॉर्ड करें"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1378,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "आपका चेहरा दिखाने के लिए हमें कैमरे की अनुमति चाहिए. System Settings में Say Less चालू करें, या अपने चेहरे के बिना रिकॉर्ड करें.",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",

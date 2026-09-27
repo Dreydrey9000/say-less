@@ -1324,7 +1324,7 @@
     "startedAnnouncement": "Запись началась.",
     "savedAnnouncement": "Запись сохранена.",
     "showMyFace": "Показать моё лицо",
-    "cameraBlocked": "Ваша камера заблокирована, поэтому мы не можем записать ваше лицо.",
+    "cameraBlocked": "Ваша камера заблокирована, поэтому запись не начнётся, пока включён параметр «Show your face».",
     "faceCorner": {
       "top_left": "Ваше лицо появится в левом верхнем углу.",
       "top_right": "Ваше лицо появится в правом верхнем углу.",
@@ -1333,7 +1333,8 @@
     },
     "reopening": "Открываем заново…",
     "reopenFailed": "Не удалось открыть Say Less заново. Выйдите из приложения через строку меню, затем откройте его снова.",
-    "macosTooOldSteps": "Чтобы узнать свою версию, откройте меню Apple и выберите «Об этом Mac». Чтобы обновиться, откройте «Системные настройки», затем «Основные», затем «Обновление ПО». Если обновление не появилось, записывать экран на этом Mac не получится, но диктовка по-прежнему работает."
+    "macosTooOldSteps": "Чтобы узнать свою версию, откройте меню Apple и выберите «Об этом Mac». Чтобы обновиться, откройте «Системные настройки», затем «Основные», затем «Обновление ПО». Если обновление не появилось, записывать экран на этом Mac не получится, но диктовка по-прежнему работает.",
+    "recordWithoutFace": "Записать без моего лица"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1378,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "Нам нужно разрешение на доступ к камере, чтобы показать ваше лицо. Включите Say Less в Системных настройках или запишите видео без лица.",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",

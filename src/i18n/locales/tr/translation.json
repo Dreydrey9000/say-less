@@ -1324,7 +1324,7 @@
     "startedAnnouncement": "Kayıt başladı.",
     "savedAnnouncement": "Kayıt kaydedildi.",
     "showMyFace": "Yüzümü göster",
-    "cameraBlocked": "Kameranız engellendiği için yüzünüzü kaydedemiyoruz.",
+    "cameraBlocked": "Kameranız engellendiği için “Show your face” açıkken kayıt başlamaz.",
     "faceCorner": {
       "top_left": "Yüzünüz sol üst köşede görünecek.",
       "top_right": "Yüzünüz sağ üst köşede görünecek.",
@@ -1333,7 +1333,8 @@
     },
     "reopening": "Yeniden açılıyor…",
     "reopenFailed": "Say Less'i yeniden açamadık. Menü çubuğundan uygulamadan çıkın, sonra tekrar açın.",
-    "macosTooOldSteps": "Sürümünüzü görmek için Elma menüsünü açın ve Bu Mac Hakkında'yı seçin. Güncellemek için Sistem Ayarları'nı açın, Genel'i ve ardından Yazılım Güncelleme'yi seçin. Güncelleme görünmüyorsa bu Mac'te ekranı kaydedemeyiz, ama sesle yazma yine de çalışır."
+    "macosTooOldSteps": "Sürümünüzü görmek için Elma menüsünü açın ve Bu Mac Hakkında'yı seçin. Güncellemek için Sistem Ayarları'nı açın, Genel'i ve ardından Yazılım Güncelleme'yi seçin. Güncelleme görünmüyorsa bu Mac'te ekranı kaydedemeyiz, ama sesle yazma yine de çalışır.",
+    "recordWithoutFace": "Yüzüm olmadan kaydet"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1378,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "Yüzünüzü göstermek için kamera iznine ihtiyacımız var. Sistem Ayarları'nda Say Less'i etkinleştirin veya yüzünüz olmadan kaydedin.",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",

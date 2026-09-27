@@ -1324,7 +1324,7 @@
     "startedAnnouncement": "Optagelsen er startet.",
     "savedAnnouncement": "Optagelsen er gemt.",
     "showMyFace": "Vis mit ansigt",
-    "cameraBlocked": "Dit kamera er blokeret, så vi kan ikke optage dit ansigt.",
+    "cameraBlocked": "Dit kamera er blokeret, så optagelsen starter ikke, mens \"Show your face\" er slået til.",
     "faceCorner": {
       "top_left": "Dit ansigt vises i øverste venstre hjørne.",
       "top_right": "Dit ansigt vises i øverste højre hjørne.",
@@ -1333,7 +1333,8 @@
     },
     "reopening": "Genåbner…",
     "reopenFailed": "Vi kunne ikke genåbne Say Less. Afslut appen fra menulinjen, og åbn den derefter igen.",
-    "macosTooOldSteps": "Du kan tjekke din version ved at åbne Apple-menuen og vælge Om denne Mac. Du opdaterer ved at gå til Systemindstillinger, Generelt, Softwareopdatering. Hvis der ikke vises nogen opdatering, kan vi ikke optage skærmen på denne Mac, men diktering virker stadig."
+    "macosTooOldSteps": "Du kan tjekke din version ved at åbne Apple-menuen og vælge Om denne Mac. Du opdaterer ved at gå til Systemindstillinger, Generelt, Softwareopdatering. Hvis der ikke vises nogen opdatering, kan vi ikke optage skærmen på denne Mac, men diktering virker stadig.",
+    "recordWithoutFace": "Optag uden mit ansigt"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1378,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "Vi skal have tilladelse til kameraet for at vise dit ansigt. Slå Say Less til i \"System Settings\", eller optag uden dit ansigt.",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",

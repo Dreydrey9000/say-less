@@ -1324,7 +1324,7 @@
     "startedAnnouncement": "Gravação iniciada.",
     "savedAnnouncement": "Gravação salva.",
     "showMyFace": "Mostrar meu rosto",
-    "cameraBlocked": "Sua câmera está bloqueada, então não conseguimos gravar seu rosto.",
+    "cameraBlocked": "Sua câmera está bloqueada, então a gravação não começa com 'Show your face' ativado.",
     "faceCorner": {
       "top_left": "Seu rosto vai aparecer no canto superior esquerdo.",
       "top_right": "Seu rosto vai aparecer no canto superior direito.",
@@ -1333,7 +1333,8 @@
     },
     "reopening": "Reabrindo…",
     "reopenFailed": "Não foi possível reabrir o Say Less. Saia do app pela barra de menus e abra-o de novo.",
-    "macosTooOldSteps": "Para ver sua versão, abra o menu Apple e escolha Sobre Este Mac. Para atualizar, vá em Ajustes do Sistema, Geral, Atualização de Software. Se nenhuma atualização aparecer, não conseguimos gravar a tela neste Mac, mas o ditado continua funcionando."
+    "macosTooOldSteps": "Para ver sua versão, abra o menu Apple e escolha Sobre Este Mac. Para atualizar, vá em Ajustes do Sistema, Geral, Atualização de Software. Se nenhuma atualização aparecer, não conseguimos gravar a tela neste Mac, mas o ditado continua funcionando.",
+    "recordWithoutFace": "Gravar sem meu rosto"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1378,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "Precisamos da permissão da câmera para mostrar seu rosto. Ative o Say Less nos Ajustes do Sistema ou grave sem seu rosto.",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",

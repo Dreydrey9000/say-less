@@ -1324,7 +1324,7 @@
     "startedAnnouncement": "已开始录制。",
     "savedAnnouncement": "录制已保存。",
     "showMyFace": "显示我的脸",
-    "cameraBlocked": "您的摄像头已被阻止，因此我们无法录制您的脸。",
+    "cameraBlocked": "您的摄像头已被阻止，因此开启“Show your face”时无法开始录制。",
     "faceCorner": {
       "top_left": "您的脸将显示在左上角。",
       "top_right": "您的脸将显示在右上角。",
@@ -1333,7 +1333,8 @@
     },
     "reopening": "正在重新打开…",
     "reopenFailed": "我们无法重新打开 Say Less。请从菜单栏退出它，然后再次打开。",
-    "macosTooOldSteps": "要查看您的版本，请打开苹果菜单并选取“关于本机”。要更新，请打开“系统设置”，点击“通用”，然后点击“软件更新”。如果没有显示可用的更新，我们就无法在这台 Mac 上录制屏幕，但听写功能仍可正常使用。"
+    "macosTooOldSteps": "要查看您的版本，请打开苹果菜单并选取“关于本机”。要更新，请打开“系统设置”，点击“通用”，然后点击“软件更新”。如果没有显示可用的更新，我们就无法在这台 Mac 上录制屏幕，但听写功能仍可正常使用。",
+    "recordWithoutFace": "不露脸录制"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1378,7 +1379,7 @@
     },
     "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
-    "cameraDenied": "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+    "cameraDenied": "我们需要摄像头权限才能显示您的脸。请在“系统设置”中开启 Say Less，或者不露脸录制。",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
     "qualityTitle": "Quality",
     "quality": "Picture size",

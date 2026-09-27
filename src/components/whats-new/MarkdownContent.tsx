@@ -102,7 +102,7 @@ const components: Components = {
           alt={alt ?? ""}
           loading="lazy"
           decoding="async"
-          className="mx-auto block max-h-72 max-w-full rounded-md object-contain"
+          className="mx-auto block max-h-72 max-w-full rounded-md object-contain opacity-80 saturate-[0.45]"
         />
         {title && (
           <span className="mt-1.5 block text-center text-xs text-text-muted">
