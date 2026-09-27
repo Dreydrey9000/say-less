@@ -58,7 +58,8 @@ const settings = {
   selected_model: "test-model",
   app_language: "en",
   theme: query.get("theme") || "dark",
-  show_whats_new_on_update: false,
+  // `?whatsNew` turns on the What's New dialog for the current release.
+  show_whats_new_on_update: query.has("whatsNew"),
   bindings: Object.fromEntries(
     [
       "transcribe",
@@ -290,7 +291,8 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
       : [];
   if (cmd.startsWith("plugin:event|")) return 1;
   if (cmd === "plugin:os|locale") return "en-US";
-  if (cmd === "plugin:app|version") return "0.12.0";
+  if (cmd === "plugin:app|version")
+    return query.has("whatsNew") ? "0.14.1" : "0.12.0";
   if (
     cmd.includes("check_accessibility_permission") ||
     cmd.includes("check_microphone_permission")
@@ -505,7 +507,8 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
   return null;
 };
 // The overlay listens for backend events; tests drive it with `testEmit`.
-mockIPC(ipc, { shouldMockEvents: query.has("overlay") });
+// `?events` does the same for the main window.
+mockIPC(ipc, { shouldMockEvents: query.has("overlay") || query.has("events") });
 // Count live event listeners per event (listen minus unlisten), so tests can
 // catch listeners that leak across React Strict Mode's double mount.
 {
@@ -545,5 +548,9 @@ if (query.has("dock")) {
   // from this store.
   const { useModelStore } = await import("../../src/stores/modelStore");
   void useModelStore.getState().initialize();
+  if (query.has("events")) {
+    const { emit } = await import("@tauri-apps/api/event");
+    Object.assign(window, { testEmit: emit });
+  }
   ReactDOM.createRoot(document.getElementById("root")!).render(<App />);
 }
