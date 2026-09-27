@@ -32,6 +32,16 @@
 - In "one window" mode the setup panel explains that the window and the face circle should stay put, because the video does not follow a moved window.
 - Saying "Say less, start recording" on a Mac that cannot record opens the explanation on Home instead of a misleading permissions error.
 - The app checks for updates every few hours while open and shows an Update now toast, because a copy left open never learned about 0.14.0. A failed update now says so and links to the download.
+- Double-clicking Stop, on Home or the dock, saves once and no longer starts a new recording, because the second click landed on the Record button that replaced Stop. Record ignores clicks for about 0.7 seconds after a stop.
+- Pressing Enter on Record screen keeps keyboard focus on the button and announces "Recording started" and "Recording saved", because focus fell to the page and nothing said the recording began.
+- With Show your face on and the camera blocked, the card says so and offers the fix, because the switch looked on while the recording could not start with the camera.
+- The face hint has a Show my face button that opens Setup right on the Show your face switch, and Setup now lists the camera before sound, because the switch sat below the fold at the default window.
+- The Record button stays in place when it turns into Stop, the permission notice sits above the buttons, Open recordings folder has its own row, and while recording the card says how to stop.
+- On an older Mac or Windows the Record button looks clearly unavailable and the reason uses the same notice style as a permission problem. Windows no longer shows a Setup panel for a feature it does not have yet.
+- Reopen Say Less says "Reopening" and ignores a second click, and says what to do if it fails.
+- In light mode the lime Record button has a darker edge so it does not melt into the white card.
+- The dock's Talk button keeps a tooltip while a recording runs, the Stop glyph is a filled square, the camera button is named "Recording setup: camera and sound", and its tooltip no longer covers Show in Finder after you stop.
+- Clicking a setting's title in Recording setup toggles its switch, and the sound switches read "Record your voice" and "Which microphone".
 
 ## [2026-09-26]
 

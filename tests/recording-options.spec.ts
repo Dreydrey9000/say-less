@@ -199,25 +199,6 @@ test("a closed window says so and offers the setup", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("Windows shows the setup, disabled, with the same plain reason", async ({
-  page,
-}) => {
-  const panel = await openSetup(page, "/tests/fixtures/app.html?os=windows");
-  await expect(panel).toContainText(
-    "Screen recording is coming to Windows soon.",
-  );
-  await expect(
-    panel.getByRole("switch", { name: "Record your voice" }),
-  ).toBeDisabled();
-  await expect(
-    panel.getByRole("switch", { name: "Show your face" }),
-  ).toBeDisabled();
-  await expect(
-    panel.getByRole("combobox", { name: "Picture size" }),
-  ).toBeDisabled();
-  expect(await commands(page)).not.toContain("save_recording_options");
-});
-
 test("dock opens Recording setup in the main window", async ({ page }) => {
   await page.goto("/tests/fixtures/app.html?dock=1");
   // The camera icon says what it opens, so it doesn't read as "record video".
