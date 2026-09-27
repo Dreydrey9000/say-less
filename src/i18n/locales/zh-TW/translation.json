@@ -754,7 +754,14 @@
     "portableUpdateMessage": "可攜式安裝無法自動更新。請透過下方按鈕下載適用於你的系統的安裝程式，執行後安裝到相同資料夾，你的 Data/ 資料夾（設定、模型、錄音）會保留在原處。",
     "portableUpdateButton": "下載安裝程式",
     "portableUpdateBrowseMessage": "可攜式安裝無法自動更新。請從 GitHub Releases 下載適用於你的系統的最新版本，並安裝到相同資料夾，你的 Data/ 資料夾（設定、模型、錄音）會保留在原處。",
-    "portableUpdateBrowseButton": "開啟 GitHub Releases"
+    "portableUpdateBrowseButton": "開啟 GitHub Releases",
+    "updateReady": "Say Less v{{version}} 已準備就緒",
+    "updateNow": "立即更新",
+    "updateLater": "稍後",
+    "updateFailed": "無法更新 Say Less",
+    "updateFailedMacDescription": "請下載新版本，然後將它拖移到「應用程式」檔案夾。",
+    "updateFailedDescription": "請從我們的網站下載新版本並安裝。",
+    "updateFailedAction": "下載"
   },
   "common": {
     "loading": "載入中...",
@@ -805,7 +812,9 @@
     "processing": "處理中..."
   },
   "whatsNew": {
-    "title": "Say Less v{{version}} 新功能"
+    "title": "Say Less v{{version}} 新功能",
+    "tryRecording": "試試螢幕錄影",
+    "gotIt": "知道了"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} 可能正在阻擋 1 個快捷鍵",
@@ -993,17 +1002,19 @@
   "dock": {
     "drag": "Drag floating dock",
     "stop": "Stop",
-    "record": "Record",
+    "record": "說話",
     "processing": "Working",
     "settings": "Open settings",
     "hide": "Hide floating dock",
     "error": "Check permissions or open settings to retry.",
-    "idle": "Click Record, or use your dictation shortcut",
-    "recording": "Recording — click Stop when finished",
+    "idle": "點選「說話」用語音輸入文字，或點選「螢幕」錄製影片",
+    "recording": "正在聆聽。完成後請點選「Stop」。",
     "transcribing": "Turning your voice into text…",
     "arming": "Starting microphone…",
     "expand": "Expand dock",
-    "collapse": "Shrink dock"
+    "collapse": "Shrink dock",
+    "screen": "螢幕",
+    "idleTalkOnly": "點選「說話」用語音輸入文字，或使用您的聽寫快捷鍵"
   },
   "home": {
     "title": "Home",
@@ -1011,7 +1022,7 @@
     "headline": "Speak. We'll type.",
     "description": "Click where you want to type, then use your shortcut. Your words appear there when you finish.",
     "openDock": "Show floating dock",
-    "dockOpened": "The floating dock is showing. Click into the app you want to type in, then use Record or your shortcut.",
+    "dockOpened": "浮動工具列已顯示。點選您要輸入文字的應用程式，然後使用「說話」或您的快捷鍵。",
     "shortcut": "Hold to talk, let go to finish. For a long thought, tap once to go hands-free and tap again to stop.",
     "fnShortcut": "or hold Fn to talk",
     "aiShortcut": "Talk + AI cleanup. Sends your text to your AI provider.",
@@ -1031,9 +1042,9 @@
     "toggleShortcut": "Press to start. Press again to finish.",
     "slogan": "Big thoughts. Less typing.",
     "fnTip": "If the emoji picker opens, go to System Settings > Keyboard and set “Press Globe key to” to “Do Nothing.”",
-    "otherShortcuts": "Other recording shortcuts",
+    "otherShortcuts": "更多說話快捷鍵",
     "setAiShortcut": "Set up AI cleanup",
-    "cancelShortcut": "Cancel a recording",
+    "cancelShortcut": "取消聽寫",
     "share": "Share Say Less",
     "shareCopied": "Link copied: saylessvoice.com",
     "shareFailed": "Could not copy. The link is saylessvoice.com",
@@ -1046,7 +1057,8 @@
     },
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
-    "actionsHint": "Say a cue to open an app or a website"
+    "actionsHint": "Say a cue to open an app or a website",
+    "recordJump": "錄製您的螢幕"
   },
   "companion": {
     "title": "Particle pattern",
@@ -1276,11 +1288,11 @@
     "showInFinder": "Show in Finder",
     "voiceHint": "Or press your shortcut and say “Say less, start recording.”",
     "permissionDenied": "We need Screen Recording permission to record your screen.",
-    "permissionHint": "Turn on Say Less in System Settings, then quit and reopen Say Less.",
+    "permissionHint": "請在「系統設定」中開啟 Say Less，然後點選「重新打開 Say Less」。",
     "openSettings": "Open System Settings",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
-    "macosTooOld": "Screen recording needs macOS 15 or newer.",
+    "macosTooOld": "螢幕錄影需要 macOS 15（Sequoia）或以上版本。",
     "windowsSoon": "Screen recording is coming to Windows soon.",
     "linuxUnsupported": "Screen recording isn't available on Linux yet.",
     "failed": "We couldn't record your screen. Try again.",
@@ -1291,7 +1303,14 @@
     "reservedCue": "That phrase is saved for screen recording. Pick different words.",
     "cameraDenied": "We need Camera permission to show your face in the video.",
     "cameraFailed": "We couldn't start your camera. Close other apps that use it, or turn the camera off in Recording setup.",
-    "windowMissing": "The window you picked is closed. Pick another one in Recording setup."
+    "windowMissing": "The window you picked is closed. Pick another one in Recording setup.",
+    "dockCaption": "正在錄製您的螢幕。完成後請點選紅色的「Stop」按鈕。",
+    "savedIn": "已儲存到 {{parent}} 中的 {{folder}} 資料夾。",
+    "openFolder": "打開錄影資料夾",
+    "cameraOffHint": "我們不會顯示您的臉。若要加入，請點選「Setup」並開啟「Show your face」。",
+    "reopenApp": "重新打開 Say Less",
+    "macosTooOldHelp": "螢幕錄影需要 macOS 15（Sequoia）或以上版本。若要查看您的版本，請打開「蘋果」選單並選擇「關於這台 Mac」。若要更新，請打開「系統設定」，點選「一般」，然後點選「軟體更新」。如果沒有出現可用的更新，我們就無法在這台 Mac 上錄製螢幕，但聽寫功能仍可正常使用。",
+    "cameraMissing": "我們找不到相機。請打開筆電的上蓋或連接一台相機，或者在「Recording setup」中關閉「Show your face」。"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1347,6 +1366,7 @@
     "fps30": "30 (recommended)",
     "fps60": "60 (smoother, bigger file)",
     "qualityHint": "1080p at 30 frames looks sharp and stays light on 8GB laptops.",
-    "saveFailed": "We couldn't save that change. Try again."
+    "saveFailed": "We couldn't save that change. Try again.",
+    "webcamHintWindow": "您的臉會顯示在螢幕上和影片中的一個小圓圈裡。錄製時請保持視窗不動，並讓圓圈留在視窗內。"
   }
 }

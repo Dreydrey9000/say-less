@@ -754,7 +754,14 @@
     "portableUpdateMessage": "포터블 설치는 자동으로 업데이트할 수 없습니다. 아래에서 사용 중인 시스템에 맞는 설치 프로그램을 다운로드해 실행하고 같은 폴더에 설치하세요. Data/ 폴더(설정, 모델, 녹음)는 그대로 유지됩니다.",
     "portableUpdateButton": "설치 프로그램 다운로드",
     "portableUpdateBrowseMessage": "포터블 설치는 자동으로 업데이트할 수 없습니다. GitHub Releases에서 사용 중인 시스템에 맞는 최신 버전을 다운로드해 같은 폴더에 설치하세요. Data/ 폴더(설정, 모델, 녹음)는 그대로 유지됩니다.",
-    "portableUpdateBrowseButton": "GitHub Releases 열기"
+    "portableUpdateBrowseButton": "GitHub Releases 열기",
+    "updateReady": "Say Less v{{version}} 업데이트가 준비되었습니다",
+    "updateNow": "지금 업데이트",
+    "updateLater": "나중에",
+    "updateFailed": "Say Less를 업데이트하지 못했습니다",
+    "updateFailedMacDescription": "새 버전을 다운로드한 다음 응용 프로그램 폴더로 드래그하세요.",
+    "updateFailedDescription": "웹사이트에서 새 버전을 다운로드해 설치하세요.",
+    "updateFailedAction": "다운로드"
   },
   "common": {
     "loading": "로딩 중...",
@@ -805,7 +812,9 @@
     "processing": "처리 중..."
   },
   "whatsNew": {
-    "title": "Say Less v{{version}}의 새 소식"
+    "title": "Say Less v{{version}}의 새 소식",
+    "tryRecording": "화면 기록 사용해 보기",
+    "gotIt": "확인"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}}이(가) 단축키 1개를 차단하고 있을 수 있습니다",
@@ -993,17 +1002,19 @@
   "dock": {
     "drag": "Drag floating dock",
     "stop": "Stop",
-    "record": "Record",
+    "record": "말하기",
     "processing": "Working",
     "settings": "Open settings",
     "hide": "Hide floating dock",
     "error": "Check permissions or open settings to retry.",
-    "idle": "Click Record, or use your dictation shortcut",
-    "recording": "Recording — click Stop when finished",
+    "idle": "'말하기'를 클릭해 음성으로 입력하거나 '화면'을 클릭해 동영상을 녹화하세요",
+    "recording": "듣는 중입니다. 끝나면 'Stop'을 클릭하세요.",
     "transcribing": "Turning your voice into text…",
     "arming": "Starting microphone…",
     "expand": "Expand dock",
-    "collapse": "Shrink dock"
+    "collapse": "Shrink dock",
+    "screen": "화면",
+    "idleTalkOnly": "'말하기'를 클릭해 음성으로 입력하거나 받아쓰기 단축키를 사용하세요"
   },
   "home": {
     "title": "Home",
@@ -1011,7 +1022,7 @@
     "headline": "Speak. We'll type.",
     "description": "Click where you want to type, then use your shortcut. Your words appear there when you finish.",
     "openDock": "Show floating dock",
-    "dockOpened": "The floating dock is showing. Click into the app you want to type in, then use Record or your shortcut.",
+    "dockOpened": "플로팅 독이 표시되었습니다. 입력할 앱을 클릭한 다음 '말하기' 또는 단축키를 사용하세요.",
     "shortcut": "Hold to talk, let go to finish. For a long thought, tap once to go hands-free and tap again to stop.",
     "fnShortcut": "or hold Fn to talk",
     "aiShortcut": "Talk + AI cleanup. Sends your text to your AI provider.",
@@ -1031,9 +1042,9 @@
     "toggleShortcut": "Press to start. Press again to finish.",
     "slogan": "Big thoughts. Less typing.",
     "fnTip": "If the emoji picker opens, go to System Settings > Keyboard and set “Press Globe key to” to “Do Nothing.”",
-    "otherShortcuts": "Other recording shortcuts",
+    "otherShortcuts": "기타 받아쓰기 단축키",
     "setAiShortcut": "Set up AI cleanup",
-    "cancelShortcut": "Cancel a recording",
+    "cancelShortcut": "받아쓰기 취소",
     "share": "Share Say Less",
     "shareCopied": "Link copied: saylessvoice.com",
     "shareFailed": "Could not copy. The link is saylessvoice.com",
@@ -1046,7 +1057,8 @@
     },
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
-    "actionsHint": "Say a cue to open an app or a website"
+    "actionsHint": "Say a cue to open an app or a website",
+    "recordJump": "화면 녹화하기"
   },
   "companion": {
     "title": "Particle pattern",
@@ -1276,11 +1288,11 @@
     "showInFinder": "Show in Finder",
     "voiceHint": "Or press your shortcut and say “Say less, start recording.”",
     "permissionDenied": "We need Screen Recording permission to record your screen.",
-    "permissionHint": "Turn on Say Less in System Settings, then quit and reopen Say Less.",
+    "permissionHint": "'시스템 설정'에서 Say Less를 켠 다음 'Say Less 다시 열기'를 클릭하세요.",
     "openSettings": "Open System Settings",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
-    "macosTooOld": "Screen recording needs macOS 15 or newer.",
+    "macosTooOld": "화면 기록을 사용하려면 macOS 15 (Sequoia) 이상이 필요합니다.",
     "windowsSoon": "Screen recording is coming to Windows soon.",
     "linuxUnsupported": "Screen recording isn't available on Linux yet.",
     "failed": "We couldn't record your screen. Try again.",
@@ -1291,7 +1303,14 @@
     "reservedCue": "That phrase is saved for screen recording. Pick different words.",
     "cameraDenied": "We need Camera permission to show your face in the video.",
     "cameraFailed": "We couldn't start your camera. Close other apps that use it, or turn the camera off in Recording setup.",
-    "windowMissing": "The window you picked is closed. Pick another one in Recording setup."
+    "windowMissing": "The window you picked is closed. Pick another one in Recording setup.",
+    "dockCaption": "화면을 녹화하는 중입니다. 끝나면 빨간색 'Stop' 버튼을 클릭하세요.",
+    "savedIn": "{{parent}}의 {{folder}} 폴더에 저장했습니다.",
+    "openFolder": "녹화 폴더 열기",
+    "cameraOffHint": "얼굴은 표시되지 않습니다. 표시하려면 'Setup'을 클릭하고 'Show your face'를 켜세요.",
+    "reopenApp": "Say Less 다시 열기",
+    "macosTooOldHelp": "화면 기록을 사용하려면 macOS 15 (Sequoia) 이상이 필요합니다. 버전을 확인하려면 Apple 메뉴를 열고 '이 Mac에 관하여'를 선택하세요. 업데이트하려면 '시스템 설정', '일반', '소프트웨어 업데이트'로 이동하세요. 업데이트가 표시되지 않으면 이 Mac에서는 화면을 녹화할 수 없지만 받아쓰기는 계속 사용할 수 있습니다.",
+    "cameraMissing": "카메라를 찾을 수 없습니다. 노트북 덮개를 열거나 카메라를 연결하세요. 또는 'Recording setup'에서 'Show your face'를 끄세요."
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1347,6 +1366,7 @@
     "fps30": "30 (recommended)",
     "fps60": "60 (smoother, bigger file)",
     "qualityHint": "1080p at 30 frames looks sharp and stays light on 8GB laptops.",
-    "saveFailed": "We couldn't save that change. Try again."
+    "saveFailed": "We couldn't save that change. Try again.",
+    "webcamHintWindow": "얼굴이 화면과 동영상에 작은 원으로 표시됩니다. 녹화하는 동안 창을 움직이지 말고 원이 창 안에 있도록 하세요."
   }
 }

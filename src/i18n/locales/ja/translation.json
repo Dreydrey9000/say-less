@@ -754,7 +754,14 @@
     "portableUpdateMessage": "ポータブル版は自動的に更新できません。下のボタンからお使いのシステム向けのインストーラーをダウンロードし、実行して同じフォルダーにインストールしてください。Data フォルダー(設定、モデル、録音)はそのまま残ります。",
     "portableUpdateButton": "インストーラーをダウンロード",
     "portableUpdateBrowseMessage": "ポータブル版は自動的に更新できません。GitHub Releases からお使いのシステム向けの最新版をダウンロードし、同じフォルダーにインストールしてください。Data フォルダー(設定、モデル、録音)はそのまま残ります。",
-    "portableUpdateBrowseButton": "GitHub Releases を開く"
+    "portableUpdateBrowseButton": "GitHub Releases を開く",
+    "updateReady": "Say Less v{{version}} の準備ができました",
+    "updateNow": "今すぐアップデート",
+    "updateLater": "あとで",
+    "updateFailed": "Say Less をアップデートできませんでした",
+    "updateFailedMacDescription": "新しいバージョンをダウンロードして、「アプリケーション」フォルダーにドラッグしてください。",
+    "updateFailedDescription": "公式サイトから新しいバージョンをダウンロードして、インストールしてください。",
+    "updateFailedAction": "ダウンロード"
   },
   "common": {
     "loading": "読み込み中…",
@@ -805,7 +812,9 @@
     "processing": "処理中…"
   },
   "whatsNew": {
-    "title": "Say Less v{{version}} の新機能"
+    "title": "Say Less v{{version}} の新機能",
+    "tryRecording": "画面収録を試す",
+    "gotIt": "わかりました"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} が1個のショートカットをブロックしている可能性があります",
@@ -993,17 +1002,19 @@
   "dock": {
     "drag": "Drag floating dock",
     "stop": "Stop",
-    "record": "Record",
+    "record": "話す",
     "processing": "Working",
     "settings": "Open settings",
     "hide": "Hide floating dock",
     "error": "Check permissions or open settings to retry.",
-    "idle": "Click Record, or use your dictation shortcut",
-    "recording": "Recording — click Stop when finished",
+    "idle": "「話す」をクリックすると声で入力でき、「画面」をクリックすると動画を収録できます",
+    "recording": "聞き取り中です。終わったら「Stop」をクリックしてください。",
     "transcribing": "Turning your voice into text…",
     "arming": "Starting microphone…",
     "expand": "Expand dock",
-    "collapse": "Shrink dock"
+    "collapse": "Shrink dock",
+    "screen": "画面",
+    "idleTalkOnly": "「話す」をクリックすると声で入力できます。音声入力のショートカットも使えます"
   },
   "home": {
     "title": "Home",
@@ -1011,7 +1022,7 @@
     "headline": "Speak. We'll type.",
     "description": "Click where you want to type, then use your shortcut. Your words appear there when you finish.",
     "openDock": "Show floating dock",
-    "dockOpened": "The floating dock is showing. Click into the app you want to type in, then use Record or your shortcut.",
+    "dockOpened": "フローティングドックを表示しています。入力したいアプリをクリックしてから、「話す」またはショートカットを使ってください。",
     "shortcut": "Hold to talk, let go to finish. For a long thought, tap once to go hands-free and tap again to stop.",
     "fnShortcut": "or hold Fn to talk",
     "aiShortcut": "Talk + AI cleanup. Sends your text to your AI provider.",
@@ -1031,9 +1042,9 @@
     "toggleShortcut": "Press to start. Press again to finish.",
     "slogan": "Big thoughts. Less typing.",
     "fnTip": "If the emoji picker opens, go to System Settings > Keyboard and set “Press Globe key to” to “Do Nothing.”",
-    "otherShortcuts": "Other recording shortcuts",
+    "otherShortcuts": "その他の音声入力ショートカット",
     "setAiShortcut": "Set up AI cleanup",
-    "cancelShortcut": "Cancel a recording",
+    "cancelShortcut": "音声入力をキャンセル",
     "share": "Share Say Less",
     "shareCopied": "Link copied: saylessvoice.com",
     "shareFailed": "Could not copy. The link is saylessvoice.com",
@@ -1046,7 +1057,8 @@
     },
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
-    "actionsHint": "Say a cue to open an app or a website"
+    "actionsHint": "Say a cue to open an app or a website",
+    "recordJump": "画面を収録"
   },
   "companion": {
     "title": "Particle pattern",
@@ -1276,11 +1288,11 @@
     "showInFinder": "Show in Finder",
     "voiceHint": "Or press your shortcut and say “Say less, start recording.”",
     "permissionDenied": "We need Screen Recording permission to record your screen.",
-    "permissionHint": "Turn on Say Less in System Settings, then quit and reopen Say Less.",
+    "permissionHint": "「システム設定」で Say Less をオンにしてから、「Say Less を再度開く」をクリックしてください。",
     "openSettings": "Open System Settings",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
-    "macosTooOld": "Screen recording needs macOS 15 or newer.",
+    "macosTooOld": "画面収録には macOS 15 (Sequoia) 以降が必要です。",
     "windowsSoon": "Screen recording is coming to Windows soon.",
     "linuxUnsupported": "Screen recording isn't available on Linux yet.",
     "failed": "We couldn't record your screen. Try again.",
@@ -1291,7 +1303,14 @@
     "reservedCue": "That phrase is saved for screen recording. Pick different words.",
     "cameraDenied": "We need Camera permission to show your face in the video.",
     "cameraFailed": "We couldn't start your camera. Close other apps that use it, or turn the camera off in Recording setup.",
-    "windowMissing": "The window you picked is closed. Pick another one in Recording setup."
+    "windowMissing": "The window you picked is closed. Pick another one in Recording setup.",
+    "dockCaption": "画面を収録中です。終わったら赤い「Stop」ボタンをクリックしてください。",
+    "savedIn": "{{parent}} の {{folder}} フォルダーに保存しました。",
+    "openFolder": "録画フォルダーを開く",
+    "cameraOffHint": "顔は表示されません。表示するには、「Setup」をクリックして「Show your face」をオンにしてください。",
+    "reopenApp": "Say Less を再度開く",
+    "macosTooOldHelp": "画面収録には macOS 15 (Sequoia) 以降が必要です。バージョンを確認するには、Appleメニューを開いて「このMacについて」を選択してください。アップデートするには、「システム設定」、「一般」、「ソフトウェアアップデート」の順に開いてください。アップデートが表示されない場合、このMacでは画面を収録できませんが、音声入力は引き続き使えます。",
+    "cameraMissing": "カメラが見つかりません。ノートパソコンの蓋を開けるか、カメラを接続してください。または、「Recording setup」で「Show your face」をオフにしてください。"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1347,6 +1366,7 @@
     "fps30": "30 (recommended)",
     "fps60": "60 (smoother, bigger file)",
     "qualityHint": "1080p at 30 frames looks sharp and stays light on 8GB laptops.",
-    "saveFailed": "We couldn't save that change. Try again."
+    "saveFailed": "We couldn't save that change. Try again.",
+    "webcamHintWindow": "あなたの顔は、画面上と動画内の小さな円に表示されます。収録中はウィンドウを動かさず、円がウィンドウ内に収まるようにしてください。"
   }
 }

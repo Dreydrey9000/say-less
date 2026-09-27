@@ -754,7 +754,14 @@
     "portableUpdateMessage": "Las instalaciones portátiles no se pueden actualizar automáticamente. Descarga abajo el instalador para tu sistema, ejecútalo e instálalo en la misma carpeta: tu carpeta Data/ (ajustes, modelos, grabaciones) se conserva.",
     "portableUpdateButton": "Descargar instalador",
     "portableUpdateBrowseMessage": "Las instalaciones portátiles no se pueden actualizar automáticamente. Descarga la versión más reciente para tu sistema desde GitHub Releases e instálala en la misma carpeta: tu carpeta Data/ (ajustes, modelos, grabaciones) se conserva.",
-    "portableUpdateBrowseButton": "Abrir GitHub Releases"
+    "portableUpdateBrowseButton": "Abrir GitHub Releases",
+    "updateReady": "Say Less v{{version}} está listo",
+    "updateNow": "Actualizar ahora",
+    "updateLater": "Más tarde",
+    "updateFailed": "No pudimos actualizar Say Less",
+    "updateFailedMacDescription": "Descarga la nueva versión y arrástrala a tu carpeta Aplicaciones.",
+    "updateFailedDescription": "Descarga la nueva versión desde nuestro sitio web e instálala.",
+    "updateFailedAction": "Descargar"
   },
   "common": {
     "loading": "Cargando...",
@@ -805,7 +812,9 @@
     "processing": "Procesando..."
   },
   "whatsNew": {
-    "title": "Nuevo en Say Less v{{version}}"
+    "title": "Nuevo en Say Less v{{version}}",
+    "tryRecording": "Prueba la grabación de pantalla",
+    "gotIt": "Entendido"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} puede estar bloqueando 1 atajo",
@@ -993,17 +1002,19 @@
   "dock": {
     "drag": "Drag floating dock",
     "stop": "Stop",
-    "record": "Record",
+    "record": "Hablar",
     "processing": "Working",
     "settings": "Open settings",
     "hide": "Hide floating dock",
     "error": "Check permissions or open settings to retry.",
-    "idle": "Click Record, or use your dictation shortcut",
-    "recording": "Recording — click Stop when finished",
+    "idle": "Haz clic en “Hablar” para escribir con tu voz, o en “Pantalla” para grabar un video",
+    "recording": "Escuchando. Haz clic en “Stop” cuando termines.",
     "transcribing": "Turning your voice into text…",
     "arming": "Starting microphone…",
     "expand": "Expand dock",
-    "collapse": "Shrink dock"
+    "collapse": "Shrink dock",
+    "screen": "Pantalla",
+    "idleTalkOnly": "Haz clic en “Hablar” para escribir con tu voz, o usa tu atajo de dictado"
   },
   "home": {
     "title": "Home",
@@ -1011,7 +1022,7 @@
     "headline": "Speak. We'll type.",
     "description": "Click where you want to type, then use your shortcut. Your words appear there when you finish.",
     "openDock": "Show floating dock",
-    "dockOpened": "The floating dock is showing. Click into the app you want to type in, then use Record or your shortcut.",
+    "dockOpened": "El dock flotante está visible. Haz clic en la aplicación donde quieres escribir y luego usa “Hablar” o tu atajo.",
     "shortcut": "Hold to talk, let go to finish. For a long thought, tap once to go hands-free and tap again to stop.",
     "fnShortcut": "or hold Fn to talk",
     "aiShortcut": "Talk + AI cleanup. Sends your text to your AI provider.",
@@ -1031,9 +1042,9 @@
     "toggleShortcut": "Press to start. Press again to finish.",
     "slogan": "Big thoughts. Less typing.",
     "fnTip": "If the emoji picker opens, go to System Settings > Keyboard and set “Press Globe key to” to “Do Nothing.”",
-    "otherShortcuts": "Other recording shortcuts",
+    "otherShortcuts": "Más atajos para hablar",
     "setAiShortcut": "Set up AI cleanup",
-    "cancelShortcut": "Cancel a recording",
+    "cancelShortcut": "Cancelar dictado",
     "share": "Share Say Less",
     "shareCopied": "Link copied: saylessvoice.com",
     "shareFailed": "Could not copy. The link is saylessvoice.com",
@@ -1046,7 +1057,8 @@
     },
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
-    "actionsHint": "Say a cue to open an app or a website"
+    "actionsHint": "Say a cue to open an app or a website",
+    "recordJump": "Graba tu pantalla"
   },
   "companion": {
     "title": "Particle pattern",
@@ -1276,11 +1288,11 @@
     "showInFinder": "Show in Finder",
     "voiceHint": "Or press your shortcut and say “Say less, start recording.”",
     "permissionDenied": "We need Screen Recording permission to record your screen.",
-    "permissionHint": "Turn on Say Less in System Settings, then quit and reopen Say Less.",
+    "permissionHint": "Activa Say Less en Ajustes del Sistema y luego haz clic en “Volver a abrir Say Less”.",
     "openSettings": "Open System Settings",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
-    "macosTooOld": "Screen recording needs macOS 15 or newer.",
+    "macosTooOld": "La grabación de pantalla necesita macOS 15 (Sequoia) o posterior.",
     "windowsSoon": "Screen recording is coming to Windows soon.",
     "linuxUnsupported": "Screen recording isn't available on Linux yet.",
     "failed": "We couldn't record your screen. Try again.",
@@ -1291,7 +1303,14 @@
     "reservedCue": "That phrase is saved for screen recording. Pick different words.",
     "cameraDenied": "We need Camera permission to show your face in the video.",
     "cameraFailed": "We couldn't start your camera. Close other apps that use it, or turn the camera off in Recording setup.",
-    "windowMissing": "The window you picked is closed. Pick another one in Recording setup."
+    "windowMissing": "The window you picked is closed. Pick another one in Recording setup.",
+    "dockCaption": "Grabando tu pantalla. Haz clic en el botón rojo “Stop” cuando termines.",
+    "savedIn": "Guardado en la carpeta {{folder}} dentro de {{parent}}.",
+    "openFolder": "Abrir carpeta de grabaciones",
+    "cameraOffHint": "No mostraremos tu cara. Para añadirla, haz clic en “Setup” y activa “Show your face”.",
+    "reopenApp": "Volver a abrir Say Less",
+    "macosTooOldHelp": "La grabación de pantalla necesita macOS 15 (Sequoia) o posterior. Para ver tu versión, abre el menú Apple y elige Acerca de este Mac. Para actualizar, ve a Ajustes del Sistema, General, Actualización de Software. Si no aparece ninguna actualización, no podemos grabar la pantalla en este Mac, pero el dictado sigue funcionando.",
+    "cameraMissing": "No encontramos ninguna cámara. Abre la tapa de tu portátil o conecta una, o desactiva “Show your face” en “Recording setup”."
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1347,6 +1366,7 @@
     "fps30": "30 (recommended)",
     "fps60": "60 (smoother, bigger file)",
     "qualityHint": "1080p at 30 frames looks sharp and stays light on 8GB laptops.",
-    "saveFailed": "We couldn't save that change. Try again."
+    "saveFailed": "We couldn't save that change. Try again.",
+    "webcamHintWindow": "Tu cara aparece en un pequeño círculo en la pantalla y en el video. Mientras grabas, no muevas la ventana y mantén el círculo dentro de ella."
   }
 }

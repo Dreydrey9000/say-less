@@ -754,7 +754,14 @@
     "portableUpdateMessage": "Портативні встановлення не можна оновити автоматично. Завантажте нижче інсталятор для вашої системи, запустіть його та встановіть у ту саму теку — ваша тека Data/ (налаштування, моделі, записи) залишиться на місці.",
     "portableUpdateButton": "Завантажити інсталятор",
     "portableUpdateBrowseMessage": "Портативні встановлення не можна оновити автоматично. Завантажте найновішу версію для вашої системи зі сторінки GitHub Releases та встановіть її в ту саму теку — ваша тека Data/ (налаштування, моделі, записи) залишиться на місці.",
-    "portableUpdateBrowseButton": "Відкрити GitHub Releases"
+    "portableUpdateBrowseButton": "Відкрити GitHub Releases",
+    "updateReady": "Оновлення Say Less v{{version}} готове",
+    "updateNow": "Оновити зараз",
+    "updateLater": "Пізніше",
+    "updateFailed": "Не вдалося оновити Say Less",
+    "updateFailedMacDescription": "Завантажте нову версію й перетягніть її в папку «Програми».",
+    "updateFailedDescription": "Завантажте нову версію з нашого вебсайту й встановіть її.",
+    "updateFailedAction": "Завантажити"
   },
   "common": {
     "loading": "Завантаження...",
@@ -805,7 +812,9 @@
     "processing": "Постобробка..."
   },
   "whatsNew": {
-    "title": "Нове в Say Less v{{version}}"
+    "title": "Нове в Say Less v{{version}}",
+    "tryRecording": "Спробувати запис екрана",
+    "gotIt": "Зрозуміло"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} може блокувати 1 комбінацію клавіш",
@@ -993,17 +1002,19 @@
   "dock": {
     "drag": "Drag floating dock",
     "stop": "Stop",
-    "record": "Record",
+    "record": "Говорити",
     "processing": "Working",
     "settings": "Open settings",
     "hide": "Hide floating dock",
     "error": "Check permissions or open settings to retry.",
-    "idle": "Click Record, or use your dictation shortcut",
-    "recording": "Recording — click Stop when finished",
+    "idle": "Натисніть «Говорити», щоб друкувати голосом, або «Екран», щоб записати відео",
+    "recording": "Слухаємо. Коли закінчите, натисніть «Stop».",
     "transcribing": "Turning your voice into text…",
     "arming": "Starting microphone…",
     "expand": "Expand dock",
-    "collapse": "Shrink dock"
+    "collapse": "Shrink dock",
+    "screen": "Екран",
+    "idleTalkOnly": "Натисніть «Говорити», щоб друкувати голосом, або скористайтеся скороченням для диктування"
   },
   "home": {
     "title": "Home",
@@ -1011,7 +1022,7 @@
     "headline": "Speak. We'll type.",
     "description": "Click where you want to type, then use your shortcut. Your words appear there when you finish.",
     "openDock": "Show floating dock",
-    "dockOpened": "The floating dock is showing. Click into the app you want to type in, then use Record or your shortcut.",
+    "dockOpened": "Плаваюча панель на екрані. Клацніть у програмі, де хочете друкувати, а потім скористайтеся кнопкою «Говорити» або скороченням.",
     "shortcut": "Hold to talk, let go to finish. For a long thought, tap once to go hands-free and tap again to stop.",
     "fnShortcut": "or hold Fn to talk",
     "aiShortcut": "Talk + AI cleanup. Sends your text to your AI provider.",
@@ -1031,9 +1042,9 @@
     "toggleShortcut": "Press to start. Press again to finish.",
     "slogan": "Big thoughts. Less typing.",
     "fnTip": "If the emoji picker opens, go to System Settings > Keyboard and set “Press Globe key to” to “Do Nothing.”",
-    "otherShortcuts": "Other recording shortcuts",
+    "otherShortcuts": "Інші скорочення для диктування",
     "setAiShortcut": "Set up AI cleanup",
-    "cancelShortcut": "Cancel a recording",
+    "cancelShortcut": "Скасувати диктування",
     "share": "Share Say Less",
     "shareCopied": "Link copied: saylessvoice.com",
     "shareFailed": "Could not copy. The link is saylessvoice.com",
@@ -1046,7 +1057,8 @@
     },
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
-    "actionsHint": "Say a cue to open an app or a website"
+    "actionsHint": "Say a cue to open an app or a website",
+    "recordJump": "Запишіть свій екран"
   },
   "companion": {
     "title": "Particle pattern",
@@ -1276,11 +1288,11 @@
     "showInFinder": "Show in Finder",
     "voiceHint": "Or press your shortcut and say “Say less, start recording.”",
     "permissionDenied": "We need Screen Recording permission to record your screen.",
-    "permissionHint": "Turn on Say Less in System Settings, then quit and reopen Say Less.",
+    "permissionHint": "Увімкніть Say Less у «Системних параметрах», а потім натисніть «Перезапустити Say Less».",
     "openSettings": "Open System Settings",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
-    "macosTooOld": "Screen recording needs macOS 15 or newer.",
+    "macosTooOld": "Для запису екрана потрібна macOS 15 (Sequoia) або новіша.",
     "windowsSoon": "Screen recording is coming to Windows soon.",
     "linuxUnsupported": "Screen recording isn't available on Linux yet.",
     "failed": "We couldn't record your screen. Try again.",
@@ -1291,7 +1303,14 @@
     "reservedCue": "That phrase is saved for screen recording. Pick different words.",
     "cameraDenied": "We need Camera permission to show your face in the video.",
     "cameraFailed": "We couldn't start your camera. Close other apps that use it, or turn the camera off in Recording setup.",
-    "windowMissing": "The window you picked is closed. Pick another one in Recording setup."
+    "windowMissing": "The window you picked is closed. Pick another one in Recording setup.",
+    "dockCaption": "Записуємо ваш екран. Коли закінчите, натисніть червону кнопку «Stop».",
+    "savedIn": "Збережено в папці {{folder}} усередині папки {{parent}}.",
+    "openFolder": "Відкрити папку із записами",
+    "cameraOffHint": "Ми не показуватимемо ваше обличчя. Щоб додати його, натисніть «Setup» і ввімкніть «Show your face».",
+    "reopenApp": "Перезапустити Say Less",
+    "macosTooOldHelp": "Для запису екрана потрібна macOS 15 (Sequoia) або новіша. Щоб дізнатися свою версію, відкрийте меню Apple і виберіть «Про цей комп’ютер». Щоб оновити, відкрийте «Системні параметри», виберіть «Загальні», а потім «Оновлення ПЗ». Якщо оновлення не з’являється, ми не зможемо записувати екран на цьому Mac, але диктування працюватиме.",
+    "cameraMissing": "Не вдається знайти камеру. Відкрийте кришку ноутбука або під’єднайте камеру. Або вимкніть «Show your face» у розділі «Recording setup»."
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1347,6 +1366,7 @@
     "fps30": "30 (recommended)",
     "fps60": "60 (smoother, bigger file)",
     "qualityHint": "1080p at 30 frames looks sharp and stays light on 8GB laptops.",
-    "saveFailed": "We couldn't save that change. Try again."
+    "saveFailed": "We couldn't save that change. Try again.",
+    "webcamHintWindow": "Ваше обличчя з’являється в маленькому колі на екрані й у відео. Під час запису не рухайте вікно й тримайте коло всередині нього."
   }
 }
