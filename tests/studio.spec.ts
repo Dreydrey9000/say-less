@@ -307,14 +307,58 @@ test("the dock keeps Saved and Show in Finder until you close it", async ({
   await page.clock.fastForward(15_000);
   await expect(status).toContainText("Saved.");
   await expect(finder).toBeVisible();
+  const close = page.getByRole("button", {
+    name: "Close this message",
+    exact: true,
+  });
+  // Both buttons are at least 24px square to hit, and the line stays 18px.
+  for (const button of [finder, close]) {
+    const box = (await button.boundingBox())!;
+    expect(box.width).toBeGreaterThanOrEqual(24);
+    expect(box.height).toBeGreaterThanOrEqual(24);
+  }
+  expect(Math.round((await status.boundingBox())!.height)).toBe(18);
   // The small X closes it, and the usual hint comes back.
-  await page
-    .getByRole("button", { name: "Close this message", exact: true })
-    .click();
+  await close.click();
   await expect(finder).toHaveCount(0);
   await expect(status).toHaveText(
     "Click Talk to type with your voice, or Screen to record a video",
   );
+});
+
+test("starting to talk clears the dock's Saved line for good", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 460, height: 112 });
+  await page.goto("/tests/fixtures/app.html?dock=1&screen=recording&events");
+  await page.waitForFunction(() => "testEmit" in window);
+  const sendDockState = (state: string) =>
+    page.evaluate(
+      (payload) =>
+        (
+          window as unknown as {
+            testEmit: (event: string, payload?: unknown) => Promise<void>;
+          }
+        ).testEmit("dock-state", payload),
+      state,
+    );
+  await page.getByRole("button", { name: "Stop screen recording" }).click();
+  const finder = page.getByRole("button", { name: "Show in Finder" });
+  await expect(finder).toBeVisible();
+  // The dock is listening for dictation before we send it.
+  await page.waitForFunction(
+    () =>
+      ((window as unknown as { testListeners: Record<string, number> })
+        .testListeners["dock-state"] ?? 0) > 0,
+  );
+  await sendDockState("recording");
+  await expect(finder).toHaveCount(0);
+  // When dictation ends, the usual hint shows, not the old Saved line.
+  await sendDockState("idle");
+  await expect(page.getByRole("status")).toHaveText(
+    "Click Talk to type with your voice, or Screen to record a video",
+  );
+  await expect(finder).toHaveCount(0);
 });
 
 test("while the screen records, the dock's X waits for Stop", async ({
@@ -423,12 +467,37 @@ test("the dock's camera button shows whether your face is on", async ({
   const faceOn = "Recording setup: camera and sound, your face is on";
   const on = page.getByRole("button", { name: faceOn, exact: true });
   await expect(on).toHaveAttribute("data-face", "on");
-  // Filled with your color, like the Show your face switch when it's on.
-  expect(await on.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe(
-    "rgb(184, 255, 101)",
-  );
+  const look = () =>
+    on.evaluate((el) => {
+      const style = getComputedStyle(el);
+      return {
+        fill: style.backgroundColor,
+        ring: style.borderTopColor,
+        shadow: style.boxShadow,
+      };
+    });
+  // A 2px ring in your color, not a fill.
+  const lit = await look();
+  expect(lit.fill).toBe("rgba(0, 0, 0, 0)");
+  expect(lit.ring).toBe("rgb(184, 255, 101)");
+  expect(lit.shadow).toContain("rgb(184, 255, 101)");
+  expect(lit.shadow).toContain("inset");
   await on.focus();
   await expect(page.getByRole("tooltip", { name: faceOn })).toBeVisible();
+  // While the screen records, Stop stays the only filled pill.
+  await page.goto("/tests/fixtures/app.html?dock=1&screen=recording");
+  await expect(
+    page.getByRole("button", { name: "Stop screen recording" }),
+  ).toBeVisible();
+  await expect(on).toHaveAttribute("data-face", "on");
+  expect((await look()).fill).toBe("rgba(0, 0, 0, 0)");
+  // On the light theme the ring uses your color's darker twin, so it still
+  // shows against the light dock.
+  await page.goto("/tests/fixtures/app.html?dock=1&theme=light");
+  await expect(on).toHaveAttribute("data-face", "on");
+  const light = await look();
+  expect(light.ring).not.toBe("rgb(184, 255, 101)");
+  expect(light.ring).not.toBe("rgba(0, 0, 0, 0)");
 });
 
 test("update archive includes the real feature image", async ({ page }) => {

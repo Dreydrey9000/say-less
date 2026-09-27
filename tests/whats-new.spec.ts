@@ -83,6 +83,11 @@ test("What's New on Windows leads with what works there", async ({ page }) => {
   await expect
     .poll(() => dock.evaluate((img: HTMLImageElement) => img.naturalWidth))
     .toBeGreaterThan(0);
+  // It shows at the dock's real size, half the pixels of the Retina shot,
+  // not stretched to fill the frame.
+  expect(
+    await dock.evaluate((img) => Math.round(img.getBoundingClientRect().width)),
+  ).toBe(195);
   await expect(dialog.getByText("This is the floating dock.")).toBeVisible();
   // Plain words for the avatar line, no "recording pill".
   await expect(dialog).toContainText("the bubble that shows while you talk");

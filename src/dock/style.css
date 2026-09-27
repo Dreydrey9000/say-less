@@ -311,11 +311,24 @@ button:disabled {
   border: 1px solid color-mix(in srgb, var(--color-text), transparent 80%);
   border-radius: 10px;
 }
-/* Show your face is on: filled with your color, like an on switch. */
+/* Thin marks in your color, as in App.css: the darker twin on the light
+   theme, where lime would vanish. */
+:root {
+  --studio-accent-mark: var(--studio-accent-on-light, #729e3f);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --studio-accent-mark: var(--studio-accent, #b8ff65);
+  }
+}
+:root[data-theme="dark"] {
+  --studio-accent-mark: var(--studio-accent, #b8ff65);
+}
+/* Show your face is on: a 2px ring in your color. A ring, not a fill, so
+   while the screen records the red Stop stays the only filled pill. */
 .floating-bar .dock-screen-setup[data-face="on"] {
-  background: var(--studio-accent, #b8ff65);
-  border-color: var(--studio-accent, #b8ff65);
-  color: var(--studio-on-accent, #000);
+  border-color: var(--studio-accent-mark);
+  box-shadow: inset 0 0 0 1px var(--studio-accent-mark);
 }
 /* Hide waits while the screen records (see main.tsx). */
 .floating-bar .dock-hide[aria-disabled="true"] {
@@ -364,7 +377,11 @@ button:disabled {
   background: var(--color-background);
   border-radius: 8px;
 }
+/* The note's buttons are 24px tall to hit, but the line stays 18px: the
+   negative margins let them reach past it. */
 .dock-screen-note button {
+  height: 24px;
+  margin-block: -3px;
   border: 0;
   padding: 0 4px;
   background: transparent;
@@ -377,7 +394,6 @@ button:disabled {
   display: grid;
   place-items: center;
   min-width: 24px;
-  height: 18px;
 }
 .compact-dock .compact-screen-anchor {
   position: absolute;
