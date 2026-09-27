@@ -455,7 +455,13 @@ export function RecordingSetup({
                 </div>
               </div>
             </div>
-            <p className="rec-setup-note">{t("recordingSetup.webcamHint")}</p>
+            <p className="rec-setup-note">
+              {t(
+                showWindow
+                  ? "recordingSetup.webcamHintWindow"
+                  : "recordingSetup.webcamHint",
+              )}
+            </p>
             {supported && (access === "denied" || access === "asking") && (
               <div className="rec-setup-alert" role="alert">
                 <p>

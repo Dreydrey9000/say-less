@@ -59,11 +59,17 @@ export function noticeFor(
   return "failed";
 }
 
-/** i18n key for why the button is disabled. */
-export function unsupportedKey(reason: string | null | undefined) {
+/** i18n key for why the button is disabled. `detailed` adds the steps to
+ * update for places with room; the dock's one-line tooltip keeps it short. */
+export function unsupportedKey(
+  reason: string | null | undefined,
+  { detailed = false }: { detailed?: boolean } = {},
+) {
   if (reason === "windows_soon") return "screenRecording.windowsSoon";
   if (reason === "linux_unsupported") return "screenRecording.linuxUnsupported";
-  return "screenRecording.macosTooOld";
+  return detailed
+    ? "screenRecording.macosTooOldHelp"
+    : "screenRecording.macosTooOld";
 }
 
 interface RecordingStore {
