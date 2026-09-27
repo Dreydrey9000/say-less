@@ -33,6 +33,7 @@ import { Sidebar, SidebarSection, SECTIONS_CONFIG } from "./components/Sidebar";
 import { NavigateContext } from "./components/navigation";
 import { NAVIGATE_EVENT } from "./lib/navigation";
 import {
+  OPEN_RECORDING_HOME_EVENT,
   OPEN_RECORDING_SETUP_EVENT,
   useRecordingOptions,
 } from "./lib/recordingOptions";
@@ -202,7 +203,7 @@ function App() {
   // The dock or a recording problem: show Home with the recording card and its
   // notice in view.
   useEffect(() => {
-    const pending = listen("open-recording-home", showRecordingCard);
+    const pending = listen(OPEN_RECORDING_HOME_EVENT, showRecordingCard);
     return () => {
       void pending.then((fn) => fn());
     };

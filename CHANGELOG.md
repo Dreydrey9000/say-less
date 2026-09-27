@@ -6,9 +6,9 @@
 
 - Home has a "Record your screen" link next to Share (Mac only) that scrolls to the recording card, because at the default 680x570 window the card starts below the fold.
 - The recording card stacks its text above its buttons at the same 580px content-width breakpoint as the rest of Home, because the old 640px window breakpoint never fired on a window that can't be narrower than 680px, leaving the text in a thin column.
-- What's New has "Got it" and, on Mac, "Try screen recording", which closes the dialog and brings Home forward with the recording card in view, because a first-time user had no button to reach the feature the note describes.
-- The main window listens for "open-recording-home" and shows Home with the recording card in view, so the dock and recording problems can send people straight to it.
-- The 0.14.0 note says up front that screen recording needs macOS 15 or newer, and explains how to turn on the floating dock it mentions, because both were missing or buried at the end.
+- What's New has "Got it" and "Try screen recording", which closes the dialog and brings Home forward with the recording card in view, because a first-time user had no button to reach the feature the note describes. The second button shows only on the 0.14 notes and only when this computer can record (macOS 15 or newer), so it never leads to a faded Record button or sits under an unrelated note.
+- The main window listens for "open-recording-home" and shows Home with the recording card in view, so the dock and recording problems can send people straight to it. The name is shared as OPEN_RECORDING_HOME_EVENT in src/lib/recordingOptions.ts, so a typo on either side can't make it fail silently.
+- The 0.14.0 note says up front that screen recording needs macOS 15 or newer, and explains how to turn on the floating dock it mentions, because both were missing or buried at the end. It also names the save folder in words instead of an arrow, to match the rest of the note.
 
 ## [2026-09-26]
 

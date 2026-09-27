@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { type } from "@tauri-apps/plugin-os";
+import {
+  startScreenRecordingSync,
+  useScreenRecording,
+} from "@/lib/screenRecording";
 import { Dialog } from "../ui";
 import { Button } from "../ui/Button";
 import { MarkdownContent } from "./MarkdownContent";
@@ -21,8 +24,13 @@ export const WhatsNewModal: React.FC<WhatsNewModalProps> = ({
   onTryRecording,
 }) => {
   const { t } = useTranslation();
-  // Screen recording is Mac only; on Windows the card just says "coming soon".
-  const canTryRecording = onTryRecording !== undefined && type() === "macos";
+  // Only offer it when this computer can record (a Mac on macOS 15 or newer).
+  // Elsewhere the card's Record button is faded, so the jump would dead end.
+  const recordingSupported = useScreenRecording(
+    (state) => state.status?.supported === true,
+  );
+  useEffect(() => startScreenRecordingSync(), []);
+  const canTryRecording = onTryRecording !== undefined && recordingSupported;
 
   return (
     <Dialog
