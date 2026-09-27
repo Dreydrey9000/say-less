@@ -218,7 +218,7 @@ function ScreenButton({
 
 function Dock() {
   const { t } = useTranslation();
-  const { state, ready, level, text } = useVoiceActivity();
+  const { state, ready, level, text, listening } = useVoiceActivity();
   const { settings, save, busy, loaded } = useStudio();
   const [error, setError] = useState(false);
   const [pending, setPending] = useState(false);
@@ -322,7 +322,7 @@ function Dock() {
           >
             <Companion
               level={level}
-              active={state === "recording"}
+              active={listening}
               thinking={state === "transcribing"}
               paused={!settings.floating}
             />
@@ -386,7 +386,7 @@ function Dock() {
           >
             <Companion
               level={level}
-              active={state === "recording"}
+              active={listening}
               thinking={state === "transcribing"}
               paused={!settings.floating}
             />

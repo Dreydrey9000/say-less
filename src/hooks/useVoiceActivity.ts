@@ -8,9 +8,13 @@ export function useVoiceActivity() {
   const [level, setLevel] = useState(0);
   const [ready, setReady] = useState(false);
   const [text, setText] = useState("");
+  // True while a screen recording is sending mic levels, so the orb and dock
+  // move with your voice even when you are not dictating.
+  const [screenListening, setScreenListening] = useState(false);
   useEffect(() => {
     let disposed = false;
     let received = false;
+    let screenTimer: ReturnType<typeof setTimeout> | undefined;
     const removers: Array<() => void> = [];
     void Promise.all([
       listen<string>("dock-state", ({ payload }) => {
@@ -31,6 +35,20 @@ export function useVoiceActivity() {
         // the orb and avatar move smoothly instead of jumping.
         setLevel((prev) => prev * 0.4 + target * 0.6);
       }),
+      listen<number>("screen-mic-level", ({ payload }) => {
+        const target = Number.isFinite(payload)
+          ? Math.min(1, Math.max(0, payload))
+          : 0;
+        setScreenListening(true);
+        setLevel((prev) => prev * 0.4 + target * 0.6);
+        // ponytail: levels come every ~66ms; if they stop for 400ms the
+        // recording ended (or stalled), so settle the visuals back down.
+        clearTimeout(screenTimer);
+        screenTimer = setTimeout(() => {
+          setScreenListening(false);
+          setLevel(0);
+        }, 400);
+      }),
       listen<StreamTextEvent>("stream-text-event", ({ payload }) =>
         setText(`${payload.committed} ${payload.tentative}`.trim()),
       ),
@@ -49,8 +67,10 @@ export function useVoiceActivity() {
     });
     return () => {
       disposed = true;
+      clearTimeout(screenTimer);
       removers.forEach((fn) => fn());
     };
   }, []);
-  return { state, level, ready, text };
+  const listening = state === "recording" || screenListening;
+  return { state, level, ready, text, listening };
 }

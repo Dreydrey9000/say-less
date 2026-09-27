@@ -260,6 +260,7 @@ mod platform {
         ) -> *mut c_char;
         fn sl_screen_recorder_stop() -> *mut c_char;
         fn sl_screen_recorder_take_error() -> *mut c_char;
+        fn sl_screen_recorder_mic_level() -> f32;
         fn sl_screen_recorder_sources() -> *mut c_char;
         fn sl_camera_preview_start(camera_id: *const c_char) -> *mut c_char;
         fn sl_camera_preview_frame() -> *mut c_char;
@@ -296,6 +297,16 @@ mod platform {
 
     pub fn camera_allowed() -> bool {
         unsafe { sl_screen_recorder_camera_status() == 3 }
+    }
+
+    /// Microphone loudness during a recording, 0 to 1.
+    pub fn mic_level() -> f32 {
+        let level = unsafe { sl_screen_recorder_mic_level() };
+        if level.is_finite() {
+            level.clamp(0.0, 1.0)
+        } else {
+            0.0
+        }
     }
 
     /// macOS's camera answer as a word for the page. Never shows a prompt.
@@ -365,6 +376,10 @@ mod platform {
     }
     pub fn mic_allowed() -> bool {
         false
+    }
+    #[allow(dead_code)]
+    pub fn mic_level() -> f32 {
+        0.0
     }
     pub fn camera_allowed() -> bool {
         false
@@ -503,6 +518,9 @@ pub async fn start(app: &AppHandle) -> Result<ScreenRecordingStatus, String> {
             machine().start_succeeded(path, Instant::now());
             log::info!("Screen recording started");
             spawn_watcher(app.clone());
+            if bridge_mic_on(&options) {
+                spawn_mic_meter(app.clone());
+            }
             Ok(broadcast(app))
         }
         Err(raw) => {
@@ -528,6 +546,24 @@ pub async fn stop(app: &AppHandle) -> Result<ScreenRecordingStatus, String> {
         Some(e) if !file_exists => Err(e),
         _ => Ok(status),
     }
+}
+
+fn bridge_mic_on(options: &crate::capture_options::RecordingOptions) -> bool {
+    options.microphone
+}
+
+/// While a recording runs, read the microphone meter about 15 times a second
+/// and send it to the main window and the dock, so the Home orb, the dock and
+/// the avatar move with your voice. Stops by itself when the recording ends.
+fn spawn_mic_meter(app: AppHandle) {
+    std::thread::spawn(move || loop {
+        std::thread::sleep(std::time::Duration::from_millis(66));
+        if machine().state() != RecorderState::Recording {
+            crate::overlay::emit_screen_mic_level(&app, 0.0);
+            return;
+        }
+        crate::overlay::emit_screen_mic_level(&app, platform::mic_level());
+    });
 }
 
 /// Notice when macOS ends the recording on its own (for example the user

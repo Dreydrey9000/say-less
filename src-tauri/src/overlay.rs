@@ -803,6 +803,22 @@ fn emit_side_levels(app_handle: &AppHandle, levels: &[f32], now: u64) {
     });
 }
 
+/// During a screen recording the dictation audio isn't running, so the
+/// recorder's own mic meter feeds the main window and the dock instead.
+/// Called from its own thread, never the audio callback.
+pub fn emit_screen_mic_level(app_handle: &AppHandle, level: f32) {
+    for label in SIDE_LEVEL_WINDOWS {
+        let Some(window) = app_handle.get_webview_window(label) else {
+            continue;
+        };
+        let on_screen =
+            window.is_visible().unwrap_or(false) && !window.is_minimized().unwrap_or(false);
+        if on_screen {
+            let _ = app_handle.emit_to(label, "screen-mic-level", level);
+        }
+    }
+}
+
 fn side_emit_due(last: u64, now: u64) -> bool {
     now.saturating_sub(last) >= SIDE_EMIT_THROTTLE_MS
 }

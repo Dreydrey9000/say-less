@@ -34,6 +34,10 @@ char* sl_screen_recorder_stop(void);
 // 1 while a recording is running.
 int sl_screen_recorder_is_recording(void);
 
+// Microphone loudness during a recording, 0 to 1. 0 when the mic is off or
+// no audio arrived in the last half second.
+float sl_screen_recorder_mic_level(void);
+
 // An error that ended a recording on its own (for example the user stopped
 // sharing from the menu bar). NULL when there is none. Clears it.
 char* sl_screen_recorder_take_error(void);
