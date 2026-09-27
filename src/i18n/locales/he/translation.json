@@ -1340,7 +1340,8 @@
     "macosTooOldSteps": "כדי לבדוק את הגרסה שלך, פתח את תפריט Apple ובחר 'אודות Mac זה'. כדי לעדכן, עבור אל 'הגדרות המערכת', 'כללי', 'עדכון תוכנה'. אם לא מופיע עדכון, לא נוכל להקליט את המסך ב-Mac הזה, אבל ההכתבה עדיין עובדת.",
     "recordWithoutFace": "הקלט ללא הפנים שלי",
     "shortcutStartHint": "או הקש {{shortcut}} מכל אפליקציה, או אמור \"Say less, start recording.\"",
-    "shortcutStopHint": "כשתסיים, לחץ על 'Stop', הקש {{shortcut}} או אמור \"Say less, stop recording.\""
+    "shortcutStopHint": "כשתסיים, לחץ על 'Stop', הקש {{shortcut}} או אמור \"Say less, stop recording.\"",
+    "shortcutLabel": "קיצור דרך להקלטה"
   },
   "recordingSetup": {
     "button": "Setup",

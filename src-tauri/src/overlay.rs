@@ -70,6 +70,13 @@ fn overlay_dimensions(state: &str) -> (f64, f64) {
 
 static LAST_MIC_LEVEL_EMIT: AtomicU64 = AtomicU64::new(0);
 const EMIT_THROTTLE_MS: u64 = 33; // ~30 FPS
+                                  // The main window and the floating dock also show a voice visual (the Home
+                                  // orb, the dock companion, the Appearance preview). They get the levels at a
+                                  // lower rate, and only while they are on screen, so hidden webviews never
+                                  // receive events (see issue #1279 below).
+static LAST_SIDE_LEVEL_EMIT: AtomicU64 = AtomicU64::new(0);
+const SIDE_EMIT_THROTTLE_MS: u64 = 66; // ~15 FPS
+const SIDE_LEVEL_WINDOWS: [&str; 2] = ["main", "say_less_dock"];
 
 // Window offsets from the screen edge. The visible card sits a further 18px
 // (--ov-lift) in, so the card lands at: macOS top 46, bottom 18; Windows and
@@ -737,7 +744,14 @@ pub fn update_overlay_enabled_cache(enabled: bool) {
 }
 
 pub fn emit_levels(app_handle: &AppHandle, levels: &[f32]) {
-    // Skip emission when the overlay is disabled. The recording_overlay
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_millis() as u64;
+
+    emit_side_levels(app_handle, levels, now);
+
+    // Skip overlay emission when the overlay is disabled. The recording_overlay
     // window is created at boot regardless of overlay_style, so without this
     // guard a hidden overlay's WebKit subprocess still
     // processes every event. Each event drives some kind of WebKit
@@ -753,31 +767,56 @@ pub fn emit_levels(app_handle: &AppHandle, levels: &[f32]) {
     // callback fires far faster than the UI needs; capping emission rate
     // cuts the per-frame `eval_script`/IPC volume that drives the wry
     // memory growth in issue #1279 (upstream tauri-apps/wry#1489).
-    let now = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_millis() as u64;
     let last = LAST_MIC_LEVEL_EMIT.load(Ordering::Relaxed);
     if now.saturating_sub(last) < EMIT_THROTTLE_MS {
         return;
     }
     LAST_MIC_LEVEL_EMIT.store(now, Ordering::Relaxed);
 
-    // Target only the overlay window. In Tauri 2 both `AppHandle::emit`
-    // and `WebviewWindow::emit` broadcast to all webviews; Tauri's
-    // listener filter then skips webviews with no registered listener
-    // for the event, so the settings webview never received `mic-level`.
-    // But the previous dual-call pattern still produced two `eval_script`
-    // calls to the overlay per audio callback (one from each .emit()).
-    // `emit_to` with the overlay's window label produces a single
-    // eval_script call per callback, cutting the per-callback WebKit
-    // dispatch work in half.
+    // Target only the overlay window. `emit_to` with the overlay's window
+    // label produces a single eval_script call per callback.
     let _ = app_handle.emit_to("recording_overlay", "mic-level", levels);
+}
+
+/// Send levels to the main window and the dock, only while each is visible.
+fn emit_side_levels(app_handle: &AppHandle, levels: &[f32], now: u64) {
+    let last = LAST_SIDE_LEVEL_EMIT.load(Ordering::Relaxed);
+    if !side_emit_due(last, now) {
+        return;
+    }
+    LAST_SIDE_LEVEL_EMIT.store(now, Ordering::Relaxed);
+    // Visibility checks wait on the main thread, so never run them on the
+    // audio callback thread: hand them to a task instead.
+    let app = app_handle.clone();
+    let levels = levels.to_vec();
+    tauri::async_runtime::spawn(async move {
+        for label in SIDE_LEVEL_WINDOWS {
+            let Some(window) = app.get_webview_window(label) else {
+                continue;
+            };
+            let on_screen =
+                window.is_visible().unwrap_or(false) && !window.is_minimized().unwrap_or(false);
+            if on_screen {
+                let _ = app.emit_to(label, "mic-level", &levels);
+            }
+        }
+    });
+}
+
+fn side_emit_due(last: u64, now: u64) -> bool {
+    now.saturating_sub(last) >= SIDE_EMIT_THROTTLE_MS
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn side_windows_get_levels_at_most_every_66ms() {
+        assert!(!side_emit_due(1_000, 1_030));
+        assert!(side_emit_due(1_000, 1_066));
+        assert!(side_emit_due(0, 5_000));
+    }
 
     /// Reads a `--ov-*: NNpx` custom property from the overlay stylesheet.
     fn css_px(name: &str) -> f64 {

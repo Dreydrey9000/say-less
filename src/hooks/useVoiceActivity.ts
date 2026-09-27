@@ -26,7 +26,10 @@ export function useVoiceActivity() {
       listen<number[]>("mic-level", ({ payload }) => {
         setReady(true);
         const finite = payload.filter(Number.isFinite);
-        setLevel(Math.min(1, Math.max(0, ...finite)));
+        const target = Math.min(1, Math.max(0, ...finite));
+        // Levels arrive about 15 times a second here; ease toward each one so
+        // the orb and avatar move smoothly instead of jumping.
+        setLevel((prev) => prev * 0.4 + target * 0.6);
       }),
       listen<StreamTextEvent>("stream-text-event", ({ payload }) =>
         setText(`${payload.committed} ${payload.tentative}`.trim()),

@@ -18,6 +18,8 @@ interface GlobalShortcutInputProps {
   descriptionMode?: "inline" | "tooltip";
   grouped?: boolean;
   shortcutId: string;
+  /** Row title; defaults to the shortcut's own name. */
+  title?: string;
   disabled?: boolean;
 }
 
@@ -25,6 +27,7 @@ export const GlobalShortcutInput: React.FC<GlobalShortcutInputProps> = ({
   descriptionMode = "tooltip",
   grouped = false,
   shortcutId,
+  title,
   disabled = false,
 }) => {
   const { t } = useTranslation();
@@ -289,7 +292,7 @@ export const GlobalShortcutInput: React.FC<GlobalShortcutInputProps> = ({
 
   return (
     <SettingContainer
-      title={translatedName}
+      title={title ?? translatedName}
       description={translatedDescription}
       descriptionMode={descriptionMode}
       grouped={grouped}

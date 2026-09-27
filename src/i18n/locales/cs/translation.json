@@ -1340,7 +1340,8 @@
     "macosTooOldSteps": "Svou verzi zjistíte tak, že otevřete nabídku Apple a vyberete „O tomto Macu“. Chcete-li aktualizovat, přejděte do Nastavení systému, Obecné, Aktualizace softwaru. Pokud se žádná aktualizace nezobrazí, na tomto Macu obrazovku nahrávat nemůžeme, ale diktování bude dál fungovat.",
     "recordWithoutFace": "Nahrávat bez mého obličeje",
     "shortcutStartHint": "Nebo stiskněte {{shortcut}} v libovolné aplikaci, případně řekněte „Say less, start recording.“",
-    "shortcutStopHint": "Až budete hotovi, klikněte na „Stop“, stiskněte {{shortcut}} nebo řekněte „Say less, stop recording.“"
+    "shortcutStopHint": "Až budete hotovi, klikněte na „Stop“, stiskněte {{shortcut}} nebo řekněte „Say less, stop recording.“",
+    "shortcutLabel": "Zkratka pro nahrávání"
   },
   "recordingSetup": {
     "button": "Setup",

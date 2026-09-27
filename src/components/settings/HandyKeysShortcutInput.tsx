@@ -19,6 +19,8 @@ interface HandyKeysShortcutInputProps {
   descriptionMode?: "inline" | "tooltip";
   grouped?: boolean;
   shortcutId: string;
+  /** Row title; defaults to the shortcut's own name. */
+  title?: string;
   disabled?: boolean;
 }
 
@@ -33,6 +35,7 @@ export const HandyKeysShortcutInput: React.FC<HandyKeysShortcutInputProps> = ({
   descriptionMode = "tooltip",
   grouped = false,
   shortcutId,
+  title,
   disabled = false,
 }) => {
   const { t } = useTranslation();
@@ -345,7 +348,7 @@ export const HandyKeysShortcutInput: React.FC<HandyKeysShortcutInputProps> = ({
 
   return (
     <SettingContainer
-      title={translatedName}
+      title={title ?? translatedName}
       description={translatedDescription}
       descriptionMode={descriptionMode}
       grouped={grouped}

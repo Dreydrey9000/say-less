@@ -1340,7 +1340,8 @@
     "macosTooOldSteps": "Du kan tjekke din version ved at åbne Apple-menuen og vælge Om denne Mac. Du opdaterer ved at gå til Systemindstillinger, Generelt, Softwareopdatering. Hvis der ikke vises nogen opdatering, kan vi ikke optage skærmen på denne Mac, men diktering virker stadig.",
     "recordWithoutFace": "Optag uden mit ansigt",
     "shortcutStartHint": "Eller tryk på {{shortcut}} fra enhver app, eller sig \"Say less, start recording.\"",
-    "shortcutStopHint": "Når du er færdig, skal du klikke på \"Stop\", trykke på {{shortcut}} eller sige \"Say less, stop recording.\""
+    "shortcutStopHint": "Når du er færdig, skal du klikke på \"Stop\", trykke på {{shortcut}} eller sige \"Say less, stop recording.\"",
+    "shortcutLabel": "Genvej til optagelse"
   },
   "recordingSetup": {
     "button": "Setup",

@@ -1340,7 +1340,8 @@
     "macosTooOldSteps": "バージョンを確認するには、Appleメニューを開いて「このMacについて」を選択してください。アップデートするには、「システム設定」、「一般」、「ソフトウェアアップデート」の順に開いてください。アップデートが表示されない場合、このMacでは画面を収録できませんが、音声入力は引き続き使えます。",
     "recordWithoutFace": "顔を表示せずに収録する",
     "shortcutStartHint": "または、どのアプリからでも{{shortcut}}を押すか、「Say less, start recording.」と言ってください。",
-    "shortcutStopHint": "終わったら「Stop」をクリックするか、{{shortcut}}を押すか、「Say less, stop recording.」と言ってください。"
+    "shortcutStopHint": "終わったら「Stop」をクリックするか、{{shortcut}}を押すか、「Say less, stop recording.」と言ってください。",
+    "shortcutLabel": "録画ショートカット"
   },
   "recordingSetup": {
     "button": "Setup",

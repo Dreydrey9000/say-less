@@ -11,6 +11,7 @@ import {
 import { invoke } from "@tauri-apps/api/core";
 import { useSettings } from "@/hooks/useSettings";
 import { formatKeyCombination } from "@/lib/utils/keyboard";
+import { ShortcutInput } from "./settings/ShortcutInput";
 import {
   formatElapsed,
   openPrivacyPane,
@@ -537,6 +538,17 @@ export function ScreenRecordingCard() {
           <FolderOpen size={14} aria-hidden="true" />
           {t("screenRecording.openFolder")}
         </Button>
+      )}
+      {/* Change the Record screen shortcut right here, not only in Settings. */}
+      {supported && recordBinding && (
+        <div className="home-record-shortcut">
+          <ShortcutInput
+            shortcutId="toggle_screen_recording"
+            title={t("screenRecording.shortcutLabel")}
+            descriptionMode="tooltip"
+            grouped={true}
+          />
+        </div>
       )}
       {setupOpen && !comingSoon && (
         <RecordingSetup

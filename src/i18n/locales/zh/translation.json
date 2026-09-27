@@ -1340,7 +1340,8 @@
     "macosTooOldSteps": "要查看您的版本，请打开苹果菜单并选取“关于本机”。要更新，请打开“系统设置”，点击“通用”，然后点击“软件更新”。如果没有显示可用的更新，我们就无法在这台 Mac 上录制屏幕，但听写功能仍可正常使用。",
     "recordWithoutFace": "不露脸录制",
     "shortcutStartHint": "或者在任意应用中按 {{shortcut}}，或说“Say less, start recording.”",
-    "shortcutStopHint": "完成后，请点击“Stop”、按 {{shortcut}}，或说“Say less, stop recording.”"
+    "shortcutStopHint": "完成后，请点击“Stop”、按 {{shortcut}}，或说“Say less, stop recording.”",
+    "shortcutLabel": "录制快捷键"
   },
   "recordingSetup": {
     "button": "Setup",

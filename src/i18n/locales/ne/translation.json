@@ -1340,7 +1340,8 @@
     "macosTooOldSteps": "आफ्नो संस्करण जाँच्न Apple मेनु खोल्नुहोस् र About This Mac छान्नुहोस्। अपडेट गर्न System Settings, General, Software Update मा जानुहोस्। कुनै अपडेट देखिएन भने हामी यो Mac मा स्क्रिन रेकर्ड गर्न सक्दैनौं, तर डिक्टेसन अझै पनि काम गर्छ।",
     "recordWithoutFace": "मेरो अनुहार बिना रेकर्ड गर्नुहोस्",
     "shortcutStartHint": "वा जुनसुकै एपबाट {{shortcut}} थिच्नुहोस्, वा “Say less, start recording.” भन्नुहोस्।",
-    "shortcutStopHint": "सकिएपछि 'Stop' मा क्लिक गर्नुहोस्, {{shortcut}} थिच्नुहोस् वा “Say less, stop recording.” भन्नुहोस्।"
+    "shortcutStopHint": "सकिएपछि 'Stop' मा क्लिक गर्नुहोस्, {{shortcut}} थिच्नुहोस् वा “Say less, stop recording.” भन्नुहोस्।",
+    "shortcutLabel": "रेकर्डिङ सर्टकट"
   },
   "recordingSetup": {
     "button": "Setup",

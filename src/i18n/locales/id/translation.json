@@ -1340,7 +1340,8 @@
     "macosTooOldSteps": "Untuk memeriksa versi Anda, buka menu Apple dan pilih Tentang Mac Ini. Untuk memperbarui, buka Pengaturan Sistem, Umum, Pembaruan Perangkat Lunak. Jika tidak ada pembaruan yang muncul, kami tidak dapat merekam layar di Mac ini, tetapi dikte tetap berfungsi.",
     "recordWithoutFace": "Rekam tanpa wajah saya",
     "shortcutStartHint": "Atau tekan {{shortcut}} dari aplikasi apa pun, atau ucapkan “Say less, start recording.”",
-    "shortcutStopHint": "Setelah selesai, klik 'Stop', tekan {{shortcut}}, atau ucapkan “Say less, stop recording.”"
+    "shortcutStopHint": "Setelah selesai, klik 'Stop', tekan {{shortcut}}, atau ucapkan “Say less, stop recording.”",
+    "shortcutLabel": "Pintasan rekam"
   },
   "recordingSetup": {
     "button": "Setup",
