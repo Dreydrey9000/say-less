@@ -42,9 +42,11 @@ export const WhatsNewModal: React.FC<WhatsNewModalProps> = ({
       }}
       footer={
         <>
+          {/* Focus lands here when the dialog opens: the safe choice. */}
           <Button
             variant={canTryRecording ? "secondary" : "primary"}
             onClick={onDismiss}
+            data-autofocus
           >
             {t("whatsNew.gotIt")}
           </Button>

@@ -292,6 +292,145 @@ test("while the screen records, the dock keeps the Talk word when it fits", asyn
   await expect.poll(look).toEqual({ wordShown: false, pillFits: true });
 });
 
+test("the dock keeps Saved and Show in Finder until you close it", async ({
+  page,
+}) => {
+  await page.clock.install();
+  await page.setViewportSize({ width: 460, height: 112 });
+  await page.goto("/tests/fixtures/app.html?dock=1&screen=recording");
+  await page.getByRole("button", { name: "Stop screen recording" }).click();
+  const status = page.getByRole("status");
+  const finder = page.getByRole("button", { name: "Show in Finder" });
+  await expect(status).toContainText("Saved.");
+  await expect(finder).toBeVisible();
+  // Well past the old 12 second limit, the way to the video is still there.
+  await page.clock.fastForward(15_000);
+  await expect(status).toContainText("Saved.");
+  await expect(finder).toBeVisible();
+  // The small X closes it, and the usual hint comes back.
+  await page
+    .getByRole("button", { name: "Close this message", exact: true })
+    .click();
+  await expect(finder).toHaveCount(0);
+  await expect(status).toHaveText(
+    "Click Talk to type with your voice, or Screen to record a video",
+  );
+});
+
+test("while the screen records, the dock's X waits for Stop", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.setViewportSize({ width: 460, height: 112 });
+  await page.goto("/tests/fixtures/app.html?dock=1&screen=recording");
+  const saves = () =>
+    page.evaluate(
+      () =>
+        (window as unknown as { testCommands: string[] }).testCommands.filter(
+          (c) => c === "save_studio_settings",
+        ).length,
+    );
+  const why = "To hide the dock, stop the recording first.";
+  const hide = page.getByRole("button", { name: why, exact: true });
+  await expect(hide).toHaveAttribute("aria-disabled", "true");
+  expect(await hide.evaluate((el) => getComputedStyle(el).cursor)).toBe(
+    "not-allowed",
+  );
+  // Playwright won't click an aria-disabled button, so use the keyboard: it
+  // stays focusable, says why, and does nothing.
+  const before = await saves();
+  await hide.focus();
+  await expect(page.getByRole("tooltip", { name: why })).toBeVisible();
+  await page.keyboard.press("Enter");
+  expect(await saves()).toBe(before);
+  // Once the video is saved, the X hides the dock again.
+  await page.getByRole("button", { name: "Stop screen recording" }).click();
+  const idleHide = page.getByRole("button", {
+    name: "Hide floating dock",
+    exact: true,
+  });
+  await expect(idleHide).not.toHaveAttribute("aria-disabled", "true");
+  await idleHide.click();
+  await expect.poll(saves).toBe(before + 1);
+});
+
+test("while the screen records, the dock's Stop leads in the card's red", async ({
+  page,
+}) => {
+  // Transitions finish first, so we read the color at rest.
+  const fill = (locator: import("@playwright/test").Locator) =>
+    locator.evaluate((el) => {
+      el.getAnimations().forEach((animation) => animation.finish());
+      return getComputedStyle(el).backgroundColor;
+    });
+  await page.goto("/tests/fixtures/app.html?screen=recording");
+  const cardRed = await fill(
+    page
+      .getByTestId("screen-recording-card")
+      .getByRole("button", { name: "Stop screen recording" }),
+  );
+  await page.setViewportSize({ width: 460, height: 112 });
+  await page.goto("/tests/fixtures/app.html?dock=1");
+  const talk = page.locator(".floating-bar .dock-record");
+  // Idle: Talk is the filled pill in your color.
+  await expect(
+    page.getByRole("button", { name: "Talk", exact: true }),
+  ).toBeVisible();
+  expect(await fill(talk)).toBe("rgb(184, 255, 101)");
+  await page.goto("/tests/fixtures/app.html?dock=1&screen=recording");
+  const stop = page.getByRole("button", { name: "Stop screen recording" });
+  await expect(stop).toBeVisible();
+  // Recording: Talk steps back to an outline, and Stop is the card's red.
+  expect(await fill(talk)).toBe("rgba(0, 0, 0, 0)");
+  expect(await fill(stop)).toBe(cardRed);
+});
+
+test("the dock's camera button shows whether your face is on", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 460, height: 112 });
+  await page.goto("/tests/fixtures/app.html?dock=1");
+  const off = page.getByRole("button", {
+    name: "Recording setup: camera and sound, your face is off",
+    exact: true,
+  });
+  await expect(off).toHaveAttribute("data-face", "off");
+  expect(await off.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe(
+    "rgba(0, 0, 0, 0)",
+  );
+  // Turn on Show your face in the saved setup, as the main window does.
+  await page.evaluate(() =>
+    localStorage.setItem(
+      "test-recording",
+      JSON.stringify({
+        source: "display",
+        display_id: null,
+        window_id: null,
+        window_label: null,
+        microphone: true,
+        microphone_name: null,
+        system_audio: true,
+        webcam: true,
+        camera_id: null,
+        webcam_corner: "bottom_right",
+        webcam_size: "medium",
+        quality: "p1080",
+        fps: 30,
+      }),
+    ),
+  );
+  await page.reload();
+  const faceOn = "Recording setup: camera and sound, your face is on";
+  const on = page.getByRole("button", { name: faceOn, exact: true });
+  await expect(on).toHaveAttribute("data-face", "on");
+  // Filled with your color, like the Show your face switch when it's on.
+  expect(await on.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe(
+    "rgb(184, 255, 101)",
+  );
+  await on.focus();
+  await expect(page.getByRole("tooltip", { name: faceOn })).toBeVisible();
+});
+
 test("update archive includes the real feature image", async ({ page }) => {
   await page.goto("/tests/fixtures/app.html");
   await page.getByRole("button", { name: "About", exact: true }).click();

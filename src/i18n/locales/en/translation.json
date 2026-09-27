@@ -1016,7 +1016,11 @@
     "expand": "Expand dock",
     "collapse": "Shrink to small dock",
     "talkHint": "Talk: type with your voice",
-    "recordingSetup": "Recording setup: camera and sound"
+    "recordingSetup": "Recording setup: camera and sound",
+    "recordingSetupFaceOn": "Recording setup: camera and sound, your face is on",
+    "recordingSetupFaceOff": "Recording setup: camera and sound, your face is off",
+    "hideWhileRecording": "To hide the dock, stop the recording first.",
+    "closeSaved": "Close this message"
   },
   "home": {
     "title": "Home",

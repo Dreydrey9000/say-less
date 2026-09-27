@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom/client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { emit, listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
@@ -20,7 +20,11 @@ import {
   FolderOpen,
   Video,
 } from "lucide-react";
-import { OPEN_RECORDING_SETUP_EVENT } from "@/lib/recordingOptions";
+import {
+  OPEN_RECORDING_SETUP_EVENT,
+  startRecordingOptionsSync,
+  useRecordingOptions,
+} from "@/lib/recordingOptions";
 import { Companion, formations } from "@/components/companion/Companion";
 import { useVoiceActivity } from "@/hooks/useVoiceActivity";
 import { startStudioSync, useStudio } from "@/lib/studio";
@@ -43,9 +47,8 @@ applyTheme(getStoredTheme());
 void syncThemeFromSettings();
 void startStudioSync();
 startScreenRecordingSync();
+startRecordingOptionsSync();
 
-/** How long the dock offers "Show in Finder" after a recording is saved. */
-const SAVED_NOTE_MS = 12_000;
 /** After Stop, Record takes its place under the pointer. Clicks are ignored
  * this long, so a double-click saves the video and doesn't start a new one. */
 const AFTER_STOP_MS = 700;
@@ -56,12 +59,12 @@ function useDockScreenRecording() {
   const elapsed = useElapsed(rec.startedAt);
   const [showSaved, setShowSaved] = useState(false);
   const lastFile = rec.status?.last_file;
+  // "Show in Finder" is the dock's only way to the new video, so it stays
+  // until the next recording or dictation starts, or the user closes it.
   useEffect(() => {
-    if (!rec.justSaved || !lastFile) return;
-    setShowSaved(true);
-    const id = window.setTimeout(() => setShowSaved(false), SAVED_NOTE_MS);
-    return () => window.clearTimeout(id);
+    if (rec.justSaved && lastFile) setShowSaved(true);
   }, [rec.justSaved, lastFile]);
+  const hideSaved = useCallback(() => setShowSaved(false), []);
   const state = rec.status?.state ?? "idle";
   const recording = state === "recording" || state === "stopping";
   return {
@@ -72,6 +75,7 @@ function useDockScreenRecording() {
     busy: rec.pending || state === "starting" || state === "stopping",
     supported: rec.status?.supported ?? false,
     showSaved: showSaved && state === "idle" && rec.justSaved,
+    hideSaved,
     async toggleFromDock() {
       await rec.toggle();
       // TODO(card-permissions merge): drop the string widening so these
@@ -219,6 +223,21 @@ function Dock() {
   const [error, setError] = useState(false);
   const [pending, setPending] = useState(false);
   const screen = useDockScreenRecording();
+  // Show your face, from the saved setup the main window edits. Until it
+  // loads the camera button only names what it opens.
+  const faceOn = useRecordingOptions((store) => store.options?.webcam);
+  const setupLabel = t(
+    faceOn === undefined
+      ? "dock.recordingSetup"
+      : faceOn
+        ? "dock.recordingSetupFaceOn"
+        : "dock.recordingSetupFaceOff",
+  );
+  // Starting to talk clears the Saved line, just as a new recording does.
+  const { hideSaved } = screen;
+  useEffect(() => {
+    if (state === "recording") hideSaved();
+  }, [state, hideSaved]);
   // Without screen recording (Windows, older Macs) there is no Screen button
   // for the idle hint to point at.
   const stateKey =
@@ -373,10 +392,11 @@ function Dock() {
             />
           </button>
         </Tooltip>
-        {/* While the screen records, the red Stop pill takes room, so this
-            pill keeps its word only if the word fits whole (.word-if-room)
-            and says what it does in a tooltip. While dictating too, it keeps
-            Stop instead, so the caption's "Click Stop" points here. */}
+        {/* While the screen records, the red Stop pill takes room and leads,
+            so this pill turns to an outline (.is-secondary), keeps its word
+            only if the word fits whole (.word-if-room) and says what it does
+            in a tooltip. While dictating too, it stays filled and keeps Stop
+            instead, so the caption's "Click Stop" points here. */}
         <Tooltip
           label={t(
             talkHint
@@ -389,7 +409,7 @@ function Dock() {
           className={`dock-record-anchor ${talkHint ? "" : "tip-hidden"}`}
         >
           <button
-            className={`dock-record ${talkHint ? "word-if-room" : ""}`}
+            className={`dock-record ${talkHint ? "word-if-room is-secondary" : ""}`}
             disabled={pending || state === "transcribing"}
             onClick={() => void record()}
           >
@@ -410,16 +430,14 @@ function Dock() {
           </button>
         </Tooltip>
         <ScreenButton compact={false} dictating={state === "recording"} />
-        <Tooltip
-          label={t("dock.recordingSetup")}
-          placement="bottom"
-          align="end"
-        >
+        <Tooltip label={setupLabel} placement="bottom" align="end">
           {/* The dock never takes keyboard focus from the app you're in, so
-              the setup lives in the main window, where it can. */}
+              the setup lives in the main window, where it can. Filled with
+              your color while Show your face is on, like the switch. */}
           <button
             className="dock-screen-setup"
-            aria-label={t("dock.recordingSetup")}
+            aria-label={setupLabel}
+            data-face={faceOn === undefined ? undefined : faceOn ? "on" : "off"}
             onClick={async () => {
               await invoke("show_main_window_command").catch(() => undefined);
               await emit(OPEN_RECORDING_SETUP_EVENT).catch(() => undefined);
@@ -443,13 +461,23 @@ function Dock() {
             <ChevronDown size={18} />
           </button>
         </Tooltip>
-        <Tooltip label={t("dock.hide")} placement="bottom" align="end">
+        {/* Hiding the dock mid-recording would take its Stop away, so the
+            X waits for the recording to end. aria-disabled, not disabled, so
+            it stays focusable and the tooltip can say why. */}
+        <Tooltip
+          label={t(screen.recording ? "dock.hideWhileRecording" : "dock.hide")}
+          placement="bottom"
+          align="end"
+        >
           <button
-            onClick={() =>
+            className="dock-hide"
+            aria-disabled={screen.recording || undefined}
+            onClick={() => {
+              if (screen.recording) return;
               void useStudio
                 .getState()
-                .save({ ...useStudio.getState().settings, floating: false })
-            }
+                .save({ ...useStudio.getState().settings, floating: false });
+            }}
           >
             <X size={18} />
           </button>
@@ -461,6 +489,11 @@ function Dock() {
           <button onClick={() => void screen.reveal()}>
             {t("screenRecording.showInFinder")}
           </button>
+          <Tooltip label={t("dock.closeSaved")} placement="top" align="end">
+            <button className="dock-screen-note-close" onClick={hideSaved}>
+              <X size={12} aria-hidden="true" />
+            </button>
+          </Tooltip>
         </div>
       ) : (
         <p role="status">

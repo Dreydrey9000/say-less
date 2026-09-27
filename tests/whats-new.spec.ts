@@ -18,6 +18,29 @@ test("What's New on a Mac opens with the card picture and three steps", async ({
   await expect
     .poll(() => picture.evaluate((img: HTMLImageElement) => img.naturalWidth))
     .toBeGreaterThan(0);
+  // It reads as a picture, not live buttons: framed, narrower than the text,
+  // deaf to clicks, and captioned right under it.
+  const look = await picture.evaluate((img) => {
+    const frame = img.parentElement!;
+    const text = frame.parentElement!;
+    return {
+      pointerEvents: getComputedStyle(img).pointerEvents,
+      frameWidth: frame.getBoundingClientRect().width,
+      textWidth: text.getBoundingClientRect().width,
+      frameBorder: getComputedStyle(frame).borderTopWidth,
+    };
+  });
+  expect(look.pointerEvents).toBe("none");
+  expect(look.frameBorder).toBe("1px");
+  expect(look.frameWidth).toBeLessThanOrEqual(look.textWidth * 0.8 + 1);
+  const caption = dialog.getByText("This is on Home.", { exact: true });
+  await expect(caption).toBeVisible();
+  const [pictureBottom, captionTop] = await Promise.all([
+    picture.evaluate((el) => el.getBoundingClientRect().bottom),
+    caption.evaluate((el) => el.getBoundingClientRect().top),
+  ]);
+  expect(captionTop).toBeGreaterThanOrEqual(pictureBottom);
+  expect(captionTop - pictureBottom).toBeLessThan(12);
   const steps = dialog.locator("ol > li");
   await expect(steps).toHaveCount(3);
   await expect(steps.nth(0)).toContainText("Start");
@@ -51,9 +74,39 @@ test("What's New on Windows leads with what works there", async ({ page }) => {
   await expect(
     dialog.getByRole("heading", { name: "Record your screen" }),
   ).toHaveCount(0);
-  await expect(dialog.getByRole("img")).toHaveCount(0);
+  // One picture: the dock's Talk button, not the Mac recording card.
+  await expect(dialog.getByRole("img")).toHaveCount(1);
+  const dock = dialog.getByRole("img", {
+    name: "The floating dock with its Talk button",
+  });
+  await expect(dock).toBeVisible();
+  await expect
+    .poll(() => dock.evaluate((img: HTMLImageElement) => img.naturalWidth))
+    .toBeGreaterThan(0);
+  await expect(dialog.getByText("This is the floating dock.")).toBeVisible();
+  // Plain words for the avatar line, no "recording pill".
+  await expect(dialog).toContainText("the bubble that shows while you talk");
+  await expect(dialog).not.toContainText("recording pill");
   await expect(dialog.locator("ol")).toHaveCount(0);
   await expect(dialog.getByText("Show your face")).toHaveCount(0);
   await expect(dialog.getByText("Reopen Say Less")).toHaveCount(0);
   await expect(dialog).not.toContainText("<!--");
+});
+
+test("What's New moves keyboard focus into the dialog, onto Got it", async ({
+  page,
+}) => {
+  for (const query of ["whatsNew", "whatsNew&os=windows"]) {
+    await page.goto(`/tests/fixtures/app.html?${query}`);
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await expect(
+      dialog.getByRole("button", { name: "Got it", exact: true }),
+    ).toBeFocused();
+    // Tab stays inside the dialog from there.
+    await page.keyboard.press("Tab");
+    expect(
+      await dialog.evaluate((el) => el.contains(document.activeElement)),
+    ).toBe(true);
+  }
 });

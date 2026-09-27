@@ -137,6 +137,15 @@ button:disabled {
   height: 44px;
   line-height: 44px;
 }
+/* While the screen records, Stop leads, so Talk steps back to the same thin
+   outline as the idle Screen pill. An inset shadow, not a border, so the
+   pill keeps its size. */
+.floating-bar .dock-record.is-secondary {
+  background: transparent;
+  color: var(--color-text);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--color-text), transparent 80%);
+}
 /* Icon buttons stay at least 32px wide so they're easy to hit. */
 .floating-bar button {
   min-width: 32px;
@@ -283,10 +292,12 @@ button:disabled {
   font-weight: 650;
   font-size: 13px;
 }
+/* Stop uses the same red as Stop on Home (the danger button's Tailwind
+   red-600). The dock loads no Tailwind, so the fallback is that value. */
 .floating-bar .dock-screen.is-live {
-  background: #ff5a5a;
-  border-color: #ff5a5a;
-  color: #151820;
+  background: var(--color-red-600, oklch(57.7% 0.245 27.325));
+  border-color: var(--color-red-600, oklch(57.7% 0.245 27.325));
+  color: #fff;
   font-weight: 650;
   font-size: 13px;
 }
@@ -299,6 +310,17 @@ button:disabled {
   padding: 0;
   border: 1px solid color-mix(in srgb, var(--color-text), transparent 80%);
   border-radius: 10px;
+}
+/* Show your face is on: filled with your color, like an on switch. */
+.floating-bar .dock-screen-setup[data-face="on"] {
+  background: var(--studio-accent, #b8ff65);
+  border-color: var(--studio-accent, #b8ff65);
+  color: var(--studio-on-accent, #000);
+}
+/* Hide waits while the screen records (see main.tsx). */
+.floating-bar .dock-hide[aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 /* Only the "can't record here" button looks off. The short pause after Stop
    keeps aria-disabled for screen readers but looks like a normal button. */
@@ -351,6 +373,12 @@ button:disabled {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+.dock-screen-note .dock-screen-note-close {
+  display: grid;
+  place-items: center;
+  min-width: 24px;
+  height: 18px;
+}
 .compact-dock .compact-screen-anchor {
   position: absolute;
   top: 0;
@@ -386,8 +414,8 @@ button:disabled {
   padding: 0 9px;
   border: 2px solid #151820;
   border-radius: 13px;
-  background: #ff5a5a;
-  color: #151820;
+  background: var(--color-red-600, oklch(57.7% 0.245 27.325));
+  color: #fff;
   font-size: 12px;
   font-weight: 700;
 }
