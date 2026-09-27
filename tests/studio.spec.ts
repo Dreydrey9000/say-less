@@ -153,6 +153,13 @@ test("double-clicking Stop in the dock saves once and starts nothing new", async
   await page.getByRole("button", { name: "Stop screen recording" }).dblclick();
   const start = page.getByRole("button", { name: "Record screen" });
   await expect(start).toHaveAttribute("aria-disabled", "true");
+  // The pause looks like a normal button, not a broken one.
+  expect(
+    await start.evaluate((el) => {
+      const style = getComputedStyle(el);
+      return [el.getAttribute("aria-disabled"), style.opacity, style.cursor];
+    }),
+  ).toEqual(["true", "1", "pointer"]);
   await expect(page.getByRole("status")).toContainText("Saved.");
   await expect(
     page.getByRole("button", { name: "Show in Finder" }),
@@ -196,6 +203,32 @@ test("after Stop, the dock keeps the Screen tooltip off the Saved line", async (
   await expect(tip).toBeVisible();
 });
 
+test("the Screen tooltip comes back when the pointer left while saving", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.setViewportSize({ width: 460, height: 112 });
+  await page.goto("/tests/fixtures/app.html?dock=1&screen=recording&holdStop");
+  // WebKit sends no pointer events to a disabled button, so the pointer
+  // leaving while the video saves goes unseen. Hide those leaves here too.
+  await page.evaluate(() =>
+    window.addEventListener("pointerout", (e) => e.stopPropagation(), true),
+  );
+  const stop = page.getByRole("button", { name: "Stop screen recording" });
+  await stop.click();
+  await expect(stop).toBeDisabled();
+  await page.mouse.move(0, 0);
+  await page.waitForFunction(() => "testFinishStop" in window);
+  await page.evaluate(() =>
+    (window as unknown as { testFinishStop: () => void }).testFinishStop(),
+  );
+  await expect(page.getByRole("status")).toContainText("Saved.");
+  await page.getByRole("button", { name: "Record screen" }).hover();
+  await expect(
+    page.getByRole("tooltip", { name: "Record screen" }),
+  ).toBeVisible();
+});
+
 test("while the screen records, the dock's Talk mic still says Talk", async ({
   page,
 }) => {
@@ -225,6 +258,38 @@ test("while the screen records, the dock's Talk mic still says Talk", async ({
     "fill",
     "currentColor",
   );
+});
+
+test("while the screen records, the dock keeps the Talk word when it fits", async ({
+  page,
+}) => {
+  const talk = page.getByRole("button", {
+    name: "Talk: type with your voice",
+    exact: true,
+  });
+  // Whether the word sits whole inside the pill, and whether the pill
+  // itself stays inside its own width.
+  const look = () =>
+    talk.evaluate((pill) => {
+      const word = pill.querySelector("span")!;
+      const box = pill.getBoundingClientRect();
+      const text = word.getBoundingClientRect();
+      return {
+        wordShown:
+          text.top >= box.top &&
+          text.bottom <= box.bottom + 0.5 &&
+          word.scrollWidth <= word.clientWidth,
+        pillFits: pill.scrollWidth <= pill.clientWidth + 1,
+      };
+    });
+  // With room to spare, the word stays.
+  await page.setViewportSize({ width: 640, height: 112 });
+  await page.goto("/tests/fixtures/app.html?dock=1&screen=recording");
+  await expect(talk).toHaveText("Talk");
+  await expect.poll(look).toEqual({ wordShown: true, pillFits: true });
+  // Squeezed, the word drops out whole instead of showing "Ta...".
+  await page.setViewportSize({ width: 430, height: 112 });
+  await expect.poll(look).toEqual({ wordShown: false, pillFits: true });
 });
 
 test("update archive includes the real feature image", async ({ page }) => {

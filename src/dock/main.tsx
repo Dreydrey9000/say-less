@@ -109,11 +109,20 @@ function ScreenButton({
   // After a Stop click the pointer is still on the button, and its tooltip
   // would cover the Saved line. It stays hidden until the pointer leaves.
   const [quietTip, setQuietTip] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (!settling) return;
     const id = window.setTimeout(() => setSettling(false), AFTER_STOP_MS);
     return () => window.clearTimeout(id);
   }, [settling]);
+  // WebKit sends no pointer events to a disabled button, so a pointer that
+  // left while the video was saving was never seen leaving. Once the button
+  // works again, ask whether the pointer is still on it.
+  useEffect(() => {
+    const idle = !settling && !rec.busy;
+    if (quietTip && idle && !buttonRef.current?.matches(":hover"))
+      setQuietTip(false);
+  }, [quietTip, settling, rec.busy]);
   async function press(byPointer: boolean) {
     if (Date.now() < ignoreUntil.current) return;
     const stopping = rec.recording;
@@ -154,6 +163,7 @@ function ScreenButton({
         className={compact ? "compact-screen-live-anchor" : ""}
       >
         <button
+          ref={buttonRef}
           className={compact ? "compact-screen-live" : "dock-screen is-live"}
           disabled={rec.busy}
           aria-busy={rec.busy || undefined}
@@ -186,6 +196,7 @@ function ScreenButton({
       className={`${compact ? "compact-screen-anchor" : ""} ${quietTip ? "tip-hidden" : ""}`}
     >
       <button
+        ref={buttonRef}
         className={compact ? "compact-screen" : "dock-screen"}
         disabled={rec.busy}
         aria-busy={rec.busy || undefined}
@@ -214,7 +225,7 @@ function Dock() {
     state === "idle" && !screen.supported
       ? "dock.idleTalkOnly"
       : `dock.${state}`;
-  const talkWordHidden = screen.recording && state !== "recording";
+  const talkHint = screen.recording && state !== "recording";
   // Expanding or collapsing swaps the whole dock, which would drop keyboard
   // focus to <body>. When the user toggled it here, land focus on the control
   // that undoes the change.
@@ -362,23 +373,23 @@ function Dock() {
             />
           </button>
         </Tooltip>
-        {/* While the screen records, the red Stop pill needs the room, so
-            this pill drops its word and says what it does in a tooltip.
-            While dictating too, it keeps Stop instead, so the caption's
-            "Click Stop" points here. */}
+        {/* While the screen records, the red Stop pill takes room, so this
+            pill keeps its word only if the word fits whole (.word-if-room)
+            and says what it does in a tooltip. While dictating too, it keeps
+            Stop instead, so the caption's "Click Stop" points here. */}
         <Tooltip
           label={t(
-            talkWordHidden
+            talkHint
               ? "dock.talkHint"
               : state === "recording"
                 ? "dock.stop"
                 : "dock.record",
           )}
           placement="bottom"
-          className={`dock-record-anchor ${talkWordHidden ? "" : "tip-hidden"}`}
+          className={`dock-record-anchor ${talkHint ? "" : "tip-hidden"}`}
         >
           <button
-            className="dock-record"
+            className={`dock-record ${talkHint ? "word-if-room" : ""}`}
             disabled={pending || state === "transcribing"}
             onClick={() => void record()}
           >
@@ -387,17 +398,15 @@ function Dock() {
             ) : (
               <Mic size={20} />
             )}
-            {!talkWordHidden && (
-              <span>
-                {t(
-                  state === "recording"
-                    ? "dock.stop"
-                    : state === "transcribing"
-                      ? "dock.processing"
-                      : "dock.record",
-                )}
-              </span>
-            )}
+            <span>
+              {t(
+                state === "recording"
+                  ? "dock.stop"
+                  : state === "transcribing"
+                    ? "dock.processing"
+                    : "dock.record",
+              )}
+            </span>
           </button>
         </Tooltip>
         <ScreenButton compact={false} dictating={state === "recording"} />
