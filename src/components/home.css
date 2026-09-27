@@ -334,6 +334,12 @@
 .home-record-slot > [data-off] {
   visibility: hidden;
 }
+/* The face line holds a small button (32px plus the line's 4px top margin), so
+   it keeps that height even when empty: Show your face on, or the camera check
+   still running. */
+.home-record-face-slot {
+  min-height: 36px;
+}
 .home-record-text .home-record-face {
   display: flex;
   flex-wrap: wrap;

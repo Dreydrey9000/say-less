@@ -2,6 +2,35 @@ import { test, expect } from "@playwright/test";
 
 const card = (page: import("@playwright/test").Page) =>
   page.getByTestId("screen-recording-card");
+/** Turn on Show your face in the saved recording setup before the page loads. */
+const withFaceOn = (page: import("@playwright/test").Page) =>
+  page.addInitScript(() =>
+    localStorage.setItem(
+      "test-recording",
+      JSON.stringify({
+        source: "display",
+        display_id: null,
+        window_id: null,
+        window_label: null,
+        microphone: true,
+        microphone_name: null,
+        system_audio: true,
+        webcam: true,
+        camera_id: null,
+        webcam_corner: "bottom_right",
+        webcam_size: "medium",
+        quality: "p1080",
+        fps: 30,
+      }),
+    ),
+  );
+/** A button's distance from the top of the card. */
+const topInCard = (button: import("@playwright/test").Locator) =>
+  button.evaluate(
+    (el) =>
+      el.getBoundingClientRect().top -
+      el.closest("section")!.getBoundingClientRect().top,
+  );
 /** How many times the page has called a backend command. */
 const count = (page: import("@playwright/test").Page, cmd: string) =>
   page.evaluate(
@@ -160,22 +189,13 @@ test("Record and Stop sit in the same spot", async ({ page }) => {
     await page.setViewportSize(size);
     await page.goto("/tests/fixtures/app.html");
     const home = card(page);
-    const topInCard = (name: string) =>
-      home
-        .getByRole("button", { name, exact: true })
-        .evaluate(
-          (el) =>
-            el.getBoundingClientRect().top -
-            el.closest("section")!.getBoundingClientRect().top,
-        );
     const start = home.getByRole("button", { name: "Record screen" });
     await expect(start).toBeEnabled();
-    const before = await topInCard("Record screen");
+    const before = await topInCard(start);
     await start.click();
-    await expect(
-      home.getByRole("button", { name: "Stop screen recording" }),
-    ).toBeVisible();
-    expect(await topInCard("Stop screen recording")).toBeCloseTo(before, 1);
+    const stop = home.getByRole("button", { name: "Stop screen recording" });
+    await expect(stop).toBeVisible();
+    expect(await topInCard(stop)).toBeCloseTo(before, 1);
   }
 });
 
@@ -247,36 +267,67 @@ test("a blocked camera warns on the card and opens the fix", async ({
   page,
 }) => {
   // Show your face is on, but ?camera=denied refuses Camera permission.
-  await page.addInitScript(() =>
-    localStorage.setItem(
-      "test-recording",
-      JSON.stringify({
-        source: "display",
-        display_id: null,
-        window_id: null,
-        window_label: null,
-        microphone: true,
-        microphone_name: null,
-        system_audio: true,
-        webcam: true,
-        camera_id: null,
-        webcam_corner: "bottom_right",
-        webcam_size: "medium",
-        quality: "p1080",
-        fps: 30,
-      }),
-    ),
-  );
+  await withFaceOn(page);
   await page.goto("/tests/fixtures/app.html?camera=denied");
   const home = card(page);
   await expect(
     home.getByText(
-      "Your camera is blocked, so your face won't be in the video.",
+      "We can't use your camera. Allow it in System Settings, or turn off Show your face to record.",
     ),
   ).toBeVisible();
   await expect(home.getByText("We won't show your face")).toHaveCount(0);
   await home.getByRole("button", { name: "Open System Settings" }).click();
   await expect.poll(() => count(page, "open_camera_settings")).toBe(1);
+});
+
+test("the camera warning keeps its space when the camera notice shows", async ({
+  page,
+}) => {
+  await withFaceOn(page);
+  await page.goto("/tests/fixtures/app.html?camera=denied");
+  const home = card(page);
+  const warning = home.getByText("We can't use your camera.");
+  await expect(warning).toBeVisible();
+  const record = home.getByRole("button", { name: "Record screen" });
+  const before = await topInCard(record);
+  // The backend won't start with Show your face on and no camera.
+  await record.click();
+  await expect(home.getByRole("alert")).toContainText(
+    "We need Camera permission to show your face in the video.",
+  );
+  await expect(warning).toBeHidden();
+  expect(await topInCard(record)).toBeCloseTo(before, 1);
+});
+
+test("open Setup shows the camera problem, not the card", async ({ page }) => {
+  await withFaceOn(page);
+  await page.goto("/tests/fixtures/app.html?camera=denied");
+  const home = card(page);
+  const warning = home.getByText("We can't use your camera.");
+  await expect(warning).toBeVisible();
+  const record = home.getByRole("button", { name: "Record screen" });
+  const before = await topInCard(record);
+  await home.getByRole("button", { name: "Recording setup" }).click();
+  const panel = page.getByRole("region", { name: "Recording setup" });
+  await expect(panel.getByRole("alert")).toBeVisible();
+  await expect(warning).toBeHidden();
+  expect(await topInCard(record)).toBeCloseTo(before, 1);
+});
+
+test("turning on Show your face during the macOS prompt doesn't say blocked", async ({
+  page,
+}) => {
+  // Before macOS has asked, the camera check says no, same as ?camera=denied.
+  await page.goto("/tests/fixtures/app.html?camera=denied");
+  const home = card(page);
+  await home.getByRole("button", { name: "Recording setup" }).click();
+  const panel = page.getByRole("region", { name: "Recording setup" });
+  await panel.getByRole("switch", { name: "Show your face" }).check();
+  await expect(panel.getByRole("alert")).toBeVisible();
+  // The card's warning is there, keeping its space, but not shown.
+  const warning = home.getByText("We can't use your camera.");
+  await expect(warning).toHaveCount(1);
+  await expect(warning).toBeHidden();
 });
 
 test("Show my face opens Setup on the Show your face switch", async ({
@@ -293,6 +344,29 @@ test("Show my face opens Setup on the Show your face switch", async ({
   await expect(
     page.getByRole("switch", { name: "Show your face" }),
   ).toBeFocused();
+});
+
+test("closing Setup forgets Show my face, so a plain open stays put", async ({
+  page,
+}) => {
+  await page.clock.install({ time: new Date("2026-09-27T10:00:00") });
+  await page.goto("/tests/fixtures/app.html");
+  const home = card(page);
+  const setup = home.getByRole("button", { name: "Recording setup" });
+  await expect(home.getByText("We won't show your face")).toBeVisible();
+  // Freeze animation frames, so Setup closes before the search for the
+  // Show your face switch gets a chance to run.
+  await page.clock.pauseAt(new Date("2026-09-27T10:05:00"));
+  await home.getByRole("button", { name: "Show my face" }).click();
+  await setup.click();
+  await expect(setup).toHaveAttribute("aria-expanded", "false");
+  await setup.click();
+  await expect(setup).toHaveAttribute("aria-expanded", "true");
+  await page.clock.runFor(1000);
+  await expect(
+    page.getByRole("switch", { name: "Show your face" }),
+  ).toBeVisible();
+  await expect(setup).toBeFocused();
 });
 
 test("light theme gives the lime Record button a darker edge", async ({

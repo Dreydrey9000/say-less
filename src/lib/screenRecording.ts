@@ -214,7 +214,9 @@ export async function openPrivacyPane(kind: "camera" | "microphone") {
 
 /** True while the webcam is on but macOS hasn't given us the camera. Checked
  * when `watch` turns on and when the window gets focus back (say, from System
- * Settings), and every 2 seconds while blocked so the warning clears itself. */
+ * Settings), and every 2 seconds while blocked so the warning clears itself.
+ * macOS also says no before it has asked, so the card hides its warning while
+ * Setup, which asks and tracks the prompt, is open. */
 export function useCameraBlocked(watch: boolean) {
   const [blocked, setBlocked] = useState(false);
   useEffect(() => {

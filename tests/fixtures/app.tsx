@@ -223,6 +223,11 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
       screenStatus = { ...screenStatus, error: "permission_denied" };
       throw "permission_denied";
     }
+    // Like the backend: Show your face on and no Camera permission won't start.
+    if (recordingOptions.webcam && query.get("camera") === "denied") {
+      screenStatus = { ...screenStatus, error: "camera_denied" };
+      throw "camera_denied";
+    }
     // A short delay, so tests can prove a second click is ignored.
     return new Promise((resolve) =>
       setTimeout(() => {

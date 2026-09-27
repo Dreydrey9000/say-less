@@ -1295,7 +1295,7 @@
     "savedAnnouncement": "Recording saved.",
     "cameraOffHint": "We won't show your face in the video.",
     "showMyFace": "Show my face",
-    "cameraBlocked": "Your camera is blocked, so your face won't be in the video.",
+    "cameraBlocked": "We can't use your camera. Allow it in System Settings, or turn off Show your face to record.",
     "permissionDenied": "We need Screen Recording permission to record your screen.",
     "permissionHint": "Turn on Say Less in System Settings, then click Reopen Say Less.",
     "openSettings": "Open System Settings",

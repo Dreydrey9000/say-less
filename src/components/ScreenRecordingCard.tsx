@@ -91,9 +91,11 @@ export function ScreenRecordingCard() {
   const busy = pending || state === "starting" || state === "stopping";
   // Clicks are ignored, but unlike `disabled` the button keeps focus.
   const inert = busy || settling;
-  const cameraBlocked =
-    useCameraBlocked(supported && webcam === true) &&
-    notice !== "camera_denied";
+  const cameraBlocked = useCameraBlocked(supported && webcam === true);
+  // The warning steps aside but keeps its space: while recording, while Setup
+  // is open (Setup shows the camera problem itself and knows when the macOS
+  // prompt is still up), and while the camera notice below says the same.
+  const cameraWarningOff = recording || setupOpen || notice === "camera_denied";
   const fileParts = status?.last_file?.split(/[\\/]/) ?? [];
   const fileName = fileParts.pop();
   // "the Say Less folder in Movies": the two folders the video sits in.
@@ -150,11 +152,11 @@ export function ScreenRecordingCard() {
                 {t("screenRecording.stopHint")}
               </p>
             </div>
-            <div className="home-record-slot">
+            <div className="home-record-slot home-record-face-slot">
               {cameraBlocked ? (
                 <p
                   className="home-record-hint home-record-face home-record-warn"
-                  data-off={recording || undefined}
+                  data-off={cameraWarningOff || undefined}
                 >
                   <TriangleAlert
                     size={14}
@@ -294,7 +296,12 @@ export function ScreenRecordingCard() {
                 className="home-record-setup"
                 aria-expanded={setupOpen}
                 aria-controls="recording-setup"
-                onClick={() => setSetupOpen((open) => !open)}
+                onClick={() => {
+                  setSetupOpen((open) => !open);
+                  // A plain open or close drops a Show my face request that
+                  // hasn't found its switch yet.
+                  setFocusFace(false);
+                }}
               >
                 {t("recordingSetup.button")}
                 <ChevronDown
