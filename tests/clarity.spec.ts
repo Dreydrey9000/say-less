@@ -214,3 +214,23 @@ test("the Setup tooltip hides on Escape and after a click", async ({
   await expect(setup).toHaveAttribute("aria-expanded", "true");
   await expect(tip).toBeHidden();
 });
+
+test("a dismissed tooltip shows again when the keyboard comes back", async ({
+  page,
+}) => {
+  await page.goto("/tests/fixtures/app.html");
+  const setup = page
+    .getByTestId("screen-recording-card")
+    .getByRole("button", { name: "Recording setup", exact: true });
+  const tip = page.getByRole("tooltip", { name: "Recording setup" });
+  await setup.hover();
+  await setup.focus();
+  await page.keyboard.press("Escape");
+  await expect(tip).toBeHidden();
+  // Tab away and back while the pointer still rests on Setup.
+  await page.keyboard.press("Tab");
+  await expect(setup).not.toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  await expect(setup).toBeFocused();
+  await expect(tip).toBeVisible();
+});

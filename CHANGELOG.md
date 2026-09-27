@@ -9,13 +9,17 @@
 ### Changed
 
 - The dock's dictation button says Talk instead of Record, and the screen button has a visible Screen label, because "Record" meant two different things on the same screen. While recording, the red pill says Stop and the caption says the screen is recording.
+- The 0.14.1 What's New note opens with a picture of the recording card's buttons, three short steps and the permission line, all in the first view at the smallest window, because the old note was a wall of text. Mac-only and Windows-only parts are picked before the note shows in What's New and About, so Windows users no longer read Mac steps.
 - Every switch fills with the accent color when on, because on and off looked almost the same.
+- Tooltips hide after the click that used their control, and Escape hides a tooltip that is only hovered, because the tip covered what the click had just opened. Keyboard focus brings a hidden tip back, so keyboard users still see the name.
 - On a Mac older than macOS 15 the recording card explains how to check the version and update, instead of a short grey reason with no next step.
 - The site says screen recording needs macOS 15 or newer and explains how to tell an Apple Silicon Mac from an Intel one before picking a download.
 
 ### Fixed
 
 - Home has a "Record your screen" link next to Share (Mac only) that scrolls to the recording card, because at the default 680x570 window the card starts below the fold.
+- The Record your screen link on Home is now a real button, first in the row, because a small underlined link was easy to miss. While a recording runs it shows a red dot and the time and takes you to Stop, so a running recording is never hidden below the fold.
+- The sidebar list scrolls on its own, with a fade while more items sit below, because at the 680x570 window About was cut off and tabbing to it moved the whole window.
 - The recording card stacks its text above its buttons at the same 580px content-width breakpoint as the rest of Home, because the old 640px window breakpoint never fired on a window that can't be narrower than 680px, leaving the text in a thin column.
 - What's New has "Got it" and "Try screen recording", which closes the dialog and brings Home forward with the recording card in view, because a first-time user had no button to reach the feature the note describes. The second button shows only on the 0.14 notes and only when this computer can record (macOS 15 or newer), so it never leads to a faded Record button or sits under an unrelated note.
 - The main window listens for "open-recording-home" and shows Home with the recording card in view, so the dock and recording problems can send people straight to it. The name is shared as OPEN_RECORDING_HOME_EVENT in src/lib/recordingOptions.ts, so a typo on either side can't make it fail silently.
