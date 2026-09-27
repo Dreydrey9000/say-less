@@ -7,7 +7,11 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { platform } from "@tauri-apps/plugin-os";
 import {
+  checkCameraPermission,
+  checkMicrophonePermission,
   checkScreenRecordingPermission,
+  requestCameraPermission,
+  requestMicrophonePermission,
   requestScreenRecordingPermission,
 } from "tauri-plugin-macos-permissions-api";
 import type { ScreenRecordingStatus } from "@/bindings";
@@ -20,6 +24,7 @@ export type RecordingNotice =
   | "microphone_denied"
   | "camera_denied"
   | "camera_failed"
+  | "camera_missing"
   | "window_missing"
   | "failed"
   | "ended_early"
@@ -45,11 +50,11 @@ export function noticeFor(
     code === "permission_denied" ||
     code === "microphone_denied" ||
     code === "camera_denied" ||
+    code === "camera_missing" ||
     code === "window_missing"
   )
     return code;
-  if (code === "camera_failed" || code === "camera_missing")
-    return "camera_failed";
+  if (code === "camera_failed") return "camera_failed";
   if (hasFile) return "ended_early";
   return "failed";
 }
@@ -155,12 +160,39 @@ export const useScreenRecording = create<RecordingStore>((set, get) => ({
   },
   openSettings: async () => {
     try {
+      if (platform() === "macos" && !(await checkScreenRecordingPermission())) {
+        // Puts Say Less in the Screen Recording list (macOS asks only once),
+        // even when the failed start came from the menu bar or a voice cue.
+        await requestScreenRecordingPermission().catch(() => undefined);
+      }
       await invoke("open_screen_recording_settings");
     } catch {
       set({ notice: "permission_denied" });
     }
   },
 }));
+
+/** Open the Camera or Microphone pane of System Settings. macOS lists an app
+ * there only after it has asked once, so ask first if it never did. */
+export async function openPrivacyPane(kind: "camera" | "microphone") {
+  const camera = kind === "camera";
+  try {
+    if (platform() === "macos") {
+      const allowed = camera
+        ? await checkCameraPermission()
+        : await checkMicrophonePermission();
+      if (!allowed)
+        await (
+          camera ? requestCameraPermission() : requestMicrophonePermission()
+        ).catch(() => undefined);
+    }
+    await invoke(
+      camera ? "open_camera_settings" : "open_microphone_privacy_settings",
+    );
+  } catch {
+    // The notice above stays; nothing else to do here.
+  }
+}
 
 let syncStarted = false;
 /** Load the current status once per window and follow every change. */

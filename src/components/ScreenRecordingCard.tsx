@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { MonitorPlay, Square, FolderOpen, ChevronDown } from "lucide-react";
 import {
-  checkCameraPermission,
-  checkMicrophonePermission,
-  requestCameraPermission,
-  requestMicrophonePermission,
-} from "tauri-plugin-macos-permissions-api";
+  MonitorPlay,
+  Square,
+  FolderOpen,
+  ChevronDown,
+  TriangleAlert,
+} from "lucide-react";
+import { invoke } from "@tauri-apps/api/core";
 import {
   formatElapsed,
+  openPrivacyPane,
   startScreenRecordingSync,
   unsupportedKey,
   useElapsed,
@@ -40,6 +42,9 @@ export function ScreenRecordingCard() {
   const [setupOpen, setSetupOpen] = useState(false);
   // The dock's setup button opens this panel in the main window.
   const setupRequested = useRecordingOptions((state) => state.setupRequested);
+  const webcamOff = useRecordingOptions(
+    (state) => state.options?.webcam === false,
+  );
   useEffect(() => {
     if (!setupRequested) return;
     useRecordingOptions.setState({ setupRequested: false });
@@ -55,7 +60,15 @@ export function ScreenRecordingCard() {
   const supported = status?.supported ?? false;
   const recording = state === "recording" || state === "stopping";
   const busy = pending || state === "starting" || state === "stopping";
-  const fileName = status?.last_file?.split(/[\\/]/).pop();
+  const fileParts = status?.last_file?.split(/[\\/]/) ?? [];
+  const fileName = fileParts.pop();
+  // "the Say Less folder in Movies": the two folders the video sits in.
+  const [parent, folder] = fileParts.slice(-2);
+  const needsPermission = notice === "permission_denied";
+  const showSaved =
+    state === "idle" &&
+    justSaved &&
+    (notice === null || notice === "ended_early");
   return (
     <section
       className="home-record"
@@ -68,6 +81,11 @@ export function ScreenRecordingCard() {
         <p>{t("screenRecording.description")}</p>
         {supported && (
           <p className="home-record-hint">{t("screenRecording.voiceHint")}</p>
+        )}
+        {supported && webcamOff && !recording && (
+          <p className="home-record-hint">
+            {t("screenRecording.cameraOffHint")}
+          </p>
         )}
         {status && !supported && (
           <p id="home-record-reason" className="home-record-hint">
@@ -87,7 +105,9 @@ export function ScreenRecordingCard() {
         )}
         <div className="home-record-buttons">
           <Button
-            variant={recording ? "danger" : "accent"}
+            variant={
+              recording ? "danger" : needsPermission ? "secondary" : "accent"
+            }
             className="home-record-button"
             disabled={!status || !supported || busy}
             aria-busy={busy || undefined}
@@ -133,6 +153,17 @@ export function ScreenRecordingCard() {
             </Button>
           </Tooltip>
         </div>
+        {supported && state === "idle" && !showSaved && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="inline-flex items-center gap-1.5 self-end"
+            onClick={() => void reveal()}
+          >
+            <FolderOpen size={14} aria-hidden="true" />
+            {t("screenRecording.openFolder")}
+          </Button>
+        )}
       </div>
       {setupOpen && (
         <RecordingSetup
@@ -146,18 +177,28 @@ export function ScreenRecordingCard() {
           }
         />
       )}
-      {notice === "permission_denied" && (
-        <div className="home-record-notice" role="alert">
+      {needsPermission && (
+        <div
+          className="home-record-notice rounded-lg border border-warning/40 bg-warning/10 px-3 py-2.5"
+          role="alert"
+        >
+          <TriangleAlert
+            size={16}
+            className="shrink-0 text-warning"
+            aria-hidden="true"
+          />
           <p>
             <strong>{t("screenRecording.permissionDenied")}</strong>{" "}
             {t("screenRecording.permissionHint")}
           </p>
+          <Button variant="accent" onClick={() => void openSettings()}>
+            {t("screenRecording.openSettings")}
+          </Button>
           <Button
             variant="secondary"
-            size="sm"
-            onClick={() => void openSettings()}
+            onClick={() => void invoke("reopen_app").catch(() => undefined)}
           >
-            {t("screenRecording.openSettings")}
+            {t("screenRecording.reopenApp")}
           </Button>
         </div>
       )}
@@ -167,45 +208,35 @@ export function ScreenRecordingCard() {
           <Button
             variant="secondary"
             size="sm"
-            onClick={async () => {
-              try {
-                if (!(await checkMicrophonePermission()))
-                  await requestMicrophonePermission();
-              } catch {
-                // The message above stays; nothing else to do here.
-              }
-            }}
+            onClick={() => void openPrivacyPane("microphone")}
           >
-            {t("screenRecording.fixMicrophone")}
+            {t("screenRecording.openSettings")}
           </Button>
         </div>
       )}
       {notice === "camera_denied" && (
         <div className="home-record-notice" role="alert">
-          <p>{t("screenRecording.cameraDenied")}</p>
+          <p>{t("recordingSetup.cameraDenied")}</p>
           <Button
             variant="secondary"
             size="sm"
-            onClick={async () => {
-              try {
-                if (!(await checkCameraPermission()))
-                  await requestCameraPermission();
-              } catch {
-                // The message above stays; nothing else to do here.
-              }
-            }}
+            onClick={() => void openPrivacyPane("camera")}
           >
-            {t("screenRecording.fixMicrophone")}
+            {t("screenRecording.openSettings")}
           </Button>
         </div>
       )}
-      {(notice === "window_missing" || notice === "camera_failed") && (
+      {(notice === "window_missing" ||
+        notice === "camera_failed" ||
+        notice === "camera_missing") && (
         <div className="home-record-notice" role="alert">
           <p>
             {t(
               notice === "window_missing"
                 ? "screenRecording.windowMissing"
-                : "screenRecording.cameraFailed",
+                : notice === "camera_missing"
+                  ? "screenRecording.cameraMissing"
+                  : "screenRecording.cameraFailed",
             )}
           </p>
           {!setupOpen && (
@@ -228,24 +259,25 @@ export function ScreenRecordingCard() {
           )}
         </p>
       )}
-      {state === "idle" &&
-        justSaved &&
-        (notice === null || notice === "ended_early") && (
-          <div className="home-record-notice" role="status">
-            <p>
-              {t(
-                notice === "ended_early"
-                  ? "screenRecording.endedEarly"
+      {showSaved && (
+        <div className="home-record-notice" role="status">
+          <p>
+            {t(
+              notice === "ended_early"
+                ? "screenRecording.endedEarly"
+                : parent && folder
+                  ? "screenRecording.savedIn"
                   : "screenRecording.saved",
-              )}{" "}
-              {fileName && <span className="home-record-file">{fileName}</span>}
-            </p>
-            <Button variant="secondary" size="sm" onClick={() => void reveal()}>
-              <FolderOpen size={14} aria-hidden="true" />{" "}
-              {t("screenRecording.showInFinder")}
-            </Button>
-          </div>
-        )}
+              { folder, parent },
+            )}{" "}
+            {fileName && <span className="home-record-file">{fileName}</span>}
+          </p>
+          <Button variant="secondary" size="sm" onClick={() => void reveal()}>
+            <FolderOpen size={14} aria-hidden="true" />{" "}
+            {t("screenRecording.showInFinder")}
+          </Button>
+        </div>
+      )}
     </section>
   );
 }

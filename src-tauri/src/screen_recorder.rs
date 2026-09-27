@@ -572,6 +572,8 @@ pub fn toggle_in_background(app: &AppHandle, want_recording: Option<bool>) {
                     | "macos_too_old"
             ) {
                 crate::show_main_window_for(&app);
+                // Open Home, where the recording card shows the explanation.
+                let _ = app.emit("open-recording-home", ());
             }
         }
     });
@@ -595,18 +597,24 @@ pub fn screen_recording_status() -> ScreenRecordingStatus {
     current_status()
 }
 
-/// Show the last recording in Finder (or Explorer). Only ever the file we
-/// wrote, never a path from the page.
+/// Show the last recording in Finder (or Explorer), or open the recordings
+/// folder when there is none yet. Only ever paths we chose, never a path from
+/// the page.
 #[tauri::command]
 #[specta::specta]
 pub fn show_screen_recording_in_folder(app: AppHandle) -> Result<(), String> {
     use tauri_plugin_opener::OpenerExt;
-    let path = machine().last_file.clone().ok_or("no_recording")?;
-    if !path.is_file() {
-        return Err("file_missing".into());
+    let last_file = machine().last_file.clone();
+    if let Some(path) = last_file.filter(|p| p.is_file()) {
+        return app
+            .opener()
+            .reveal_item_in_dir(path)
+            .map_err(|_| "reveal_failed".into());
     }
+    let dir = recordings_dir()?;
+    std::fs::create_dir_all(&dir).map_err(|_| "folder_failed")?;
     app.opener()
-        .reveal_item_in_dir(path)
+        .open_path(dir.to_string_lossy(), None::<&str>)
         .map_err(|_| "reveal_failed".into())
 }
 
@@ -631,6 +639,31 @@ pub fn open_screen_recording_settings() -> Result<(), String> {
     }
 }
 
+/// Tells the next launch to show the window even with "start hidden" on.
+/// Tauri's restart spawns the new process from this one, so it inherits it.
+const SHOW_ON_LAUNCH_ENV: &str = "SAY_LESS_SHOW_ON_LAUNCH";
+
+/// "Reopen Say Less" on the permission notice. macOS applies a new Screen
+/// Recording grant only after a restart, and the window comes back on Home.
+#[tauri::command]
+#[specta::specta]
+pub fn reopen_app(app: AppHandle) {
+    std::env::set_var(SHOW_ON_LAUNCH_ENV, "1");
+    app.request_restart();
+}
+
+/// True when "Reopen Say Less" started this launch. The first call (at the
+/// top of `run`, before other threads) reads and clears the flag, so a later
+/// restart such as an update starts hidden again.
+pub(crate) fn launched_to_show() -> bool {
+    static SHOW: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *SHOW.get_or_init(|| {
+        let show = std::env::var_os(SHOW_ON_LAUNCH_ENV).is_some();
+        std::env::remove_var(SHOW_ON_LAUNCH_ENV);
+        show
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -641,6 +674,17 @@ mod tests {
             .unwrap()
             .and_hms_opt(14, 3, 7)
             .unwrap()
+    }
+
+    #[test]
+    fn reopen_flag_shows_the_window_for_that_launch_only() {
+        // Nothing in this test binary calls `run`, so this is the first read.
+        std::env::set_var(SHOW_ON_LAUNCH_ENV, "1");
+        assert!(launched_to_show());
+        // Cleared, so a later restart (like an update) starts hidden again.
+        assert!(std::env::var_os(SHOW_ON_LAUNCH_ENV).is_none());
+        // The window checks later in startup still get the same answer.
+        assert!(launched_to_show());
     }
 
     #[test]
