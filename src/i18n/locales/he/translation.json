@@ -265,6 +265,10 @@
           "transcribe_with_post_process": {
             "name": "קיצור לעיבוד משלים",
             "description": "Optional. Works like your Talk shortcut, but your words go through AI cleanup first. It sends text only, never audio, to the provider you set in AI cleanup."
+          },
+          "toggle_screen_recording": {
+            "name": "Record screen",
+            "description": "הקש פעם אחת כדי להתחיל הקלטת מסך ופעם נוספת כדי לעצור אותה, מכל אפליקציה."
           }
         },
         "errors": {
@@ -1334,7 +1338,9 @@
     "reopening": "פותחים מחדש…",
     "reopenFailed": "לא הצלחנו לפתוח מחדש את Say Less. צא מהאפליקציה דרך שורת התפריטים, ואז פתח אותה שוב.",
     "macosTooOldSteps": "כדי לבדוק את הגרסה שלך, פתח את תפריט Apple ובחר 'אודות Mac זה'. כדי לעדכן, עבור אל 'הגדרות המערכת', 'כללי', 'עדכון תוכנה'. אם לא מופיע עדכון, לא נוכל להקליט את המסך ב-Mac הזה, אבל ההכתבה עדיין עובדת.",
-    "recordWithoutFace": "הקלט ללא הפנים שלי"
+    "recordWithoutFace": "הקלט ללא הפנים שלי",
+    "shortcutStartHint": "או הקש {{shortcut}} מכל אפליקציה, או אמור \"Say less, start recording.\"",
+    "shortcutStopHint": "כשתסיים, לחץ על 'Stop', הקש {{shortcut}} או אמור \"Say less, stop recording.\""
   },
   "recordingSetup": {
     "button": "Setup",

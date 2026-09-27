@@ -929,6 +929,20 @@ pub fn get_default_settings() -> AppSettings {
             current_binding: default_command_shortcut.to_string(),
         },
     );
+    // Start or stop a screen recording from any app. macOS only, since screen
+    // recording is Mac-only for now. Existing installs pick it up because
+    // missing default bindings are merged in on load.
+    #[cfg(target_os = "macos")]
+    bindings.insert(
+        "toggle_screen_recording".to_string(),
+        ShortcutBinding {
+            id: "toggle_screen_recording".to_string(),
+            name: "Record screen".to_string(),
+            description: "Starts or stops a screen recording.".to_string(),
+            default_binding: "ctrl+option+r".to_string(),
+            current_binding: "ctrl+option+r".to_string(),
+        },
+    );
     bindings.insert(
         "cancel".to_string(),
         ShortcutBinding {
@@ -1763,5 +1777,19 @@ mod tests {
         let out = format!("{:?}", map);
         assert!(!out.contains("secret"));
         assert!(out.contains("[REDACTED]"));
+    }
+}
+
+#[cfg(all(test, target_os = "macos"))]
+mod record_shortcut_tests {
+    #[test]
+    fn record_screen_shortcut_defaults_to_control_option_r() {
+        let settings = super::get_default_settings();
+        let binding = settings
+            .bindings
+            .get("toggle_screen_recording")
+            .expect("record screen binding");
+        assert_eq!(binding.default_binding, "ctrl+option+r");
+        assert_eq!(binding.current_binding, "ctrl+option+r");
     }
 }

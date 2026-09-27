@@ -265,6 +265,10 @@
           "transcribe_with_post_process": {
             "name": "Sneltoets voor naverwerking",
             "description": "Optional. Works like your Talk shortcut, but your words go through AI cleanup first. It sends text only, never audio, to the provider you set in AI cleanup."
+          },
+          "toggle_screen_recording": {
+            "name": "Record screen",
+            "description": "Druk één keer om een schermopname te starten en nogmaals om te stoppen, vanuit elke app."
           }
         },
         "errors": {
@@ -1334,7 +1338,9 @@
     "reopening": "Opnieuw openen…",
     "reopenFailed": "We konden Say Less niet opnieuw openen. Sluit de app af via de menubalk en open hem daarna weer.",
     "macosTooOldSteps": "Om je versie te bekijken, open je het Apple-menu en kies je 'Over deze Mac'. Om bij te werken, ga je naar Systeeminstellingen, 'Algemeen', 'Software-update'. Zie je geen update, dan kunnen we op deze Mac je scherm niet opnemen, maar dicteren werkt nog steeds.",
-    "recordWithoutFace": "Opnemen zonder mijn gezicht"
+    "recordWithoutFace": "Opnemen zonder mijn gezicht",
+    "shortcutStartHint": "Of druk op {{shortcut}} vanuit elke app, of zeg “Say less, start recording.”",
+    "shortcutStopHint": "Als je klaar bent, klik je op 'Stop', druk je op {{shortcut}} of zeg je “Say less, stop recording.”"
   },
   "recordingSetup": {
     "button": "Setup",
