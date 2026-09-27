@@ -365,6 +365,32 @@
     transform: scale(0.8);
   }
 }
+/* The nav list scrolls on its own under the fixed logo, so every item stays
+   reachable at the 570px minimum height and focusing one never shifts the
+   whole workspace. 4px of inline room keeps focus rings from being clipped. */
+.app-sidebar-nav {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: calc(100% + 8px);
+  margin-inline: -4px;
+  padding-inline: 4px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* Focus scrolling leaves room for the fade below. */
+  scroll-padding-bottom: 28px;
+}
+/* A fade that sticks to the bottom while more items sit below, and rests as
+   blank space under the last item once the list is scrolled to the end. */
+.app-sidebar-nav::after {
+  content: "";
+  position: sticky;
+  bottom: 0;
+  flex: none;
+  align-self: stretch;
+  height: 24px;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--color-background));
+}
 @media (max-width: 540px) {
   .app-sidebar {
     width: 100%;
@@ -384,6 +410,9 @@
   .app-sidebar-nav > button {
     width: auto;
     flex-shrink: 0;
+  }
+  .app-sidebar-nav::after {
+    display: none;
   }
   .app-workspace {
     flex-direction: column;

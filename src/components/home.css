@@ -83,10 +83,14 @@
   align-items: center;
   gap: 16px;
 }
-.home-actions > button:first-child {
+.home-actions > button:not(.home-link) {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+}
+/* A recording is running: the red dot plus a red edge, so it reads as live. */
+.home-jump-live {
+  border-color: color-mix(in srgb, #ff5a5a, transparent 45%);
 }
 .home-link {
   display: inline-flex;

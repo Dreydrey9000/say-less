@@ -132,3 +132,85 @@ test("each setting has one home and duplicates point to it", async ({
     }),
   ).toBeVisible();
 });
+
+test("at the smallest window the sidebar list scrolls, so About is reachable", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 680, height: 570 });
+  await page.goto("/tests/fixtures/app.html");
+  const nav = page.getByRole("navigation", { name: "Settings navigation" });
+  const about = nav.getByRole("button", { name: "About", exact: true });
+  // The mouse wheel over the list scrolls it.
+  await nav.getByRole("button", { name: "Home", exact: true }).hover();
+  await page.mouse.wheel(0, 400);
+  await expect(about).toBeInViewport({ ratio: 1 });
+  await about.click();
+  await expect(about).toHaveAttribute("aria-current", "page");
+});
+
+test("tabbing to About scrolls only the sidebar list", async ({ page }) => {
+  await page.setViewportSize({ width: 680, height: 570 });
+  await page.goto("/tests/fixtures/app.html");
+  const nav = page.getByRole("navigation", { name: "Settings navigation" });
+  const about = nav.getByRole("button", { name: "About", exact: true });
+  await nav.getByRole("button", { name: "Home", exact: true }).focus();
+  for (let i = 0; i < 15; i++) {
+    if (await about.evaluate((el) => el === document.activeElement)) break;
+    await page.keyboard.press("Tab");
+  }
+  await expect(about).toBeFocused();
+  await expect(about).toBeInViewport({ ratio: 1 });
+  // The workspace itself never moves, so the Say Less header stays put.
+  expect(
+    await page.locator(".app-workspace").evaluate((el) => el.scrollTop),
+  ).toBe(0);
+  await expect(
+    nav.getByText("Say Less", { exact: true }).first(),
+  ).toBeInViewport({ ratio: 1 });
+});
+
+test("the top of Home shows a running recording and leads to Stop", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 680, height: 570 });
+  await page.goto("/tests/fixtures/app.html");
+  // Idle: the way to the card is a real button, first in the row.
+  await expect(page.locator(".home-actions > button").first()).toHaveText(
+    "Record your screen",
+  );
+  await page.goto("/tests/fixtures/app.html?screen=recording");
+  const live = page.getByRole("button", {
+    name: /^Recording 01:\d\d\. Go to Stop$/,
+  });
+  await expect(live).toBeInViewport();
+  await expect(
+    page.getByRole("button", { name: "Record your screen" }),
+  ).toHaveCount(0);
+  await live.click();
+  await expect(page.locator("#home-record-title")).toBeFocused();
+  await expect(
+    page.getByRole("button", { name: "Stop screen recording" }),
+  ).toBeInViewport();
+});
+
+test("the Setup tooltip hides on Escape and after a click", async ({
+  page,
+}) => {
+  await page.goto("/tests/fixtures/app.html");
+  const setup = page
+    .getByTestId("screen-recording-card")
+    .getByRole("button", { name: "Recording setup", exact: true });
+  const tip = page.getByRole("tooltip", { name: "Recording setup" });
+  await setup.hover();
+  await expect(tip).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(tip).toBeHidden();
+  // It comes back once the pointer leaves and returns.
+  await page.mouse.move(0, 0);
+  await setup.hover();
+  await expect(tip).toBeVisible();
+  // The click that opens Setup does not leave the tip over what opened.
+  await setup.click();
+  await expect(setup).toHaveAttribute("aria-expanded", "true");
+  await expect(tip).toBeHidden();
+});

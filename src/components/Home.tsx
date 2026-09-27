@@ -15,6 +15,11 @@ import { formatKeyCombination } from "@/lib/utils/keyboard";
 import type { HistoryEntry, PaginatedHistory } from "@/bindings";
 import { useSettings } from "@/hooks/useSettings";
 import { useVoiceActivity } from "@/hooks/useVoiceActivity";
+import {
+  formatElapsed,
+  useElapsed,
+  useScreenRecording,
+} from "@/lib/screenRecording";
 import { useStudio } from "@/lib/studio";
 import { Companion } from "./companion/Companion";
 import { HomeStats } from "./HomeStats";
@@ -35,6 +40,40 @@ export function revealRecordingCard() {
   title.focus({ preventScroll: true });
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   card.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+}
+
+/** Top of Home: a way down to the recording card, which sits below the fold
+ *  at the default window size. While a recording runs it shows the timer and
+ *  leads to Stop, so a recording started by voice or the dock is never
+ *  invisible here. Its own component, so the ticking timer re-renders only
+ *  this button. */
+function RecordJump() {
+  const { t } = useTranslation();
+  const recording = useScreenRecording(
+    (state) => state.status?.state === "recording",
+  );
+  const startedAt = useScreenRecording((state) => state.startedAt);
+  const elapsed = useElapsed(recording ? startedAt : null);
+  return (
+    <Button
+      variant="secondary"
+      className={recording ? "home-jump-live" : undefined}
+      onClick={revealRecordingCard}
+    >
+      {recording ? (
+        <>
+          <span className="rec-dot" aria-hidden="true" />
+          <span className="rec-time">
+            {t("home.recordingJump", { time: formatElapsed(elapsed) })}
+          </span>
+        </>
+      ) : (
+        <>
+          <MonitorPlay size={16} aria-hidden="true" /> {t("home.recordJump")}
+        </>
+      )}
+    </Button>
+  );
 }
 
 export function Home({
@@ -156,6 +195,9 @@ export function Home({
             </ul>
           </details>
           <div className="home-actions">
+            {/* The recording card sits below the fold at the default window
+                size, so this keeps it one click away. Mac only for now. */}
+            {isMac && <RecordJump />}
             {!settings.floating && (
               <Button
                 variant="secondary"
@@ -167,18 +209,6 @@ export function Home({
               >
                 {t("home.openDock")} <ArrowUpRight size={16} />
               </Button>
-            )}
-            {/* The recording card sits below the fold at the default window
-                size, so this keeps it one click away. Mac only for now. */}
-            {isMac && (
-              <button
-                type="button"
-                className="home-link"
-                onClick={revealRecordingCard}
-              >
-                <MonitorPlay size={14} aria-hidden="true" />{" "}
-                {t("home.recordJump")}
-              </button>
             )}
             <button
               type="button"

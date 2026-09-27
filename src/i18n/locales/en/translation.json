@@ -1049,6 +1049,7 @@
     "shareCopied": "Link copied: saylessvoice.com",
     "shareFailed": "Could not copy. The link is saylessvoice.com",
     "recordJump": "Record your screen",
+    "recordingJump": "Recording {{time}}. Go to Stop",
     "status": {
       "idle": "Ready",
       "arming": "Starting microphone…",
