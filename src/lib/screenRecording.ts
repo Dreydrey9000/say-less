@@ -7,7 +7,11 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { platform } from "@tauri-apps/plugin-os";
 import {
+  checkCameraPermission,
+  checkMicrophonePermission,
   checkScreenRecordingPermission,
+  requestCameraPermission,
+  requestMicrophonePermission,
   requestScreenRecordingPermission,
 } from "tauri-plugin-macos-permissions-api";
 import type { ScreenRecordingStatus } from "@/bindings";
@@ -167,6 +171,28 @@ export const useScreenRecording = create<RecordingStore>((set, get) => ({
     }
   },
 }));
+
+/** Open the Camera or Microphone pane of System Settings. macOS lists an app
+ * there only after it has asked once, so ask first if it never did. */
+export async function openPrivacyPane(kind: "camera" | "microphone") {
+  const camera = kind === "camera";
+  try {
+    if (platform() === "macos") {
+      const allowed = camera
+        ? await checkCameraPermission()
+        : await checkMicrophonePermission();
+      if (!allowed)
+        await (
+          camera ? requestCameraPermission() : requestMicrophonePermission()
+        ).catch(() => undefined);
+    }
+    await invoke(
+      camera ? "open_camera_settings" : "open_microphone_privacy_settings",
+    );
+  } catch {
+    // The notice above stays; nothing else to do here.
+  }
+}
 
 let syncStarted = false;
 /** Load the current status once per window and follow every change. */

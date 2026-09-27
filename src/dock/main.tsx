@@ -78,6 +78,7 @@ function useDockScreenRecording() {
         notice === "microphone_denied" ||
         notice === "camera_denied" ||
         notice === "camera_failed" ||
+        notice === "camera_missing" ||
         notice === "window_missing"
       )
         await invoke("show_main_window_command").catch(() => undefined);

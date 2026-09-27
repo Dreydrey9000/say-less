@@ -8,9 +8,9 @@ import {
   TriangleAlert,
 } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
-import { relaunch } from "@tauri-apps/plugin-process";
 import {
   formatElapsed,
+  openPrivacyPane,
   startScreenRecordingSync,
   unsupportedKey,
   useElapsed,
@@ -62,8 +62,8 @@ export function ScreenRecordingCard() {
   const busy = pending || state === "starting" || state === "stopping";
   const fileParts = status?.last_file?.split(/[\\/]/) ?? [];
   const fileName = fileParts.pop();
-  // "Movies, Say Less": the two folders the video sits in.
-  const folder = fileParts.slice(-2).join(", ");
+  // "the Say Less folder in Movies": the two folders the video sits in.
+  const [parent, folder] = fileParts.slice(-2);
   const needsPermission = notice === "permission_denied";
   const showSaved =
     state === "idle" &&
@@ -196,7 +196,7 @@ export function ScreenRecordingCard() {
           </Button>
           <Button
             variant="secondary"
-            onClick={() => void relaunch().catch(() => undefined)}
+            onClick={() => void invoke("reopen_app").catch(() => undefined)}
           >
             {t("screenRecording.reopenApp")}
           </Button>
@@ -208,11 +208,7 @@ export function ScreenRecordingCard() {
           <Button
             variant="secondary"
             size="sm"
-            onClick={() =>
-              void invoke("open_microphone_privacy_settings").catch(
-                () => undefined,
-              )
-            }
+            onClick={() => void openPrivacyPane("microphone")}
           >
             {t("screenRecording.openSettings")}
           </Button>
@@ -224,9 +220,7 @@ export function ScreenRecordingCard() {
           <Button
             variant="secondary"
             size="sm"
-            onClick={() =>
-              void invoke("open_camera_settings").catch(() => undefined)
-            }
+            onClick={() => void openPrivacyPane("camera")}
           >
             {t("screenRecording.openSettings")}
           </Button>
@@ -271,10 +265,10 @@ export function ScreenRecordingCard() {
             {t(
               notice === "ended_early"
                 ? "screenRecording.endedEarly"
-                : folder
+                : parent && folder
                   ? "screenRecording.savedIn"
                   : "screenRecording.saved",
-              { folder },
+              { folder, parent },
             )}{" "}
             {fileName && <span className="home-record-file">{fileName}</span>}
           </p>

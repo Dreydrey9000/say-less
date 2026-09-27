@@ -1273,7 +1273,7 @@
     "stopping": "Saving",
     "recording": "Recording",
     "saved": "Saved.",
-    "savedIn": "Saved in {{folder}}.",
+    "savedIn": "Saved in the {{folder}} folder in {{parent}}.",
     "showInFinder": "Show in Finder",
     "openFolder": "Open recordings folder",
     "voiceHint": "Or press your shortcut and say “Say less, start recording.”",

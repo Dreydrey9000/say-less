@@ -89,6 +89,13 @@ async openScreenRecordingSettings() : Promise<Result<null, string>> {
     else return { status: "error", error: e  as any };
 }
 },
+/**
+ * "Reopen Say Less" on the permission notice. macOS applies a new Screen
+ * Recording grant only after a restart, and the window comes back on Home.
+ */
+async reopenApp() : Promise<void> {
+    await TAURI_INVOKE("reopen_app");
+},
 async getRecordingOptions() : Promise<RecordingOptions> {
     return await TAURI_INVOKE("get_recording_options");
 },

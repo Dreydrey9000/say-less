@@ -639,6 +639,31 @@ pub fn open_screen_recording_settings() -> Result<(), String> {
     }
 }
 
+/// Tells the next launch to show the window even with "start hidden" on.
+/// Tauri's restart spawns the new process from this one, so it inherits it.
+const SHOW_ON_LAUNCH_ENV: &str = "SAY_LESS_SHOW_ON_LAUNCH";
+
+/// "Reopen Say Less" on the permission notice. macOS applies a new Screen
+/// Recording grant only after a restart, and the window comes back on Home.
+#[tauri::command]
+#[specta::specta]
+pub fn reopen_app(app: AppHandle) {
+    std::env::set_var(SHOW_ON_LAUNCH_ENV, "1");
+    app.request_restart();
+}
+
+/// True when "Reopen Say Less" started this launch. The first call (at the
+/// top of `run`, before other threads) reads and clears the flag, so a later
+/// restart such as an update starts hidden again.
+pub(crate) fn launched_to_show() -> bool {
+    static SHOW: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *SHOW.get_or_init(|| {
+        let show = std::env::var_os(SHOW_ON_LAUNCH_ENV).is_some();
+        std::env::remove_var(SHOW_ON_LAUNCH_ENV);
+        show
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -649,6 +674,17 @@ mod tests {
             .unwrap()
             .and_hms_opt(14, 3, 7)
             .unwrap()
+    }
+
+    #[test]
+    fn reopen_flag_shows_the_window_for_that_launch_only() {
+        // Nothing in this test binary calls `run`, so this is the first read.
+        std::env::set_var(SHOW_ON_LAUNCH_ENV, "1");
+        assert!(launched_to_show());
+        // Cleared, so a later restart (like an update) starts hidden again.
+        assert!(std::env::var_os(SHOW_ON_LAUNCH_ENV).is_none());
+        // The window checks later in startup still get the same answer.
+        assert!(launched_to_show());
     }
 
     #[test]
