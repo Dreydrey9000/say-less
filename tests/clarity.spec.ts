@@ -187,10 +187,10 @@ test("the top of Home shows a running recording and leads to Stop", async ({
     page.getByRole("button", { name: "Record your screen" }),
   ).toHaveCount(0);
   await live.click();
-  await expect(page.locator("#home-record-title")).toBeFocused();
-  await expect(
-    page.getByRole("button", { name: "Stop screen recording" }),
-  ).toBeInViewport();
+  // "Go to Stop" lands on Stop itself.
+  const stop = page.getByRole("button", { name: "Stop screen recording" });
+  await expect(stop).toBeFocused();
+  await expect(stop).toBeInViewport();
 });
 
 test("the Setup tooltip hides on Escape and after a click", async ({

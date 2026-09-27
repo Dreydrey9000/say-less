@@ -90,6 +90,18 @@ async openScreenRecordingSettings() : Promise<Result<null, string>> {
 }
 },
 /**
+ * Open System Settings on General > Software Update, for the notice on a Mac
+ * too old to record.
+ */
+async openSoftwareUpdate() : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("open_software_update") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+/**
  * "Reopen Say Less" on the permission notice. macOS applies a new Screen
  * Recording grant only after a restart, and the window comes back on Home.
  */

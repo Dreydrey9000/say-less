@@ -15,6 +15,7 @@ import {
   requestScreenRecordingPermission,
 } from "tauri-plugin-macos-permissions-api";
 import type { ScreenRecordingStatus } from "@/bindings";
+import { useRecordingOptions } from "@/lib/recordingOptions";
 
 export type { ScreenRecordingStatus } from "@/bindings";
 
@@ -190,11 +191,28 @@ export const useScreenRecording = create<RecordingStore>((set, get) => ({
   },
 }));
 
+// A module flag, not state, like `inFlight`: the second click of a
+// double-click opens System Settings only once, from any button.
+let settingsOpening = false;
+async function openSettingsOnce(open: () => Promise<unknown>) {
+  if (settingsOpening) return;
+  settingsOpening = true;
+  try {
+    await open();
+  } catch {
+    // The notice stays; nothing else to do here.
+  } finally {
+    window.setTimeout(() => {
+      settingsOpening = false;
+    }, SETTLE_MS);
+  }
+}
+
 /** Open the Camera or Microphone pane of System Settings. macOS lists an app
  * there only after it has asked once, so ask first if it never did. */
-export async function openPrivacyPane(kind: "camera" | "microphone") {
+export function openPrivacyPane(kind: "camera" | "microphone") {
   const camera = kind === "camera";
-  try {
+  return openSettingsOnce(async () => {
     if (platform() === "macos") {
       const allowed = camera
         ? await checkCameraPermission()
@@ -207,37 +225,82 @@ export async function openPrivacyPane(kind: "camera" | "microphone") {
     await invoke(
       camera ? "open_camera_settings" : "open_microphone_privacy_settings",
     );
-  } catch {
-    // The notice above stays; nothing else to do here.
-  }
+  });
 }
 
-/** True while the webcam is on but macOS hasn't given us the camera. Checked
- * when `watch` turns on and when the window gets focus back (say, from System
- * Settings), and every 2 seconds while blocked so the warning clears itself.
- * macOS also says no before it has asked, so the card hides its warning while
- * Setup, which asks and tracks the prompt, is open. */
-export function useCameraBlocked(watch: boolean) {
-  const [blocked, setBlocked] = useState(false);
+/** Open Software Update in System Settings, for a Mac too old to record. */
+export function openSoftwareUpdate() {
+  return openSettingsOnce(() => invoke("open_software_update"));
+}
+
+/** Camera permission, shared by the card and Setup. "asking" means we just
+ * raised the macOS prompt: macOS says no until it is answered, so that isn't
+ * blocked yet. */
+export type CameraAccess = "unknown" | "allowed" | "asking" | "denied";
+const useCameraStore = create<{ access: CameraAccess }>(() => ({
+  access: "unknown",
+}));
+
+/** Turn Show your face on or off. The card's Show my face button and Setup's
+ * switch both come here, so both raise the macOS camera prompt. Returns
+ * whether the change was saved. */
+export async function setShowFace(on: boolean) {
+  const mac = platform() === "macos";
+  const allowed =
+    !on || !mac || (await checkCameraPermission().catch(() => false));
+  // Asking before the switch flips, so nothing says blocked while macOS asks.
+  if (!allowed) useCameraStore.setState({ access: "asking" });
+  const ok = await useRecordingOptions.getState().update({ webcam: on });
+  if (!ok) {
+    if (!allowed) useCameraStore.setState({ access: "unknown" });
+    return false;
+  }
+  if (on && mac && allowed) useCameraStore.setState({ access: "allowed" });
+  // macOS shows its own prompt the first time. useCameraAccess keeps
+  // watching for the answer.
+  if (!allowed)
+    await requestCameraPermission().catch(() =>
+      useCameraStore.setState({ access: "denied" }),
+    );
+  return true;
+}
+
+/** Camera permission while `watch` is on (the webcam is on). Checked when
+ * `watch` turns on, every 1.5 seconds until allowed, and when the window gets
+ * focus back. Focus coming back also ends "asking": the prompt was answered,
+ * or the user is back from System Settings. */
+export function useCameraAccess(watch: boolean): CameraAccess {
+  const access = useCameraStore((state) => state.access);
+  const allowed = access === "allowed";
   useEffect(() => {
     if (!watch || platform() !== "macos") return;
     let disposed = false;
-    const check = () =>
+    const check = (answered: boolean) =>
       void checkCameraPermission()
         .catch(() => false)
         .then((allowed) => {
-          if (!disposed) setBlocked(!allowed);
+          if (disposed) return;
+          useCameraStore.setState((current) => ({
+            access: allowed
+              ? "allowed"
+              : current.access === "asking" && !answered
+                ? "asking"
+                : "denied",
+          }));
         });
-    check();
-    window.addEventListener("focus", check);
-    const id = blocked ? window.setInterval(check, 2000) : undefined;
+    const onFocus = () => check(true);
+    check(false);
+    window.addEventListener("focus", onFocus);
+    const id = allowed
+      ? undefined
+      : window.setInterval(() => check(false), 1500);
     return () => {
       disposed = true;
-      window.removeEventListener("focus", check);
+      window.removeEventListener("focus", onFocus);
       window.clearInterval(id);
     };
-  }, [watch, blocked]);
-  return watch && blocked;
+  }, [watch, allowed]);
+  return watch ? access : "unknown";
 }
 
 let syncStarted = false;

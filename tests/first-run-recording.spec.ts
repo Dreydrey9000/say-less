@@ -17,6 +17,25 @@ test("Record your screen at the default window size brings the card into view", 
   ).toBeInViewport();
 });
 
+test("Record your screen hides while the whole card is on screen", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 680, height: 570 });
+  await page.goto("/tests/fixtures/app.html");
+  const jump = page.getByRole("button", { name: "Record your screen" });
+  await expect(jump).toBeInViewport();
+  // With the card fully in view the button would go nowhere.
+  await page
+    .getByTestId("screen-recording-card")
+    .evaluate((el) => el.scrollIntoView({ block: "center" }));
+  await expect(jump).toHaveCount(0);
+  // Scrolled back up, the card is below the fold again.
+  await page
+    .locator(".page-eyebrow")
+    .evaluate((el) => el.scrollIntoView({ block: "start" }));
+  await expect(jump).toBeInViewport();
+});
+
 test("open-recording-home from another page lands on Home", async ({
   page,
 }) => {
@@ -69,4 +88,23 @@ test("An older Mac explains how to check and update macOS", async ({
     "Screen recording needs macOS 15 (Sequoia) or newer.",
   );
   await expect(record).not.toHaveClass(/accent-action/);
+  // One click to Software Update, opened once even on a double-click.
+  const update = card.getByRole("button", { name: "Open Software Update" });
+  await update.dblclick();
+  const opened = () =>
+    page.evaluate(
+      () =>
+        (window as unknown as { testCommands: string[] }).testCommands.filter(
+          (c) => c === "open_software_update",
+        ).length,
+    );
+  await expect.poll(opened).toBe(1);
+  await page.waitForTimeout(300);
+  expect(await opened()).toBe(1);
+  // The icon sits beside the first line, not the middle of the paragraph,
+  // and the button starts under the text.
+  const icon = (await card.locator(".home-record-notice > svg").boundingBox())!;
+  const text = (await card.locator("#home-record-reason").boundingBox())!;
+  expect(Math.abs(icon.y + icon.height / 2 - (text.y + 10))).toBeLessThan(2);
+  expect((await update.boundingBox())!.x).toBeCloseTo(text.x, 0);
 });

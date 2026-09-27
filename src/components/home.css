@@ -303,8 +303,8 @@
 .home-record[data-state="stopping"] {
   border-color: color-mix(in srgb, #ff5a5a, transparent 40%);
 }
-/* Can't record (no permission, older Mac, Windows): one column, with the
-   notice above the buttons. */
+/* Can't record (older Mac, Windows): one column, with the notice above the
+   buttons. */
 .home-record[data-blocked] {
   grid-template-columns: minmax(0, 1fr);
 }
@@ -339,8 +339,8 @@
   visibility: hidden;
 }
 /* The face line holds a small button (32px plus the line's 4px top margin), so
-   it keeps that height even when empty: Show your face on, or the camera check
-   still running. */
+   it keeps that height even while its line is hidden: Setup open, the camera
+   check still running, or the macOS camera prompt up. */
 .home-record-face-slot {
   min-height: 36px;
 }
@@ -427,6 +427,28 @@
 }
 .home-record-notice p {
   flex: 1 1 280px;
+}
+/* A warning: the icon beside the first line of text, and the buttons under
+   the text starting at the same left edge. */
+.home-record-notice > svg {
+  align-self: flex-start;
+  margin-top: 2px;
+}
+.home-record-notice-body {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.home-record-notice-body > p {
+  flex-basis: 100%;
+}
+/* The one slot for what the last Record or Stop brought back, right under
+   the buttons. */
+.home-record-result {
+  grid-column: 1 / -1;
 }
 .home-record-notice .home-record-error {
   flex-basis: 100%;

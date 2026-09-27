@@ -1,12 +1,7 @@
 import { useEffect, useId, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { invoke } from "@tauri-apps/api/core";
-import { type } from "@tauri-apps/plugin-os";
 import { RefreshCw } from "lucide-react";
-import {
-  checkCameraPermission,
-  requestCameraPermission,
-} from "tauri-plugin-macos-permissions-api";
 import {
   WEBCAM_CORNERS,
   WEBCAM_SIZES,
@@ -14,13 +9,16 @@ import {
   windowLabel,
   type RecordingOptions,
 } from "@/lib/recordingOptions";
-import { useScreenRecording } from "@/lib/screenRecording";
+import {
+  openPrivacyPane,
+  setShowFace,
+  useCameraAccess,
+  useScreenRecording,
+} from "@/lib/screenRecording";
 import { Button } from "./ui/Button";
 import { Dropdown } from "./ui/Dropdown";
 import { SettingContainer } from "./ui/SettingContainer";
 import { ToggleSwitch } from "./ui/ToggleSwitch";
-
-type CameraAccess = "unknown" | "allowed" | "asking" | "denied";
 
 /** Live camera frames for the thumbnail, only while it is on screen. */
 function useCameraThumbnail(active: boolean, cameraId: string | null) {
@@ -59,50 +57,6 @@ function useCameraThumbnail(active: boolean, cameraId: string | null) {
   return { frame, failed };
 }
 
-/** Camera permission: checked when the webcam is on, asked for only when the
- * user turns it on, and re-checked while the macOS prompt is up. */
-function useCameraAccess(watch: boolean) {
-  const isMac = type() === "macos";
-  const [access, setAccess] = useState<CameraAccess>("unknown");
-  useEffect(() => {
-    if (!watch || !isMac) return;
-    let disposed = false;
-    const check = async () => {
-      try {
-        const allowed = await checkCameraPermission();
-        if (!disposed)
-          setAccess((current) =>
-            allowed ? "allowed" : current === "asking" ? "asking" : "denied",
-          );
-      } catch {
-        if (!disposed) setAccess("denied");
-      }
-    };
-    void check();
-    const id = window.setInterval(check, 1500);
-    return () => {
-      disposed = true;
-      window.clearInterval(id);
-    };
-  }, [watch, isMac]);
-  const ask = async () => {
-    if (!isMac) return;
-    try {
-      if (await checkCameraPermission()) {
-        setAccess("allowed");
-        return;
-      }
-      setAccess("asking");
-      // macOS shows its own prompt the first time. The check above keeps
-      // watching for the answer.
-      await requestCameraPermission();
-    } catch {
-      setAccess("denied");
-    }
-  };
-  return { access, ask };
-}
-
 /**
  * Recording setup: what the next recording captures. Every change saves
  * right away, so the Record button, the dock and "Say less, start recording"
@@ -136,7 +90,7 @@ export function RecordingSetup({
   const [wantWindow, setWantWindow] = useState(false);
   const disabled = !supported || !options;
   const webcamOn = !!options?.webcam && supported;
-  const { access, ask } = useCameraAccess(webcamOn);
+  const access = useCameraAccess(webcamOn);
   const thumbnail = useCameraThumbnail(
     webcamOn && access === "allowed" && !recording,
     options?.camera_id ?? null,
@@ -196,11 +150,6 @@ export function RecordingSetup({
     if (first) pickWindow(String(first.id));
     else setWantWindow(true);
   };
-  const toggleWebcam = async (on: boolean) => {
-    const ok = await update({ webcam: on });
-    if (ok && on) await ask();
-  };
-
   return (
     <div
       id={id}
@@ -323,14 +272,14 @@ export function RecordingSetup({
           <fieldset className="rec-setup-group" disabled={disabled}>
             <legend>{t("recordingSetup.cameraTitle")}</legend>
             <ToggleSwitch
-              // The card's face hint opens Setup and focuses this switch.
+              // Show my face on the card falls back to this switch.
               id="rec-setup-webcam"
               label={t("recordingSetup.webcam")}
               description=""
               grouped
               checked={options.webcam}
               disabled={disabled}
-              onChange={(on) => void toggleWebcam(on)}
+              onChange={(on) => void setShowFace(on)}
             />
             {options.webcam && (
               <>
@@ -442,11 +391,7 @@ export function RecordingSetup({
                     <Button
                       variant="secondary"
                       size="sm"
-                      onClick={() =>
-                        void invoke("open_camera_settings").catch(
-                          () => undefined,
-                        )
-                      }
+                      onClick={() => void openPrivacyPane("camera")}
                     >
                       {t("screenRecording.openSettings")}
                     </Button>

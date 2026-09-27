@@ -116,7 +116,7 @@ test("webcam shows a live preview and remembers its corner and size", async ({
 test("clicking a switch's title flips the switch", async ({ page }) => {
   const panel = await openSetup(page);
   const face = panel.getByRole("switch", { name: "Show your face" });
-  // The card's face hint focuses this switch by its id.
+  // The card's Show my face falls back to this switch by its id.
   await expect(face).toHaveAttribute("id", "rec-setup-webcam");
   await panel.getByText("Show your face", { exact: true }).click();
   await expect(face).toBeChecked();
@@ -184,7 +184,9 @@ test("denied camera explains the fix and opens System Settings", async ({
   const alert = panel.getByRole("alert");
   await expect(alert).toContainText("System Settings");
   await alert.getByRole("button", { name: "Open System Settings" }).click();
-  expect(await commands(page)).toContain("open_camera_settings");
+  await expect
+    .poll(async () => (await commands(page)).includes("open_camera_settings"))
+    .toBe(true);
   expect(await commands(page)).not.toContain("start_camera_preview");
 });
 

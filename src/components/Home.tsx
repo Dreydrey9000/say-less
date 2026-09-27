@@ -45,8 +45,9 @@ export function revealRecordingCard() {
 /** Top of Home: a way down to the recording card, which sits below the fold
  *  at the default window size. While a recording runs it shows the timer and
  *  leads to Stop, so a recording started by voice or the dock is never
- *  invisible here. Its own component, so the ticking timer re-renders only
- *  this button. */
+ *  invisible here. Hidden while the whole card is on screen, where it would
+ *  go nowhere. Its own component, so the ticking timer re-renders only this
+ *  button. */
 function RecordJump() {
   const { t } = useTranslation();
   const recording = useScreenRecording(
@@ -54,11 +55,32 @@ function RecordJump() {
   );
   const startedAt = useScreenRecording((state) => state.startedAt);
   const elapsed = useElapsed(recording ? startedAt : null);
+  const [cardInView, setCardInView] = useState(false);
+  useEffect(() => {
+    const card = document
+      .getElementById("home-record-title")
+      ?.closest("section");
+    if (!card || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setCardInView(entry.intersectionRatio >= 0.99),
+      { threshold: 0.99 },
+    );
+    observer.observe(card);
+    return () => observer.disconnect();
+  }, []);
+  if (cardInView) return null;
   return (
     <Button
       variant="secondary"
       className={recording ? "home-jump-live" : undefined}
-      onClick={revealRecordingCard}
+      onClick={() => {
+        revealRecordingCard();
+        // "Go to Stop": land on Stop itself, not the card's title.
+        if (recording)
+          document
+            .querySelector<HTMLElement>(".home-record-button")
+            ?.focus({ preventScroll: true });
+      }}
     >
       {recording ? (
         <>

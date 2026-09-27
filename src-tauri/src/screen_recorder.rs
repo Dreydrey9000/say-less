@@ -639,6 +639,28 @@ pub fn open_screen_recording_settings() -> Result<(), String> {
     }
 }
 
+/// Open System Settings on General > Software Update, for the notice on a Mac
+/// too old to record.
+#[tauri::command]
+#[specta::specta]
+pub fn open_software_update() -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    {
+        let status = std::process::Command::new("/usr/bin/open")
+            .arg("x-apple.systempreferences:com.apple.Software-Update-Settings.extension")
+            .status()
+            .map_err(|_| "open_failed")?;
+        if status.success() {
+            return Ok(());
+        }
+        Err("open_failed".into())
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        Err("unsupported_platform".into())
+    }
+}
+
 /// Tells the next launch to show the window even with "start hidden" on.
 /// Tauri's restart spawns the new process from this one, so it inherits it.
 const SHOW_ON_LAUNCH_ENV: &str = "SAY_LESS_SHOW_ON_LAUNCH";
