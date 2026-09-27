@@ -206,15 +206,12 @@ test("a closed window says so and offers the setup", async ({ page }) => {
 
 test("dock opens Recording setup in the main window", async ({ page }) => {
   await page.goto("/tests/fixtures/app.html?dock=1");
-  // The camera icon says what it opens, so it doesn't read as "record video".
-  const setup = page.getByRole("button", {
-    name: "Recording setup: camera and sound",
-    exact: true,
-  });
+  // The camera icon says what it opens, so it doesn't read as "record video",
+  // and whether your face is on.
+  const label = "Recording setup: camera and sound, your face is off";
+  const setup = page.getByRole("button", { name: label, exact: true });
   await setup.focus();
-  await expect(
-    page.getByRole("tooltip", { name: "Recording setup: camera and sound" }),
-  ).toBeVisible();
+  await expect(page.getByRole("tooltip", { name: label })).toBeVisible();
   await setup.click();
   await expect
     .poll(async () =>

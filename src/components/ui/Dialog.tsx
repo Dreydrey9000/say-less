@@ -75,16 +75,17 @@ export const Dialog: React.FC<DialogProps> = ({
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
-    const focusDialog = () => {
-      const fallback = contentRef.current;
-      const target = initialFocusRef?.current ?? fallback;
-      target?.focus();
-    };
-
-    const animationFrame = requestAnimationFrame(focusDialog);
+    // Move focus in right away. The dialog is already in the page when this
+    // runs, and an animation frame never comes while the window is hidden.
+    // A control marked data-autofocus wins over the dialog itself.
+    const fallback = contentRef.current;
+    const target =
+      initialFocusRef?.current ??
+      fallback?.querySelector<HTMLElement>("[data-autofocus]") ??
+      fallback;
+    target?.focus();
 
     return () => {
-      cancelAnimationFrame(animationFrame);
       document.body.style.overflow = previousOverflow;
       previousFocusRef.current?.focus();
       previousFocusRef.current = null;

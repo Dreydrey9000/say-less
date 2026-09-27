@@ -550,7 +550,7 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
   return null;
 };
 // The overlay listens for backend events; tests drive it with `testEmit`.
-// `?events` does the same for the main window.
+// `?events` does the same for the main window and the dock.
 mockIPC(ipc, { shouldMockEvents: query.has("overlay") || query.has("events") });
 // Count live event listeners per event (listen minus unlisten), so tests can
 // catch listeners that leak across React Strict Mode's double mount.
@@ -581,6 +581,11 @@ await import("../../src/i18n");
 const { applyTheme } = await import("../../src/lib/utils/theme");
 applyTheme(settings.theme as "dark" | "light");
 if (query.has("dock")) {
+  // `?dock&events` lets tests send the dock backend events too.
+  if (query.has("events")) {
+    const { emit } = await import("@tauri-apps/api/event");
+    Object.assign(window, { testEmit: emit });
+  }
   await import("../../src/dock/main");
 } else if (query.has("overlay")) {
   const { emit } = await import("@tauri-apps/api/event");
