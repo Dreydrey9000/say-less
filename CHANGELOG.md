@@ -2,6 +2,10 @@
 
 ## [2026-09-26]
 
+### Release
+
+- Version 0.14.0: screen recording with setup (window or screen, mic, computer sound, webcam bubble, quality), the painted avatar pack, the bot avatar, Home usage stats, and voice commands on selected text ship together.
+
 ### Added
 
 - Voice commands on selected text: select text in any app, hold the new "Rewrite selected text" shortcut (Ctrl+Option+Space on Mac, Ctrl+Alt+Space elsewhere) and say what to do with it, like "make this shorter". A small preview shows the rewrite first: Enter replaces the selection, Esc keeps the original. The rewrite runs through the AI provider you already set up for cleanup (your own key, Apple Intelligence or Ollama), sending the text and never audio.
