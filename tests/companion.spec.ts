@@ -12,9 +12,9 @@ for (const width of [390, 1200])
       await dock.focus();
       await expect(dock).toBeFocused();
       await dock.press("Enter");
-      await expect(page.getByRole("status")).toContainText(
-        "The floating dock is showing",
-      );
+      await expect(
+        page.getByRole("status").filter({ hasText: "The floating dock" }),
+      ).toContainText("The floating dock is showing");
       expect(
         await page
           .locator(".settings-content")

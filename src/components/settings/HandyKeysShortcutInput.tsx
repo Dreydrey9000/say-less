@@ -358,7 +358,7 @@ export const HandyKeysShortcutInput: React.FC<HandyKeysShortcutInputProps> = ({
       <div className="flex items-center space-x-1">
         <ShortcutChip
           ref={shortcutRef}
-          name={translatedName}
+          name={title ?? translatedName}
           keysLabel={formatKeyCombination(binding.current_binding, osType)}
           recording={isRecording}
           recordingLabel={formatCurrentKeys()}

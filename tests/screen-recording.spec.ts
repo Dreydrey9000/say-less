@@ -831,12 +831,10 @@ test("the Record shortcut can be changed from the Home card", async ({
   page,
 }) => {
   await page.goto("/tests/fixtures/app.html");
-  const home = card(page);
+  const row = page.locator(".home-record-shortcut");
+  await expect(row.getByText("Record shortcut", { exact: true })).toBeVisible();
   await expect(
-    home.getByText("Record shortcut", { exact: true }),
-  ).toBeVisible();
-  await expect(
-    home.getByRole("button", { name: /Ctrl \+ Option \+ R/ }),
+    row.getByRole("button", { name: /Ctrl \+ Option \+ R/ }),
   ).toBeVisible();
 });
 
@@ -844,7 +842,13 @@ test("the Home orb grows with your voice while you dictate", async ({
   page,
 }) => {
   await page.goto("/tests/fixtures/app.html?events");
+  await page.waitForFunction(
+    () =>
+      typeof (window as unknown as { testEmit?: unknown }).testEmit ===
+      "function",
+  );
   const orb = page.locator(".home-companion .companion");
+  await expect(orb).toBeVisible();
   const scale = () =>
     orb.evaluate((el) =>
       Number(getComputedStyle(el).getPropertyValue("--voice-scale") || "1"),

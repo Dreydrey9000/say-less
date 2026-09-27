@@ -302,7 +302,7 @@ export const GlobalShortcutInput: React.FC<GlobalShortcutInputProps> = ({
       <div className="flex items-center space-x-1">
         <ShortcutChip
           ref={(ref) => setShortcutRef(shortcutId, ref)}
-          name={translatedName}
+          name={title ?? translatedName}
           keysLabel={formatKeyCombination(binding.current_binding, osType)}
           recording={editingShortcutId === shortcutId}
           recordingLabel={formatCurrentKeys()}

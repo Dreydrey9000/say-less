@@ -739,6 +739,18 @@
 
 /* Record shortcut row on the recording card: one slim line, label left,
    keys right, no box. The label says what it is, so the details toggle goes. */
+.home-record-shortcut {
+  /* Sits right under the card (which has a 24px bottom margin). */
+  margin: -12px 0 24px;
+  padding-inline: 20px;
+}
+.home-record-shortcut .setting-row {
+  flex-wrap: wrap;
+}
+.home-record-shortcut .setting-label,
+.home-record-shortcut button {
+  white-space: nowrap;
+}
 .home-record-shortcut .setting-row {
   display: flex;
   align-items: center;
