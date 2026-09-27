@@ -1016,7 +1016,11 @@
     "screen": "Ekran",
     "idleTalkOnly": "Kliknij „Mów”, aby pisać głosem, lub użyj skrótu do dyktowania",
     "talkHint": "Mów: pisz głosem",
-    "recordingSetup": "Recording setup: kamera i dźwięk"
+    "recordingSetup": "Recording setup: kamera i dźwięk",
+    "recordingSetupFaceOn": "Recording setup: kamera i dźwięk, Twoja twarz jest widoczna",
+    "recordingSetupFaceOff": "Recording setup: kamera i dźwięk, Twoja twarz jest niewidoczna",
+    "hideWhileRecording": "Aby ukryć dock, najpierw zatrzymaj nagrywanie.",
+    "closeSaved": "Zamknij tę wiadomość"
   },
   "home": {
     "title": "Home",

@@ -1016,7 +1016,11 @@
     "screen": "Schermo",
     "idleTalkOnly": "Clicca su 'Parla' per scrivere con la voce, oppure usa la tua scorciatoia di dettatura",
     "talkHint": "Parla: scrivi con la voce",
-    "recordingSetup": "Recording setup: videocamera e audio"
+    "recordingSetup": "Recording setup: videocamera e audio",
+    "recordingSetupFaceOn": "Recording setup: videocamera e audio, il tuo viso è visibile",
+    "recordingSetupFaceOff": "Recording setup: videocamera e audio, il tuo viso è nascosto",
+    "hideWhileRecording": "Per nascondere il dock, prima interrompi la registrazione.",
+    "closeSaved": "Chiudi questo messaggio"
   },
   "home": {
     "title": "Home",

@@ -1016,7 +1016,11 @@
     "screen": "画面",
     "idleTalkOnly": "「話す」をクリックすると声で入力できます。音声入力のショートカットも使えます",
     "talkHint": "話す：声で入力",
-    "recordingSetup": "Recording setup：カメラと音声"
+    "recordingSetup": "Recording setup：カメラと音声",
+    "recordingSetupFaceOn": "Recording setup：カメラと音声、顔を表示中",
+    "recordingSetupFaceOff": "Recording setup：カメラと音声、顔は非表示",
+    "hideWhileRecording": "ドックを隠すには、先に収録を停止してください。",
+    "closeSaved": "このメッセージを閉じる"
   },
   "home": {
     "title": "Home",

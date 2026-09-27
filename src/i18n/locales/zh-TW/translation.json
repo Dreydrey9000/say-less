@@ -1016,7 +1016,11 @@
     "screen": "螢幕",
     "idleTalkOnly": "點選「說話」用語音輸入文字，或使用您的聽寫快捷鍵",
     "talkHint": "說話：用語音輸入文字",
-    "recordingSetup": "Recording setup：相機和聲音"
+    "recordingSetup": "Recording setup：相機和聲音",
+    "recordingSetupFaceOn": "Recording setup：相機和聲音，您的臉已顯示",
+    "recordingSetupFaceOff": "Recording setup：相機和聲音，您的臉已隱藏",
+    "hideWhileRecording": "要隱藏工具列，請先停止錄製。",
+    "closeSaved": "關閉此訊息"
   },
   "home": {
     "title": "Home",

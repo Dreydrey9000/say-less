@@ -1016,7 +1016,11 @@
     "screen": "Skærm",
     "idleTalkOnly": "Klik på \"Tal\" for at skrive med din stemme, eller brug din dikteringsgenvej",
     "talkHint": "Tal: skriv med din stemme",
-    "recordingSetup": "Recording setup: kamera og lyd"
+    "recordingSetup": "Recording setup: kamera og lyd",
+    "recordingSetupFaceOn": "Recording setup: kamera og lyd, dit ansigt vises",
+    "recordingSetupFaceOff": "Recording setup: kamera og lyd, dit ansigt vises ikke",
+    "hideWhileRecording": "Stop optagelsen først for at skjule docken.",
+    "closeSaved": "Luk denne besked"
   },
   "home": {
     "title": "Home",

@@ -1016,7 +1016,11 @@
     "screen": "Bildschirm",
     "idleTalkOnly": "Klicke auf „Sprechen“, um mit deiner Stimme zu tippen, oder nutze dein Diktierkürzel",
     "talkHint": "Sprechen: mit deiner Stimme tippen",
-    "recordingSetup": "Recording setup: Kamera und Ton"
+    "recordingSetup": "Recording setup: Kamera und Ton",
+    "recordingSetupFaceOn": "Recording setup: Kamera und Ton, dein Gesicht ist sichtbar",
+    "recordingSetupFaceOff": "Recording setup: Kamera und Ton, dein Gesicht ist nicht sichtbar",
+    "hideWhileRecording": "Um das Dock auszublenden, beende zuerst die Aufnahme.",
+    "closeSaved": "Diese Meldung schließen"
   },
   "home": {
     "title": "Home",

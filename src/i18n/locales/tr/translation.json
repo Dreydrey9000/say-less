@@ -1016,7 +1016,11 @@
     "screen": "Ekran",
     "idleTalkOnly": "Sesinizle yazmak için “Konuş” düğmesine tıklayın veya sesle yazma kısayolunuzu kullanın",
     "talkHint": "Konuş: sesinizle yazın",
-    "recordingSetup": "Recording setup: kamera ve ses"
+    "recordingSetup": "Recording setup: kamera ve ses",
+    "recordingSetupFaceOn": "Recording setup: kamera ve ses, yüzünüz görünüyor",
+    "recordingSetupFaceOff": "Recording setup: kamera ve ses, yüzünüz görünmüyor",
+    "hideWhileRecording": "Dock'u gizlemek için önce kaydı durdurun.",
+    "closeSaved": "Bu mesajı kapat"
   },
   "home": {
     "title": "Home",

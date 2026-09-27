@@ -1016,7 +1016,11 @@
     "screen": "Tela",
     "idleTalkOnly": "Clique em 'Falar' para digitar com a voz, ou use seu atalho de ditado",
     "talkHint": "Falar: digite com a voz",
-    "recordingSetup": "Recording setup: câmera e som"
+    "recordingSetup": "Recording setup: câmera e som",
+    "recordingSetupFaceOn": "Recording setup: câmera e som, seu rosto está visível",
+    "recordingSetupFaceOff": "Recording setup: câmera e som, seu rosto está oculto",
+    "hideWhileRecording": "Para ocultar o dock, pare a gravação primeiro.",
+    "closeSaved": "Fechar esta mensagem"
   },
   "home": {
     "title": "Home",

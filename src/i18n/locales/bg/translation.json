@@ -1016,7 +1016,11 @@
     "screen": "Екран",
     "idleTalkOnly": "Натиснете „Говори“, за да пишете с гласа си, или използвайте клавишната комбинация за диктовка",
     "talkHint": "Говори: пишете с гласа си",
-    "recordingSetup": "Recording setup: камера и звук"
+    "recordingSetup": "Recording setup: камера и звук",
+    "recordingSetupFaceOn": "Recording setup: камера и звук, лицето ви се вижда",
+    "recordingSetupFaceOff": "Recording setup: камера и звук, лицето ви не се вижда",
+    "hideWhileRecording": "За да скриете панела, първо спрете записа.",
+    "closeSaved": "Затваряне на това съобщение"
   },
   "home": {
     "title": "Home",

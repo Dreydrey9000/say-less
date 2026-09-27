@@ -1016,7 +1016,11 @@
     "screen": "Màn hình",
     "idleTalkOnly": "Nhấn “Nói” để gõ bằng giọng nói, hoặc dùng phím tắt đọc chính tả của bạn",
     "talkHint": "Nói: gõ bằng giọng nói",
-    "recordingSetup": "Recording setup: camera và âm thanh"
+    "recordingSetup": "Recording setup: camera và âm thanh",
+    "recordingSetupFaceOn": "Recording setup: camera và âm thanh, khuôn mặt của bạn đang hiện",
+    "recordingSetupFaceOff": "Recording setup: camera và âm thanh, khuôn mặt của bạn đang ẩn",
+    "hideWhileRecording": "Để ẩn thanh dock, hãy dừng quay trước.",
+    "closeSaved": "Đóng thông báo này"
   },
   "home": {
     "title": "Home",

@@ -42,6 +42,13 @@
 - In light mode the lime Record button has a darker edge so it does not melt into the white card.
 - The dock's Talk button keeps a tooltip while a recording runs, the Stop glyph is a filled square, the camera button is named "Recording setup: camera and sound", and its tooltip no longer covers Show in Finder after you stop.
 - Clicking a setting's title in Recording setup toggles its switch, and the sound switches read "Record your voice" and "Which microphone".
+- The Saved line, Show in Finder and every start problem (permission, blocked camera, missing camera, closed window) now show right under the Record button, above the Setup panel, and focus moves to the fix, because with Setup open they appeared far below the fold and a failed start looked like nothing happened.
+- Say Less asks macOS for the real camera permission status, so a camera you refused earlier shows the blocked warning right away, and the warning stays visible while Setup is open.
+- Show my face turns the camera on through the same steps as the Setup switch, then opens Setup at the corner and size controls. With your face on, the card says which corner it will appear in, instead of leaving a blank space.
+- The Recording button at the top of Home takes you straight to Stop while a recording runs, and the Record your screen button hides when the card is already on screen.
+- On an older Mac the notice has an Open Software Update button, with the right pane for older and newer macOS. On Windows the card is one plain line with no dead button.
+- The dock keeps Saved and Show in Finder until the next recording or dictation (or until you close it), shows a lime ring on the camera button when your face is on, turns Talk secondary while the screen records so Stop leads, uses the same red for Stop as Home, and cannot be hidden in the middle of a recording.
+- What's New moves focus to Got it when it opens, shows the picture as a framed screenshot with a caption so it does not look like a button, and gives Windows its own picture of the Talk button.
 
 ## [2026-09-26]
 

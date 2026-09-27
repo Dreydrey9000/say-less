@@ -1016,7 +1016,11 @@
     "screen": "स्क्रिन",
     "idleTalkOnly": "आवाजले टाइप गर्न 'बोल्नुहोस्' मा क्लिक गर्नुहोस्, वा आफ्नो डिक्टेसन सर्टकट प्रयोग गर्नुहोस्",
     "talkHint": "बोल्नुहोस्: आवाजले टाइप गर्नुहोस्",
-    "recordingSetup": "Recording setup: क्यामेरा र आवाज"
+    "recordingSetup": "Recording setup: क्यामेरा र आवाज",
+    "recordingSetupFaceOn": "Recording setup: क्यामेरा र आवाज, तपाईंको अनुहार देखिन्छ",
+    "recordingSetupFaceOff": "Recording setup: क्यामेरा र आवाज, तपाईंको अनुहार देखिँदैन",
+    "hideWhileRecording": "डक लुकाउन पहिले रेकर्डिङ रोक्नुहोस्।",
+    "closeSaved": "यो सन्देश बन्द गर्नुहोस्"
   },
   "home": {
     "title": "Home",

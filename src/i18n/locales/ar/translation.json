@@ -1016,7 +1016,11 @@
     "screen": "الشاشة",
     "idleTalkOnly": "انقر على «تحدّث» لتكتب بصوتك، أو استخدم اختصار الإملاء",
     "talkHint": "تحدّث: اكتب بصوتك",
-    "recordingSetup": "«Recording setup»: الكاميرا والصوت"
+    "recordingSetup": "«Recording setup»: الكاميرا والصوت",
+    "recordingSetupFaceOn": "«Recording setup»: الكاميرا والصوت، وجهك ظاهر",
+    "recordingSetupFaceOff": "«Recording setup»: الكاميرا والصوت، وجهك مخفي",
+    "hideWhileRecording": "لإخفاء الشريط، أوقف التسجيل أولًا.",
+    "closeSaved": "إغلاق هذه الرسالة"
   },
   "home": {
     "title": "Home",

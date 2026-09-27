@@ -1016,7 +1016,11 @@
     "screen": "화면",
     "idleTalkOnly": "'말하기'를 클릭해 음성으로 입력하거나 받아쓰기 단축키를 사용하세요",
     "talkHint": "말하기: 음성으로 입력",
-    "recordingSetup": "Recording setup: 카메라 및 사운드"
+    "recordingSetup": "Recording setup: 카메라 및 사운드",
+    "recordingSetupFaceOn": "Recording setup: 카메라 및 사운드, 얼굴 표시 켜짐",
+    "recordingSetupFaceOff": "Recording setup: 카메라 및 사운드, 얼굴 표시 꺼짐",
+    "hideWhileRecording": "독을 숨기려면 먼저 녹화를 중지하세요.",
+    "closeSaved": "이 메시지 닫기"
   },
   "home": {
     "title": "Home",

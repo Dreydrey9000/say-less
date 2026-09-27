@@ -1016,7 +1016,11 @@
     "screen": "מסך",
     "idleTalkOnly": "לחץ על 'דיבור' כדי להקליד בעזרת הקול, או השתמש בקיצור הדרך להכתבה",
     "talkHint": "דיבור: הקלדה בעזרת הקול",
-    "recordingSetup": "Recording setup: מצלמה וקול"
+    "recordingSetup": "Recording setup: מצלמה וקול",
+    "recordingSetupFaceOn": "Recording setup: מצלמה וקול, הפנים שלך מוצגות",
+    "recordingSetupFaceOff": "Recording setup: מצלמה וקול, הפנים שלך מוסתרות",
+    "hideWhileRecording": "כדי להסתיר את ה-Dock, עצור קודם את ההקלטה.",
+    "closeSaved": "סגור את ההודעה הזו"
   },
   "home": {
     "title": "Home",

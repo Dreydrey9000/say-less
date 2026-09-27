@@ -1016,7 +1016,11 @@
     "screen": "Layar",
     "idleTalkOnly": "Klik 'Bicara' untuk mengetik dengan suara Anda, atau gunakan pintasan dikte Anda",
     "talkHint": "Bicara: ketik dengan suara Anda",
-    "recordingSetup": "Recording setup: kamera dan suara"
+    "recordingSetup": "Recording setup: kamera dan suara",
+    "recordingSetupFaceOn": "Recording setup: kamera dan suara, wajah Anda terlihat",
+    "recordingSetupFaceOff": "Recording setup: kamera dan suara, wajah Anda tidak terlihat",
+    "hideWhileRecording": "Untuk menyembunyikan dock, hentikan rekaman terlebih dahulu.",
+    "closeSaved": "Tutup pesan ini"
   },
   "home": {
     "title": "Home",

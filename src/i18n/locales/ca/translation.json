@@ -1016,7 +1016,11 @@
     "screen": "Pantalla",
     "idleTalkOnly": "Feu clic a «Parla» per escriure amb la veu, o feu servir la drecera de dictat",
     "talkHint": "Parla: escriviu amb la veu",
-    "recordingSetup": "Recording setup: càmera i so"
+    "recordingSetup": "Recording setup: càmera i so",
+    "recordingSetupFaceOn": "Recording setup: càmera i so, la vostra cara es veu",
+    "recordingSetupFaceOff": "Recording setup: càmera i so, la vostra cara no es veu",
+    "hideWhileRecording": "Per amagar la barra, primer atureu l'enregistrament.",
+    "closeSaved": "Tanca aquest missatge"
   },
   "home": {
     "title": "Home",

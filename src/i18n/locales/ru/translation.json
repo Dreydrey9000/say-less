@@ -1016,7 +1016,11 @@
     "screen": "Экран",
     "idleTalkOnly": "Нажмите «Говорить», чтобы печатать голосом, или используйте горячую клавишу для диктовки",
     "talkHint": "Говорить: печатайте голосом",
-    "recordingSetup": "Recording setup: камера и звук"
+    "recordingSetup": "Recording setup: камера и звук",
+    "recordingSetupFaceOn": "Recording setup: камера и звук, ваше лицо видно",
+    "recordingSetupFaceOff": "Recording setup: камера и звук, ваше лицо скрыто",
+    "hideWhileRecording": "Чтобы скрыть панель, сначала остановите запись.",
+    "closeSaved": "Закрыть это сообщение"
   },
   "home": {
     "title": "Home",

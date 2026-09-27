@@ -395,6 +395,8 @@ test("overlay says what it is doing, and its controls are big enough", async ({
 test("the overlay avatar is 40px with 8px clearance in the pill", async ({
   page,
 }) => {
+  // The avatar bounces when recording starts; measure its resting pose.
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/tests/fixtures/app.html");
   await page.evaluate(() => {
     const saved = JSON.parse(localStorage.getItem("test-studio") || "{}");

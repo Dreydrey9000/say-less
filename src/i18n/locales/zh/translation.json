@@ -1016,7 +1016,11 @@
     "screen": "屏幕",
     "idleTalkOnly": "点击“说话”用语音输入文字，或使用您的听写快捷键",
     "talkHint": "说话：用语音输入文字",
-    "recordingSetup": "Recording setup：摄像头和声音"
+    "recordingSetup": "Recording setup：摄像头和声音",
+    "recordingSetupFaceOn": "Recording setup：摄像头和声音，您的脸已显示",
+    "recordingSetupFaceOff": "Recording setup：摄像头和声音，您的脸已隐藏",
+    "hideWhileRecording": "要隐藏工具栏，请先停止录制。",
+    "closeSaved": "关闭此消息"
   },
   "home": {
     "title": "Home",

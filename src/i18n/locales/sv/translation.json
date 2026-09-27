@@ -1016,7 +1016,11 @@
     "screen": "Skärm",
     "idleTalkOnly": "Klicka på ”Prata” för att skriva med rösten, eller använd ditt kortkommando för diktering",
     "talkHint": "Prata: skriv med rösten",
-    "recordingSetup": "Recording setup: kamera och ljud"
+    "recordingSetup": "Recording setup: kamera och ljud",
+    "recordingSetupFaceOn": "Recording setup: kamera och ljud, ditt ansikte syns",
+    "recordingSetupFaceOff": "Recording setup: kamera och ljud, ditt ansikte syns inte",
+    "hideWhileRecording": "Stoppa inspelningen först för att dölja dockan.",
+    "closeSaved": "Stäng det här meddelandet"
   },
   "home": {
     "title": "Home",

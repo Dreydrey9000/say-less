@@ -1016,7 +1016,11 @@
     "screen": "Obrazovka",
     "idleTalkOnly": "Klikněte na „Mluvit“ a pište hlasem, nebo použijte zkratku pro diktování",
     "talkHint": "Mluvit: pište hlasem",
-    "recordingSetup": "Recording setup: kamera a zvuk"
+    "recordingSetup": "Recording setup: kamera a zvuk",
+    "recordingSetupFaceOn": "Recording setup: kamera a zvuk, váš obličej je vidět",
+    "recordingSetupFaceOff": "Recording setup: kamera a zvuk, váš obličej není vidět",
+    "hideWhileRecording": "Chcete-li panel skrýt, nejprve zastavte nahrávání.",
+    "closeSaved": "Zavřít tuto zprávu"
   },
   "home": {
     "title": "Home",

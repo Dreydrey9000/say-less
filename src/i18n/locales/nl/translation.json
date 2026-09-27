@@ -1016,7 +1016,11 @@
     "screen": "Scherm",
     "idleTalkOnly": "Klik op 'Praten' om met je stem te typen, of gebruik je sneltoets voor dicteren",
     "talkHint": "Praten: typ met je stem",
-    "recordingSetup": "Recording setup: camera en geluid"
+    "recordingSetup": "Recording setup: camera en geluid",
+    "recordingSetupFaceOn": "Recording setup: camera en geluid, je gezicht staat aan",
+    "recordingSetupFaceOff": "Recording setup: camera en geluid, je gezicht staat uit",
+    "hideWhileRecording": "Stop eerst de opname om het dock te verbergen.",
+    "closeSaved": "Dit bericht sluiten"
   },
   "home": {
     "title": "Home",
