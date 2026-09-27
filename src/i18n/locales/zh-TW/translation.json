@@ -1014,7 +1014,9 @@
     "expand": "Expand dock",
     "collapse": "Shrink dock",
     "screen": "螢幕",
-    "idleTalkOnly": "點選「說話」用語音輸入文字，或使用您的聽寫快捷鍵"
+    "idleTalkOnly": "點選「說話」用語音輸入文字，或使用您的聽寫快捷鍵",
+    "talkHint": "說話：用語音輸入文字",
+    "recordingSetup": "Recording setup：相機和聲音"
   },
   "home": {
     "title": "Home",
@@ -1058,7 +1060,8 @@
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
     "actionsHint": "Say a cue to open an app or a website",
-    "recordJump": "錄製您的螢幕"
+    "recordJump": "錄製您的螢幕",
+    "recordingJump": "正在錄製 {{time}}。前往「Stop」"
   },
   "companion": {
     "title": "Particle pattern",
@@ -1307,10 +1310,18 @@
     "dockCaption": "正在錄製您的螢幕。完成後請點選紅色的「Stop」按鈕。",
     "savedIn": "已儲存到 {{parent}} 中的 {{folder}} 資料夾。",
     "openFolder": "打開錄影資料夾",
-    "cameraOffHint": "我們不會顯示您的臉。若要加入，請點選「Setup」並開啟「Show your face」。",
+    "cameraOffHint": "我們不會在影片中顯示您的臉。",
     "reopenApp": "重新打開 Say Less",
     "macosTooOldHelp": "螢幕錄影需要 macOS 15（Sequoia）或以上版本。若要查看您的版本，請打開「蘋果」選單並選擇「關於這台 Mac」。若要更新，請打開「系統設定」，點選「一般」，然後點選「軟體更新」。如果沒有出現可用的更新，我們就無法在這台 Mac 上錄製螢幕，但聽寫功能仍可正常使用。",
-    "cameraMissing": "我們找不到相機。請打開筆電的上蓋或連接一台相機，或者在「Recording setup」中關閉「Show your face」。"
+    "cameraMissing": "我們找不到相機。請打開筆電的上蓋或連接一台相機，或者在「Recording setup」中關閉「Show your face」。",
+    "stopHint": "完成後，請點選「Stop」或說「Say less, stop recording」。",
+    "startedAnnouncement": "已開始錄製。",
+    "savedAnnouncement": "錄影已儲存。",
+    "showMyFace": "顯示我的臉",
+    "cameraBlocked": "我們無法使用您的相機。請在「系統設定」中允許存取，或關閉「Show your face」後再錄製。",
+    "reopening": "正在重新打開…",
+    "reopenFailed": "我們無法重新打開 Say Less。請從選單列結束它，然後再次打開。",
+    "macosTooOldSteps": "若要查看您的版本，請打開「蘋果」選單並選擇「關於這台 Mac」。若要更新，請打開「系統設定」，點選「一般」，然後點選「軟體更新」。如果沒有出現可用的更新，我們就無法在這台 Mac 上錄製螢幕，但聽寫功能仍可正常使用。"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1332,8 +1343,8 @@
     "windowsNeedPermission": "We can list your windows once Say Less has Screen Recording permission.",
     "noWindows": "Open the window you want to record, then pick it here.",
     "soundTitle": "Sound",
-    "microphone": "Your microphone",
-    "whichMicrophone": "Microphone",
+    "microphone": "錄製您的聲音",
+    "whichMicrophone": "哪個麥克風",
     "sameAsDictation": "Same as dictation",
     "systemAudio": "Computer sound",
     "cameraTitle": "Camera",

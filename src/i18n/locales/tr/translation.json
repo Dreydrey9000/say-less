@@ -1014,7 +1014,9 @@
     "expand": "Expand dock",
     "collapse": "Shrink dock",
     "screen": "Ekran",
-    "idleTalkOnly": "Sesinizle yazmak için “Konuş” düğmesine tıklayın veya sesle yazma kısayolunuzu kullanın"
+    "idleTalkOnly": "Sesinizle yazmak için “Konuş” düğmesine tıklayın veya sesle yazma kısayolunuzu kullanın",
+    "talkHint": "Konuş: sesinizle yazın",
+    "recordingSetup": "Recording setup: kamera ve ses"
   },
   "home": {
     "title": "Home",
@@ -1058,7 +1060,8 @@
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
     "actionsHint": "Say a cue to open an app or a website",
-    "recordJump": "Ekranınızı kaydedin"
+    "recordJump": "Ekranınızı kaydedin",
+    "recordingJump": "Kaydediliyor {{time}}. “Stop” düğmesine git"
   },
   "companion": {
     "title": "Particle pattern",
@@ -1307,10 +1310,18 @@
     "dockCaption": "Ekranınız kaydediliyor. İşiniz bitince kırmızı “Stop” düğmesine tıklayın.",
     "savedIn": "{{parent}} içindeki {{folder}} klasörüne kaydedildi.",
     "openFolder": "Kayıtlar klasörünü aç",
-    "cameraOffHint": "Yüzünüzü göstermeyeceğiz. Eklemek için “Setup” düğmesine tıklayın ve “Show your face” seçeneğini açın.",
+    "cameraOffHint": "Videoda yüzünüzü göstermeyeceğiz.",
     "reopenApp": "Say Less'i yeniden aç",
     "macosTooOldHelp": "Ekran kaydı için macOS 15 (Sequoia) veya daha yeni bir sürüm gerekir. Sürümünüzü görmek için Elma menüsünü açın ve Bu Mac Hakkında'yı seçin. Güncellemek için Sistem Ayarları'nı açın, Genel'i ve ardından Yazılım Güncelleme'yi seçin. Güncelleme görünmüyorsa bu Mac'te ekranı kaydedemeyiz, ama sesle yazma yine de çalışır.",
-    "cameraMissing": "Kamera bulamıyoruz. Dizüstü bilgisayarınızın kapağını açın veya bir kamera takın. Ya da “Recording setup” içinde “Show your face” seçeneğini kapatın."
+    "cameraMissing": "Kamera bulamıyoruz. Dizüstü bilgisayarınızın kapağını açın veya bir kamera takın. Ya da “Recording setup” içinde “Show your face” seçeneğini kapatın.",
+    "stopHint": "İşiniz bitince “Stop” düğmesine tıklayın veya “Say less, stop recording” deyin.",
+    "startedAnnouncement": "Kayıt başladı.",
+    "savedAnnouncement": "Kayıt kaydedildi.",
+    "showMyFace": "Yüzümü göster",
+    "cameraBlocked": "Kameranızı kullanamıyoruz. Sistem Ayarları'nda izin verin veya kayıt yapmak için “Show your face” seçeneğini kapatın.",
+    "reopening": "Yeniden açılıyor…",
+    "reopenFailed": "Say Less'i yeniden açamadık. Menü çubuğundan uygulamadan çıkın, sonra tekrar açın.",
+    "macosTooOldSteps": "Sürümünüzü görmek için Elma menüsünü açın ve Bu Mac Hakkında'yı seçin. Güncellemek için Sistem Ayarları'nı açın, Genel'i ve ardından Yazılım Güncelleme'yi seçin. Güncelleme görünmüyorsa bu Mac'te ekranı kaydedemeyiz, ama sesle yazma yine de çalışır."
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1332,8 +1343,8 @@
     "windowsNeedPermission": "We can list your windows once Say Less has Screen Recording permission.",
     "noWindows": "Open the window you want to record, then pick it here.",
     "soundTitle": "Sound",
-    "microphone": "Your microphone",
-    "whichMicrophone": "Microphone",
+    "microphone": "Sesinizi kaydedin",
+    "whichMicrophone": "Hangi mikrofon",
     "sameAsDictation": "Same as dictation",
     "systemAudio": "Computer sound",
     "cameraTitle": "Camera",

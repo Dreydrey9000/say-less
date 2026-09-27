@@ -1014,7 +1014,9 @@
     "expand": "Expand dock",
     "collapse": "Shrink dock",
     "screen": "स्क्रीन",
-    "idleTalkOnly": "अपनी आवाज़ से टाइप करने के लिए 'बोलें' पर क्लिक करें, या अपना डिक्टेशन शॉर्टकट इस्तेमाल करें"
+    "idleTalkOnly": "अपनी आवाज़ से टाइप करने के लिए 'बोलें' पर क्लिक करें, या अपना डिक्टेशन शॉर्टकट इस्तेमाल करें",
+    "talkHint": "बोलें: अपनी आवाज़ से टाइप करें",
+    "recordingSetup": "Recording setup: कैमरा और साउंड"
   },
   "home": {
     "title": "Home",
@@ -1058,7 +1060,8 @@
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
     "actionsHint": "Say a cue to open an app or a website",
-    "recordJump": "अपनी स्क्रीन रिकॉर्ड करें"
+    "recordJump": "अपनी स्क्रीन रिकॉर्ड करें",
+    "recordingJump": "रिकॉर्डिंग {{time}}. 'Stop' पर जाएँ"
   },
   "companion": {
     "title": "Particle pattern",
@@ -1307,10 +1310,18 @@
     "dockCaption": "आपकी स्क्रीन रिकॉर्ड हो रही है. काम पूरा होने पर लाल 'Stop' बटन पर क्लिक करें.",
     "savedIn": "{{parent}} के {{folder}} फ़ोल्डर में सेव किया गया.",
     "openFolder": "रिकॉर्डिंग फ़ोल्डर खोलें",
-    "cameraOffHint": "हम आपका चेहरा नहीं दिखाएँगे. इसे जोड़ने के लिए, 'Setup' पर क्लिक करें और 'Show your face' चालू करें.",
+    "cameraOffHint": "हम वीडियो में आपका चेहरा नहीं दिखाएँगे.",
     "reopenApp": "Say Less फिर से खोलें",
     "macosTooOldHelp": "स्क्रीन रिकॉर्डिंग के लिए macOS 15 (Sequoia) या उसके बाद का वर्शन चाहिए. अपना वर्शन देखने के लिए, Apple मेनू खोलें और 'यह Mac का परिचय' चुनें. अपडेट करने के लिए, 'सिस्टम सेटिंग', 'सामान्य', 'सॉफ़्टवेयर अपडेट' पर जाएँ. अगर कोई अपडेट नहीं दिखता, तो हम इस Mac पर स्क्रीन रिकॉर्ड नहीं कर सकते, लेकिन डिक्टेशन फिर भी काम करता है.",
-    "cameraMissing": "हमें कोई कैमरा नहीं मिला. अपने लैपटॉप का ढक्कन खोलें या कैमरा लगाएँ, या 'Recording setup' में 'Show your face' बंद करें."
+    "cameraMissing": "हमें कोई कैमरा नहीं मिला. अपने लैपटॉप का ढक्कन खोलें या कैमरा लगाएँ, या 'Recording setup' में 'Show your face' बंद करें.",
+    "stopHint": "काम पूरा होने पर 'Stop' पर क्लिक करें या कहें “Say less, stop recording.”",
+    "startedAnnouncement": "रिकॉर्डिंग शुरू हो गई.",
+    "savedAnnouncement": "रिकॉर्डिंग सेव हो गई.",
+    "showMyFace": "मेरा चेहरा दिखाएँ",
+    "cameraBlocked": "हम आपका कैमरा इस्तेमाल नहीं कर सकते. सिस्टम सेटिंग में इसकी अनुमति दें, या रिकॉर्ड करने के लिए 'Show your face' बंद करें.",
+    "reopening": "फिर से खोल रहे हैं…",
+    "reopenFailed": "हम Say Less को फिर से नहीं खोल सके. मेनू बार से इसे बंद करें, फिर इसे दोबारा खोलें.",
+    "macosTooOldSteps": "अपना वर्शन देखने के लिए, Apple मेनू खोलें और 'यह Mac का परिचय' चुनें. अपडेट करने के लिए, 'सिस्टम सेटिंग', 'सामान्य', 'सॉफ़्टवेयर अपडेट' पर जाएँ. अगर कोई अपडेट नहीं दिखता, तो हम इस Mac पर स्क्रीन रिकॉर्ड नहीं कर सकते, लेकिन डिक्टेशन फिर भी काम करता है."
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1332,8 +1343,8 @@
     "windowsNeedPermission": "We can list your windows once Say Less has Screen Recording permission.",
     "noWindows": "Open the window you want to record, then pick it here.",
     "soundTitle": "Sound",
-    "microphone": "Your microphone",
-    "whichMicrophone": "Microphone",
+    "microphone": "अपनी आवाज़ रिकॉर्ड करें",
+    "whichMicrophone": "कौन-सा माइक्रोफ़ोन",
     "sameAsDictation": "Same as dictation",
     "systemAudio": "Computer sound",
     "cameraTitle": "Camera",

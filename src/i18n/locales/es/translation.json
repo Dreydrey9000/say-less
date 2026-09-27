@@ -1014,7 +1014,9 @@
     "expand": "Expand dock",
     "collapse": "Shrink dock",
     "screen": "Pantalla",
-    "idleTalkOnly": "Haz clic en “Hablar” para escribir con tu voz, o usa tu atajo de dictado"
+    "idleTalkOnly": "Haz clic en “Hablar” para escribir con tu voz, o usa tu atajo de dictado",
+    "talkHint": "Hablar: escribe con tu voz",
+    "recordingSetup": "Recording setup: cámara y sonido"
   },
   "home": {
     "title": "Home",
@@ -1058,7 +1060,8 @@
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
     "actionsHint": "Say a cue to open an app or a website",
-    "recordJump": "Graba tu pantalla"
+    "recordJump": "Graba tu pantalla",
+    "recordingJump": "Grabando {{time}}. Ir a “Stop”"
   },
   "companion": {
     "title": "Particle pattern",
@@ -1307,10 +1310,18 @@
     "dockCaption": "Grabando tu pantalla. Haz clic en el botón rojo “Stop” cuando termines.",
     "savedIn": "Guardado en la carpeta {{folder}} dentro de {{parent}}.",
     "openFolder": "Abrir carpeta de grabaciones",
-    "cameraOffHint": "No mostraremos tu cara. Para añadirla, haz clic en “Setup” y activa “Show your face”.",
+    "cameraOffHint": "No mostraremos tu cara en el video.",
     "reopenApp": "Volver a abrir Say Less",
     "macosTooOldHelp": "La grabación de pantalla necesita macOS 15 (Sequoia) o posterior. Para ver tu versión, abre el menú Apple y elige Acerca de este Mac. Para actualizar, ve a Ajustes del Sistema, General, Actualización de Software. Si no aparece ninguna actualización, no podemos grabar la pantalla en este Mac, pero el dictado sigue funcionando.",
-    "cameraMissing": "No encontramos ninguna cámara. Abre la tapa de tu portátil o conecta una, o desactiva “Show your face” en “Recording setup”."
+    "cameraMissing": "No encontramos ninguna cámara. Abre la tapa de tu portátil o conecta una, o desactiva “Show your face” en “Recording setup”.",
+    "stopHint": "Cuando termines, haz clic en “Stop” o di “Say less, stop recording.”",
+    "startedAnnouncement": "Grabación iniciada.",
+    "savedAnnouncement": "Grabación guardada.",
+    "showMyFace": "Mostrar mi cara",
+    "cameraBlocked": "No podemos usar tu cámara. Permítela en Ajustes del Sistema, o desactiva “Show your face” para grabar.",
+    "reopening": "Volviendo a abrir…",
+    "reopenFailed": "No pudimos volver a abrir Say Less. Ciérralo desde la barra de menús y luego ábrelo de nuevo.",
+    "macosTooOldSteps": "Para ver tu versión, abre el menú Apple y elige Acerca de este Mac. Para actualizar, ve a Ajustes del Sistema, General, Actualización de Software. Si no aparece ninguna actualización, no podemos grabar la pantalla en este Mac, pero el dictado sigue funcionando."
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1332,8 +1343,8 @@
     "windowsNeedPermission": "We can list your windows once Say Less has Screen Recording permission.",
     "noWindows": "Open the window you want to record, then pick it here.",
     "soundTitle": "Sound",
-    "microphone": "Your microphone",
-    "whichMicrophone": "Microphone",
+    "microphone": "Grabar tu voz",
+    "whichMicrophone": "Qué micrófono",
     "sameAsDictation": "Same as dictation",
     "systemAudio": "Computer sound",
     "cameraTitle": "Camera",

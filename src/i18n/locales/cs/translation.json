@@ -1014,7 +1014,9 @@
     "expand": "Expand dock",
     "collapse": "Shrink dock",
     "screen": "Obrazovka",
-    "idleTalkOnly": "Klikněte na „Mluvit“ a pište hlasem, nebo použijte zkratku pro diktování"
+    "idleTalkOnly": "Klikněte na „Mluvit“ a pište hlasem, nebo použijte zkratku pro diktování",
+    "talkHint": "Mluvit: pište hlasem",
+    "recordingSetup": "Recording setup: kamera a zvuk"
   },
   "home": {
     "title": "Home",
@@ -1058,7 +1060,8 @@
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
     "actionsHint": "Say a cue to open an app or a website",
-    "recordJump": "Nahrát obrazovku"
+    "recordJump": "Nahrát obrazovku",
+    "recordingJump": "Nahrávání {{time}}. Přejít na „Stop“"
   },
   "companion": {
     "title": "Particle pattern",
@@ -1307,10 +1310,18 @@
     "dockCaption": "Nahráváme vaši obrazovku. Až budete hotovi, klikněte na červené tlačítko „Stop“.",
     "savedIn": "Uloženo do složky {{folder}} ve složce {{parent}}.",
     "openFolder": "Otevřít složku s nahrávkami",
-    "cameraOffHint": "Váš obličej nezobrazíme. Chcete-li ho přidat, klikněte na „Setup“ a zapněte „Show your face“.",
+    "cameraOffHint": "Váš obličej ve videu nezobrazíme.",
     "reopenApp": "Znovu otevřít Say Less",
     "macosTooOldHelp": "Nahrávání obrazovky vyžaduje macOS 15 (Sequoia) nebo novější. Svou verzi zjistíte tak, že otevřete nabídku Apple a vyberete „O tomto Macu“. Chcete-li aktualizovat, přejděte do Nastavení systému, Obecné, Aktualizace softwaru. Pokud se žádná aktualizace nezobrazí, na tomto Macu obrazovku nahrávat nemůžeme, ale diktování bude dál fungovat.",
-    "cameraMissing": "Nemůžeme najít kameru. Otevřete víko notebooku nebo nějakou připojte, případně vypněte „Show your face“ v „Recording setup“."
+    "cameraMissing": "Nemůžeme najít kameru. Otevřete víko notebooku nebo nějakou připojte, případně vypněte „Show your face“ v „Recording setup“.",
+    "stopHint": "Až budete hotovi, klikněte na „Stop“ nebo řekněte „Say less, stop recording.“",
+    "startedAnnouncement": "Nahrávání začalo.",
+    "savedAnnouncement": "Nahrávka byla uložena.",
+    "showMyFace": "Zobrazit můj obličej",
+    "cameraBlocked": "Nemůžeme použít vaši kameru. Povolte ji v Nastavení systému, nebo vypněte „Show your face“, abyste mohli nahrávat.",
+    "reopening": "Znovu otevíráme…",
+    "reopenFailed": "Say Less se nám nepodařilo znovu otevřít. Ukončete ho z řádku nabídek a pak ho otevřete znovu.",
+    "macosTooOldSteps": "Svou verzi zjistíte tak, že otevřete nabídku Apple a vyberete „O tomto Macu“. Chcete-li aktualizovat, přejděte do Nastavení systému, Obecné, Aktualizace softwaru. Pokud se žádná aktualizace nezobrazí, na tomto Macu obrazovku nahrávat nemůžeme, ale diktování bude dál fungovat."
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1332,8 +1343,8 @@
     "windowsNeedPermission": "We can list your windows once Say Less has Screen Recording permission.",
     "noWindows": "Open the window you want to record, then pick it here.",
     "soundTitle": "Sound",
-    "microphone": "Your microphone",
-    "whichMicrophone": "Microphone",
+    "microphone": "Nahrávat váš hlas",
+    "whichMicrophone": "Který mikrofon",
     "sameAsDictation": "Same as dictation",
     "systemAudio": "Computer sound",
     "cameraTitle": "Camera",

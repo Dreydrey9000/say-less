@@ -1014,7 +1014,9 @@
     "expand": "Expand dock",
     "collapse": "Shrink dock",
     "screen": "画面",
-    "idleTalkOnly": "「話す」をクリックすると声で入力できます。音声入力のショートカットも使えます"
+    "idleTalkOnly": "「話す」をクリックすると声で入力できます。音声入力のショートカットも使えます",
+    "talkHint": "話す：声で入力",
+    "recordingSetup": "Recording setup：カメラと音声"
   },
   "home": {
     "title": "Home",
@@ -1058,7 +1060,8 @@
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
     "actionsHint": "Say a cue to open an app or a website",
-    "recordJump": "画面を収録"
+    "recordJump": "画面を収録",
+    "recordingJump": "収録中 {{time}}。「Stop」へ移動"
   },
   "companion": {
     "title": "Particle pattern",
@@ -1307,10 +1310,18 @@
     "dockCaption": "画面を収録中です。終わったら赤い「Stop」ボタンをクリックしてください。",
     "savedIn": "{{parent}} の {{folder}} フォルダーに保存しました。",
     "openFolder": "録画フォルダーを開く",
-    "cameraOffHint": "顔は表示されません。表示するには、「Setup」をクリックして「Show your face」をオンにしてください。",
+    "cameraOffHint": "動画に顔は表示されません。",
     "reopenApp": "Say Less を再度開く",
     "macosTooOldHelp": "画面収録には macOS 15 (Sequoia) 以降が必要です。バージョンを確認するには、Appleメニューを開いて「このMacについて」を選択してください。アップデートするには、「システム設定」、「一般」、「ソフトウェアアップデート」の順に開いてください。アップデートが表示されない場合、このMacでは画面を収録できませんが、音声入力は引き続き使えます。",
-    "cameraMissing": "カメラが見つかりません。ノートパソコンの蓋を開けるか、カメラを接続してください。または、「Recording setup」で「Show your face」をオフにしてください。"
+    "cameraMissing": "カメラが見つかりません。ノートパソコンの蓋を開けるか、カメラを接続してください。または、「Recording setup」で「Show your face」をオフにしてください。",
+    "stopHint": "終わったら「Stop」をクリックするか、「Say less, stop recording.」と言ってください。",
+    "startedAnnouncement": "収録を開始しました。",
+    "savedAnnouncement": "録画を保存しました。",
+    "showMyFace": "顔を表示する",
+    "cameraBlocked": "カメラを使用できません。「システム設定」で許可するか、「Show your face」をオフにして収録してください。",
+    "reopening": "再度開いています…",
+    "reopenFailed": "Say Less を再度開けませんでした。メニューバーから終了して、もう一度開いてください。",
+    "macosTooOldSteps": "バージョンを確認するには、Appleメニューを開いて「このMacについて」を選択してください。アップデートするには、「システム設定」、「一般」、「ソフトウェアアップデート」の順に開いてください。アップデートが表示されない場合、このMacでは画面を収録できませんが、音声入力は引き続き使えます。"
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1332,8 +1343,8 @@
     "windowsNeedPermission": "We can list your windows once Say Less has Screen Recording permission.",
     "noWindows": "Open the window you want to record, then pick it here.",
     "soundTitle": "Sound",
-    "microphone": "Your microphone",
-    "whichMicrophone": "Microphone",
+    "microphone": "声を収録",
+    "whichMicrophone": "使用するマイク",
     "sameAsDictation": "Same as dictation",
     "systemAudio": "Computer sound",
     "cameraTitle": "Camera",

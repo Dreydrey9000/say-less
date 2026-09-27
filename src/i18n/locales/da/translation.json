@@ -1014,7 +1014,9 @@
     "expand": "Expand dock",
     "collapse": "Shrink dock",
     "screen": "Skærm",
-    "idleTalkOnly": "Klik på \"Tal\" for at skrive med din stemme, eller brug din dikteringsgenvej"
+    "idleTalkOnly": "Klik på \"Tal\" for at skrive med din stemme, eller brug din dikteringsgenvej",
+    "talkHint": "Tal: skriv med din stemme",
+    "recordingSetup": "Recording setup: kamera og lyd"
   },
   "home": {
     "title": "Home",
@@ -1058,7 +1060,8 @@
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
     "actionsHint": "Say a cue to open an app or a website",
-    "recordJump": "Optag din skærm"
+    "recordJump": "Optag din skærm",
+    "recordingJump": "Optager {{time}}. Gå til \"Stop\""
   },
   "companion": {
     "title": "Particle pattern",
@@ -1307,10 +1310,18 @@
     "dockCaption": "Din skærm bliver optaget. Klik på den røde knap \"Stop\", når du er færdig.",
     "savedIn": "Gemt i mappen {{folder}} i {{parent}}.",
     "openFolder": "Åbn mappen med optagelser",
-    "cameraOffHint": "Vi viser ikke dit ansigt. Hvis du vil have det med, skal du klikke på \"Setup\" og slå \"Show your face\" til.",
+    "cameraOffHint": "Vi viser ikke dit ansigt i videoen.",
     "reopenApp": "Genåbn Say Less",
     "macosTooOldHelp": "Skærmoptagelse kræver macOS 15 (Sequoia) eller nyere. Du kan tjekke din version ved at åbne Apple-menuen og vælge Om denne Mac. Du opdaterer ved at gå til Systemindstillinger, Generelt, Softwareopdatering. Hvis der ikke vises nogen opdatering, kan vi ikke optage skærmen på denne Mac, men diktering virker stadig.",
-    "cameraMissing": "Vi kan ikke finde et kamera. Åbn låget på din bærbare, sæt et kamera til, eller slå \"Show your face\" fra i \"Recording setup\"."
+    "cameraMissing": "Vi kan ikke finde et kamera. Åbn låget på din bærbare, sæt et kamera til, eller slå \"Show your face\" fra i \"Recording setup\".",
+    "stopHint": "Når du er færdig, skal du klikke på \"Stop\" eller sige \"Say less, stop recording.\"",
+    "startedAnnouncement": "Optagelsen er startet.",
+    "savedAnnouncement": "Optagelsen er gemt.",
+    "showMyFace": "Vis mit ansigt",
+    "cameraBlocked": "Vi kan ikke bruge dit kamera. Tillad det i Systemindstillinger, eller slå \"Show your face\" fra for at optage.",
+    "reopening": "Genåbner…",
+    "reopenFailed": "Vi kunne ikke genåbne Say Less. Afslut appen fra menulinjen, og åbn den derefter igen.",
+    "macosTooOldSteps": "Du kan tjekke din version ved at åbne Apple-menuen og vælge Om denne Mac. Du opdaterer ved at gå til Systemindstillinger, Generelt, Softwareopdatering. Hvis der ikke vises nogen opdatering, kan vi ikke optage skærmen på denne Mac, men diktering virker stadig."
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1332,8 +1343,8 @@
     "windowsNeedPermission": "We can list your windows once Say Less has Screen Recording permission.",
     "noWindows": "Open the window you want to record, then pick it here.",
     "soundTitle": "Sound",
-    "microphone": "Your microphone",
-    "whichMicrophone": "Microphone",
+    "microphone": "Optag din stemme",
+    "whichMicrophone": "Hvilken mikrofon",
     "sameAsDictation": "Same as dictation",
     "systemAudio": "Computer sound",
     "cameraTitle": "Camera",

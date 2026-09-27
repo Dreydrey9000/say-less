@@ -1014,7 +1014,9 @@
     "expand": "Expand dock",
     "collapse": "Shrink dock",
     "screen": "Màn hình",
-    "idleTalkOnly": "Nhấn “Nói” để gõ bằng giọng nói, hoặc dùng phím tắt đọc chính tả của bạn"
+    "idleTalkOnly": "Nhấn “Nói” để gõ bằng giọng nói, hoặc dùng phím tắt đọc chính tả của bạn",
+    "talkHint": "Nói: gõ bằng giọng nói",
+    "recordingSetup": "Recording setup: camera và âm thanh"
   },
   "home": {
     "title": "Home",
@@ -1058,7 +1060,8 @@
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
     "actionsHint": "Say a cue to open an app or a website",
-    "recordJump": "Quay màn hình của bạn"
+    "recordJump": "Quay màn hình của bạn",
+    "recordingJump": "Đang quay {{time}}. Đến nút “Stop”"
   },
   "companion": {
     "title": "Particle pattern",
@@ -1307,10 +1310,18 @@
     "dockCaption": "Đang quay màn hình của bạn. Nhấn nút “Stop” màu đỏ khi xong.",
     "savedIn": "Đã lưu vào thư mục {{folder}} trong {{parent}}.",
     "openFolder": "Mở thư mục bản quay",
-    "cameraOffHint": "Chúng tôi sẽ không hiển thị khuôn mặt của bạn. Để thêm vào, hãy nhấn “Setup” và bật “Show your face”.",
+    "cameraOffHint": "Chúng tôi sẽ không hiển thị khuôn mặt của bạn trong video.",
     "reopenApp": "Mở lại Say Less",
     "macosTooOldHelp": "Quay màn hình cần macOS 15 (Sequoia) trở lên. Để kiểm tra phiên bản, hãy mở menu Apple và chọn Giới thiệu về máy Mac này. Để cập nhật, hãy mở Cài đặt hệ thống, chọn Cài đặt chung, rồi chọn Cập nhật phần mềm. Nếu không thấy bản cập nhật nào, chúng tôi không thể quay màn hình trên máy Mac này, nhưng tính năng đọc chính tả vẫn hoạt động.",
-    "cameraMissing": "Chúng tôi không tìm thấy camera. Hãy mở nắp máy tính xách tay hoặc cắm camera vào. Hoặc tắt “Show your face” trong “Recording setup”."
+    "cameraMissing": "Chúng tôi không tìm thấy camera. Hãy mở nắp máy tính xách tay hoặc cắm camera vào. Hoặc tắt “Show your face” trong “Recording setup”.",
+    "stopHint": "Khi xong, hãy nhấn “Stop” hoặc nói “Say less, stop recording.”",
+    "startedAnnouncement": "Đã bắt đầu quay.",
+    "savedAnnouncement": "Đã lưu bản quay.",
+    "showMyFace": "Hiện khuôn mặt của tôi",
+    "cameraBlocked": "Chúng tôi không thể dùng camera của bạn. Hãy cho phép trong Cài đặt hệ thống, hoặc tắt “Show your face” để quay.",
+    "reopening": "Đang mở lại…",
+    "reopenFailed": "Chúng tôi không thể mở lại Say Less. Hãy thoát ứng dụng từ thanh menu, rồi mở lại.",
+    "macosTooOldSteps": "Để kiểm tra phiên bản, hãy mở menu Apple và chọn Giới thiệu về máy Mac này. Để cập nhật, hãy mở Cài đặt hệ thống, chọn Cài đặt chung, rồi chọn Cập nhật phần mềm. Nếu không thấy bản cập nhật nào, chúng tôi không thể quay màn hình trên máy Mac này, nhưng tính năng đọc chính tả vẫn hoạt động."
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1332,8 +1343,8 @@
     "windowsNeedPermission": "We can list your windows once Say Less has Screen Recording permission.",
     "noWindows": "Open the window you want to record, then pick it here.",
     "soundTitle": "Sound",
-    "microphone": "Your microphone",
-    "whichMicrophone": "Microphone",
+    "microphone": "Ghi âm giọng nói của bạn",
+    "whichMicrophone": "Micrô nào",
     "sameAsDictation": "Same as dictation",
     "systemAudio": "Computer sound",
     "cameraTitle": "Camera",

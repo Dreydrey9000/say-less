@@ -1014,7 +1014,9 @@
     "expand": "Expand dock",
     "collapse": "Shrink dock",
     "screen": "Scherm",
-    "idleTalkOnly": "Klik op 'Praten' om met je stem te typen, of gebruik je sneltoets voor dicteren"
+    "idleTalkOnly": "Klik op 'Praten' om met je stem te typen, of gebruik je sneltoets voor dicteren",
+    "talkHint": "Praten: typ met je stem",
+    "recordingSetup": "Recording setup: camera en geluid"
   },
   "home": {
     "title": "Home",
@@ -1058,7 +1060,8 @@
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
     "actionsHint": "Say a cue to open an app or a website",
-    "recordJump": "Je scherm opnemen"
+    "recordJump": "Je scherm opnemen",
+    "recordingJump": "Opname {{time}}. Ga naar 'Stop'"
   },
   "companion": {
     "title": "Particle pattern",
@@ -1307,10 +1310,18 @@
     "dockCaption": "Je scherm wordt opgenomen. Klik op de rode knop 'Stop' als je klaar bent.",
     "savedIn": "Opgeslagen in de map {{folder}} in {{parent}}.",
     "openFolder": "Map met opnamen openen",
-    "cameraOffHint": "We tonen je gezicht niet. Wil je het toevoegen? Klik op 'Setup' en zet 'Show your face' aan.",
+    "cameraOffHint": "We tonen je gezicht niet in de video.",
     "reopenApp": "Say Less opnieuw openen",
     "macosTooOldHelp": "Schermopname heeft macOS 15 (Sequoia) of nieuwer nodig. Om je versie te bekijken, open je het Apple-menu en kies je 'Over deze Mac'. Om bij te werken, ga je naar Systeeminstellingen, 'Algemeen', 'Software-update'. Zie je geen update, dan kunnen we op deze Mac je scherm niet opnemen, maar dicteren werkt nog steeds.",
-    "cameraMissing": "We kunnen geen camera vinden. Klap je laptop open of sluit een camera aan, of zet 'Show your face' uit in 'Recording setup'."
+    "cameraMissing": "We kunnen geen camera vinden. Klap je laptop open of sluit een camera aan, of zet 'Show your face' uit in 'Recording setup'.",
+    "stopHint": "Klik op 'Stop' of zeg “Say less, stop recording.” als je klaar bent.",
+    "startedAnnouncement": "Opname gestart.",
+    "savedAnnouncement": "Opname opgeslagen.",
+    "showMyFace": "Mijn gezicht tonen",
+    "cameraBlocked": "We kunnen je camera niet gebruiken. Geef toestemming in Systeeminstellingen, of zet 'Show your face' uit om op te nemen.",
+    "reopening": "Opnieuw openen…",
+    "reopenFailed": "We konden Say Less niet opnieuw openen. Sluit de app af via de menubalk en open hem daarna weer.",
+    "macosTooOldSteps": "Om je versie te bekijken, open je het Apple-menu en kies je 'Over deze Mac'. Om bij te werken, ga je naar Systeeminstellingen, 'Algemeen', 'Software-update'. Zie je geen update, dan kunnen we op deze Mac je scherm niet opnemen, maar dicteren werkt nog steeds."
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1332,8 +1343,8 @@
     "windowsNeedPermission": "We can list your windows once Say Less has Screen Recording permission.",
     "noWindows": "Open the window you want to record, then pick it here.",
     "soundTitle": "Sound",
-    "microphone": "Your microphone",
-    "whichMicrophone": "Microphone",
+    "microphone": "Je stem opnemen",
+    "whichMicrophone": "Welke microfoon",
     "sameAsDictation": "Same as dictation",
     "systemAudio": "Computer sound",
     "cameraTitle": "Camera",

@@ -293,7 +293,7 @@ test("the camera warning keeps its space when the camera notice shows", async ({
   // The backend won't start with Show your face on and no camera.
   await record.click();
   await expect(home.getByRole("alert")).toContainText(
-    "We need Camera permission to show your face in the video.",
+    "We need Camera permission to show your face",
   );
   await expect(warning).toBeHidden();
   expect(await topInCard(record)).toBeCloseTo(before, 1);

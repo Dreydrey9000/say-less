@@ -1014,7 +1014,9 @@
     "expand": "Expand dock",
     "collapse": "Shrink dock",
     "screen": "Skärm",
-    "idleTalkOnly": "Klicka på ”Prata” för att skriva med rösten, eller använd ditt kortkommando för diktering"
+    "idleTalkOnly": "Klicka på ”Prata” för att skriva med rösten, eller använd ditt kortkommando för diktering",
+    "talkHint": "Prata: skriv med rösten",
+    "recordingSetup": "Recording setup: kamera och ljud"
   },
   "home": {
     "title": "Home",
@@ -1058,7 +1060,8 @@
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
     "actionsHint": "Say a cue to open an app or a website",
-    "recordJump": "Spela in skärmen"
+    "recordJump": "Spela in skärmen",
+    "recordingJump": "Spelar in {{time}}. Gå till ”Stop”"
   },
   "companion": {
     "title": "Particle pattern",
@@ -1307,10 +1310,18 @@
     "dockCaption": "Spelar in skärmen. Klicka på den röda knappen ”Stop” när du är klar.",
     "savedIn": "Sparad i mappen {{folder}} i {{parent}}.",
     "openFolder": "Öppna mappen med inspelningar",
-    "cameraOffHint": "Vi visar inte ditt ansikte. Om du vill lägga till det klickar du på ”Setup” och slår på ”Show your face”.",
+    "cameraOffHint": "Vi visar inte ditt ansikte i videon.",
     "reopenApp": "Öppna Say Less igen",
     "macosTooOldHelp": "Skärminspelning kräver macOS 15 (Sequoia) eller senare. Om du vill se din version öppnar du Apple-menyn och väljer Om den här datorn. Om du vill uppdatera går du till Systeminställningar, Allmänt, Programuppdatering. Om ingen uppdatering visas kan vi inte spela in skärmen på den här datorn, men diktering fungerar fortfarande.",
-    "cameraMissing": "Vi hittar ingen kamera. Öppna locket på den bärbara datorn eller anslut en kamera, eller stäng av ”Show your face” i ”Recording setup”."
+    "cameraMissing": "Vi hittar ingen kamera. Öppna locket på den bärbara datorn eller anslut en kamera, eller stäng av ”Show your face” i ”Recording setup”.",
+    "stopHint": "Klicka på ”Stop” eller säg ”Say less, stop recording.” när du är klar.",
+    "startedAnnouncement": "Inspelningen har startat.",
+    "savedAnnouncement": "Inspelningen har sparats.",
+    "showMyFace": "Visa mitt ansikte",
+    "cameraBlocked": "Vi kan inte använda din kamera. Tillåt den i Systeminställningar, eller stäng av ”Show your face” för att spela in.",
+    "reopening": "Öppnar igen…",
+    "reopenFailed": "Vi kunde inte öppna Say Less igen. Avsluta appen från menyraden och öppna den sedan igen.",
+    "macosTooOldSteps": "Om du vill se din version öppnar du Apple-menyn och väljer Om den här datorn. Om du vill uppdatera går du till Systeminställningar, Allmänt, Programuppdatering. Om ingen uppdatering visas kan vi inte spela in skärmen på den här datorn, men diktering fungerar fortfarande."
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1332,8 +1343,8 @@
     "windowsNeedPermission": "We can list your windows once Say Less has Screen Recording permission.",
     "noWindows": "Open the window you want to record, then pick it here.",
     "soundTitle": "Sound",
-    "microphone": "Your microphone",
-    "whichMicrophone": "Microphone",
+    "microphone": "Spela in din röst",
+    "whichMicrophone": "Vilken mikrofon",
     "sameAsDictation": "Same as dictation",
     "systemAudio": "Computer sound",
     "cameraTitle": "Camera",

@@ -1014,7 +1014,9 @@
     "expand": "Expand dock",
     "collapse": "Shrink dock",
     "screen": "Pantalla",
-    "idleTalkOnly": "Feu clic a «Parla» per escriure amb la veu, o feu servir la drecera de dictat"
+    "idleTalkOnly": "Feu clic a «Parla» per escriure amb la veu, o feu servir la drecera de dictat",
+    "talkHint": "Parla: escriviu amb la veu",
+    "recordingSetup": "Recording setup: càmera i so"
   },
   "home": {
     "title": "Home",
@@ -1058,7 +1060,8 @@
     "lookHint": "Colors, the dock, and what shows while you talk",
     "wordsHint": "Names and terms we should spell right",
     "actionsHint": "Say a cue to open an app or a website",
-    "recordJump": "Enregistra la pantalla"
+    "recordJump": "Enregistra la pantalla",
+    "recordingJump": "S'està enregistrant {{time}}. Aneu a «Stop»"
   },
   "companion": {
     "title": "Particle pattern",
@@ -1307,10 +1310,18 @@
     "dockCaption": "S'està enregistrant la pantalla. Feu clic al botó vermell «Stop» quan acabeu.",
     "savedIn": "S'ha desat a la carpeta {{folder}}, dins de {{parent}}.",
     "openFolder": "Obre la carpeta d'enregistraments",
-    "cameraOffHint": "No mostrarem la vostra cara. Per afegir-la, feu clic a «Setup» i activeu «Show your face».",
+    "cameraOffHint": "No mostrarem la vostra cara al vídeo.",
     "reopenApp": "Torna a obrir el Say Less",
     "macosTooOldHelp": "L'enregistrament de pantalla necessita el macOS 15 (Sequoia) o posterior. Per comprovar la vostra versió, obriu el menú Apple i trieu «Sobre aquest Mac». Per actualitzar, aneu a Configuració del sistema, General, Actualització de programari. Si no hi apareix cap actualització, no podem enregistrar la pantalla en aquest Mac, però el dictat continua funcionant.",
-    "cameraMissing": "No trobem cap càmera. Obriu la tapa del portàtil o connecteu-ne una, o bé desactiveu «Show your face» a «Recording setup»."
+    "cameraMissing": "No trobem cap càmera. Obriu la tapa del portàtil o connecteu-ne una, o bé desactiveu «Show your face» a «Recording setup».",
+    "stopHint": "Quan acabeu, feu clic a «Stop» o digueu «Say less, stop recording.»",
+    "startedAnnouncement": "Ha començat l'enregistrament.",
+    "savedAnnouncement": "S'ha desat l'enregistrament.",
+    "showMyFace": "Mostra la meva cara",
+    "cameraBlocked": "No podem fer servir la vostra càmera. Permeteu-la a Configuració del sistema o desactiveu «Show your face» per enregistrar.",
+    "reopening": "S'està tornant a obrir…",
+    "reopenFailed": "No hem pogut tornar a obrir el Say Less. Tanqueu-lo des de la barra de menús i torneu-lo a obrir.",
+    "macosTooOldSteps": "Per comprovar la vostra versió, obriu el menú Apple i trieu «Sobre aquest Mac». Per actualitzar, aneu a Configuració del sistema, General, Actualització de programari. Si no hi apareix cap actualització, no podem enregistrar la pantalla en aquest Mac, però el dictat continua funcionant."
   },
   "recordingSetup": {
     "button": "Setup",
@@ -1332,8 +1343,8 @@
     "windowsNeedPermission": "We can list your windows once Say Less has Screen Recording permission.",
     "noWindows": "Open the window you want to record, then pick it here.",
     "soundTitle": "Sound",
-    "microphone": "Your microphone",
-    "whichMicrophone": "Microphone",
+    "microphone": "Enregistra la vostra veu",
+    "whichMicrophone": "Quin micròfon",
     "sameAsDictation": "Same as dictation",
     "systemAudio": "Computer sound",
     "cameraTitle": "Camera",
