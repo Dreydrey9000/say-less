@@ -4,7 +4,13 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { type } from "@tauri-apps/plugin-os";
-import { Copy, ArrowRight, ArrowUpRight, Share2 } from "lucide-react";
+import {
+  Copy,
+  ArrowRight,
+  ArrowUpRight,
+  MonitorPlay,
+  Share2,
+} from "lucide-react";
 import { formatKeyCombination } from "@/lib/utils/keyboard";
 import type { HistoryEntry, PaginatedHistory } from "@/bindings";
 import { useSettings } from "@/hooks/useSettings";
@@ -18,6 +24,18 @@ import { Button } from "./ui/Button";
 import { WorkingStatus } from "./ui/WorkingStatus";
 import { Tooltip } from "./ui/Tooltip";
 import "./home.css";
+
+/** Scroll the screen recording card into view and move focus to its title,
+ *  so keyboard and screen reader users land on it too. */
+export function revealRecordingCard() {
+  const title = document.getElementById("home-record-title");
+  const card = title?.closest("section");
+  if (!title || !card) return;
+  if (!title.hasAttribute("tabindex")) title.setAttribute("tabindex", "-1");
+  title.focus({ preventScroll: true });
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  card.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+}
 
 export function Home({
   onNavigate,
@@ -149,6 +167,18 @@ export function Home({
               >
                 {t("home.openDock")} <ArrowUpRight size={16} />
               </Button>
+            )}
+            {/* The recording card sits below the fold at the default window
+                size, so this keeps it one click away. Mac only for now. */}
+            {isMac && (
+              <button
+                type="button"
+                className="home-link"
+                onClick={revealRecordingCard}
+              >
+                <MonitorPlay size={14} aria-hidden="true" />{" "}
+                {t("home.recordJump")}
+              </button>
             )}
             <button
               type="button"

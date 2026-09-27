@@ -293,6 +293,7 @@
   padding: 20px;
   border: 1px solid #80808040;
   border-radius: 16px;
+  scroll-margin-top: 16px;
 }
 .home-record[data-state="recording"],
 .home-record[data-state="stopping"] {
@@ -593,7 +594,9 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
-@media (max-width: 640px) {
+/* Same breakpoint as the rest of Home: the content area, not the window, so
+   the card stacks at the default 680px window too. */
+@container (max-width: 580px) {
   .home-record {
     grid-template-columns: 1fr;
   }

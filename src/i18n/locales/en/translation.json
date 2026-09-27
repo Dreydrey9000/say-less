@@ -757,7 +757,9 @@
     "portableUpdateBrowseButton": "Open GitHub Releases"
   },
   "whatsNew": {
-    "title": "New in Say Less v{{version}}"
+    "title": "New in Say Less v{{version}}",
+    "tryRecording": "Try screen recording",
+    "gotIt": "Got it"
   },
   "common": {
     "loading": "Loading...",
@@ -1037,6 +1039,7 @@
     "share": "Share Say Less",
     "shareCopied": "Link copied: saylessvoice.com",
     "shareFailed": "Could not copy. The link is saylessvoice.com",
+    "recordJump": "Record your screen",
     "status": {
       "idle": "Ready",
       "arming": "Starting microphone…",

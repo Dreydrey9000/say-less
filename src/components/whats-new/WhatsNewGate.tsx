@@ -5,7 +5,10 @@ import { findReleaseNoteToShow } from "./releaseNotes";
 import type { ReleaseNote } from "./releaseNotes";
 import { WhatsNewModal } from "./WhatsNewModal";
 
-export const WhatsNewGate: React.FC = () => {
+export const WhatsNewGate: React.FC<{
+  /** Shown as "Try screen recording" in the dialog (Mac only). */
+  onTryRecording?: () => void;
+}> = ({ onTryRecording }) => {
   const { settings, isLoading, updateSetting } = useSettings();
   const [note, setNote] = useState<ReleaseNote | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -68,5 +71,12 @@ export const WhatsNewGate: React.FC = () => {
 
   if (!note) return null;
 
-  return <WhatsNewModal note={note} open={isOpen} onDismiss={dismiss} />;
+  return (
+    <WhatsNewModal
+      note={note}
+      open={isOpen}
+      onDismiss={dismiss}
+      onTryRecording={onTryRecording}
+    />
+  );
 };

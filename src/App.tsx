@@ -18,7 +18,7 @@ import { ModelStateEvent, RecordingErrorEvent } from "./lib/types/events";
 import "./App.css";
 import AccessibilityPermissions from "./components/AccessibilityPermissions";
 import SecureInputWarning from "./components/SecureInputWarning";
-import { Home } from "./components/Home";
+import { Home, revealRecordingCard } from "./components/Home";
 import Footer from "./components/footer";
 import Onboarding, {
   AccessibilityOnboarding,
@@ -80,6 +80,12 @@ function App() {
   const setupTotal = askedPermissions ? 3 : 2;
   const setupOffset = askedPermissions ? 1 : 0;
   const [currentSection, setCurrentSection] = useState<SidebarSection>("home");
+  // Each request brings Home forward with the screen recording card in view.
+  const [recordingCardRequest, setRecordingCardRequest] = useState(0);
+  const showRecordingCard = useCallback(() => {
+    setCurrentSection("home");
+    setRecordingCardRequest((count) => count + 1);
+  }, []);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
   const shownSection = useRef<SidebarSection | null>(null);
@@ -193,6 +199,15 @@ function App() {
     };
   }, []);
 
+  // The dock or a recording problem: show Home with the recording card and its
+  // notice in view.
+  useEffect(() => {
+    const pending = listen("open-recording-home", showRecordingCard);
+    return () => {
+      void pending.then((fn) => fn());
+    };
+  }, [showRecordingCard]);
+
   // Other parts of the window (e.g. the footer model popover) can ask to open a
   // section without prop drilling.
   useEffect(() => {
@@ -219,6 +234,14 @@ function App() {
     if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
     target.focus({ preventScroll: true });
   }, [currentSection, onboardingStep]);
+
+  // Runs after the section change above has reset the scroll, and waits a
+  // frame so a freshly opened Home is laid out before we scroll to the card.
+  useEffect(() => {
+    if (recordingCardRequest === 0) return;
+    const frame = requestAnimationFrame(revealRecordingCard);
+    return () => cancelAnimationFrame(frame);
+  }, [recordingCardRequest]);
 
   // Handle keyboard shortcuts for debug mode toggle
   useEffect(() => {
@@ -501,7 +524,7 @@ function App() {
           {t("ux.skipToContent")}
         </a>
         <ErrorBoundary context="What's New">
-          <WhatsNewGate />
+          <WhatsNewGate onTryRecording={showRecordingCard} />
         </ErrorBoundary>
         {/* Main content area that takes remaining space */}
         <div className="app-workspace flex-1 flex overflow-hidden">
