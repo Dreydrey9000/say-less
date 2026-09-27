@@ -247,6 +247,9 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
   }
   if (cmd === "show_screen_recording_in_folder") return null;
   if (cmd === "open_screen_recording_settings") return null;
+  // ?reopen=fail makes Reopen Say Less fail.
+  if (cmd === "reopen_app" && query.get("reopen") === "fail")
+    throw "reopen_failed";
   if (cmd.includes("screen_recording_permission"))
     return query.get("screen") !== "denied";
   if (cmd === "list_learned_corrections") return learned;

@@ -2,6 +2,15 @@ import { test, expect } from "@playwright/test";
 
 const card = (page: import("@playwright/test").Page) =>
   page.getByTestId("screen-recording-card");
+/** How many times the page has called a backend command. */
+const count = (page: import("@playwright/test").Page, cmd: string) =>
+  page.evaluate(
+    (name) =>
+      (window as unknown as { testCommands: string[] }).testCommands.filter(
+        (c) => c === name,
+      ).length,
+    cmd,
+  );
 
 test("Home records, shows a ticking timer, stops and offers the file", async ({
   page,
@@ -94,6 +103,209 @@ test("Windows shows a disabled button with a plain reason", async ({
   await expect(button).toHaveAccessibleDescription(
     "Screen recording is coming to Windows soon.",
   );
+  // One bold line in the same notice as the other can't-record states, a
+  // grey button that doesn't look clickable, and no Setup for a feature
+  // Windows doesn't have yet.
+  await expect(home.locator(".home-record-notice strong")).toHaveText(
+    "Screen recording is coming to Windows soon.",
+  );
+  await expect(button).not.toHaveClass(/accent-action/);
+  await expect(button).toHaveCSS("opacity", "1");
+  await expect(
+    home.getByRole("button", { name: "Recording setup" }),
+  ).toHaveCount(0);
+});
+
+test("double-clicking Stop saves once and doesn't start a new recording", async ({
+  page,
+}) => {
+  await page.goto("/tests/fixtures/app.html?screen=recording");
+  const home = card(page);
+  await home.getByRole("button", { name: "Stop screen recording" }).dblclick();
+  await expect(home.getByRole("status")).toContainText(
+    "Saved in the Say Less folder in Movies.",
+  );
+  // Record ignores clicks for a moment after Stop. Once that passes, the
+  // second click must not have started anything.
+  await expect(
+    home.getByRole("button", { name: "Record screen" }),
+  ).not.toHaveAttribute("aria-disabled", "true");
+  expect(await count(page, "stop_screen_recording")).toBe(1);
+  expect(await count(page, "start_screen_recording")).toBe(0);
+  await expect(home.getByRole("status")).toBeVisible();
+});
+
+test("Enter on Record keeps focus on the button and announces the start", async ({
+  page,
+}) => {
+  await page.goto("/tests/fixtures/app.html");
+  const home = card(page);
+  const start = home.getByRole("button", { name: "Record screen" });
+  await expect(start).toBeEnabled();
+  await start.focus();
+  await page.keyboard.press("Enter");
+  await expect(
+    home.getByRole("button", { name: "Stop screen recording" }),
+  ).toBeFocused();
+  await expect(home.locator('[aria-live="polite"]')).toHaveText(
+    "Recording started.",
+  );
+});
+
+test("Record and Stop sit in the same spot", async ({ page }) => {
+  for (const size of [
+    { width: 680, height: 570 },
+    { width: 1100, height: 800 },
+  ]) {
+    await page.setViewportSize(size);
+    await page.goto("/tests/fixtures/app.html");
+    const home = card(page);
+    const topInCard = (name: string) =>
+      home
+        .getByRole("button", { name, exact: true })
+        .evaluate(
+          (el) =>
+            el.getBoundingClientRect().top -
+            el.closest("section")!.getBoundingClientRect().top,
+        );
+    const start = home.getByRole("button", { name: "Record screen" });
+    await expect(start).toBeEnabled();
+    const before = await topInCard("Record screen");
+    await start.click();
+    await expect(
+      home.getByRole("button", { name: "Stop screen recording" }),
+    ).toBeVisible();
+    expect(await topInCard("Stop screen recording")).toBeCloseTo(before, 1);
+  }
+});
+
+test("while recording, the card says how to stop", async ({ page }) => {
+  await page.goto("/tests/fixtures/app.html?screen=recording");
+  const home = card(page);
+  await expect(home.getByText("Click Stop or say")).toBeVisible();
+  await expect(home.getByText("Or press your shortcut")).toBeHidden();
+  await expect(home.getByRole("button", { name: "Show my face" })).toBeHidden();
+});
+
+test("Open recordings folder has its own row at the card's left edge", async ({
+  page,
+}) => {
+  for (const width of [680, 1100]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto("/tests/fixtures/app.html");
+    const home = card(page);
+    const start = home.getByRole("button", { name: "Record screen" });
+    await expect(start).toBeEnabled();
+    const record = (await start.boundingBox())!;
+    const title = (await home
+      .getByRole("heading", { name: "Record your screen" })
+      .boundingBox())!;
+    const folder = (await home
+      .getByRole("button", { name: "Open recordings folder" })
+      .boundingBox())!;
+    expect(folder.y).toBeGreaterThanOrEqual(record.y + record.height);
+    expect(folder.x).toBeLessThanOrEqual(title.x);
+  }
+});
+
+test("denied permission shows the notice above the buttons and Reopen runs once", async ({
+  page,
+}) => {
+  await page.goto("/tests/fixtures/app.html?screen=denied");
+  const home = card(page);
+  const record = home.getByRole("button", { name: "Record screen" });
+  await record.click();
+  const alert = home.getByRole("alert");
+  await expect(alert).toBeVisible();
+  const notice = (await alert.boundingBox())!;
+  const button = (await record.boundingBox())!;
+  expect(notice.y + notice.height).toBeLessThanOrEqual(button.y);
+  await alert.getByRole("button", { name: "Reopen Say Less" }).dblclick();
+  await expect(
+    alert.getByRole("button", { name: "Reopening…" }),
+  ).toHaveAttribute("aria-disabled", "true");
+  expect(await count(page, "reopen_app")).toBe(1);
+});
+
+test("a failed Reopen says what to do and can be tried again", async ({
+  page,
+}) => {
+  await page.goto("/tests/fixtures/app.html?screen=denied&reopen=fail");
+  const home = card(page);
+  await home.getByRole("button", { name: "Record screen" }).click();
+  const alert = home.getByRole("alert");
+  await alert.getByRole("button", { name: "Reopen Say Less" }).click();
+  await expect(alert).toContainText(
+    "We couldn't reopen Say Less. Quit it from the menu bar, then open it again.",
+  );
+  await expect(
+    alert.getByRole("button", { name: "Reopen Say Less" }),
+  ).toBeEnabled();
+});
+
+test("a blocked camera warns on the card and opens the fix", async ({
+  page,
+}) => {
+  // Show your face is on, but ?camera=denied refuses Camera permission.
+  await page.addInitScript(() =>
+    localStorage.setItem(
+      "test-recording",
+      JSON.stringify({
+        source: "display",
+        display_id: null,
+        window_id: null,
+        window_label: null,
+        microphone: true,
+        microphone_name: null,
+        system_audio: true,
+        webcam: true,
+        camera_id: null,
+        webcam_corner: "bottom_right",
+        webcam_size: "medium",
+        quality: "p1080",
+        fps: 30,
+      }),
+    ),
+  );
+  await page.goto("/tests/fixtures/app.html?camera=denied");
+  const home = card(page);
+  await expect(
+    home.getByText(
+      "Your camera is blocked, so your face won't be in the video.",
+    ),
+  ).toBeVisible();
+  await expect(home.getByText("We won't show your face")).toHaveCount(0);
+  await home.getByRole("button", { name: "Open System Settings" }).click();
+  await expect.poll(() => count(page, "open_camera_settings")).toBe(1);
+});
+
+test("Show my face opens Setup on the Show your face switch", async ({
+  page,
+}) => {
+  await page.goto("/tests/fixtures/app.html");
+  const home = card(page);
+  await expect(home.getByText("We won't show your face")).toBeVisible();
+  await home.getByRole("button", { name: "Show my face" }).click();
+  await expect(
+    page.getByRole("region", { name: "Recording setup" }),
+  ).toBeVisible();
+  // RecordingSetup gives this switch the id "rec-setup-webcam".
+  await expect(
+    page.getByRole("switch", { name: "Show your face" }),
+  ).toBeFocused();
+});
+
+test("light theme gives the lime Record button a darker edge", async ({
+  page,
+}) => {
+  await page.goto("/tests/fixtures/app.html?theme=light");
+  const record = card(page).getByRole("button", { name: "Record screen" });
+  await expect(record).toBeEnabled();
+  const [edge, fill] = await record.evaluate((el) => {
+    const style = getComputedStyle(el);
+    return [style.borderTopColor, style.backgroundColor];
+  });
+  expect(edge).not.toBe(fill);
 });
 
 test("dock records the screen and shows Saved with Show in Finder", async ({

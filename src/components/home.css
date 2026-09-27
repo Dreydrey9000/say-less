@@ -299,6 +299,14 @@
 .home-record[data-state="stopping"] {
   border-color: color-mix(in srgb, #ff5a5a, transparent 40%);
 }
+/* Can't record (no permission, older Mac, Windows): one column, with the
+   notice above the buttons. */
+.home-record[data-blocked] {
+  grid-template-columns: minmax(0, 1fr);
+}
+.home-record[data-blocked] .home-record-controls {
+  align-items: flex-start;
+}
 .home-record-text h2 {
   font-size: 18px;
   line-height: 24px;
@@ -314,6 +322,29 @@
 .home-record-text .home-record-hint {
   font-size: 13px;
 }
+/* A hint slot keeps its idle line and its recording line in one cell, so the
+   card is the same height in both states and the buttons stay put. */
+.home-record-slot {
+  display: grid;
+  min-height: 24px;
+}
+.home-record-slot > * {
+  grid-area: 1 / 1;
+}
+.home-record-slot > [data-off] {
+  visibility: hidden;
+}
+.home-record-text .home-record-face {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+.home-record-text .home-record-warn,
+.home-record-text .home-record-live,
+.home-record-text .home-record-face button {
+  color: var(--color-text);
+}
 .home-record-controls {
   display: flex;
   flex-direction: column;
@@ -324,8 +355,29 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  min-width: 148px;
+  min-width: 160px;
   justify-content: center;
+}
+/* Light theme: the accent's darker twin as an edge, so lime doesn't melt into
+   the white card. In dark it is the fill color, so nothing changes there. */
+.home-record-button.accent-action {
+  border-color: var(--studio-accent-mark);
+}
+/* This computer can't record: flat grey, not a dimmed lime that still looks
+   clickable. */
+.home-record-button:disabled {
+  opacity: 1;
+  color: var(--color-text-muted);
+  background: color-mix(in srgb, var(--color-mid-gray) 16%, transparent);
+  border-color: transparent;
+}
+/* aria-disabled: clicks are ignored while it works, but focus stays. */
+.home-record [aria-disabled="true"] {
+  cursor: default;
+}
+.home-record-button[aria-busy="true"],
+.home-record-notice button[aria-disabled="true"] {
+  opacity: 0.6;
 }
 .home-record-live {
   display: inline-flex;
@@ -366,6 +418,9 @@
 .home-record-notice p {
   flex: 1 1 280px;
 }
+.home-record-notice .home-record-error {
+  flex-basis: 100%;
+}
 .home-record-notice button {
   display: inline-flex;
   align-items: center;
@@ -378,6 +433,12 @@
 .home-record-buttons {
   display: flex;
   gap: 8px;
+}
+/* Its own row under the buttons, text lined up with the card's left edge. */
+.home-record-folder {
+  grid-column: 1 / -1;
+  justify-self: start;
+  margin-inline-start: -0.75rem;
 }
 .home-record-setup {
   display: inline-flex;

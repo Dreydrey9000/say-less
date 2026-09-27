@@ -80,6 +80,9 @@ interface RecordingStore {
   notice: RecordingNotice | null;
   /** A file was saved while this window was open. */
   justSaved: boolean;
+  /** Just stopped: Record ignores clicks for a moment, so the second click
+   * of a double-click on Stop can't start a new recording. */
+  settling: boolean;
   apply: (status: ScreenRecordingStatus) => void;
   start: () => Promise<void>;
   stop: () => Promise<void>;
@@ -91,6 +94,9 @@ interface RecordingStore {
 // A module flag, not state: a second click before React re-renders is
 // still blocked.
 let inFlight = false;
+// How long Record stays inert after a stop, and the timer that lifts it.
+const SETTLE_MS = 700;
+let settleTimer: number | undefined;
 
 export const useScreenRecording = create<RecordingStore>((set, get) => ({
   status: null,
@@ -98,6 +104,7 @@ export const useScreenRecording = create<RecordingStore>((set, get) => ({
   pending: false,
   notice: null,
   justSaved: false,
+  settling: false,
   apply: (status) => {
     const previous = get().status;
     const idle = status.state === "idle";
@@ -120,7 +127,7 @@ export const useScreenRecording = create<RecordingStore>((set, get) => ({
     });
   },
   start: async () => {
-    if (inFlight) return;
+    if (inFlight || get().settling) return;
     inFlight = true;
     set({ pending: true, notice: null });
     try {
@@ -149,7 +156,12 @@ export const useScreenRecording = create<RecordingStore>((set, get) => ({
       set({ notice: noticeFor(String(error), false) ?? "failed" });
     } finally {
       inFlight = false;
-      set({ pending: false });
+      set({ pending: false, settling: true });
+      window.clearTimeout(settleTimer);
+      settleTimer = window.setTimeout(
+        () => set({ settling: false }),
+        SETTLE_MS,
+      );
     }
   },
   toggle: async () => {
@@ -198,6 +210,32 @@ export async function openPrivacyPane(kind: "camera" | "microphone") {
   } catch {
     // The notice above stays; nothing else to do here.
   }
+}
+
+/** True while the webcam is on but macOS hasn't given us the camera. Checked
+ * when `watch` turns on and when the window gets focus back (say, from System
+ * Settings), and every 2 seconds while blocked so the warning clears itself. */
+export function useCameraBlocked(watch: boolean) {
+  const [blocked, setBlocked] = useState(false);
+  useEffect(() => {
+    if (!watch || platform() !== "macos") return;
+    let disposed = false;
+    const check = () =>
+      void checkCameraPermission()
+        .catch(() => false)
+        .then((allowed) => {
+          if (!disposed) setBlocked(!allowed);
+        });
+    check();
+    window.addEventListener("focus", check);
+    const id = blocked ? window.setInterval(check, 2000) : undefined;
+    return () => {
+      disposed = true;
+      window.removeEventListener("focus", check);
+      window.clearInterval(id);
+    };
+  }, [watch, blocked]);
+  return watch && blocked;
 }
 
 let syncStarted = false;

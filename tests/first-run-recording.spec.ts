@@ -58,7 +58,15 @@ test("An older Mac explains how to check and update macOS", async ({
   const card = page.getByTestId("screen-recording-card");
   await expect(card).toContainText("macOS 15 (Sequoia) or newer");
   await expect(card).toContainText("About This Mac");
-  await expect(
-    card.getByRole("button", { name: "Record screen", exact: true }),
-  ).toBeDisabled();
+  const record = card.getByRole("button", {
+    name: "Record screen",
+    exact: true,
+  });
+  await expect(record).toBeDisabled();
+  // Same notice as the denied state: a short bold lead, then the steps, and
+  // a grey button instead of a dimmed lime one.
+  await expect(card.locator(".home-record-notice strong")).toHaveText(
+    "Screen recording needs macOS 15 (Sequoia) or newer.",
+  );
+  await expect(record).not.toHaveClass(/accent-action/);
 });
