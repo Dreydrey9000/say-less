@@ -18,6 +18,9 @@ import {
 // the app sits in the menu bar. Check again every few hours so a running copy
 // still finds new versions.
 const UPDATE_RECHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;
+// Timers pause while the Mac sleeps, so also check when the window comes back
+// into focus, but not more than once per half hour.
+const FOCUS_RECHECK_MIN_GAP_MS = 30 * 60 * 1000;
 // Fixed ids so repeat checks replace one toast instead of stacking new ones.
 const UPDATE_READY_TOAST_ID = "update-ready";
 const UPDATE_FAILED_TOAST_ID = "update-failed";
@@ -57,6 +60,10 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
   const downloadedBytesRef = useRef(0);
   const contentLengthRef = useRef(0);
   const notifiedVersionRef = useRef<string | null>(null);
+  // A ref, not state: the toast button and the event listener hold functions
+  // from an older render, and they still need to see an install in progress.
+  const isInstallingRef = useRef(false);
+  const lastCheckRef = useRef(0);
 
   useEffect(() => {
     // Wait for settings to load before doing anything
@@ -75,6 +82,11 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
 
     checkForUpdates();
     const recheck = setInterval(checkForUpdates, UPDATE_RECHECK_INTERVAL_MS);
+    const onFocus = () => {
+      if (Date.now() - lastCheckRef.current < FOCUS_RECHECK_MIN_GAP_MS) return;
+      checkForUpdates();
+    };
+    window.addEventListener("focus", onFocus);
 
     // Listen for update check events
     const updateUnlisten = listen("check-for-updates", () => {
@@ -86,6 +98,7 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
         clearTimeout(upToDateTimeoutRef.current);
       }
       clearInterval(recheck);
+      window.removeEventListener("focus", onFocus);
       updateUnlisten.then((fn) => fn());
     };
   }, [settingsLoaded, updateChecksEnabled]);
@@ -95,6 +108,7 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
     if (!updateChecksEnabled || isChecking) return;
 
     try {
+      lastCheckRef.current = Date.now();
       setIsChecking(true);
       const update = await check();
 
@@ -107,10 +121,12 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
           resolvePortableInstallerUrl(update.rawJson, platform(), arch()),
         );
         // The footer label is small and easy to miss, so also say it in a
-        // toast: once per version, and again on every manual check.
+        // toast: once per version, and again on every manual check. Never
+        // while an install is running, or its button would start a second one.
         if (
-          isManualCheckRef.current ||
-          notifiedVersionRef.current !== update.version
+          !isInstallingRef.current &&
+          (isManualCheckRef.current ||
+            notifiedVersionRef.current !== update.version)
         ) {
           notifiedVersionRef.current = update.version;
           toast(t("footer.updateReady", { version: update.version }), {
@@ -157,18 +173,19 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
   };
 
   const installUpdate = async () => {
-    if (!updateChecksEnabled) return;
+    if (!updateChecksEnabled || isInstallingRef.current) return;
+    isInstallingRef.current = true;
     // Starting from the footer label must not leave a second "Update now"
     // button on screen that would start another download.
     toast.dismiss(UPDATE_READY_TOAST_ID);
 
-    const portable = await commands.isPortable();
-    if (portable) {
-      setShowPortableUpdateDialog(true);
-      return;
-    }
-
     try {
+      const portable = await commands.isPortable();
+      if (portable) {
+        setShowPortableUpdateDialog(true);
+        return;
+      }
+
       setIsInstalling(true);
       setDownloadProgress(0);
       downloadedBytesRef.current = 0;
@@ -218,6 +235,7 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
         },
       });
     } finally {
+      isInstallingRef.current = false;
       setIsInstalling(false);
       setDownloadProgress(0);
       downloadedBytesRef.current = 0;
