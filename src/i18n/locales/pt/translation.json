@@ -1340,7 +1340,8 @@
     "macosTooOldSteps": "Para ver sua versão, abra o menu Apple e escolha Sobre Este Mac. Para atualizar, vá em Ajustes do Sistema, Geral, Atualização de Software. Se nenhuma atualização aparecer, não conseguimos gravar a tela neste Mac, mas o ditado continua funcionando.",
     "recordWithoutFace": "Gravar sem meu rosto",
     "shortcutStartHint": "Ou pressione {{shortcut}} em qualquer app, ou diga “Say less, start recording.”",
-    "shortcutStopHint": "Quando terminar, clique em 'Stop', pressione {{shortcut}} ou diga “Say less, stop recording.”"
+    "shortcutStopHint": "Quando terminar, clique em 'Stop', pressione {{shortcut}} ou diga “Say less, stop recording.”",
+    "shortcutLabel": "Atalho de gravação"
   },
   "recordingSetup": {
     "button": "Setup",

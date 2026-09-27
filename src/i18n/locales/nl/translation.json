@@ -1340,7 +1340,8 @@
     "macosTooOldSteps": "Om je versie te bekijken, open je het Apple-menu en kies je 'Over deze Mac'. Om bij te werken, ga je naar Systeeminstellingen, 'Algemeen', 'Software-update'. Zie je geen update, dan kunnen we op deze Mac je scherm niet opnemen, maar dicteren werkt nog steeds.",
     "recordWithoutFace": "Opnemen zonder mijn gezicht",
     "shortcutStartHint": "Of druk op {{shortcut}} vanuit elke app, of zeg “Say less, start recording.”",
-    "shortcutStopHint": "Als je klaar bent, klik je op 'Stop', druk je op {{shortcut}} of zeg je “Say less, stop recording.”"
+    "shortcutStopHint": "Als je klaar bent, klik je op 'Stop', druk je op {{shortcut}} of zeg je “Say less, stop recording.”",
+    "shortcutLabel": "Sneltoets voor opnemen"
   },
   "recordingSetup": {
     "button": "Setup",

@@ -1340,7 +1340,8 @@
     "macosTooOldSteps": "Per comprovar la vostra versió, obriu el menú Apple i trieu «Sobre aquest Mac». Per actualitzar, aneu a Configuració del sistema, General, Actualització de programari. Si no hi apareix cap actualització, no podem enregistrar la pantalla en aquest Mac, però el dictat continua funcionant.",
     "recordWithoutFace": "Enregistra sense la meva cara",
     "shortcutStartHint": "O premeu {{shortcut}} des de qualsevol aplicació, o digueu «Say less, start recording.»",
-    "shortcutStopHint": "Quan acabeu, feu clic a «Stop», premeu {{shortcut}} o digueu «Say less, stop recording.»"
+    "shortcutStopHint": "Quan acabeu, feu clic a «Stop», premeu {{shortcut}} o digueu «Say less, stop recording.»",
+    "shortcutLabel": "Drecera de gravació"
   },
   "recordingSetup": {
     "button": "Setup",

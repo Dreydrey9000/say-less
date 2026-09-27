@@ -1340,7 +1340,8 @@
     "macosTooOldSteps": "لمعرفة إصدارك، افتح قائمة Apple واختر «حول هذا الـ Mac». للتحديث، انتقل إلى «إعدادات النظام» ثم «عام» ثم «تحديث البرامج». إذا لم يظهر أي تحديث، فلن نتمكن من تسجيل الشاشة على هذا الـ Mac، لكن الإملاء سيظل يعمل.",
     "recordWithoutFace": "سجّل بدون وجهي",
     "shortcutStartHint": "أو اضغط {{shortcut}} من أي تطبيق، أو قل «Say less, start recording.»",
-    "shortcutStopHint": "عند الانتهاء، انقر على «Stop» أو اضغط {{shortcut}} أو قل «Say less, stop recording.»"
+    "shortcutStopHint": "عند الانتهاء، انقر على «Stop» أو اضغط {{shortcut}} أو قل «Say less, stop recording.»",
+    "shortcutLabel": "اختصار التسجيل"
   },
   "recordingSetup": {
     "button": "Setup",

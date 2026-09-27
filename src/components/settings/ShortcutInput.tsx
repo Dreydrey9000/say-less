@@ -7,6 +7,7 @@ interface ShortcutInputProps {
   descriptionMode?: "inline" | "tooltip";
   grouped?: boolean;
   shortcutId: string;
+  title?: string;
   disabled?: boolean;
 }
 

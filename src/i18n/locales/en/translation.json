@@ -1304,6 +1304,7 @@
     "shortcutStartHint": "Or press {{shortcut}} from any app, or say “Say less, start recording.”",
     "stopHint": "When you're done, click Stop or say “Say less, stop recording.”",
     "shortcutStopHint": "When you're done, click Stop, press {{shortcut}}, or say “Say less, stop recording.”",
+    "shortcutLabel": "Record shortcut",
     "startedAnnouncement": "Recording started.",
     "savedAnnouncement": "Recording saved.",
     "cameraOffHint": "We won't show your face in the video.",

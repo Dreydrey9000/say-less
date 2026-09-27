@@ -1340,7 +1340,8 @@
     "macosTooOldSteps": "Sürümünüzü görmek için Elma menüsünü açın ve Bu Mac Hakkında'yı seçin. Güncellemek için Sistem Ayarları'nı açın, Genel'i ve ardından Yazılım Güncelleme'yi seçin. Güncelleme görünmüyorsa bu Mac'te ekranı kaydedemeyiz, ama sesle yazma yine de çalışır.",
     "recordWithoutFace": "Yüzüm olmadan kaydet",
     "shortcutStartHint": "Ya da herhangi bir uygulamadan {{shortcut}} tuşlarına basın veya “Say less, start recording.” deyin.",
-    "shortcutStopHint": "İşiniz bitince “Stop” düğmesine tıklayın, {{shortcut}} tuşlarına basın veya “Say less, stop recording.” deyin."
+    "shortcutStopHint": "İşiniz bitince “Stop” düğmesine tıklayın, {{shortcut}} tuşlarına basın veya “Say less, stop recording.” deyin.",
+    "shortcutLabel": "Kayıt kısayolu"
   },
   "recordingSetup": {
     "button": "Setup",

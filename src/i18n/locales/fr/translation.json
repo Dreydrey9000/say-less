@@ -1340,7 +1340,8 @@
     "macosTooOldSteps": "Pour vérifier votre version, ouvrez le menu Apple et choisissez À propos de ce Mac. Pour mettre à jour, allez dans Réglages Système, Général, Mise à jour logicielle. Si aucune mise à jour n’apparaît, nous ne pouvons pas enregistrer l’écran sur ce Mac, mais la dictée fonctionne toujours.",
     "recordWithoutFace": "Enregistrer sans mon visage",
     "shortcutStartHint": "Ou appuyez sur {{shortcut}} depuis n’importe quelle app, ou dites « Say less, start recording. »",
-    "shortcutStopHint": "Quand vous avez terminé, cliquez sur « Stop », appuyez sur {{shortcut}} ou dites « Say less, stop recording. »"
+    "shortcutStopHint": "Quand vous avez terminé, cliquez sur « Stop », appuyez sur {{shortcut}} ou dites « Say less, stop recording. »",
+    "shortcutLabel": "Raccourci d’enregistrement"
   },
   "recordingSetup": {
     "button": "Setup",

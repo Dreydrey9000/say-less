@@ -1340,7 +1340,8 @@
     "macosTooOldSteps": "За да проверите версията си, отворете менюто Apple и изберете „About This Mac“. За да актуализирате, отидете в „System Settings“, „General“, „Software Update“. Ако не се покаже актуализация, не можем да записваме екрана на този Mac, но диктовката продължава да работи.",
     "recordWithoutFace": "Запиши без лицето ми",
     "shortcutStartHint": "Или натиснете {{shortcut}} от всяко приложение, или кажете „Say less, start recording.“",
-    "shortcutStopHint": "Когато приключите, натиснете „Stop“ или {{shortcut}}, или кажете „Say less, stop recording.“"
+    "shortcutStopHint": "Когато приключите, натиснете „Stop“ или {{shortcut}}, или кажете „Say less, stop recording.“",
+    "shortcutLabel": "Клавишна комбинация за запис"
   },
   "recordingSetup": {
     "button": "Setup",

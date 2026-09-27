@@ -826,3 +826,46 @@ test("Shortcuts & mic lists the Record screen shortcut on a Mac", async ({
   await expect(page.getByText("Record screen", { exact: true })).toBeVisible();
   await expect(page.getByText("Ctrl + Option + R").first()).toBeVisible();
 });
+
+test("the Record shortcut can be changed from the Home card", async ({
+  page,
+}) => {
+  await page.goto("/tests/fixtures/app.html");
+  const row = page.locator(".home-record-shortcut");
+  await expect(row.getByText("Record shortcut", { exact: true })).toBeVisible();
+  await expect(
+    row.getByRole("button", { name: /Ctrl \+ Option \+ R/ }),
+  ).toBeVisible();
+});
+
+test("the Home orb grows with your voice while you dictate", async ({
+  page,
+}) => {
+  await page.goto("/tests/fixtures/app.html?events");
+  await page.waitForFunction(
+    () =>
+      typeof (window as unknown as { testEmit?: unknown }).testEmit ===
+      "function",
+  );
+  const orb = page.locator(".home-companion .companion");
+  await expect(orb).toBeVisible();
+  const scale = () =>
+    orb.evaluate((el) =>
+      Number(getComputedStyle(el).getPropertyValue("--voice-scale") || "1"),
+    );
+  const emit = (event: string, payload: unknown) =>
+    page.evaluate(
+      ([e, p]) =>
+        (
+          window as unknown as {
+            testEmit: (e: string, p?: unknown) => Promise<void>;
+          }
+        ).testEmit(e as string, p),
+      [event, payload] as const,
+    );
+  await emit("dock-state", "recording");
+  for (let i = 0; i < 6; i++) {
+    await emit("mic-level", Array(16).fill(0.9));
+  }
+  await expect.poll(scale).toBeGreaterThan(1.1);
+});

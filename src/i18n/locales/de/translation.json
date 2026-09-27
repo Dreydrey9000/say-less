@@ -1340,7 +1340,8 @@
     "macosTooOldSteps": "Um deine Version zu prüfen, öffne das Apple-Menü und wähle „Über diesen Mac“. Zum Aktualisieren gehe zu „Systemeinstellungen“, „Allgemein“, „Softwareupdate“. Wenn kein Update angezeigt wird, können wir auf diesem Mac den Bildschirm nicht aufnehmen, aber das Diktieren funktioniert weiterhin.",
     "recordWithoutFace": "Ohne mein Gesicht aufnehmen",
     "shortcutStartHint": "Oder drücke {{shortcut}} in einer beliebigen App oder sage „Say less, start recording.“",
-    "shortcutStopHint": "Wenn du fertig bist, klicke auf „Stop“, drücke {{shortcut}} oder sage „Say less, stop recording.“"
+    "shortcutStopHint": "Wenn du fertig bist, klicke auf „Stop“, drücke {{shortcut}} oder sage „Say less, stop recording.“",
+    "shortcutLabel": "Tastenkürzel für Aufnahme"
   },
   "recordingSetup": {
     "button": "Setup",

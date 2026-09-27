@@ -1340,7 +1340,8 @@
     "macosTooOldSteps": "Per controllare la tua versione, apri il menu Apple e scegli Informazioni su questo Mac. Per aggiornare, vai in Impostazioni di Sistema, Generali, Aggiornamento software. Se non compare nessun aggiornamento, non possiamo registrare lo schermo su questo Mac, ma la dettatura funziona comunque.",
     "recordWithoutFace": "Registra senza il mio viso",
     "shortcutStartHint": "Oppure premi {{shortcut}} da qualsiasi app, o di' “Say less, start recording.”",
-    "shortcutStopHint": "Quando hai finito, clicca su 'Stop', premi {{shortcut}} o di' “Say less, stop recording.”"
+    "shortcutStopHint": "Quando hai finito, clicca su 'Stop', premi {{shortcut}} o di' “Say less, stop recording.”",
+    "shortcutLabel": "Scorciatoia di registrazione"
   },
   "recordingSetup": {
     "button": "Setup",

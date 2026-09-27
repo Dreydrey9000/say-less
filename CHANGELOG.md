@@ -4,6 +4,21 @@
 
 ### Release
 
+- Version 0.14.3: the voice visuals on Home and the dock move with your voice, and the Record shortcut can be changed from the Home card.
+
+### Fixed
+
+- The Home orb, the floating dock companion, the talking avatar and the Appearance preview now react to your voice while you dictate. Voice levels were only sent to the recording bubble, so every other visual played a canned loop. The main window and the dock now get the levels about 15 times a second, only while they are on screen, from a separate task so the audio thread never waits on the UI.
+- Voice level changes are eased so the orb and avatar move smoothly between updates.
+
+### Added
+
+- A Record shortcut row on the recording card shows Control + Option + R and lets you change or reset it without opening Settings.
+
+## [2026-09-27]
+
+### Release
+
 - Version 0.14.2: a Control+Option+R shortcut starts and stops a screen recording from any app, because recording a presentation shouldn't need a trip back to the Say Less window.
 
 ### Added

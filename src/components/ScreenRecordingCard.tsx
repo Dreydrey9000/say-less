@@ -11,6 +11,7 @@ import {
 import { invoke } from "@tauri-apps/api/core";
 import { useSettings } from "@/hooks/useSettings";
 import { formatKeyCombination } from "@/lib/utils/keyboard";
+import { ShortcutInput } from "./settings/ShortcutInput";
 import {
   formatElapsed,
   openPrivacyPane,
@@ -172,57 +173,271 @@ export function ScreenRecordingCard() {
     });
   };
   return (
-    <section
-      className="home-record"
-      aria-labelledby="home-record-title"
-      data-state={state}
-      data-blocked={unsupported || undefined}
-      data-testid="screen-recording-card"
-    >
-      <div className="home-record-text">
-        <h2 id="home-record-title">{t("screenRecording.title")}</h2>
-        {/* Windows and Linux: one plain line instead of a promise. */}
-        <p>
-          {comingSoon
-            ? t(unsupportedKey(reason))
-            : t("screenRecording.description")}
-        </p>
-        {supported && (
-          <>
-            {/* Each slot holds its idle line and its recording line in the
+    <>
+      <section
+        className="home-record"
+        aria-labelledby="home-record-title"
+        data-state={state}
+        data-blocked={unsupported || undefined}
+        data-testid="screen-recording-card"
+      >
+        <div className="home-record-text">
+          <h2 id="home-record-title">{t("screenRecording.title")}</h2>
+          {/* Windows and Linux: one plain line instead of a promise. */}
+          <p>
+            {comingSoon
+              ? t(unsupportedKey(reason))
+              : t("screenRecording.description")}
+          </p>
+          {supported && (
+            <>
+              {/* Each slot holds its idle line and its recording line in the
                 same space, so the buttons don't move when Record turns into
                 Stop. */}
-            <div className="home-record-slot">
-              <p className="home-record-hint" data-off={recording || undefined}>
-                {recordKey
-                  ? t("screenRecording.shortcutStartHint", {
-                      shortcut: recordKey,
-                    })
-                  : t("screenRecording.voiceHint")}
-              </p>
-              <p
-                className="home-record-hint"
-                data-off={!recording || undefined}
-              >
-                {recordKey
-                  ? t("screenRecording.shortcutStopHint", {
-                      shortcut: recordKey,
-                    })
-                  : t("screenRecording.stopHint")}
-              </p>
-            </div>
-            <div className="home-record-slot home-record-face-slot">
-              {cameraBlocked ? (
+              <div className="home-record-slot">
                 <p
-                  className="home-record-hint home-record-face home-record-warn"
-                  data-off={cameraWarningOff || undefined}
+                  className="home-record-hint"
+                  data-off={recording || undefined}
                 >
-                  <TriangleAlert
-                    size={14}
-                    className="shrink-0 text-warning"
+                  {recordKey
+                    ? t("screenRecording.shortcutStartHint", {
+                        shortcut: recordKey,
+                      })
+                    : t("screenRecording.voiceHint")}
+                </p>
+                <p
+                  className="home-record-hint"
+                  data-off={!recording || undefined}
+                >
+                  {recordKey
+                    ? t("screenRecording.shortcutStopHint", {
+                        shortcut: recordKey,
+                      })
+                    : t("screenRecording.stopHint")}
+                </p>
+              </div>
+              <div className="home-record-slot home-record-face-slot">
+                {cameraBlocked ? (
+                  <p
+                    className="home-record-hint home-record-face home-record-warn"
+                    data-off={cameraWarningOff || undefined}
+                  >
+                    <TriangleAlert
+                      size={14}
+                      className="shrink-0 text-warning"
+                      aria-hidden="true"
+                    />
+                    <span>{t("screenRecording.cameraBlocked")}</span>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => void openPrivacyPane("camera")}
+                    >
+                      {t("screenRecording.openSettings")}
+                    </Button>
+                  </p>
+                ) : webcam === true ? (
+                  // Where the face goes, once macOS has given us the camera.
+                  <p
+                    className="home-record-hint"
+                    data-off={
+                      recording || cameraAccess !== "allowed" || undefined
+                    }
+                  >
+                    {t(`screenRecording.faceCorner.${corner}`)}
+                  </p>
+                ) : (
+                  webcam === false && (
+                    <p
+                      className="home-record-hint home-record-face"
+                      data-off={recording || undefined}
+                    >
+                      <span>{t("screenRecording.cameraOffHint")}</span>
+                      {/* Setup's own Show your face switch is right there when
+                        it is open, so the line stays and its button goes. */}
+                      {!setupOpen && (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={openFaceSetup}
+                        >
+                          {t("screenRecording.showMyFace")}
+                        </Button>
+                      )}
+                    </p>
+                  )
+                )}
+                {recording && (
+                  <p className="home-record-live">
+                    <span className="rec-dot" aria-hidden="true" />
+                    <span>{t("screenRecording.recording")}</span>
+                    <span role="timer" className="rec-time">
+                      {formatElapsed(elapsed)}
+                    </span>
+                  </p>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+        {unsupported && !comingSoon && (
+          <div className="home-record-notice rounded-lg border border-warning/40 bg-warning/10 px-3 py-2.5">
+            <TriangleAlert
+              size={16}
+              className="shrink-0 text-warning"
+              aria-hidden="true"
+            />
+            <div className="home-record-notice-body">
+              <p id="home-record-reason">
+                <strong>{t(unsupportedKey(reason))}</strong>{" "}
+                {t("screenRecording.macosTooOldSteps")}
+              </p>
+              <Button
+                variant="secondary"
+                onClick={() =>
+                  void openSoftwareUpdate().then((opened) => {
+                    // Undefined is the ignored second click of a double-click.
+                    if (opened !== undefined) setUpdateFailed(!opened);
+                  })
+                }
+              >
+                {t("screenRecording.openSoftwareUpdate")}
+              </Button>
+              {updateFailed && (
+                <p className="home-record-error" role="alert">
+                  {t("screenRecording.softwareUpdateFailed")}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+        {!comingSoon && (
+          <div className="home-record-controls">
+            <div className="home-record-buttons">
+              <Button
+                variant={
+                  recording
+                    ? "danger"
+                    : needsPermission || unsupported
+                      ? "secondary"
+                      : "accent"
+                }
+                className="home-record-button"
+                disabled={!status || !supported}
+                aria-disabled={inert || undefined}
+                aria-busy={busy || undefined}
+                aria-describedby={
+                  unsupported ? "home-record-reason" : undefined
+                }
+                aria-label={
+                  recording ? t("screenRecording.stopLabel") : undefined
+                }
+                onClick={() => {
+                  if (inert) return;
+                  clickedHere.current = true;
+                  void toggle();
+                }}
+              >
+                {recording ? (
+                  <Square size={16} aria-hidden="true" />
+                ) : (
+                  <MonitorPlay size={16} aria-hidden="true" />
+                )}
+                {t(
+                  state === "starting"
+                    ? "screenRecording.starting"
+                    : state === "stopping"
+                      ? "screenRecording.stopping"
+                      : recording
+                        ? "screenRecording.stop"
+                        : "screenRecording.start",
+                )}
+              </Button>
+              <Tooltip
+                label={t("recordingSetup.open")}
+                placement="bottom"
+                align="end"
+              >
+                <Button
+                  variant="secondary"
+                  className="home-record-setup"
+                  aria-expanded={setupOpen}
+                  aria-controls="recording-setup"
+                  onClick={() => {
+                    setSetupOpen((open) => !open);
+                    // A plain open or close drops a Show my face request that
+                    // hasn't found its choices yet.
+                    setFocusFace(false);
+                  }}
+                >
+                  {t("recordingSetup.button")}
+                  <ChevronDown
+                    size={16}
                     aria-hidden="true"
+                    className={setupOpen ? "is-open" : ""}
                   />
-                  <span>{t("screenRecording.cameraBlocked")}</span>
+                </Button>
+              </Tooltip>
+            </div>
+          </div>
+        )}
+        {/* Every problem from a start, and the saved video, show right under
+          Record, above Setup, so they are never below the fold. */}
+        {result && (
+          <div className="home-record-result" ref={resultRef}>
+            {needsPermission && (
+              <div
+                className="home-record-notice rounded-lg border border-warning/40 bg-warning/10 px-3 py-2.5"
+                role="alert"
+              >
+                <TriangleAlert
+                  size={16}
+                  className="shrink-0 text-warning"
+                  aria-hidden="true"
+                />
+                <div className="home-record-notice-body">
+                  <p>
+                    <strong>{t("screenRecording.permissionDenied")}</strong>{" "}
+                    {t("screenRecording.permissionHint")}
+                  </p>
+                  <Button variant="accent" onClick={() => void openSettings()}>
+                    {t("screenRecording.openSettings")}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    aria-disabled={reopening || undefined}
+                    onClick={reopen}
+                  >
+                    {t(
+                      reopening
+                        ? "screenRecording.reopening"
+                        : "screenRecording.reopenApp",
+                    )}
+                  </Button>
+                  {reopenFailed && (
+                    <p className="home-record-error">
+                      {t("screenRecording.reopenFailed")}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+            {notice === "microphone_denied" && (
+              <div className="home-record-notice" role="alert">
+                <p>{t("screenRecording.microphoneDenied")}</p>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => void openPrivacyPane("microphone")}
+                >
+                  {t("screenRecording.openSettings")}
+                </Button>
+              </div>
+            )}
+            {notice === "camera_denied" && (
+              <div className="home-record-notice" role="alert">
+                <p>{t("recordingSetup.cameraDenied")}</p>
+                <div className="home-record-notice-actions">
                   <Button
                     variant="secondary"
                     size="sm"
@@ -230,327 +445,133 @@ export function ScreenRecordingCard() {
                   >
                     {t("screenRecording.openSettings")}
                   </Button>
-                </p>
-              ) : webcam === true ? (
-                // Where the face goes, once macOS has given us the camera.
-                <p
-                  className="home-record-hint"
-                  data-off={
-                    recording || cameraAccess !== "allowed" || undefined
-                  }
-                >
-                  {t(`screenRecording.faceCorner.${corner}`)}
-                </p>
-              ) : (
-                webcam === false && (
-                  <p
-                    className="home-record-hint home-record-face"
-                    data-off={recording || undefined}
+                  {/* The backend won't start with a blocked camera, so offer
+                    the recording without the face in one click. */}
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={async () => {
+                      if (
+                        await useRecordingOptions
+                          .getState()
+                          .update({ webcam: false })
+                      )
+                        void useScreenRecording.getState().start();
+                    }}
                   >
-                    <span>{t("screenRecording.cameraOffHint")}</span>
-                    {/* Setup's own Show your face switch is right there when
-                        it is open, so the line stays and its button goes. */}
-                    {!setupOpen && (
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={openFaceSetup}
-                      >
-                        {t("screenRecording.showMyFace")}
-                      </Button>
-                    )}
-                  </p>
-                )
-              )}
-              {recording && (
-                <p className="home-record-live">
-                  <span className="rec-dot" aria-hidden="true" />
-                  <span>{t("screenRecording.recording")}</span>
-                  <span role="timer" className="rec-time">
-                    {formatElapsed(elapsed)}
-                  </span>
+                    {t("screenRecording.recordWithoutFace")}
+                  </Button>
+                </div>
+              </div>
+            )}
+            {(notice === "window_missing" ||
+              notice === "camera_failed" ||
+              notice === "camera_missing") && (
+              <div className="home-record-notice" role="alert">
+                <p>
+                  {t(
+                    notice === "window_missing"
+                      ? "screenRecording.windowMissing"
+                      : notice === "camera_missing"
+                        ? "screenRecording.cameraMissing"
+                        : "screenRecording.cameraFailed",
+                  )}
                 </p>
-              )}
-            </div>
-          </>
-        )}
-      </div>
-      {unsupported && !comingSoon && (
-        <div className="home-record-notice rounded-lg border border-warning/40 bg-warning/10 px-3 py-2.5">
-          <TriangleAlert
-            size={16}
-            className="shrink-0 text-warning"
-            aria-hidden="true"
-          />
-          <div className="home-record-notice-body">
-            <p id="home-record-reason">
-              <strong>{t(unsupportedKey(reason))}</strong>{" "}
-              {t("screenRecording.macosTooOldSteps")}
-            </p>
-            <Button
-              variant="secondary"
-              onClick={() =>
-                void openSoftwareUpdate().then((opened) => {
-                  // Undefined is the ignored second click of a double-click.
-                  if (opened !== undefined) setUpdateFailed(!opened);
-                })
-              }
-            >
-              {t("screenRecording.openSoftwareUpdate")}
-            </Button>
-            {updateFailed && (
-              <p className="home-record-error" role="alert">
-                {t("screenRecording.softwareUpdateFailed")}
+                {!setupOpen && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setSetupOpen(true)}
+                  >
+                    {t("recordingSetup.open")}
+                  </Button>
+                )}
+              </div>
+            )}
+            {(notice === "failed" || notice === "reveal_failed") && (
+              <p className="home-record-notice" role="alert">
+                {t(
+                  notice === "failed"
+                    ? "screenRecording.failed"
+                    : "screenRecording.revealFailed",
+                )}
               </p>
             )}
-          </div>
-        </div>
-      )}
-      {!comingSoon && (
-        <div className="home-record-controls">
-          <div className="home-record-buttons">
-            <Button
-              variant={
-                recording
-                  ? "danger"
-                  : needsPermission || unsupported
-                    ? "secondary"
-                    : "accent"
-              }
-              className="home-record-button"
-              disabled={!status || !supported}
-              aria-disabled={inert || undefined}
-              aria-busy={busy || undefined}
-              aria-describedby={unsupported ? "home-record-reason" : undefined}
-              aria-label={
-                recording ? t("screenRecording.stopLabel") : undefined
-              }
-              onClick={() => {
-                if (inert) return;
-                clickedHere.current = true;
-                void toggle();
-              }}
-            >
-              {recording ? (
-                <Square size={16} aria-hidden="true" />
-              ) : (
-                <MonitorPlay size={16} aria-hidden="true" />
-              )}
-              {t(
-                state === "starting"
-                  ? "screenRecording.starting"
-                  : state === "stopping"
-                    ? "screenRecording.stopping"
-                    : recording
-                      ? "screenRecording.stop"
-                      : "screenRecording.start",
-              )}
-            </Button>
-            <Tooltip
-              label={t("recordingSetup.open")}
-              placement="bottom"
-              align="end"
-            >
-              <Button
-                variant="secondary"
-                className="home-record-setup"
-                aria-expanded={setupOpen}
-                aria-controls="recording-setup"
-                onClick={() => {
-                  setSetupOpen((open) => !open);
-                  // A plain open or close drops a Show my face request that
-                  // hasn't found its choices yet.
-                  setFocusFace(false);
-                }}
-              >
-                {t("recordingSetup.button")}
-                <ChevronDown
-                  size={16}
-                  aria-hidden="true"
-                  className={setupOpen ? "is-open" : ""}
-                />
-              </Button>
-            </Tooltip>
-          </div>
-        </div>
-      )}
-      {/* Every problem from a start, and the saved video, show right under
-          Record, above Setup, so they are never below the fold. */}
-      {result && (
-        <div className="home-record-result" ref={resultRef}>
-          {needsPermission && (
-            <div
-              className="home-record-notice rounded-lg border border-warning/40 bg-warning/10 px-3 py-2.5"
-              role="alert"
-            >
-              <TriangleAlert
-                size={16}
-                className="shrink-0 text-warning"
-                aria-hidden="true"
-              />
-              <div className="home-record-notice-body">
-                <p>
-                  <strong>{t("screenRecording.permissionDenied")}</strong>{" "}
-                  {t("screenRecording.permissionHint")}
-                </p>
-                <Button variant="accent" onClick={() => void openSettings()}>
-                  {t("screenRecording.openSettings")}
-                </Button>
-                <Button
-                  variant="secondary"
-                  aria-disabled={reopening || undefined}
-                  onClick={reopen}
-                >
-                  {t(
-                    reopening
-                      ? "screenRecording.reopening"
-                      : "screenRecording.reopenApp",
+            {showSaved && (
+              <div className="home-record-notice" role="status">
+                <p className="home-record-saved">
+                  {notice !== "ended_early" && (
+                    <CircleCheck
+                      size={16}
+                      className="home-record-saved-icon"
+                      aria-hidden="true"
+                    />
                   )}
-                </Button>
-                {reopenFailed && (
-                  <p className="home-record-error">
-                    {t("screenRecording.reopenFailed")}
+                  {t(
+                    notice === "ended_early"
+                      ? "screenRecording.endedEarly"
+                      : parent && folder
+                        ? "screenRecording.savedIn"
+                        : "screenRecording.saved",
+                    { folder, parent },
+                  )}
+                </p>
+                {fileName && (
+                  <p className="home-record-file" title={fileName}>
+                    {fileName}
                   </p>
                 )}
-              </div>
-            </div>
-          )}
-          {notice === "microphone_denied" && (
-            <div className="home-record-notice" role="alert">
-              <p>{t("screenRecording.microphoneDenied")}</p>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => void openPrivacyPane("microphone")}
-              >
-                {t("screenRecording.openSettings")}
-              </Button>
-            </div>
-          )}
-          {notice === "camera_denied" && (
-            <div className="home-record-notice" role="alert">
-              <p>{t("recordingSetup.cameraDenied")}</p>
-              <div className="home-record-notice-actions">
                 <Button
                   variant="secondary"
                   size="sm"
-                  onClick={() => void openPrivacyPane("camera")}
+                  onClick={() => void reveal()}
                 >
-                  {t("screenRecording.openSettings")}
-                </Button>
-                {/* The backend won't start with a blocked camera, so offer
-                    the recording without the face in one click. */}
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={async () => {
-                    if (
-                      await useRecordingOptions
-                        .getState()
-                        .update({ webcam: false })
-                    )
-                      void useScreenRecording.getState().start();
-                  }}
-                >
-                  {t("screenRecording.recordWithoutFace")}
+                  <FolderOpen size={14} aria-hidden="true" />{" "}
+                  {t("screenRecording.showInFinder")}
                 </Button>
               </div>
-            </div>
-          )}
-          {(notice === "window_missing" ||
-            notice === "camera_failed" ||
-            notice === "camera_missing") && (
-            <div className="home-record-notice" role="alert">
-              <p>
-                {t(
-                  notice === "window_missing"
-                    ? "screenRecording.windowMissing"
-                    : notice === "camera_missing"
-                      ? "screenRecording.cameraMissing"
-                      : "screenRecording.cameraFailed",
-                )}
-              </p>
-              {!setupOpen && (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setSetupOpen(true)}
-                >
-                  {t("recordingSetup.open")}
-                </Button>
-              )}
-            </div>
-          )}
-          {(notice === "failed" || notice === "reveal_failed") && (
-            <p className="home-record-notice" role="alert">
-              {t(
-                notice === "failed"
-                  ? "screenRecording.failed"
-                  : "screenRecording.revealFailed",
-              )}
-            </p>
-          )}
-          {showSaved && (
-            <div className="home-record-notice" role="status">
-              <p className="home-record-saved">
-                {notice !== "ended_early" && (
-                  <CircleCheck
-                    size={16}
-                    className="home-record-saved-icon"
-                    aria-hidden="true"
-                  />
-                )}
-                {t(
-                  notice === "ended_early"
-                    ? "screenRecording.endedEarly"
-                    : parent && folder
-                      ? "screenRecording.savedIn"
-                      : "screenRecording.saved",
-                  { folder, parent },
-                )}
-              </p>
-              {fileName && (
-                <p className="home-record-file" title={fileName}>
-                  {fileName}
-                </p>
-              )}
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => void reveal()}
-              >
-                <FolderOpen size={14} aria-hidden="true" />{" "}
-                {t("screenRecording.showInFinder")}
-              </Button>
-            </div>
-          )}
+            )}
+          </div>
+        )}
+        {/* Show in Finder already leads to the new video, so one path at a time. */}
+        {supported && state === "idle" && !showSaved && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="home-record-folder inline-flex items-center gap-1.5"
+            onClick={() => void reveal()}
+          >
+            <FolderOpen size={14} aria-hidden="true" />
+            {t("screenRecording.openFolder")}
+          </Button>
+        )}
+        {setupOpen && !comingSoon && (
+          <RecordingSetup
+            id="recording-setup"
+            supported={supported}
+            recording={recording}
+            unsupportedReason={
+              unsupported ? t(unsupportedKey(reason, { detailed: true })) : null
+            }
+          />
+        )}
+        <p className="sr-only" aria-live="polite">
+          {announcement}
+        </p>
+      </section>
+      {/* Change the Record screen shortcut right under the card, without
+          opening Settings. It sits outside the card so its controls never
+          mix with the card's own buttons and status line. */}
+      {supported && recordBinding && (
+        <div className="home-record-shortcut">
+          <ShortcutInput
+            shortcutId="toggle_screen_recording"
+            title={t("screenRecording.shortcutLabel")}
+            descriptionMode="tooltip"
+            grouped={true}
+          />
         </div>
       )}
-      {/* Show in Finder already leads to the new video, so one path at a time. */}
-      {supported && state === "idle" && !showSaved && (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="home-record-folder inline-flex items-center gap-1.5"
-          onClick={() => void reveal()}
-        >
-          <FolderOpen size={14} aria-hidden="true" />
-          {t("screenRecording.openFolder")}
-        </Button>
-      )}
-      {setupOpen && !comingSoon && (
-        <RecordingSetup
-          id="recording-setup"
-          supported={supported}
-          recording={recording}
-          unsupportedReason={
-            unsupported ? t(unsupportedKey(reason, { detailed: true })) : null
-          }
-        />
-      )}
-      <p className="sr-only" aria-live="polite">
-        {announcement}
-      </p>
-    </section>
+    </>
   );
 }
