@@ -9,6 +9,8 @@ import {
   CircleCheck,
 } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
+import { useSettings } from "@/hooks/useSettings";
+import { formatKeyCombination } from "@/lib/utils/keyboard";
 import {
   formatElapsed,
   openPrivacyPane,
@@ -56,6 +58,13 @@ export function ScreenRecordingCard() {
   // The dock's setup button opens this panel in the main window.
   const setupRequested = useRecordingOptions((state) => state.setupRequested);
   const webcam = useRecordingOptions((state) => state.options?.webcam);
+  const { settings: appSettings } = useSettings();
+  const recordBinding =
+    appSettings?.bindings?.toggle_screen_recording?.current_binding ?? "";
+  // No shortcut saved (Windows, or cleared): fall back to the voice hint.
+  const recordKey = recordBinding
+    ? formatKeyCombination(recordBinding, "macos")
+    : "";
   const corner = useRecordingOptions(
     (state) => state.options?.webcam_corner ?? "bottom_right",
   );
@@ -185,13 +194,21 @@ export function ScreenRecordingCard() {
                 Stop. */}
             <div className="home-record-slot">
               <p className="home-record-hint" data-off={recording || undefined}>
-                {t("screenRecording.voiceHint")}
+                {recordKey
+                  ? t("screenRecording.shortcutStartHint", {
+                      shortcut: recordKey,
+                    })
+                  : t("screenRecording.voiceHint")}
               </p>
               <p
                 className="home-record-hint"
                 data-off={!recording || undefined}
               >
-                {t("screenRecording.stopHint")}
+                {recordKey
+                  ? t("screenRecording.shortcutStopHint", {
+                      shortcut: recordKey,
+                    })
+                  : t("screenRecording.stopHint")}
               </p>
             </div>
             <div className="home-record-slot home-record-face-slot">

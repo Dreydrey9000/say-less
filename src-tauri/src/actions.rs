@@ -1008,6 +1008,18 @@ impl ShortcutAction for VoiceCommandDismissAction {
     fn stop(&self, _app: &AppHandle, _binding_id: &str, _shortcut_str: &str) {}
 }
 
+// Record screen shortcut: each press starts or stops a screen recording.
+// Problems (permission, camera) bring Home forward to explain them.
+struct ScreenRecordingAction;
+
+impl ShortcutAction for ScreenRecordingAction {
+    fn start(&self, app: &AppHandle, _binding_id: &str, _shortcut_str: &str) {
+        crate::screen_recorder::toggle_in_background(app, None);
+    }
+
+    fn stop(&self, _app: &AppHandle, _binding_id: &str, _shortcut_str: &str) {}
+}
+
 // Test Action
 struct TestAction;
 
@@ -1069,6 +1081,10 @@ pub static ACTION_MAP: Lazy<HashMap<String, Arc<dyn ShortcutAction>>> = Lazy::ne
     map.insert(
         crate::voice_command::DISMISS_BINDING_ID.to_string(),
         Arc::new(VoiceCommandDismissAction) as Arc<dyn ShortcutAction>,
+    );
+    map.insert(
+        "toggle_screen_recording".to_string(),
+        Arc::new(ScreenRecordingAction) as Arc<dyn ShortcutAction>,
     );
     map.insert(
         "cancel".to_string(),

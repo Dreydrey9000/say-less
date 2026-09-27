@@ -194,11 +194,11 @@ test("while recording, the card says how to stop", async ({ page }) => {
   const home = card(page);
   await expect(
     home.getByText(
-      "When you're done, click Stop or say “Say less, stop recording.”",
+      "When you're done, click Stop, press Ctrl + Option + R, or say “Say less, stop recording.”",
       { exact: true },
     ),
   ).toBeVisible();
-  await expect(home.getByText("Or press your shortcut")).toBeHidden();
+  await expect(home.getByText("from any app")).toBeHidden();
   await expect(home.getByRole("button", { name: "Show my face" })).toBeHidden();
 });
 
@@ -802,4 +802,27 @@ test("voice recording commands have their own switch and reserved words", async 
   await expect(page.getByRole("status")).toContainText(
     "That phrase is saved for screen recording.",
   );
+});
+
+test("the card shows the Ctrl + Option + R record shortcut", async ({
+  page,
+}) => {
+  await page.goto("/tests/fixtures/app.html");
+  await expect(
+    card(page).getByText(
+      "Or press Ctrl + Option + R from any app, or say “Say less, start recording.”",
+      { exact: true },
+    ),
+  ).toBeVisible();
+});
+
+test("Shortcuts & mic lists the Record screen shortcut on a Mac", async ({
+  page,
+}) => {
+  await page.goto("/tests/fixtures/app.html");
+  await page
+    .getByRole("button", { name: "Shortcuts & mic", exact: true })
+    .click();
+  await expect(page.getByText("Record screen", { exact: true })).toBeVisible();
+  await expect(page.getByText("Ctrl + Option + R").first()).toBeVisible();
 });

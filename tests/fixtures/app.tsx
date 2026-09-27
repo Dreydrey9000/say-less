@@ -66,6 +66,8 @@ const settings = {
       "transcribe_fn",
       "cancel",
       "transcribe_with_post_process",
+      // Screen recording is Mac-only, so Windows has no Record screen shortcut.
+      ...(osName === "macos" ? ["toggle_screen_recording"] : []),
     ].map((id) => [
       id,
       {
@@ -77,7 +79,9 @@ const settings = {
             ? "Escape"
             : id === "transcribe_fn"
               ? "fn"
-              : "option+space",
+              : id === "toggle_screen_recording"
+                ? "ctrl+option+r"
+                : "option+space",
         default_binding: "option+space",
       },
     ]),
@@ -335,7 +339,7 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
   if (cmd.startsWith("plugin:event|")) return 1;
   if (cmd === "plugin:os|locale") return "en-US";
   if (cmd === "plugin:app|version")
-    return query.has("whatsNew") ? "0.14.1" : "0.12.0";
+    return query.has("whatsNew") ? "0.14.2" : "0.12.0";
   if (
     cmd.includes("check_accessibility_permission") ||
     cmd.includes("check_microphone_permission")

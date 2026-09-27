@@ -48,6 +48,13 @@ export const GeneralSettings: React.FC = () => {
           />
         )}
         <ShortcutActivationSetting descriptionMode="inline" grouped={true} />
+        {isMac && (
+          <ShortcutInput
+            shortcutId="toggle_screen_recording"
+            descriptionMode="inline"
+            grouped={true}
+          />
+        )}
         {/* Cancel shortcut remains hidden on Linux because of dynamic shortcut instability. */}
         {!isLinux && (
           <ShortcutInput

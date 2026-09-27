@@ -4,6 +4,17 @@
 
 ### Release
 
+- Version 0.14.2: a Control+Option+R shortcut starts and stops a screen recording from any app, because recording a presentation shouldn't need a trip back to the Say Less window.
+
+### Added
+
+- Record screen shortcut (Control+Option+R on Mac, changeable in Shortcuts & mic). Each press starts or stops a recording through the same path as the voice command, and a permission or camera problem brings Home forward to explain it. The recording card's hints name the shortcut. Existing installs get it automatically because missing default shortcuts are merged in on load.
+- The 0.14.2 What's New note repeats the recording intro, because a fresh install only shows the newest note, and adds the shortcut to its list.
+
+## [2026-09-27]
+
+### Release
+
 - Version 0.14.1: a first-run clarity pass on screen recording, because a new user could not easily find or understand it. The What's New note for 0.14.1 repeats the full screen recording intro, because a fresh install only shows the newest note.
 
 ### Changed
