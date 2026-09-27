@@ -134,6 +134,9 @@ test("dock labels Talk and Screen, and says Stop while the screen records", asyn
   ).toHaveText("Talk");
   const start = page.getByRole("button", { name: "Record screen" });
   await expect(start).toHaveText("Screen");
+  await expect(page.locator(".floating-shell > p")).toHaveText(
+    "Click Talk to type with your voice, or Screen to record a video",
+  );
   expect(await pillsFit()).toBe(true);
   expect(await noPageOverflow()).toBe(true);
   await start.click();
@@ -195,6 +198,10 @@ test("dock on Windows keeps the button focusable and says why", async ({
     name: "Screen recording is coming to Windows soon.",
   });
   await expect(button).toHaveAttribute("aria-disabled", "true");
+  // There is no Screen label here, so the hint must not point at one.
+  await expect(page.locator(".floating-shell > p")).toHaveText(
+    "Click Talk to type with your voice, or use your dictation shortcut",
+  );
   // Playwright won't click an aria-disabled button, so use the keyboard:
   // it must stay focusable and do nothing.
   await button.focus();

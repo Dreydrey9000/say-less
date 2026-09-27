@@ -71,6 +71,8 @@ function useDockScreenRecording() {
     showSaved: showSaved && state === "idle" && rec.justSaved,
     async toggleFromDock() {
       await rec.toggle();
+      // TODO(card-permissions merge): drop the string widening so these
+      // names are checked against RecordingNotice again.
       const notice: string | null = useScreenRecording.getState().notice;
       // The dock is too small to explain permissions; the main window does.
       if (
@@ -88,7 +90,13 @@ function useDockScreenRecording() {
   };
 }
 
-function ScreenButton({ compact }: { compact: boolean }) {
+function ScreenButton({
+  compact,
+  dictating = false,
+}: {
+  compact: boolean;
+  dictating?: boolean;
+}) {
   const { t } = useTranslation();
   const rec = useDockScreenRecording();
   if (!rec.status) return null;
@@ -133,7 +141,8 @@ function ScreenButton({ compact }: { compact: boolean }) {
           {!compact && (
             <>
               <Square size={14} aria-hidden="true" />
-              <span>{t("dock.stop")}</span>
+              {/* While dictating, the Talk pill owns the word Stop. */}
+              {!dictating && <span>{t("dock.stop")}</span>}
             </>
           )}
         </button>
@@ -170,6 +179,12 @@ function Dock() {
   const [error, setError] = useState(false);
   const [pending, setPending] = useState(false);
   const screen = useDockScreenRecording();
+  // Without screen recording (Windows, older Macs) there is no Screen button
+  // for the idle hint to point at.
+  const stateKey =
+    state === "idle" && !screen.supported
+      ? "dock.idleTalkOnly"
+      : `dock.${state}`;
   // Expanding or collapsing swaps the whole dock, which would drop keyboard
   // focus to <body>. When the user toggled it here, land focus on the control
   // that undoes the change.
@@ -268,7 +283,7 @@ function Dock() {
           <span
             className={`compact-indicator ${error ? "has-error" : ""}`}
             role="status"
-            aria-label={t(error ? "dock.error" : `dock.${state}`)}
+            aria-label={t(error ? "dock.error" : stateKey)}
           />
         )}
       </main>
@@ -324,8 +339,10 @@ function Dock() {
           aria-label={t(state === "recording" ? "dock.stop" : "dock.record")}
         >
           {state === "recording" ? <Square size={20} /> : <Mic size={20} />}
-          {/* While the screen records, the red Stop pill needs the room. */}
-          {!screen.recording && (
+          {/* While the screen records, the red Stop pill needs the room.
+              While dictating too, this pill keeps Stop instead, so the
+              caption's "Click Stop" points here. */}
+          {(!screen.recording || state === "recording") && (
             <span>
               {t(
                 state === "recording"
@@ -337,7 +354,7 @@ function Dock() {
             </span>
           )}
         </button>
-        <ScreenButton compact={false} />
+        <ScreenButton compact={false} dictating={state === "recording"} />
         <Tooltip
           label={t("recordingSetup.open")}
           placement="bottom"
@@ -395,11 +412,7 @@ function Dock() {
             ? t("dock.error")
             : screen.recording && state === "idle"
               ? t("screenRecording.dockCaption")
-              : t(
-                  state === "recording" && !ready
-                    ? "dock.arming"
-                    : `dock.${state}`,
-                )}
+              : t(state === "recording" && !ready ? "dock.arming" : stateKey)}
         </p>
       )}
       {state === "recording" && text && (

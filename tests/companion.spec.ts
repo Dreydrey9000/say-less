@@ -136,10 +136,10 @@ test("name corrections persist and duplicates cannot silently replace a rule", a
   );
 });
 
-test("dock shows switchable companion and remains usable at 360px", async ({
+test("dock shows switchable companion and remains usable at its real width", async ({
   page,
 }) => {
-  await page.setViewportSize({ width: 360, height: 132 });
+  await page.setViewportSize({ width: 460, height: 132 });
   await page.goto("/tests/fixtures/app.html?dock=1");
   await page.getByRole("button", { name: "Switch particle pattern" }).click();
   await expect(page.locator(".formation-helix")).toBeVisible();

@@ -102,6 +102,14 @@ button:disabled {
   min-height: 44px;
   padding: 0 8px;
 }
+/* The Talk pill is the only control that shrinks, so its word clips instead
+   of painting over the Screen pill. */
+.floating-bar .dock-record span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 /* Icon buttons stay at least 32px wide so they're easy to hit. */
 .floating-bar button {
   min-width: 32px;

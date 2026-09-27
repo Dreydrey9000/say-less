@@ -1000,6 +1000,7 @@
     "hide": "Hide floating dock",
     "error": "Check permissions or open settings to retry.",
     "idle": "Click Talk to type with your voice, or Screen to record a video",
+    "idleTalkOnly": "Click Talk to type with your voice, or use your dictation shortcut",
     "recording": "Listening. Click Stop when finished.",
     "transcribing": "Turning your voice into text…",
     "arming": "Starting microphone…",
