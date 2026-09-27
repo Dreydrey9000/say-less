@@ -710,6 +710,11 @@ fn build_screen_recorder_bridge() {
     if source_file == REAL_SWIFT_FILE {
         println!("cargo:rustc-link-lib=framework=AVFoundation");
         println!("cargo:rustc-link-lib=framework=CoreMedia");
+        // The webcam bubble window and the setup panel's camera thumbnail.
+        println!("cargo:rustc-link-lib=framework=AppKit");
+        println!("cargo:rustc-link-lib=framework=QuartzCore");
+        println!("cargo:rustc-link-lib=framework=CoreImage");
+        println!("cargo:rustc-link-lib=framework=CoreVideo");
         // ScreenCaptureKit only exists on macOS 12.3+, and Say Less still
         // launches on older Macs, so link it weakly.
         println!("cargo:rustc-link-arg=-weak_framework");
