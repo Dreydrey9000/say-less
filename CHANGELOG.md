@@ -2,6 +2,17 @@
 
 ## [2026-09-27]
 
+### Release
+
+- Version 0.14.1: a first-run clarity pass on screen recording, because a new user could not easily find or understand it. The What's New note for 0.14.1 repeats the full screen recording intro, because a fresh install only shows the newest note.
+
+### Changed
+
+- The dock's dictation button says Talk instead of Record, and the screen button has a visible Screen label, because "Record" meant two different things on the same screen. While recording, the red pill says Stop and the caption says the screen is recording.
+- Every switch fills with the accent color when on, because on and off looked almost the same.
+- On a Mac older than macOS 15 the recording card explains how to check the version and update, instead of a short grey reason with no next step.
+- The site says screen recording needs macOS 15 or newer and explains how to tell an Apple Silicon Mac from an Intel one before picking a download.
+
 ### Fixed
 
 - Home has a "Record your screen" link next to Share (Mac only) that scrolls to the recording card, because at the default 680x570 window the card starts below the fold.
@@ -9,6 +20,14 @@
 - What's New has "Got it" and "Try screen recording", which closes the dialog and brings Home forward with the recording card in view, because a first-time user had no button to reach the feature the note describes. The second button shows only on the 0.14 notes and only when this computer can record (macOS 15 or newer), so it never leads to a faded Record button or sits under an unrelated note.
 - The main window listens for "open-recording-home" and shows Home with the recording card in view, so the dock and recording problems can send people straight to it. The name is shared as OPEN_RECORDING_HOME_EVENT in src/lib/recordingOptions.ts, so a typo on either side can't make it fail silently.
 - The 0.14.0 note says up front that screen recording needs macOS 15 or newer, and explains how to turn on the floating dock it mentions, because both were missing or buried at the end. It also names the save folder in words instead of an arrow, to match the rest of the note.
+- The recording card's permission buttons ask macOS first when access was never requested, so Say Less appears in the System Settings list, and the screen, camera and microphone buttons open the matching privacy page instead of doing nothing after one "Don't Allow".
+- A Reopen Say Less button sits next to Open System Settings in the permission notice, because macOS only applies Screen Recording access after a restart and closing the window only hides the app.
+- When the window comes forward for a recording problem (from the dock, the menu bar or the voice command), it opens on Home where the explanation is, instead of whichever page was last open.
+- No camera found (lid closed, no webcam) shows its own message with a fix, instead of the generic camera error.
+- The card says when your face is off and where to turn it on, names the save folder in the Saved line, and keeps an Open recordings folder button, because there was no lasting way to find videos.
+- In "one window" mode the setup panel explains that the window and the face circle should stay put, because the video does not follow a moved window.
+- Saying "Say less, start recording" on a Mac that cannot record opens the explanation on Home instead of a misleading permissions error.
+- The app checks for updates every few hours while open and shows an Update now toast, because a copy left open never learned about 0.14.0. A failed update now says so and links to the download.
 
 ## [2026-09-26]
 

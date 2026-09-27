@@ -14,6 +14,7 @@ import {
   windowLabel,
   type RecordingOptions,
 } from "@/lib/recordingOptions";
+import { useScreenRecording } from "@/lib/screenRecording";
 import { Button } from "./ui/Button";
 import { Dropdown } from "./ui/Dropdown";
 import { SettingContainer } from "./ui/SettingContainer";
@@ -300,11 +301,7 @@ export function RecordingSetup({
             <Button
               variant="secondary"
               size="sm"
-              onClick={() =>
-                void invoke("open_screen_recording_settings").catch(
-                  () => undefined,
-                )
-              }
+              onClick={() => void useScreenRecording.getState().openSettings()}
             >
               {t("screenRecording.openSettings")}
             </Button>
