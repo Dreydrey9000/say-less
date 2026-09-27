@@ -21,7 +21,7 @@ pub fn set_visible(app: &AppHandle, visible: bool) -> Result<(), String> {
                     .url(tauri::WebviewUrl::App("src/dock/index.html".into()))
                     .title("Say Less — Floating dock")
                     .size(tauri::Size::Logical(tauri::LogicalSize {
-                        width: 400.0,
+                        width: 460.0,
                         height: 132.0,
                     }))
                     .position(tauri::Position::Logical(tauri::LogicalPosition {
@@ -59,7 +59,7 @@ pub fn set_visible(app: &AppHandle, visible: bool) -> Result<(), String> {
                     tauri::WebviewUrl::App("src/dock/index.html".into()),
                 )
                 .title("Say Less — Floating dock")
-                .inner_size(400.0, 132.0)
+                .inner_size(460.0, 132.0)
                 .decorations(false)
                 .always_on_top(true)
                 .skip_taskbar(true)
@@ -80,7 +80,7 @@ pub fn set_visible(app: &AppHandle, visible: bool) -> Result<(), String> {
             let (width, height) = if compact {
                 (104.0, 104.0)
             } else {
-                (400.0, 112.0)
+                (460.0, 112.0)
             };
             let _ = window.set_size(tauri::LogicalSize::new(width, height));
             let _ = snap_to_edge(&handle);

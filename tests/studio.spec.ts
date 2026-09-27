@@ -126,7 +126,7 @@ test("floating dock renders controls without horizontal overflow", async ({
   await page.setViewportSize({ width: 360, height: 96 });
   await page.goto("/tests/fixtures/app.html?dock=1");
   await expect(
-    page.getByRole("button", { name: "Record", exact: true }),
+    page.getByRole("button", { name: "Talk", exact: true }),
   ).toBeVisible();
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth <= 360),

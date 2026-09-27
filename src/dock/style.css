@@ -245,6 +245,8 @@ button:disabled {
   gap: 6px;
   padding: 0 8px;
   border: 1px solid color-mix(in srgb, var(--color-text), transparent 80%);
+  font-weight: 650;
+  font-size: 13px;
 }
 .floating-bar .dock-screen.is-live {
   background: #ff5a5a;
@@ -253,12 +255,14 @@ button:disabled {
   font-weight: 650;
   font-size: 13px;
 }
-/* Recording setup: a slim button right next to the screen button. */
+/* Recording setup: a slim button right next to the screen button, outlined
+   the same way so the two read as one pair. */
 .floating-bar .dock-screen-setup {
   min-width: 32px;
   width: 32px;
   margin-inline-start: -2px;
   padding: 0;
+  border: 1px solid color-mix(in srgb, var(--color-text), transparent 80%);
   border-radius: 10px;
 }
 .dock-screen[aria-disabled="true"],
