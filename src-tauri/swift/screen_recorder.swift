@@ -237,6 +237,78 @@ private final class CameraBubble {
 
 // MARK: Recorder
 
+/// The loudness of the microphone during a screen recording, 0 to 1, written
+/// on the audio queue and read by Rust about 15 times a second so the voice
+/// visuals move while you record.
+private final class MicMeter {
+    private let lock = NSLock()
+    private var level: Float = 0
+    private var updated = Date.distantPast
+
+    func set(_ value: Float) {
+        lock.lock()
+        level = value
+        updated = Date()
+        lock.unlock()
+    }
+
+    /// 0 when no audio has arrived for half a second (mic off or stopped).
+    func current() -> Float {
+        lock.lock()
+        defer { lock.unlock() }
+        return Date().timeIntervalSince(updated) > 0.5 ? 0 : level
+    }
+}
+
+private let micMeter = MicMeter()
+
+/// Loudness of one audio buffer as 0 to 1: RMS in decibels, -50 dB (quiet
+/// room) to -10 dB (talking close to the mic).
+func micLevel(from sampleBuffer: CMSampleBuffer) -> Float? {
+    guard
+        let format = CMSampleBufferGetFormatDescription(sampleBuffer),
+        let asbd = CMAudioFormatDescriptionGetStreamBasicDescription(format)?.pointee
+    else { return nil }
+    var sizeNeeded = 0
+    CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer(
+        sampleBuffer, bufferListSizeNeededOut: &sizeNeeded, bufferListOut: nil,
+        bufferListSize: 0, blockBufferAllocator: nil, blockBufferMemoryAllocator: nil,
+        flags: 0, blockBufferOut: nil)
+    guard sizeNeeded > 0 else { return nil }
+    let raw = UnsafeMutableRawPointer.allocate(
+        byteCount: sizeNeeded, alignment: MemoryLayout<AudioBufferList>.alignment)
+    defer { raw.deallocate() }
+    let list = raw.bindMemory(to: AudioBufferList.self, capacity: 1)
+    var block: CMBlockBuffer?
+    guard CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer(
+        sampleBuffer, bufferListSizeNeededOut: nil, bufferListOut: list,
+        bufferListSize: sizeNeeded, blockBufferAllocator: nil, blockBufferMemoryAllocator: nil,
+        flags: kCMSampleBufferFlag_AudioBufferList_Assure16ByteAlignment,
+        blockBufferOut: &block) == noErr
+    else { return nil }
+    let isFloat = asbd.mFormatFlags & kAudioFormatFlagIsFloat != 0
+    var sum: Double = 0
+    var count = 0
+    for buffer in UnsafeMutableAudioBufferListPointer(list) {
+        guard let data = buffer.mData else { continue }
+        if isFloat && asbd.mBitsPerChannel == 32 {
+            let n = Int(buffer.mDataByteSize) / MemoryLayout<Float>.size
+            let samples = data.bindMemory(to: Float.self, capacity: n)
+            for i in 0..<n { let v = Double(samples[i]); sum += v * v }
+            count += n
+        } else if asbd.mBitsPerChannel == 16 {
+            let n = Int(buffer.mDataByteSize) / MemoryLayout<Int16>.size
+            let samples = data.bindMemory(to: Int16.self, capacity: n)
+            for i in 0..<n { let v = Double(samples[i]) / 32768.0; sum += v * v }
+            count += n
+        }
+    }
+    guard count > 0 else { return nil }
+    let rms = (sum / Double(count)).squareRoot()
+    let db = 20 * log10(max(rms, 1e-9))
+    return Float(min(1, max(0, (db + 50) / 40)))
+}
+
 @available(macOS 15.0, *)
 private final class Recorder: NSObject, SCStreamDelegate, SCRecordingOutputDelegate, SCStreamOutput {
     private let lock = NSLock()
@@ -249,6 +321,7 @@ private final class Recorder: NSObject, SCStreamDelegate, SCRecordingOutputDeleg
     private var pendingError: String?
     private var stopping = false
     private let sampleQueue = DispatchQueue(label: "say-less.screen-recorder.samples")
+    private let micQueue = DispatchQueue(label: "say-less.screen-recorder.mic")
 
     var isRecording: Bool {
         lock.lock()
@@ -425,6 +498,11 @@ private final class Recorder: NSObject, SCStreamDelegate, SCRecordingOutputDeleg
             // A plain stream output keeps the pipeline pulling frames; the
             // handler drops every sample right away.
             try stream.addStreamOutput(self, type: .screen, sampleHandlerQueue: sampleQueue)
+            // Meter the microphone so the voice visuals move while recording.
+            // Metering is optional: if it can't attach, the recording goes on.
+            if options.microphone {
+                try? stream.addStreamOutput(self, type: .microphone, sampleHandlerQueue: micQueue)
+            }
             try stream.addRecordingOutput(output)
         } catch {
             hideBubble()
@@ -530,7 +608,10 @@ private final class Recorder: NSObject, SCStreamDelegate, SCRecordingOutputDeleg
 
     // MARK: SCStreamOutput
 
-    func stream(_ stream: SCStream, didOutputSampleBuffer sampleBuffer: CMSampleBuffer, of type: SCStreamOutputType) {}
+    func stream(_ stream: SCStream, didOutputSampleBuffer sampleBuffer: CMSampleBuffer, of type: SCStreamOutputType) {
+        guard type == .microphone, let level = micLevel(from: sampleBuffer) else { return }
+        micMeter.set(level)
+    }
 
     // MARK: SCRecordingOutputDelegate
 
@@ -732,6 +813,11 @@ public func sl_screen_recorder_stop() -> UnsafeMutablePointer<CChar>? {
 public func sl_screen_recorder_is_recording() -> Int32 {
     guard #available(macOS 15.0, *) else { return 0 }
     return recorder().isRecording ? 1 : 0
+}
+
+@_cdecl("sl_screen_recorder_mic_level")
+public func sl_screen_recorder_mic_level() -> Float {
+    return micMeter.current()
 }
 
 @_cdecl("sl_screen_recorder_take_error")

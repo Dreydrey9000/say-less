@@ -30,6 +30,9 @@ public func sl_screen_recorder_stop() -> UnsafeMutablePointer<CChar>? {
 @_cdecl("sl_screen_recorder_is_recording")
 public func sl_screen_recorder_is_recording() -> Int32 { return 0 }
 
+@_cdecl("sl_screen_recorder_mic_level")
+public func sl_screen_recorder_mic_level() -> Float { return 0 }
+
 @_cdecl("sl_screen_recorder_take_error")
 public func sl_screen_recorder_take_error() -> UnsafeMutablePointer<CChar>? { return nil }
 

@@ -4,6 +4,16 @@
 
 ### Release
 
+- Version 0.14.4: the orb and dock move with your voice during a screen recording too.
+
+### Added
+
+- While a screen recording runs with the mic on, the Home orb and the floating dock companion follow your voice. ScreenCaptureKit's mic stream feeds a small level meter that the app reads about 15 times a second, so recording never waits on the UI. The visuals settle back down within half a second after the recording stops.
+
+## [2026-09-27]
+
+### Release
+
 - Version 0.14.3: the voice visuals on Home and the dock move with your voice, and the Record shortcut can be changed from the Home card.
 
 ### Fixed

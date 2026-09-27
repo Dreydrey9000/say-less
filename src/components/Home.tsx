@@ -242,10 +242,7 @@ export function Home({
           </div>
         </div>
         <div className="home-companion">
-          <Companion
-            level={activity.level}
-            active={activity.state === "recording"}
-          />
+          <Companion level={activity.level} active={activity.listening} />
           <p className="home-companion-caption">
             <span className="home-slogan">{t("home.slogan")}</span>
             <span>

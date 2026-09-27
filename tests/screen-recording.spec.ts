@@ -869,3 +869,34 @@ test("the Home orb grows with your voice while you dictate", async ({
   }
   await expect.poll(scale).toBeGreaterThan(1.1);
 });
+
+test("the Home orb moves with your voice during a screen recording, then settles", async ({
+  page,
+}) => {
+  await page.goto("/tests/fixtures/app.html?events");
+  await page.waitForFunction(
+    () =>
+      typeof (window as unknown as { testEmit?: unknown }).testEmit ===
+      "function",
+  );
+  const orb = page.locator(".home-companion .companion");
+  await expect(orb).toBeVisible();
+  const scale = () =>
+    orb.evaluate((el) =>
+      Number(getComputedStyle(el).getPropertyValue("--voice-scale") || "1"),
+    );
+  const emit = (level: number) =>
+    page.evaluate(
+      (l) =>
+        (
+          window as unknown as {
+            testEmit: (e: string, p?: unknown) => Promise<void>;
+          }
+        ).testEmit("screen-mic-level", l),
+      level,
+    );
+  for (let i = 0; i < 6; i++) await emit(0.9);
+  await expect.poll(scale).toBeGreaterThan(1.1);
+  // No more levels: the recording ended, so the orb calms down on its own.
+  await expect.poll(scale, { timeout: 3000 }).toBeLessThan(1.02);
+});
