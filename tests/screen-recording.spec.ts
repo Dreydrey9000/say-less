@@ -117,6 +117,40 @@ test("dock records the screen and shows Saved with Show in Finder", async ({
   await page.getByRole("button", { name: "Show in Finder" }).click();
 });
 
+test("dock labels Talk and Screen, and says Stop while the screen records", async ({
+  page,
+}) => {
+  // The expanded dock window is 460px wide (src-tauri/src/floating.rs).
+  await page.setViewportSize({ width: 460, height: 112 });
+  await page.goto("/tests/fixtures/app.html?dock=1");
+  const pillsFit = () =>
+    page
+      .locator(".floating-bar .dock-record, .floating-bar .dock-screen")
+      .evaluateAll((els) =>
+        els.every((el) => el.scrollWidth <= el.clientWidth + 1),
+      );
+  const noPageOverflow = () =>
+    page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
+  await expect(
+    page.getByRole("button", { name: "Talk", exact: true }),
+  ).toHaveText("Talk");
+  const start = page.getByRole("button", { name: "Record screen" });
+  await expect(start).toHaveText("Screen");
+  await expect(page.locator(".floating-shell > p")).toHaveText(
+    "Click Talk to type with your voice, or Screen to record a video",
+  );
+  expect(await pillsFit()).toBe(true);
+  expect(await noPageOverflow()).toBe(true);
+  await start.click();
+  const stop = page.getByRole("button", { name: "Stop screen recording" });
+  await expect(stop).toContainText("Stop");
+  await expect(page.locator(".floating-shell > p")).toHaveText(
+    "Recording your screen. Click the red Stop button when you're done.",
+  );
+  expect(await pillsFit()).toBe(true);
+  expect(await noPageOverflow()).toBe(true);
+});
+
 test("compact dock offers recording from a small corner button", async ({
   page,
 }) => {
@@ -166,6 +200,10 @@ test("dock on Windows keeps the button focusable and says why", async ({
     name: "Screen recording is coming to Windows soon.",
   });
   await expect(button).toHaveAttribute("aria-disabled", "true");
+  // There is no Screen label here, so the hint must not point at one.
+  await expect(page.locator(".floating-shell > p")).toHaveText(
+    "Click Talk to type with your voice, or use your dictation shortcut",
+  );
   // Playwright won't click an aria-disabled button, so use the keyboard:
   // it must stay focusable and do nothing.
   await button.focus();

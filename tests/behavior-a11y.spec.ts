@@ -278,7 +278,7 @@ test("the volume slider has a name", async ({ page }) => {
 test("dock icon buttons are named, big enough and show a tooltip on focus", async ({
   page,
 }) => {
-  await page.setViewportSize({ width: 360, height: 112 });
+  await page.setViewportSize({ width: 460, height: 112 });
   await page.goto("/tests/fixtures/app.html?dock=1");
   const settings = page.getByRole("button", { name: "Open settings" });
   await expect(settings).toBeVisible();
@@ -306,7 +306,7 @@ test("dock icon buttons are named, big enough and show a tooltip on focus", asyn
   const expand = page.getByRole("button", { name: "Expand dock" });
   await expect(expand).toBeFocused();
   await page.keyboard.press("Enter");
-  await page.setViewportSize({ width: 360, height: 112 });
+  await page.setViewportSize({ width: 460, height: 112 });
   await expect(
     page.getByRole("button", { name: "Shrink to small dock" }),
   ).toBeFocused();

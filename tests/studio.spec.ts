@@ -123,13 +123,24 @@ for (const width of [390, 1200])
 test("floating dock renders controls without horizontal overflow", async ({
   page,
 }) => {
-  await page.setViewportSize({ width: 360, height: 96 });
+  await page.setViewportSize({ width: 460, height: 96 });
   await page.goto("/tests/fixtures/app.html?dock=1");
   await expect(
-    page.getByRole("button", { name: "Record", exact: true }),
+    page.getByRole("button", { name: "Talk", exact: true }),
   ).toBeVisible();
   expect(
-    await page.evaluate(() => document.documentElement.scrollWidth <= 360),
+    await page.evaluate(() => document.documentElement.scrollWidth <= 460),
+  ).toBe(true);
+  // The Talk and Screen labels fit inside their pills, not over each other.
+  await expect(
+    page.getByRole("button", { name: "Record screen" }),
+  ).toBeVisible();
+  expect(
+    await page
+      .locator(".floating-bar .dock-record, .floating-bar .dock-screen")
+      .evaluateAll((els) =>
+        els.every((el) => el.scrollWidth <= el.clientWidth + 1),
+      ),
   ).toBe(true);
   await page.screenshot({ path: "test-results/floating-dock.png" });
 });

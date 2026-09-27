@@ -18,7 +18,7 @@ import {
   ChevronDown,
   MonitorPlay,
   FolderOpen,
-  SlidersHorizontal,
+  Video,
 } from "lucide-react";
 import { OPEN_RECORDING_SETUP_EVENT } from "@/lib/recordingOptions";
 import { Companion, formations } from "@/components/companion/Companion";
@@ -71,7 +71,9 @@ function useDockScreenRecording() {
     showSaved: showSaved && state === "idle" && rec.justSaved,
     async toggleFromDock() {
       await rec.toggle();
-      const notice = useScreenRecording.getState().notice;
+      // TODO(card-permissions merge): drop the string widening so these
+      // names are checked against RecordingNotice again.
+      const notice: string | null = useScreenRecording.getState().notice;
       // The dock is too small to explain permissions; the main window does.
       if (
         notice === "permission_denied" ||
@@ -80,13 +82,21 @@ function useDockScreenRecording() {
         notice === "camera_failed" ||
         notice === "camera_missing" ||
         notice === "window_missing"
-      )
+      ) {
         await invoke("show_main_window_command").catch(() => undefined);
+        await emit("open-recording-home").catch(() => undefined);
+      }
     },
   };
 }
 
-function ScreenButton({ compact }: { compact: boolean }) {
+function ScreenButton({
+  compact,
+  dictating = false,
+}: {
+  compact: boolean;
+  dictating?: boolean;
+}) {
   const { t } = useTranslation();
   const rec = useDockScreenRecording();
   if (!rec.status) return null;
@@ -128,7 +138,13 @@ function ScreenButton({ compact }: { compact: boolean }) {
           <span className="rec-time" role="timer">
             {rec.time}
           </span>
-          {!compact && <Square size={14} aria-hidden="true" />}
+          {!compact && (
+            <>
+              <Square size={14} aria-hidden="true" />
+              {/* While dictating, the Talk pill owns the word Stop. */}
+              {!dictating && <span>{t("dock.stop")}</span>}
+            </>
+          )}
         </button>
       </Tooltip>
     );
@@ -150,6 +166,7 @@ function ScreenButton({ compact }: { compact: boolean }) {
         onClick={() => void rec.toggleFromDock()}
       >
         <MonitorPlay size={compact ? 15 : 18} aria-hidden="true" />
+        {!compact && <span>{t("dock.screen")}</span>}
       </button>
     </Tooltip>
   );
@@ -162,6 +179,12 @@ function Dock() {
   const [error, setError] = useState(false);
   const [pending, setPending] = useState(false);
   const screen = useDockScreenRecording();
+  // Without screen recording (Windows, older Macs) there is no Screen button
+  // for the idle hint to point at.
+  const stateKey =
+    state === "idle" && !screen.supported
+      ? "dock.idleTalkOnly"
+      : `dock.${state}`;
   // Expanding or collapsing swaps the whole dock, which would drop keyboard
   // focus to <body>. When the user toggled it here, land focus on the control
   // that undoes the change.
@@ -260,7 +283,7 @@ function Dock() {
           <span
             className={`compact-indicator ${error ? "has-error" : ""}`}
             role="status"
-            aria-label={t(error ? "dock.error" : `dock.${state}`)}
+            aria-label={t(error ? "dock.error" : stateKey)}
           />
         )}
       </main>
@@ -316,17 +339,22 @@ function Dock() {
           aria-label={t(state === "recording" ? "dock.stop" : "dock.record")}
         >
           {state === "recording" ? <Square size={20} /> : <Mic size={20} />}
-          <span>
-            {t(
-              state === "recording"
-                ? "dock.stop"
-                : state === "transcribing"
-                  ? "dock.processing"
-                  : "dock.record",
-            )}
-          </span>
+          {/* While the screen records, the red Stop pill needs the room.
+              While dictating too, this pill keeps Stop instead, so the
+              caption's "Click Stop" points here. */}
+          {(!screen.recording || state === "recording") && (
+            <span>
+              {t(
+                state === "recording"
+                  ? "dock.stop"
+                  : state === "transcribing"
+                    ? "dock.processing"
+                    : "dock.record",
+              )}
+            </span>
+          )}
         </button>
-        <ScreenButton compact={false} />
+        <ScreenButton compact={false} dictating={state === "recording"} />
         <Tooltip
           label={t("recordingSetup.open")}
           placement="bottom"
@@ -341,7 +369,7 @@ function Dock() {
               await emit(OPEN_RECORDING_SETUP_EVENT).catch(() => undefined);
             }}
           >
-            <SlidersHorizontal size={16} aria-hidden="true" />
+            <Video size={16} aria-hidden="true" />
           </button>
         </Tooltip>
         <Tooltip label={t("dock.settings")} placement="bottom" align="end">
@@ -382,11 +410,9 @@ function Dock() {
         <p role="status">
           {error
             ? t("dock.error")
-            : t(
-                state === "recording" && !ready
-                  ? "dock.arming"
-                  : `dock.${state}`,
-              )}
+            : screen.recording && state === "idle"
+              ? t("screenRecording.dockCaption")
+              : t(state === "recording" && !ready ? "dock.arming" : stateKey)}
         </p>
       )}
       {state === "recording" && text && (

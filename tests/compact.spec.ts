@@ -4,10 +4,10 @@ test.use({ deviceScaleFactor: 2 });
 test("dock collapses to a small companion and expands without recording", async ({
   page,
 }) => {
-  await page.setViewportSize({ width: 360, height: 112 });
+  await page.setViewportSize({ width: 460, height: 112 });
   await page.goto("/tests/fixtures/app.html?dock=1");
   await expect(
-    page.getByRole("button", { name: "Record", exact: true }),
+    page.getByRole("button", { name: "Talk", exact: true }),
   ).toBeVisible();
   await page.screenshot({ path: "test-results/dock-expanded-0.12.0.png" });
   await page.getByRole("button", { name: "Shrink to small dock" }).click();
@@ -24,9 +24,9 @@ test("dock collapses to a small companion and expands without recording", async 
   });
   await page.getByRole("button", { name: "Expand dock" }).focus();
   await page.keyboard.press("Enter");
-  await page.setViewportSize({ width: 360, height: 112 });
+  await page.setViewportSize({ width: 460, height: 112 });
   await expect(
-    page.getByRole("button", { name: "Record", exact: true }),
+    page.getByRole("button", { name: "Talk", exact: true }),
   ).toBeVisible();
   expect(
     await page.evaluate(() =>

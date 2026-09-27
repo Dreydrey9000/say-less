@@ -335,7 +335,7 @@ for (const dock_compact of [true, false]) {
       );
     }, dock_compact);
     await page.setViewportSize(
-      dock_compact ? { width: 104, height: 104 } : { width: 360, height: 112 },
+      dock_compact ? { width: 104, height: 104 } : { width: 460, height: 112 },
     );
     await page.goto("/tests/fixtures/app.html?dock=1");
     const center = page.locator(
