@@ -50,3 +50,15 @@ test("What's New shows only Got it on Windows", async ({ page }) => {
     dialog.getByRole("button", { name: "Try screen recording" }),
   ).toHaveCount(0);
 });
+
+test("An older Mac explains how to check and update macOS", async ({
+  page,
+}) => {
+  await page.goto("/tests/fixtures/app.html?macos=old");
+  const card = page.getByTestId("screen-recording-card");
+  await expect(card).toContainText("macOS 15 (Sequoia) or newer");
+  await expect(card).toContainText("About This Mac");
+  await expect(
+    card.getByRole("button", { name: "Record screen", exact: true }),
+  ).toBeDisabled();
+});

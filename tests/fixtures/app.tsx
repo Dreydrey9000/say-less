@@ -118,8 +118,14 @@ let snippets = JSON.parse(localStorage.getItem("test-snippets") || "[]");
 // unsupported. Otherwise start and stop succeed.
 let screenStatus = {
   state: query.get("screen") === "recording" ? "recording" : "idle",
-  supported: osName === "macos",
-  unsupported_reason: osName === "macos" ? null : "windows_soon",
+  // ?macos=old is a Mac older than macOS 15, which cannot record.
+  supported: osName === "macos" && query.get("macos") !== "old",
+  unsupported_reason:
+    osName !== "macos"
+      ? "windows_soon"
+      : query.get("macos") === "old"
+        ? "macos_too_old"
+        : null,
   elapsed_ms: query.get("screen") === "recording" ? 65_000 : 0,
   last_file: null as string | null,
   error: null as string | null,
