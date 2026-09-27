@@ -1293,6 +1293,8 @@
     "permissionDenied": "We need Screen Recording permission to record your screen.",
     "permissionHint": "Activez Say Less dans Réglages Système, puis cliquez sur « Rouvrir Say Less ».",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "Ouvrir Mise à jour logicielle",
+    "softwareUpdateFailed": "Nous n’avons pas pu ouvrir Mise à jour logicielle. Suivez les étapes ci-dessus pour l’ouvrir vous-même.",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
     "macosTooOld": "L’enregistrement d’écran nécessite macOS 15 (Sequoia) ou une version ultérieure.",
@@ -1318,7 +1320,13 @@
     "startedAnnouncement": "Enregistrement démarré.",
     "savedAnnouncement": "Enregistrement sauvegardé.",
     "showMyFace": "Afficher mon visage",
-    "cameraBlocked": "Nous ne pouvons pas utiliser votre caméra. Autorisez-la dans Réglages Système, ou désactivez « Show your face » pour enregistrer.",
+    "cameraBlocked": "Votre caméra est bloquée, nous ne pouvons donc pas enregistrer votre visage.",
+    "faceCorner": {
+      "top_left": "Votre visage apparaîtra dans le coin supérieur gauche.",
+      "top_right": "Votre visage apparaîtra dans le coin supérieur droit.",
+      "bottom_left": "Votre visage apparaîtra dans le coin inférieur gauche.",
+      "bottom_right": "Votre visage apparaîtra dans le coin inférieur droit."
+    },
     "reopening": "Réouverture…",
     "reopenFailed": "Nous n’avons pas pu rouvrir Say Less. Quittez-le depuis la barre des menus, puis rouvrez-le.",
     "macosTooOldSteps": "Pour vérifier votre version, ouvrez le menu Apple et choisissez À propos de ce Mac. Pour mettre à jour, allez dans Réglages Système, Général, Mise à jour logicielle. Si aucune mise à jour n’apparaît, nous ne pouvons pas enregistrer l’écran sur ce Mac, mais la dictée fonctionne toujours."

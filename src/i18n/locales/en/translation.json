@@ -1309,6 +1309,7 @@
     "permissionHint": "Turn on Say Less in System Settings, then click Reopen Say Less.",
     "openSettings": "Open System Settings",
     "openSoftwareUpdate": "Open Software Update",
+    "softwareUpdateFailed": "We couldn't open Software Update. Follow the steps above to open it yourself.",
     "reopenApp": "Reopen Say Less",
     "reopening": "Reopening…",
     "reopenFailed": "We couldn't reopen Say Less. Quit it from the menu bar, then open it again.",

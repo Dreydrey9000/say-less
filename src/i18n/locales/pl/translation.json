@@ -1293,6 +1293,8 @@
     "permissionDenied": "We need Screen Recording permission to record your screen.",
     "permissionHint": "Włącz Say Less w Ustawieniach systemowych, a potem kliknij „Otwórz ponownie Say Less”.",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "Otwórz Uaktualnienia",
+    "softwareUpdateFailed": "Nie udało się otworzyć panelu Uaktualnienia. Wykonaj kroki opisane wyżej, aby otworzyć go samodzielnie.",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
     "macosTooOld": "Nagrywanie ekranu wymaga systemu macOS 15 (Sequoia) lub nowszego.",
@@ -1318,7 +1320,13 @@
     "startedAnnouncement": "Nagrywanie rozpoczęte.",
     "savedAnnouncement": "Nagranie zapisane.",
     "showMyFace": "Pokaż moją twarz",
-    "cameraBlocked": "Nie możemy użyć Twojej kamery. Zezwól na dostęp w Ustawieniach systemowych albo wyłącz „Show your face”, aby nagrywać.",
+    "cameraBlocked": "Twoja kamera jest zablokowana, więc nie możemy nagrać Twojej twarzy.",
+    "faceCorner": {
+      "top_left": "Twoja twarz pojawi się w lewym górnym rogu.",
+      "top_right": "Twoja twarz pojawi się w prawym górnym rogu.",
+      "bottom_left": "Twoja twarz pojawi się w lewym dolnym rogu.",
+      "bottom_right": "Twoja twarz pojawi się w prawym dolnym rogu."
+    },
     "reopening": "Ponowne otwieranie…",
     "reopenFailed": "Nie udało się ponownie otworzyć Say Less. Zamknij aplikację z paska menu, a potem otwórz ją ponownie.",
     "macosTooOldSteps": "Aby sprawdzić swoją wersję, otwórz menu Apple i wybierz Ten Mac. Aby zaktualizować system, otwórz Ustawienia systemowe, kliknij Ogólne, a potem Uaktualnienia. Jeśli nie pojawi się żadna aktualizacja, nie możemy nagrywać ekranu na tym Macu, ale dyktowanie nadal działa."

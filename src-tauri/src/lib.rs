@@ -694,6 +694,7 @@ pub fn run(cli_args: CliArgs) {
             screen_recorder::show_screen_recording_in_folder,
             screen_recorder::open_screen_recording_settings,
             screen_recorder::open_software_update,
+            screen_recorder::camera_permission_status,
             screen_recorder::reopen_app,
             capture_options::get_recording_options,
             capture_options::save_recording_options,

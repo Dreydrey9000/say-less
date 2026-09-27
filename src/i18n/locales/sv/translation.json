@@ -1293,6 +1293,8 @@
     "permissionDenied": "We need Screen Recording permission to record your screen.",
     "permissionHint": "Slå på Say Less i Systeminställningar och klicka sedan på ”Öppna Say Less igen”.",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "Öppna Programuppdatering",
+    "softwareUpdateFailed": "Vi kunde inte öppna Programuppdatering. Följ stegen ovan för att öppna det själv.",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
     "macosTooOld": "Skärminspelning kräver macOS 15 (Sequoia) eller senare.",
@@ -1314,11 +1316,17 @@
     "reopenApp": "Öppna Say Less igen",
     "macosTooOldHelp": "Skärminspelning kräver macOS 15 (Sequoia) eller senare. Om du vill se din version öppnar du Apple-menyn och väljer Om den här datorn. Om du vill uppdatera går du till Systeminställningar, Allmänt, Programuppdatering. Om ingen uppdatering visas kan vi inte spela in skärmen på den här datorn, men diktering fungerar fortfarande.",
     "cameraMissing": "Vi hittar ingen kamera. Öppna locket på den bärbara datorn eller anslut en kamera, eller stäng av ”Show your face” i ”Recording setup”.",
-    "stopHint": "Klicka på ”Stop” eller säg ”Say less, stop recording.” när du är klar.",
+    "stopHint": "När du är klar klickar du på ”Stop” eller säger ”Say less, stop recording.”",
     "startedAnnouncement": "Inspelningen har startat.",
     "savedAnnouncement": "Inspelningen har sparats.",
     "showMyFace": "Visa mitt ansikte",
-    "cameraBlocked": "Vi kan inte använda din kamera. Tillåt den i Systeminställningar, eller stäng av ”Show your face” för att spela in.",
+    "cameraBlocked": "Din kamera är blockerad, så vi kan inte spela in ditt ansikte.",
+    "faceCorner": {
+      "top_left": "Ditt ansikte visas i det övre vänstra hörnet.",
+      "top_right": "Ditt ansikte visas i det övre högra hörnet.",
+      "bottom_left": "Ditt ansikte visas i det nedre vänstra hörnet.",
+      "bottom_right": "Ditt ansikte visas i det nedre högra hörnet."
+    },
     "reopening": "Öppnar igen…",
     "reopenFailed": "Vi kunde inte öppna Say Less igen. Avsluta appen från menyraden och öppna den sedan igen.",
     "macosTooOldSteps": "Om du vill se din version öppnar du Apple-menyn och väljer Om den här datorn. Om du vill uppdatera går du till Systeminställningar, Allmänt, Programuppdatering. Om ingen uppdatering visas kan vi inte spela in skärmen på den här datorn, men diktering fungerar fortfarande."

@@ -1293,6 +1293,8 @@
     "permissionDenied": "We need Screen Recording permission to record your screen.",
     "permissionHint": "הפעל את Say Less בהגדרות המערכת, ואז לחץ על 'פתח מחדש את Say Less'.",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "פתח את 'עדכון תוכנה'",
+    "softwareUpdateFailed": "לא הצלחנו לפתוח את 'עדכון תוכנה'. בצע את השלבים שלמעלה כדי לפתוח אותו בעצמך.",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
     "macosTooOld": "הקלטת מסך דורשת macOS 15 (Sequoia) ומעלה.",
@@ -1318,7 +1320,13 @@
     "startedAnnouncement": "ההקלטה התחילה.",
     "savedAnnouncement": "ההקלטה נשמרה.",
     "showMyFace": "הצג את הפנים שלי",
-    "cameraBlocked": "לא נוכל להשתמש במצלמה שלך. אשר את הגישה אליה בהגדרות המערכת, או כבה את 'Show your face' כדי להקליט.",
+    "cameraBlocked": "המצלמה שלך חסומה, ולכן לא נוכל להקליט את הפנים שלך.",
+    "faceCorner": {
+      "top_left": "הפנים שלך יופיעו בפינה השמאלית העליונה.",
+      "top_right": "הפנים שלך יופיעו בפינה הימנית העליונה.",
+      "bottom_left": "הפנים שלך יופיעו בפינה השמאלית התחתונה.",
+      "bottom_right": "הפנים שלך יופיעו בפינה הימנית התחתונה."
+    },
     "reopening": "פותחים מחדש…",
     "reopenFailed": "לא הצלחנו לפתוח מחדש את Say Less. צא מהאפליקציה דרך שורת התפריטים, ואז פתח אותה שוב.",
     "macosTooOldSteps": "כדי לבדוק את הגרסה שלך, פתח את תפריט Apple ובחר 'אודות Mac זה'. כדי לעדכן, עבור אל 'הגדרות המערכת', 'כללי', 'עדכון תוכנה'. אם לא מופיע עדכון, לא נוכל להקליט את המסך ב-Mac הזה, אבל ההכתבה עדיין עובדת."

@@ -1293,6 +1293,8 @@
     "permissionDenied": "We need Screen Recording permission to record your screen.",
     "permissionHint": "Slå Say Less til i Systemindstillinger, og klik derefter på \"Genåbn Say Less\".",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "Åbn Softwareopdatering",
+    "softwareUpdateFailed": "Vi kunne ikke åbne Softwareopdatering. Følg trinnene ovenfor for selv at åbne den.",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
     "macosTooOld": "Skærmoptagelse kræver macOS 15 (Sequoia) eller nyere.",
@@ -1318,7 +1320,13 @@
     "startedAnnouncement": "Optagelsen er startet.",
     "savedAnnouncement": "Optagelsen er gemt.",
     "showMyFace": "Vis mit ansigt",
-    "cameraBlocked": "Vi kan ikke bruge dit kamera. Tillad det i Systemindstillinger, eller slå \"Show your face\" fra for at optage.",
+    "cameraBlocked": "Dit kamera er blokeret, så vi kan ikke optage dit ansigt.",
+    "faceCorner": {
+      "top_left": "Dit ansigt vises i øverste venstre hjørne.",
+      "top_right": "Dit ansigt vises i øverste højre hjørne.",
+      "bottom_left": "Dit ansigt vises i nederste venstre hjørne.",
+      "bottom_right": "Dit ansigt vises i nederste højre hjørne."
+    },
     "reopening": "Genåbner…",
     "reopenFailed": "Vi kunne ikke genåbne Say Less. Afslut appen fra menulinjen, og åbn den derefter igen.",
     "macosTooOldSteps": "Du kan tjekke din version ved at åbne Apple-menuen og vælge Om denne Mac. Du opdaterer ved at gå til Systemindstillinger, Generelt, Softwareopdatering. Hvis der ikke vises nogen opdatering, kan vi ikke optage skærmen på denne Mac, men diktering virker stadig."

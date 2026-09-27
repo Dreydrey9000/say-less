@@ -339,8 +339,8 @@
   visibility: hidden;
 }
 /* The face line holds a small button (32px plus the line's 4px top margin), so
-   it keeps that height even while its line is hidden: Setup open, the camera
-   check still running, or the macOS camera prompt up. */
+   it keeps that height even while the button is gone (Setup open) or the line
+   is hidden (the camera check still running, or the macOS camera prompt up). */
 .home-record-face-slot {
   min-height: 36px;
 }

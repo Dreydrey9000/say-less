@@ -49,6 +49,7 @@ export function ScreenRecordingCard() {
   const [focusFace, setFocusFace] = useState(false);
   const [reopening, setReopening] = useState(false);
   const [reopenFailed, setReopenFailed] = useState(false);
+  const [updateFailed, setUpdateFailed] = useState(false);
   // A ref, not state: the second click of a double-click is still ignored.
   const reopenClicked = useRef(false);
   // The dock's setup button opens this panel in the main window.
@@ -224,20 +225,22 @@ export function ScreenRecordingCard() {
                 </p>
               ) : (
                 webcam === false && (
-                  // Setup's own Show your face switch is right there when
-                  // it is open.
                   <p
                     className="home-record-hint home-record-face"
-                    data-off={recording || setupOpen || undefined}
+                    data-off={recording || undefined}
                   >
                     <span>{t("screenRecording.cameraOffHint")}</span>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={openFaceSetup}
-                    >
-                      {t("screenRecording.showMyFace")}
-                    </Button>
+                    {/* Setup's own Show your face switch is right there when
+                        it is open, so the line stays and its button goes. */}
+                    {!setupOpen && (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={openFaceSetup}
+                      >
+                        {t("screenRecording.showMyFace")}
+                      </Button>
+                    )}
                   </p>
                 )
               )}
@@ -268,10 +271,20 @@ export function ScreenRecordingCard() {
             </p>
             <Button
               variant="secondary"
-              onClick={() => void openSoftwareUpdate()}
+              onClick={() =>
+                void openSoftwareUpdate().then((opened) => {
+                  // Undefined is the ignored second click of a double-click.
+                  if (opened !== undefined) setUpdateFailed(!opened);
+                })
+              }
             >
               {t("screenRecording.openSoftwareUpdate")}
             </Button>
+            {updateFailed && (
+              <p className="home-record-error" role="alert">
+                {t("screenRecording.softwareUpdateFailed")}
+              </p>
+            )}
           </div>
         </div>
       )}

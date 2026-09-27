@@ -1293,6 +1293,8 @@
     "permissionDenied": "We need Screen Recording permission to record your screen.",
     "permissionHint": "Sistem Ayarları'nda Say Less'i etkinleştirin, sonra “Say Less'i yeniden aç” düğmesine tıklayın.",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "Yazılım Güncelleme'yi aç",
+    "softwareUpdateFailed": "Yazılım Güncelleme'yi açamadık. Kendiniz açmak için yukarıdaki adımları izleyin.",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
     "macosTooOld": "Ekran kaydı için macOS 15 (Sequoia) veya daha yeni bir sürüm gerekir.",
@@ -1318,7 +1320,13 @@
     "startedAnnouncement": "Kayıt başladı.",
     "savedAnnouncement": "Kayıt kaydedildi.",
     "showMyFace": "Yüzümü göster",
-    "cameraBlocked": "Kameranızı kullanamıyoruz. Sistem Ayarları'nda izin verin veya kayıt yapmak için “Show your face” seçeneğini kapatın.",
+    "cameraBlocked": "Kameranız engellendiği için yüzünüzü kaydedemiyoruz.",
+    "faceCorner": {
+      "top_left": "Yüzünüz sol üst köşede görünecek.",
+      "top_right": "Yüzünüz sağ üst köşede görünecek.",
+      "bottom_left": "Yüzünüz sol alt köşede görünecek.",
+      "bottom_right": "Yüzünüz sağ alt köşede görünecek."
+    },
     "reopening": "Yeniden açılıyor…",
     "reopenFailed": "Say Less'i yeniden açamadık. Menü çubuğundan uygulamadan çıkın, sonra tekrar açın.",
     "macosTooOldSteps": "Sürümünüzü görmek için Elma menüsünü açın ve Bu Mac Hakkında'yı seçin. Güncellemek için Sistem Ayarları'nı açın, Genel'i ve ardından Yazılım Güncelleme'yi seçin. Güncelleme görünmüyorsa bu Mac'te ekranı kaydedemeyiz, ama sesle yazma yine de çalışır."

@@ -1293,6 +1293,8 @@
     "permissionDenied": "We need Screen Recording permission to record your screen.",
     "permissionHint": "Attiva Say Less in Impostazioni di Sistema, poi clicca su 'Riapri Say Less'.",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "Apri Aggiornamento software",
+    "softwareUpdateFailed": "Non siamo riusciti ad aprire Aggiornamento software. Segui i passaggi qui sopra per aprirlo.",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
     "macosTooOld": "La registrazione dello schermo richiede macOS 15 (Sequoia) o versioni successive.",
@@ -1314,11 +1316,17 @@
     "reopenApp": "Riapri Say Less",
     "macosTooOldHelp": "La registrazione dello schermo richiede macOS 15 (Sequoia) o versioni successive. Per controllare la tua versione, apri il menu Apple e scegli Informazioni su questo Mac. Per aggiornare, vai in Impostazioni di Sistema, Generali, Aggiornamento software. Se non compare nessun aggiornamento, non possiamo registrare lo schermo su questo Mac, ma la dettatura funziona comunque.",
     "cameraMissing": "Non troviamo nessuna videocamera. Apri il portatile o collegane una, oppure disattiva 'Show your face' in 'Recording setup'.",
-    "stopHint": "Clicca su 'Stop' o di' “Say less, stop recording.” quando hai finito.",
+    "stopHint": "Quando hai finito, clicca su 'Stop' o di' “Say less, stop recording.”",
     "startedAnnouncement": "Registrazione avviata.",
     "savedAnnouncement": "Registrazione salvata.",
     "showMyFace": "Mostra il mio viso",
-    "cameraBlocked": "Non possiamo usare la tua videocamera. Consentila in Impostazioni di Sistema, oppure disattiva 'Show your face' per registrare.",
+    "cameraBlocked": "La tua videocamera è bloccata, quindi non possiamo registrare il tuo viso.",
+    "faceCorner": {
+      "top_left": "Il tuo viso apparirà nell'angolo in alto a sinistra.",
+      "top_right": "Il tuo viso apparirà nell'angolo in alto a destra.",
+      "bottom_left": "Il tuo viso apparirà nell'angolo in basso a sinistra.",
+      "bottom_right": "Il tuo viso apparirà nell'angolo in basso a destra."
+    },
     "reopening": "Riapertura…",
     "reopenFailed": "Non siamo riusciti a riaprire Say Less. Chiudilo dalla barra dei menu, poi riaprilo.",
     "macosTooOldSteps": "Per controllare la tua versione, apri il menu Apple e scegli Informazioni su questo Mac. Per aggiornare, vai in Impostazioni di Sistema, Generali, Aggiornamento software. Se non compare nessun aggiornamento, non possiamo registrare lo schermo su questo Mac, ma la dettatura funziona comunque."

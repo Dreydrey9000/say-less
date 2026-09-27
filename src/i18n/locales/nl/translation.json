@@ -1293,6 +1293,8 @@
     "permissionDenied": "We need Screen Recording permission to record your screen.",
     "permissionHint": "Zet Say Less aan in Systeeminstellingen en klik daarna op 'Say Less opnieuw openen'.",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "'Software-update' openen",
+    "softwareUpdateFailed": "We konden 'Software-update' niet openen. Volg de stappen hierboven om het zelf te openen.",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
     "macosTooOld": "Schermopname heeft macOS 15 (Sequoia) of nieuwer nodig.",
@@ -1314,11 +1316,17 @@
     "reopenApp": "Say Less opnieuw openen",
     "macosTooOldHelp": "Schermopname heeft macOS 15 (Sequoia) of nieuwer nodig. Om je versie te bekijken, open je het Apple-menu en kies je 'Over deze Mac'. Om bij te werken, ga je naar Systeeminstellingen, 'Algemeen', 'Software-update'. Zie je geen update, dan kunnen we op deze Mac je scherm niet opnemen, maar dicteren werkt nog steeds.",
     "cameraMissing": "We kunnen geen camera vinden. Klap je laptop open of sluit een camera aan, of zet 'Show your face' uit in 'Recording setup'.",
-    "stopHint": "Klik op 'Stop' of zeg “Say less, stop recording.” als je klaar bent.",
+    "stopHint": "Als je klaar bent, klik je op 'Stop' of zeg je “Say less, stop recording.”",
     "startedAnnouncement": "Opname gestart.",
     "savedAnnouncement": "Opname opgeslagen.",
     "showMyFace": "Mijn gezicht tonen",
-    "cameraBlocked": "We kunnen je camera niet gebruiken. Geef toestemming in Systeeminstellingen, of zet 'Show your face' uit om op te nemen.",
+    "cameraBlocked": "Je camera is geblokkeerd, dus we kunnen je gezicht niet opnemen.",
+    "faceCorner": {
+      "top_left": "Je gezicht verschijnt in de hoek linksboven.",
+      "top_right": "Je gezicht verschijnt in de hoek rechtsboven.",
+      "bottom_left": "Je gezicht verschijnt in de hoek linksonder.",
+      "bottom_right": "Je gezicht verschijnt in de hoek rechtsonder."
+    },
     "reopening": "Opnieuw openen…",
     "reopenFailed": "We konden Say Less niet opnieuw openen. Sluit de app af via de menubalk en open hem daarna weer.",
     "macosTooOldSteps": "Om je versie te bekijken, open je het Apple-menu en kies je 'Over deze Mac'. Om bij te werken, ga je naar Systeeminstellingen, 'Algemeen', 'Software-update'. Zie je geen update, dan kunnen we op deze Mac je scherm niet opnemen, maar dicteren werkt nog steeds."

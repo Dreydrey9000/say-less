@@ -1293,6 +1293,8 @@
     "permissionDenied": "We need Screen Recording permission to record your screen.",
     "permissionHint": "सिस्टम सेटिंग में Say Less चालू करें, फिर 'Say Less फिर से खोलें' पर क्लिक करें.",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "'सॉफ़्टवेयर अपडेट' खोलें",
+    "softwareUpdateFailed": "हम 'सॉफ़्टवेयर अपडेट' नहीं खोल सके. इसे खुद खोलने के लिए ऊपर दिए गए चरणों का पालन करें.",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
     "macosTooOld": "स्क्रीन रिकॉर्डिंग के लिए macOS 15 (Sequoia) या उसके बाद का वर्शन चाहिए.",
@@ -1318,7 +1320,13 @@
     "startedAnnouncement": "रिकॉर्डिंग शुरू हो गई.",
     "savedAnnouncement": "रिकॉर्डिंग सेव हो गई.",
     "showMyFace": "मेरा चेहरा दिखाएँ",
-    "cameraBlocked": "हम आपका कैमरा इस्तेमाल नहीं कर सकते. सिस्टम सेटिंग में इसकी अनुमति दें, या रिकॉर्ड करने के लिए 'Show your face' बंद करें.",
+    "cameraBlocked": "आपका कैमरा ब्लॉक है, इसलिए हम आपका चेहरा रिकॉर्ड नहीं कर सकते.",
+    "faceCorner": {
+      "top_left": "आपका चेहरा ऊपर बाएँ कोने में दिखेगा.",
+      "top_right": "आपका चेहरा ऊपर दाएँ कोने में दिखेगा.",
+      "bottom_left": "आपका चेहरा नीचे बाएँ कोने में दिखेगा.",
+      "bottom_right": "आपका चेहरा नीचे दाएँ कोने में दिखेगा."
+    },
     "reopening": "फिर से खोल रहे हैं…",
     "reopenFailed": "हम Say Less को फिर से नहीं खोल सके. मेनू बार से इसे बंद करें, फिर इसे दोबारा खोलें.",
     "macosTooOldSteps": "अपना वर्शन देखने के लिए, Apple मेनू खोलें और 'यह Mac का परिचय' चुनें. अपडेट करने के लिए, 'सिस्टम सेटिंग', 'सामान्य', 'सॉफ़्टवेयर अपडेट' पर जाएँ. अगर कोई अपडेट नहीं दिखता, तो हम इस Mac पर स्क्रीन रिकॉर्ड नहीं कर सकते, लेकिन डिक्टेशन फिर भी काम करता है."

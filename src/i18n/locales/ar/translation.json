@@ -1293,6 +1293,8 @@
     "permissionDenied": "We need Screen Recording permission to record your screen.",
     "permissionHint": "فعّل Say Less في «إعدادات النظام»، ثم انقر على «إعادة فتح Say Less».",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "فتح «تحديث البرامج»",
+    "softwareUpdateFailed": "لم نتمكن من فتح «تحديث البرامج». اتبع الخطوات أعلاه لفتحه بنفسك.",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
     "macosTooOld": "يتطلب تسجيل الشاشة macOS 15 (Sequoia) أو أحدث.",
@@ -1318,7 +1320,13 @@
     "startedAnnouncement": "بدأ التسجيل.",
     "savedAnnouncement": "تم حفظ التسجيل.",
     "showMyFace": "أظهر وجهي",
-    "cameraBlocked": "لا يمكننا استخدام الكاميرا. اسمح بها في «إعدادات النظام»، أو أوقف «Show your face» لتتمكن من التسجيل.",
+    "cameraBlocked": "الكاميرا محظورة، لذا لا يمكننا تسجيل وجهك.",
+    "faceCorner": {
+      "top_left": "سيظهر وجهك في الزاوية العلوية اليسرى.",
+      "top_right": "سيظهر وجهك في الزاوية العلوية اليمنى.",
+      "bottom_left": "سيظهر وجهك في الزاوية السفلية اليسرى.",
+      "bottom_right": "سيظهر وجهك في الزاوية السفلية اليمنى."
+    },
     "reopening": "جارٍ إعادة الفتح…",
     "reopenFailed": "لم نتمكن من إعادة فتح Say Less. أنهِ التطبيق من شريط القائمة، ثم افتحه مرة أخرى.",
     "macosTooOldSteps": "لمعرفة إصدارك، افتح قائمة Apple واختر «حول هذا الـ Mac». للتحديث، انتقل إلى «إعدادات النظام» ثم «عام» ثم «تحديث البرامج». إذا لم يظهر أي تحديث، فلن نتمكن من تسجيل الشاشة على هذا الـ Mac، لكن الإملاء سيظل يعمل."

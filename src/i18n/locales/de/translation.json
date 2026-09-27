@@ -1293,6 +1293,8 @@
     "permissionDenied": "We need Screen Recording permission to record your screen.",
     "permissionHint": "Aktiviere Say Less in den Systemeinstellungen und klicke dann auf „Say Less erneut öffnen“.",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "„Softwareupdate“ öffnen",
+    "softwareUpdateFailed": "Wir konnten „Softwareupdate“ nicht öffnen. Folge den Schritten oben, um es selbst zu öffnen.",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
     "macosTooOld": "Für Bildschirmaufnahmen brauchst du macOS 15 (Sequoia) oder neuer.",
@@ -1318,7 +1320,13 @@
     "startedAnnouncement": "Aufnahme gestartet.",
     "savedAnnouncement": "Aufnahme gespeichert.",
     "showMyFace": "Mein Gesicht zeigen",
-    "cameraBlocked": "Wir können deine Kamera nicht verwenden. Erlaube sie in den Systemeinstellungen oder schalte „Show your face“ aus, um aufzunehmen.",
+    "cameraBlocked": "Deine Kamera ist blockiert, deshalb können wir dein Gesicht nicht aufnehmen.",
+    "faceCorner": {
+      "top_left": "Dein Gesicht erscheint in der oberen linken Ecke.",
+      "top_right": "Dein Gesicht erscheint in der oberen rechten Ecke.",
+      "bottom_left": "Dein Gesicht erscheint in der unteren linken Ecke.",
+      "bottom_right": "Dein Gesicht erscheint in der unteren rechten Ecke."
+    },
     "reopening": "Wird erneut geöffnet…",
     "reopenFailed": "Wir konnten Say Less nicht erneut öffnen. Beende es über die Menüleiste und öffne es dann wieder.",
     "macosTooOldSteps": "Um deine Version zu prüfen, öffne das Apple-Menü und wähle „Über diesen Mac“. Zum Aktualisieren gehe zu „Systemeinstellungen“, „Allgemein“, „Softwareupdate“. Wenn kein Update angezeigt wird, können wir auf diesem Mac den Bildschirm nicht aufnehmen, aber das Diktieren funktioniert weiterhin."

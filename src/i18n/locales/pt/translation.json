@@ -1293,6 +1293,8 @@
     "permissionDenied": "We need Screen Recording permission to record your screen.",
     "permissionHint": "Ative o Say Less nos Ajustes do Sistema e clique em 'Reabrir o Say Less'.",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "Abrir Atualização de Software",
+    "softwareUpdateFailed": "Não foi possível abrir a Atualização de Software. Siga os passos acima para abrir por conta própria.",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
     "macosTooOld": "A gravação de tela requer o macOS 15 (Sequoia) ou mais recente.",
@@ -1314,11 +1316,17 @@
     "reopenApp": "Reabrir o Say Less",
     "macosTooOldHelp": "A gravação de tela requer o macOS 15 (Sequoia) ou mais recente. Para ver sua versão, abra o menu Apple e escolha Sobre Este Mac. Para atualizar, vá em Ajustes do Sistema, Geral, Atualização de Software. Se nenhuma atualização aparecer, não conseguimos gravar a tela neste Mac, mas o ditado continua funcionando.",
     "cameraMissing": "Não encontramos uma câmera. Abra a tampa do notebook ou conecte uma câmera, ou desative 'Show your face' em 'Recording setup'.",
-    "stopHint": "Clique em 'Stop' ou diga “Say less, stop recording.” quando terminar.",
+    "stopHint": "Quando terminar, clique em 'Stop' ou diga “Say less, stop recording.”",
     "startedAnnouncement": "Gravação iniciada.",
     "savedAnnouncement": "Gravação salva.",
     "showMyFace": "Mostrar meu rosto",
-    "cameraBlocked": "Não conseguimos usar sua câmera. Permita o acesso nos Ajustes do Sistema ou desative 'Show your face' para gravar.",
+    "cameraBlocked": "Sua câmera está bloqueada, então não conseguimos gravar seu rosto.",
+    "faceCorner": {
+      "top_left": "Seu rosto vai aparecer no canto superior esquerdo.",
+      "top_right": "Seu rosto vai aparecer no canto superior direito.",
+      "bottom_left": "Seu rosto vai aparecer no canto inferior esquerdo.",
+      "bottom_right": "Seu rosto vai aparecer no canto inferior direito."
+    },
     "reopening": "Reabrindo…",
     "reopenFailed": "Não foi possível reabrir o Say Less. Saia do app pela barra de menus e abra-o de novo.",
     "macosTooOldSteps": "Para ver sua versão, abra o menu Apple e escolha Sobre Este Mac. Para atualizar, vá em Ajustes do Sistema, Geral, Atualização de Software. Se nenhuma atualização aparecer, não conseguimos gravar a tela neste Mac, mas o ditado continua funcionando."

@@ -1293,6 +1293,8 @@
     "permissionDenied": "We need Screen Recording permission to record your screen.",
     "permissionHint": "Hãy bật Say Less trong Cài đặt hệ thống, sau đó nhấn “Mở lại Say Less”.",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "Mở Cập nhật phần mềm",
+    "softwareUpdateFailed": "Chúng tôi không thể mở Cập nhật phần mềm. Hãy làm theo các bước ở trên để tự mở.",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
     "macosTooOld": "Quay màn hình cần macOS 15 (Sequoia) trở lên.",
@@ -1318,7 +1320,13 @@
     "startedAnnouncement": "Đã bắt đầu quay.",
     "savedAnnouncement": "Đã lưu bản quay.",
     "showMyFace": "Hiện khuôn mặt của tôi",
-    "cameraBlocked": "Chúng tôi không thể dùng camera của bạn. Hãy cho phép trong Cài đặt hệ thống, hoặc tắt “Show your face” để quay.",
+    "cameraBlocked": "Camera của bạn đang bị chặn, nên chúng tôi không thể quay khuôn mặt của bạn.",
+    "faceCorner": {
+      "top_left": "Khuôn mặt của bạn sẽ hiện ở góc trên bên trái.",
+      "top_right": "Khuôn mặt của bạn sẽ hiện ở góc trên bên phải.",
+      "bottom_left": "Khuôn mặt của bạn sẽ hiện ở góc dưới bên trái.",
+      "bottom_right": "Khuôn mặt của bạn sẽ hiện ở góc dưới bên phải."
+    },
     "reopening": "Đang mở lại…",
     "reopenFailed": "Chúng tôi không thể mở lại Say Less. Hãy thoát ứng dụng từ thanh menu, rồi mở lại.",
     "macosTooOldSteps": "Để kiểm tra phiên bản, hãy mở menu Apple và chọn Giới thiệu về máy Mac này. Để cập nhật, hãy mở Cài đặt hệ thống, chọn Cài đặt chung, rồi chọn Cập nhật phần mềm. Nếu không thấy bản cập nhật nào, chúng tôi không thể quay màn hình trên máy Mac này, nhưng tính năng đọc chính tả vẫn hoạt động."

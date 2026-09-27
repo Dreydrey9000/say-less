@@ -1293,6 +1293,8 @@
     "permissionDenied": "We need Screen Recording permission to record your screen.",
     "permissionHint": "Activa Say Less en Ajustes del Sistema y luego haz clic en “Volver a abrir Say Less”.",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "Abrir Actualización de Software",
+    "softwareUpdateFailed": "No pudimos abrir Actualización de Software. Sigue los pasos de arriba para abrirlo por tu cuenta.",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
     "macosTooOld": "La grabación de pantalla necesita macOS 15 (Sequoia) o posterior.",
@@ -1318,7 +1320,13 @@
     "startedAnnouncement": "Grabación iniciada.",
     "savedAnnouncement": "Grabación guardada.",
     "showMyFace": "Mostrar mi cara",
-    "cameraBlocked": "No podemos usar tu cámara. Permítela en Ajustes del Sistema, o desactiva “Show your face” para grabar.",
+    "cameraBlocked": "Tu cámara está bloqueada, así que no podemos grabar tu cara.",
+    "faceCorner": {
+      "top_left": "Tu cara aparecerá en la esquina superior izquierda.",
+      "top_right": "Tu cara aparecerá en la esquina superior derecha.",
+      "bottom_left": "Tu cara aparecerá en la esquina inferior izquierda.",
+      "bottom_right": "Tu cara aparecerá en la esquina inferior derecha."
+    },
     "reopening": "Volviendo a abrir…",
     "reopenFailed": "No pudimos volver a abrir Say Less. Ciérralo desde la barra de menús y luego ábrelo de nuevo.",
     "macosTooOldSteps": "Para ver tu versión, abre el menú Apple y elige Acerca de este Mac. Para actualizar, ve a Ajustes del Sistema, General, Actualización de Software. Si no aparece ninguna actualización, no podemos grabar la pantalla en este Mac, pero el dictado sigue funcionando."

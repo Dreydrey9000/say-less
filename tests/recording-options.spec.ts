@@ -182,7 +182,10 @@ test("denied camera explains the fix and opens System Settings", async ({
   const panel = await openSetup(page, "/tests/fixtures/app.html?camera=denied");
   await panel.getByRole("switch", { name: "Show your face" }).check();
   const alert = panel.getByRole("alert");
-  await expect(alert).toContainText("System Settings");
+  // Refused before, so macOS shows no prompt: straight to the fix.
+  await expect(alert).toContainText(
+    "We need Camera permission to show your face. Turn on Say Less in System Settings.",
+  );
   await alert.getByRole("button", { name: "Open System Settings" }).click();
   await expect
     .poll(async () => (await commands(page)).includes("open_camera_settings"))

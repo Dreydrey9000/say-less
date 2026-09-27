@@ -336,21 +336,107 @@ test("the camera warning stays next to Record while Setup is open", async ({
 test("turning on Show your face during the macOS prompt doesn't say blocked", async ({
   page,
 }) => {
-  // Before macOS has asked, the camera check says no, same as ?camera=denied.
-  await page.goto("/tests/fixtures/app.html?camera=denied");
+  // ?camera=ask: macOS hasn't asked yet, so turning the face on raises its
+  // prompt, which waits for an answer.
+  await page.goto("/tests/fixtures/app.html?camera=ask");
   const home = card(page);
   await home.getByRole("button", { name: "Recording setup" }).click();
   const panel = page.getByRole("region", { name: "Recording setup" });
   await panel.getByRole("switch", { name: "Show your face" }).check();
-  await expect(panel.getByRole("alert")).toBeVisible();
+  await expect(panel.getByRole("alert")).toContainText(
+    "Allow the camera in the macOS prompt.",
+  );
   const warning = home.getByText("Your camera is blocked");
   await expect(warning).toBeHidden();
   // Nor where the face goes: macOS hasn't given us the camera yet.
   await expect(home.getByText("Your face will show")).toBeHidden();
-  // Saying no in the prompt gives the window focus back: now it is blocked,
-  // and the card says so even with Setup open.
-  await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  // Still waiting after the next camera check, with no focus event.
+  await page.waitForTimeout(1700);
+  await expect(warning).toBeHidden();
+  // Saying no in the prompt: now it is blocked, and the card says so even
+  // with Setup open.
+  await page.evaluate(() =>
+    (
+      window as unknown as { testCameraAnswer: (allow: boolean) => void }
+    ).testCameraAnswer(false),
+  );
   await expect(warning).toBeVisible();
+  await expect(panel.getByRole("alert")).toContainText(
+    "We need Camera permission to show your face.",
+  );
+});
+
+test("saying yes in the macOS prompt shows where the face goes", async ({
+  page,
+}) => {
+  await page.goto("/tests/fixtures/app.html?camera=ask");
+  const home = card(page);
+  await home.getByRole("button", { name: "Show my face" }).click();
+  const panel = page.getByRole("region", { name: "Recording setup" });
+  await expect(panel.getByRole("alert")).toBeVisible();
+  await page.evaluate(() =>
+    (
+      window as unknown as { testCameraAnswer: (allow: boolean) => void }
+    ).testCameraAnswer(true),
+  );
+  await expect(
+    home.getByText("Your face will show in the bottom right corner.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(panel.getByRole("alert")).toHaveCount(0);
+  await expect(home.getByText("Your camera is blocked")).toHaveCount(0);
+});
+
+test("a camera refused before warns on the card right after Show my face", async ({
+  page,
+}) => {
+  // ?camera=denied: the person said no before, so macOS shows no prompt and
+  // nothing is left to wait for.
+  await page.goto("/tests/fixtures/app.html?camera=denied");
+  const home = card(page);
+  await home.getByRole("button", { name: "Show my face" }).click();
+  const panel = page.getByRole("region", { name: "Recording setup" });
+  await expect(
+    panel.getByRole("switch", { name: "Show your face" }),
+  ).toBeChecked();
+  const warning = home.getByText(
+    "Your camera is blocked, so we can't record your face.",
+    { exact: true },
+  );
+  await expect(warning).toBeVisible({ timeout: 2000 });
+  // Setup names the fix, not a prompt that isn't there.
+  await expect(panel.getByRole("alert")).toContainText(
+    "We need Camera permission to show your face.",
+  );
+  await expect(panel.getByText("macOS prompt")).toHaveCount(0);
+  expect(
+    await count(page, "plugin:macos-permissions|request_camera_permission"),
+  ).toBe(0);
+  // It stays after Setup closes.
+  await home.getByRole("button", { name: "Recording setup" }).click();
+  await expect(panel).toHaveCount(0);
+  await expect(warning).toBeVisible();
+});
+
+test("with the face on and no answer from macOS yet, the fix raises the prompt", async ({
+  page,
+}) => {
+  // Show your face was already on, but macOS never asked (say, Say Less quit
+  // while its prompt was up). No prompt of ours is waiting, so offer the fix.
+  await withFaceOn(page);
+  await page.goto("/tests/fixtures/app.html?camera=ask");
+  const home = card(page);
+  await expect(
+    home.getByText("Your camera is blocked, so we can't record your face.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await home.getByRole("button", { name: "Open System Settings" }).click();
+  await expect.poll(() => count(page, "open_camera_settings")).toBe(1);
+  expect(
+    await count(page, "plugin:macos-permissions|request_camera_permission"),
+  ).toBe(1);
 });
 
 test("Show my face turns the face on and opens Setup on where it goes", async ({
@@ -370,9 +456,7 @@ test("Show my face turns the face on and opens Setup on where it goes", async ({
   await expect(corner).toBeInViewport();
   await expect(panel.getByRole("radio", { name: "Medium" })).toBeInViewport();
   // Same path as the switch: it checked the camera permission.
-  expect(
-    await count(page, "plugin:macos-permissions|check_camera_permission"),
-  ).toBeGreaterThan(0);
+  expect(await count(page, "camera_permission_status")).toBeGreaterThan(0);
   await expect(
     home.getByText("Your face will show in the bottom right corner.", {
       exact: true,
@@ -383,7 +467,7 @@ test("Show my face turns the face on and opens Setup on where it goes", async ({
 test("saying no to the camera after Show my face warns on the card", async ({
   page,
 }) => {
-  await page.goto("/tests/fixtures/app.html?camera=denied");
+  await page.goto("/tests/fixtures/app.html?camera=ask");
   const home = card(page);
   await home.getByRole("button", { name: "Show my face" }).click();
   await expect(
@@ -402,26 +486,38 @@ test("saying no to the camera after Show my face warns on the card", async ({
     { exact: true },
   );
   await expect(warning).toBeHidden();
-  await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  await page.evaluate(() =>
+    (
+      window as unknown as { testCameraAnswer: (allow: boolean) => void }
+    ).testCameraAnswer(false),
+  );
   await expect(warning).toBeVisible();
 });
 
-test("open Setup hides the face-off hint, since its switch is right there", async ({
+test("open Setup drops Show my face but keeps the line, since its switch is right there", async ({
   page,
 }) => {
   await page.goto("/tests/fixtures/app.html");
   const home = card(page);
-  const hint = home.getByText("We won't show your face");
+  const hint = home.getByText("We won't show your face in the video.", {
+    exact: true,
+  });
+  const showMyFace = home.getByRole("button", { name: "Show my face" });
   await expect(hint).toBeVisible();
+  await expect(showMyFace).toBeVisible();
   const record = home.getByRole("button", { name: "Record screen" });
   const before = await topInCard(record);
   await home.getByRole("button", { name: "Recording setup" }).click();
   await expect(
     page.getByRole("switch", { name: "Show your face" }),
   ).toBeVisible();
-  await expect(hint).toBeHidden();
-  // The hint keeps its space, so Record doesn't move.
+  // One control for the face while Setup is open, and no blank row.
+  await expect(showMyFace).toHaveCount(0);
+  await expect(hint).toBeVisible();
+  // The line keeps the button's height, so Record doesn't move.
   expect(await topInCard(record)).toBeCloseTo(before, 1);
+  await home.getByRole("button", { name: "Recording setup" }).click();
+  await expect(showMyFace).toBeVisible();
 });
 
 test("with the face on, the card says which corner it shows in", async ({

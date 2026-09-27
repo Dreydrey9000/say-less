@@ -101,10 +101,31 @@ test("An older Mac explains how to check and update macOS", async ({
   await expect.poll(opened).toBe(1);
   await page.waitForTimeout(300);
   expect(await opened()).toBe(1);
+  // It opened, so there is nothing to explain.
+  await expect(card.getByRole("alert")).toHaveCount(0);
   // The icon sits beside the first line, not the middle of the paragraph,
   // and the button starts under the text.
   const icon = (await card.locator(".home-record-notice > svg").boundingBox())!;
   const text = (await card.locator("#home-record-reason").boundingBox())!;
   expect(Math.abs(icon.y + icon.height / 2 - (text.y + 10))).toBeLessThan(2);
   expect((await update.boundingBox())!.x).toBeCloseTo(text.x, 0);
+});
+
+test("An older Mac says so when Software Update won't open", async ({
+  page,
+}) => {
+  await page.goto("/tests/fixtures/app.html?macos=old&update=fail");
+  const card = page.getByTestId("screen-recording-card");
+  const update = card.getByRole("button", { name: "Open Software Update" });
+  // The ignored second click of a double-click doesn't clear the message.
+  await update.dblclick();
+  const error = card.getByRole("alert");
+  await expect(error).toHaveText(
+    "We couldn't open Software Update. Follow the steps above to open it yourself.",
+  );
+  await page.waitForTimeout(300);
+  await expect(error).toBeVisible();
+  // It lines up with the text above it.
+  const text = (await card.locator("#home-record-reason").boundingBox())!;
+  expect((await error.boundingBox())!.x).toBeCloseTo(text.x, 0);
 });

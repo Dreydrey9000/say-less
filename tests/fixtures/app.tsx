@@ -181,6 +181,20 @@ const recordingSources = {
   cameras: [{ id: "cam-1", name: "FaceTime HD Camera" }],
   windows_need_permission: false,
 };
+// What macOS says about the camera. ?camera=denied: refused before, so macOS
+// shows no prompt. ?camera=ask: macOS hasn't asked yet, and its prompt waits
+// until the test calls testCameraAnswer(true or false).
+let cameraStatus =
+  query.get("camera") === "denied"
+    ? "denied"
+    : query.get("camera") === "ask"
+      ? "not_asked"
+      : "allowed";
+(
+  window as unknown as { testCameraAnswer: (allow: boolean) => void }
+).testCameraAnswer = (allow) => {
+  cameraStatus = allow ? "allowed" : "denied";
+};
 const cameraFrame =
   "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='8'><rect width='8' height='8' fill='%23c98'/></svg>";
 mockWindows("main");
@@ -205,14 +219,15 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
     return recordingSources;
   }
   if (cmd === "start_camera_preview") {
-    if (query.get("camera") === "denied") throw "camera_denied";
+    if (cameraStatus !== "allowed") throw "camera_denied";
     return null;
   }
   if (cmd === "camera_preview_frame") return cameraFrame;
   if (cmd === "stop_camera_preview") return null;
   if (cmd === "open_camera_settings") return null;
+  if (cmd === "camera_permission_status") return cameraStatus;
   if (cmd.includes("check_camera_permission"))
-    return query.get("camera") !== "denied";
+    return cameraStatus === "allowed";
   if (cmd.includes("request_camera_permission")) return null;
   if (cmd === "start_screen_recording") {
     if (query.get("screen") === "window") {
@@ -224,7 +239,7 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
       throw "permission_denied";
     }
     // Like the backend: Show your face on and no Camera permission won't start.
-    if (recordingOptions.webcam && query.get("camera") === "denied") {
+    if (recordingOptions.webcam && cameraStatus !== "allowed") {
       screenStatus = { ...screenStatus, error: "camera_denied" };
       throw "camera_denied";
     }
@@ -261,6 +276,11 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
   }
   if (cmd === "show_screen_recording_in_folder") return null;
   if (cmd === "open_screen_recording_settings") return null;
+  // ?update=fail: Software Update doesn't open.
+  if (cmd === "open_software_update") {
+    if (query.get("update") === "fail") throw "open_failed";
+    return null;
+  }
   // ?reopen=fail makes Reopen Say Less fail.
   if (cmd === "reopen_app" && query.get("reopen") === "fail")
     throw "reopen_failed";

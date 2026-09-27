@@ -90,12 +90,26 @@ async openScreenRecordingSettings() : Promise<Result<null, string>> {
 }
 },
 /**
- * Open System Settings on General > Software Update, for the notice on a Mac
- * too old to record.
+ * Open Software Update in System Settings (System Preferences before macOS
+ * 13), for the notice on a Mac too old to record.
  */
 async openSoftwareUpdate() : Promise<Result<null, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("open_software_update") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+/**
+ * Camera permission for Show your face: "allowed", "denied" or "not_asked".
+ * "not_asked" means macOS has no answer yet: its prompt is up, or it never
+ * asked. The page reads this instead of guessing from window focus. Never
+ * shows a prompt.
+ */
+async cameraPermissionStatus() : Promise<Result<string, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("camera_permission_status") };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };

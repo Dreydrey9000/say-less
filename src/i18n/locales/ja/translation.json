@@ -1293,6 +1293,8 @@
     "permissionDenied": "We need Screen Recording permission to record your screen.",
     "permissionHint": "「システム設定」で Say Less をオンにしてから、「Say Less を再度開く」をクリックしてください。",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "「ソフトウェアアップデート」を開く",
+    "softwareUpdateFailed": "「ソフトウェアアップデート」を開けませんでした。上の手順に沿ってご自身で開いてください。",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
     "macosTooOld": "画面収録には macOS 15 (Sequoia) 以降が必要です。",
@@ -1314,11 +1316,17 @@
     "reopenApp": "Say Less を再度開く",
     "macosTooOldHelp": "画面収録には macOS 15 (Sequoia) 以降が必要です。バージョンを確認するには、Appleメニューを開いて「このMacについて」を選択してください。アップデートするには、「システム設定」、「一般」、「ソフトウェアアップデート」の順に開いてください。アップデートが表示されない場合、このMacでは画面を収録できませんが、音声入力は引き続き使えます。",
     "cameraMissing": "カメラが見つかりません。ノートパソコンの蓋を開けるか、カメラを接続してください。または、「Recording setup」で「Show your face」をオフにしてください。",
-    "stopHint": "終わったら「Stop」をクリックするか、「Say less, stop recording.」と言ってください。",
+    "stopHint": "終わったら「Stop」をクリックするか、「Say less, stop recording」と言ってください。",
     "startedAnnouncement": "収録を開始しました。",
     "savedAnnouncement": "録画を保存しました。",
     "showMyFace": "顔を表示する",
-    "cameraBlocked": "カメラを使用できません。「システム設定」で許可するか、「Show your face」をオフにして収録してください。",
+    "cameraBlocked": "カメラがブロックされているため、顔を収録できません。",
+    "faceCorner": {
+      "top_left": "顔は左上の隅に表示されます。",
+      "top_right": "顔は右上の隅に表示されます。",
+      "bottom_left": "顔は左下の隅に表示されます。",
+      "bottom_right": "顔は右下の隅に表示されます。"
+    },
     "reopening": "再度開いています…",
     "reopenFailed": "Say Less を再度開けませんでした。メニューバーから終了して、もう一度開いてください。",
     "macosTooOldSteps": "バージョンを確認するには、Appleメニューを開いて「このMacについて」を選択してください。アップデートするには、「システム設定」、「一般」、「ソフトウェアアップデート」の順に開いてください。アップデートが表示されない場合、このMacでは画面を収録できませんが、音声入力は引き続き使えます。"

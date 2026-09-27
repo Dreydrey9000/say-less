@@ -1293,6 +1293,8 @@
     "permissionDenied": "We need Screen Recording permission to record your screen.",
     "permissionHint": "System Settings मा Say Less अन गर्नुहोस्, त्यसपछि 'Say Less फेरि खोल्नुहोस्' मा क्लिक गर्नुहोस्।",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "Software Update खोल्नुहोस्",
+    "softwareUpdateFailed": "हामीले Software Update खोल्न सकेनौं। आफैं खोल्न माथिका चरणहरू पालना गर्नुहोस्।",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
     "macosTooOld": "स्क्रिन रेकर्डिङका लागि macOS 15 (Sequoia) वा नयाँ संस्करण चाहिन्छ।",
@@ -1314,11 +1316,17 @@
     "reopenApp": "Say Less फेरि खोल्नुहोस्",
     "macosTooOldHelp": "स्क्रिन रेकर्डिङका लागि macOS 15 (Sequoia) वा नयाँ संस्करण चाहिन्छ। आफ्नो संस्करण जाँच्न Apple मेनु खोल्नुहोस् र About This Mac छान्नुहोस्। अपडेट गर्न System Settings, General, Software Update मा जानुहोस्। कुनै अपडेट देखिएन भने हामी यो Mac मा स्क्रिन रेकर्ड गर्न सक्दैनौं, तर डिक्टेसन अझै पनि काम गर्छ।",
     "cameraMissing": "हामीले क्यामेरा फेला पार्न सकेनौं। आफ्नो ल्यापटपको ढकनी खोल्नुहोस् वा क्यामेरा जोड्नुहोस्, वा 'Recording setup' मा 'Show your face' अफ गर्नुहोस्।",
-    "stopHint": "सकिएपछि 'Stop' मा क्लिक गर्नुहोस् वा “Say less, stop recording.” भन्नुहोस्।",
+    "stopHint": "सकिएपछि 'Stop' मा क्लिक गर्नुहोस् वा “Say less, stop recording” भन्नुहोस्।",
     "startedAnnouncement": "रेकर्डिङ सुरु भयो।",
     "savedAnnouncement": "रेकर्डिङ सेभ भयो।",
     "showMyFace": "मेरो अनुहार देखाउनुहोस्",
-    "cameraBlocked": "हामी तपाईंको क्यामेरा प्रयोग गर्न सक्दैनौं। System Settings मा अनुमति दिनुहोस्, वा रेकर्ड गर्न 'Show your face' अफ गर्नुहोस्।",
+    "cameraBlocked": "तपाईंको क्यामेरा ब्लक गरिएको छ, त्यसैले हामी तपाईंको अनुहार रेकर्ड गर्न सक्दैनौं।",
+    "faceCorner": {
+      "top_left": "तपाईंको अनुहार माथिल्लो बायाँ कुनामा देखिनेछ।",
+      "top_right": "तपाईंको अनुहार माथिल्लो दायाँ कुनामा देखिनेछ।",
+      "bottom_left": "तपाईंको अनुहार तल्लो बायाँ कुनामा देखिनेछ।",
+      "bottom_right": "तपाईंको अनुहार तल्लो दायाँ कुनामा देखिनेछ।"
+    },
     "reopening": "फेरि खोल्दै…",
     "reopenFailed": "हामीले Say Less फेरि खोल्न सकेनौं। मेनु बारबाट यसलाई बन्द गर्नुहोस्, त्यसपछि फेरि खोल्नुहोस्।",
     "macosTooOldSteps": "आफ्नो संस्करण जाँच्न Apple मेनु खोल्नुहोस् र About This Mac छान्नुहोस्। अपडेट गर्न System Settings, General, Software Update मा जानुहोस्। कुनै अपडेट देखिएन भने हामी यो Mac मा स्क्रिन रेकर्ड गर्न सक्दैनौं, तर डिक्टेसन अझै पनि काम गर्छ।"

@@ -1293,6 +1293,8 @@
     "permissionDenied": "We need Screen Recording permission to record your screen.",
     "permissionHint": "Включите Say Less в Системных настройках, затем нажмите «Открыть Say Less заново».",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "Открыть «Обновление ПО»",
+    "softwareUpdateFailed": "Не удалось открыть «Обновление ПО». Откройте его сами, следуя шагам выше.",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
     "macosTooOld": "Для записи экрана нужна macOS 15 (Sequoia) или новее.",
@@ -1318,7 +1320,13 @@
     "startedAnnouncement": "Запись началась.",
     "savedAnnouncement": "Запись сохранена.",
     "showMyFace": "Показать моё лицо",
-    "cameraBlocked": "Мы не можем использовать вашу камеру. Разрешите доступ в Системных настройках или выключите «Show your face», чтобы начать запись.",
+    "cameraBlocked": "Ваша камера заблокирована, поэтому мы не можем записать ваше лицо.",
+    "faceCorner": {
+      "top_left": "Ваше лицо появится в левом верхнем углу.",
+      "top_right": "Ваше лицо появится в правом верхнем углу.",
+      "bottom_left": "Ваше лицо появится в левом нижнем углу.",
+      "bottom_right": "Ваше лицо появится в правом нижнем углу."
+    },
     "reopening": "Открываем заново…",
     "reopenFailed": "Не удалось открыть Say Less заново. Выйдите из приложения через строку меню, затем откройте его снова.",
     "macosTooOldSteps": "Чтобы узнать свою версию, откройте меню Apple и выберите «Об этом Mac». Чтобы обновиться, откройте «Системные настройки», затем «Основные», затем «Обновление ПО». Если обновление не появилось, записывать экран на этом Mac не получится, но диктовка по-прежнему работает."

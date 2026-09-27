@@ -1293,6 +1293,8 @@
     "permissionDenied": "We need Screen Recording permission to record your screen.",
     "permissionHint": "Zapněte Say Less v Nastavení systému a pak klikněte na „Znovu otevřít Say Less“.",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "Otevřít Aktualizace softwaru",
+    "softwareUpdateFailed": "Nepodařilo se nám otevřít Aktualizace softwaru. Otevřete ji sami podle kroků výše.",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
     "macosTooOld": "Nahrávání obrazovky vyžaduje macOS 15 (Sequoia) nebo novější.",
@@ -1318,7 +1320,13 @@
     "startedAnnouncement": "Nahrávání začalo.",
     "savedAnnouncement": "Nahrávka byla uložena.",
     "showMyFace": "Zobrazit můj obličej",
-    "cameraBlocked": "Nemůžeme použít vaši kameru. Povolte ji v Nastavení systému, nebo vypněte „Show your face“, abyste mohli nahrávat.",
+    "cameraBlocked": "Vaše kamera je zablokovaná, takže nemůžeme nahrát váš obličej.",
+    "faceCorner": {
+      "top_left": "Váš obličej se zobrazí v levém horním rohu.",
+      "top_right": "Váš obličej se zobrazí v pravém horním rohu.",
+      "bottom_left": "Váš obličej se zobrazí v levém dolním rohu.",
+      "bottom_right": "Váš obličej se zobrazí v pravém dolním rohu."
+    },
     "reopening": "Znovu otevíráme…",
     "reopenFailed": "Say Less se nám nepodařilo znovu otevřít. Ukončete ho z řádku nabídek a pak ho otevřete znovu.",
     "macosTooOldSteps": "Svou verzi zjistíte tak, že otevřete nabídku Apple a vyberete „O tomto Macu“. Chcete-li aktualizovat, přejděte do Nastavení systému, Obecné, Aktualizace softwaru. Pokud se žádná aktualizace nezobrazí, na tomto Macu obrazovku nahrávat nemůžeme, ale diktování bude dál fungovat."

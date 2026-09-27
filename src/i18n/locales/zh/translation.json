@@ -1293,6 +1293,8 @@
     "permissionDenied": "We need Screen Recording permission to record your screen.",
     "permissionHint": "请在“系统设置”中开启 Say Less，然后点击“重新打开 Say Less”。",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "打开“软件更新”",
+    "softwareUpdateFailed": "我们无法打开“软件更新”。请按照上面的步骤自行打开。",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
     "macosTooOld": "屏幕录制需要 macOS 15（Sequoia）或更高版本。",
@@ -1318,7 +1320,13 @@
     "startedAnnouncement": "已开始录制。",
     "savedAnnouncement": "录制已保存。",
     "showMyFace": "显示我的脸",
-    "cameraBlocked": "我们无法使用您的摄像头。请在“系统设置”中允许访问，或关闭“Show your face”后再录制。",
+    "cameraBlocked": "您的摄像头已被阻止，因此我们无法录制您的脸。",
+    "faceCorner": {
+      "top_left": "您的脸将显示在左上角。",
+      "top_right": "您的脸将显示在右上角。",
+      "bottom_left": "您的脸将显示在左下角。",
+      "bottom_right": "您的脸将显示在右下角。"
+    },
     "reopening": "正在重新打开…",
     "reopenFailed": "我们无法重新打开 Say Less。请从菜单栏退出它，然后再次打开。",
     "macosTooOldSteps": "要查看您的版本，请打开苹果菜单并选取“关于本机”。要更新，请打开“系统设置”，点击“通用”，然后点击“软件更新”。如果没有显示可用的更新，我们就无法在这台 Mac 上录制屏幕，但听写功能仍可正常使用。"

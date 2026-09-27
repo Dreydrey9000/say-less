@@ -1293,6 +1293,8 @@
     "permissionDenied": "We need Screen Recording permission to record your screen.",
     "permissionHint": "Aktifkan Say Less di Pengaturan Sistem, lalu klik 'Buka ulang Say Less'.",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "Buka Pembaruan Perangkat Lunak",
+    "softwareUpdateFailed": "Kami tidak dapat membuka Pembaruan Perangkat Lunak. Ikuti langkah di atas untuk membukanya sendiri.",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
     "macosTooOld": "Perekaman layar memerlukan macOS 15 (Sequoia) atau yang lebih baru.",
@@ -1314,11 +1316,17 @@
     "reopenApp": "Buka ulang Say Less",
     "macosTooOldHelp": "Perekaman layar memerlukan macOS 15 (Sequoia) atau yang lebih baru. Untuk memeriksa versi Anda, buka menu Apple dan pilih Tentang Mac Ini. Untuk memperbarui, buka Pengaturan Sistem, Umum, Pembaruan Perangkat Lunak. Jika tidak ada pembaruan yang muncul, kami tidak dapat merekam layar di Mac ini, tetapi dikte tetap berfungsi.",
     "cameraMissing": "Kami tidak menemukan kamera. Buka laptop Anda atau colokkan kamera, atau matikan 'Show your face' di 'Recording setup'.",
-    "stopHint": "Klik 'Stop' atau ucapkan “Say less, stop recording.” setelah selesai.",
+    "stopHint": "Setelah selesai, klik 'Stop' atau ucapkan “Say less, stop recording.”",
     "startedAnnouncement": "Perekaman dimulai.",
     "savedAnnouncement": "Rekaman disimpan.",
     "showMyFace": "Tampilkan wajah saya",
-    "cameraBlocked": "Kami tidak dapat menggunakan kamera Anda. Izinkan di Pengaturan Sistem, atau matikan 'Show your face' untuk merekam.",
+    "cameraBlocked": "Kamera Anda diblokir, jadi kami tidak dapat merekam wajah Anda.",
+    "faceCorner": {
+      "top_left": "Wajah Anda akan tampil di sudut kiri atas.",
+      "top_right": "Wajah Anda akan tampil di sudut kanan atas.",
+      "bottom_left": "Wajah Anda akan tampil di sudut kiri bawah.",
+      "bottom_right": "Wajah Anda akan tampil di sudut kanan bawah."
+    },
     "reopening": "Membuka ulang…",
     "reopenFailed": "Kami tidak dapat membuka ulang Say Less. Tutup aplikasinya dari bilah menu, lalu buka lagi.",
     "macosTooOldSteps": "Untuk memeriksa versi Anda, buka menu Apple dan pilih Tentang Mac Ini. Untuk memperbarui, buka Pengaturan Sistem, Umum, Pembaruan Perangkat Lunak. Jika tidak ada pembaruan yang muncul, kami tidak dapat merekam layar di Mac ini, tetapi dikte tetap berfungsi."

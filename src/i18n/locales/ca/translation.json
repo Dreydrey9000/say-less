@@ -1293,6 +1293,8 @@
     "permissionDenied": "We need Screen Recording permission to record your screen.",
     "permissionHint": "Activeu el Say Less a Configuració del sistema i feu clic a «Torna a obrir el Say Less».",
     "openSettings": "Open System Settings",
+    "openSoftwareUpdate": "Obre Actualització de programari",
+    "softwareUpdateFailed": "No hem pogut obrir Actualització de programari. Seguiu els passos de més amunt per obrir-lo.",
     "microphoneDenied": "We need microphone permission so your voice is in the video.",
     "fixMicrophone": "Fix permissions",
     "macosTooOld": "L'enregistrament de pantalla necessita el macOS 15 (Sequoia) o posterior.",
@@ -1318,7 +1320,13 @@
     "startedAnnouncement": "Ha començat l'enregistrament.",
     "savedAnnouncement": "S'ha desat l'enregistrament.",
     "showMyFace": "Mostra la meva cara",
-    "cameraBlocked": "No podem fer servir la vostra càmera. Permeteu-la a Configuració del sistema o desactiveu «Show your face» per enregistrar.",
+    "cameraBlocked": "La vostra càmera està bloquejada, així que no podem enregistrar la vostra cara.",
+    "faceCorner": {
+      "top_left": "La vostra cara sortirà a l'angle superior esquerre.",
+      "top_right": "La vostra cara sortirà a l'angle superior dret.",
+      "bottom_left": "La vostra cara sortirà a l'angle inferior esquerre.",
+      "bottom_right": "La vostra cara sortirà a l'angle inferior dret."
+    },
     "reopening": "S'està tornant a obrir…",
     "reopenFailed": "No hem pogut tornar a obrir el Say Less. Tanqueu-lo des de la barra de menús i torneu-lo a obrir.",
     "macosTooOldSteps": "Per comprovar la vostra versió, obriu el menú Apple i trieu «Sobre aquest Mac». Per actualitzar, aneu a Configuració del sistema, General, Actualització de programari. Si no hi apareix cap actualització, no podem enregistrar la pantalla en aquest Mac, però el dictat continua funcionant."

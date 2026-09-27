@@ -298,6 +298,11 @@ mod platform {
         unsafe { sl_screen_recorder_camera_status() == 3 }
     }
 
+    /// macOS's camera answer as a word for the page. Never shows a prompt.
+    pub fn camera_status() -> &'static str {
+        super::camera_word(unsafe { sl_screen_recorder_camera_status() })
+    }
+
     /// The caller has already checked every permission `options` needs, so
     /// nothing the user turned on is silently dropped from the file.
     pub fn start(path: &str, options: &super::BridgeOptions) -> Result<(), String> {
@@ -639,19 +644,67 @@ pub fn open_screen_recording_settings() -> Result<(), String> {
     }
 }
 
-/// Open System Settings on General > Software Update, for the notice on a Mac
-/// too old to record.
+/// AVAuthorizationStatus as a word: 0 is "not_asked" (macOS hasn't asked
+/// yet), 3 is "allowed", and refused (2) or blocked by whoever manages the
+/// Mac (1) are both "denied".
+#[cfg_attr(not(target_os = "macos"), allow(dead_code))]
+fn camera_word(status: i32) -> &'static str {
+    match status {
+        0 => "not_asked",
+        3 => "allowed",
+        _ => "denied",
+    }
+}
+
+/// Camera permission for Show your face: "allowed", "denied" or "not_asked".
+/// "not_asked" means macOS has no answer yet: its prompt is up, or it never
+/// asked. The page reads this instead of guessing from window focus. Never
+/// shows a prompt.
+#[tauri::command]
+#[specta::specta]
+pub fn camera_permission_status() -> Result<String, String> {
+    #[cfg(target_os = "macos")]
+    {
+        Ok(platform::camera_status().to_string())
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        Err("unsupported_platform".into())
+    }
+}
+
+/// Software Update's address. macOS 13 turned System Preferences into System
+/// Settings and gave the pane a new ID, so each version gets its own first,
+/// and the other one as the fallback.
+#[cfg_attr(not(target_os = "macos"), allow(dead_code))]
+fn software_update_urls(macos_major: Option<u64>) -> [&'static str; 2] {
+    const SETTINGS: &str = "x-apple.systempreferences:com.apple.Software-Update-Settings.extension";
+    const PREFERENCES: &str = "x-apple.systempreferences:com.apple.preferences.softwareupdate";
+    match macos_major {
+        Some(major) if major < 13 => [PREFERENCES, SETTINGS],
+        _ => [SETTINGS, PREFERENCES],
+    }
+}
+
+/// Open Software Update in System Settings (System Preferences before macOS
+/// 13), for the notice on a Mac too old to record.
 #[tauri::command]
 #[specta::specta]
 pub fn open_software_update() -> Result<(), String> {
     #[cfg(target_os = "macos")]
     {
-        let status = std::process::Command::new("/usr/bin/open")
-            .arg("x-apple.systempreferences:com.apple.Software-Update-Settings.extension")
-            .status()
-            .map_err(|_| "open_failed")?;
-        if status.success() {
-            return Ok(());
+        let major = match tauri_plugin_os::version() {
+            tauri_plugin_os::Version::Semantic(major, _, _) => Some(major),
+            _ => None,
+        };
+        for url in software_update_urls(major) {
+            let opened = std::process::Command::new("/usr/bin/open")
+                .arg(url)
+                .status()
+                .is_ok_and(|status| status.success());
+            if opened {
+                return Ok(());
+            }
         }
         Err("open_failed".into())
     }
@@ -707,6 +760,27 @@ mod tests {
         assert!(std::env::var_os(SHOW_ON_LAUNCH_ENV).is_none());
         // The window checks later in startup still get the same answer.
         assert!(launched_to_show());
+    }
+
+    #[test]
+    fn camera_status_words() {
+        assert_eq!(camera_word(0), "not_asked");
+        assert_eq!(camera_word(1), "denied");
+        assert_eq!(camera_word(2), "denied");
+        assert_eq!(camera_word(3), "allowed");
+    }
+
+    #[test]
+    fn software_update_opens_the_pane_for_each_macos() {
+        let settings = "x-apple.systempreferences:com.apple.Software-Update-Settings.extension";
+        let preferences = "x-apple.systempreferences:com.apple.preferences.softwareupdate";
+        // macOS 10.15 to 12: System Preferences first.
+        assert_eq!(software_update_urls(Some(10)), [preferences, settings]);
+        assert_eq!(software_update_urls(Some(12)), [preferences, settings]);
+        // macOS 13 and later, or an unknown version: System Settings first.
+        assert_eq!(software_update_urls(Some(13)), [settings, preferences]);
+        assert_eq!(software_update_urls(Some(14)), [settings, preferences]);
+        assert_eq!(software_update_urls(None), [settings, preferences]);
     }
 
     #[test]

@@ -194,13 +194,19 @@ export const useScreenRecording = create<RecordingStore>((set, get) => ({
 // A module flag, not state, like `inFlight`: the second click of a
 // double-click opens System Settings only once, from any button.
 let settingsOpening = false;
-async function openSettingsOnce(open: () => Promise<unknown>) {
-  if (settingsOpening) return;
+/** True when it opened, false when it failed, and undefined for the ignored
+ * second click of a double-click. */
+async function openSettingsOnce(
+  open: () => Promise<unknown>,
+): Promise<boolean | undefined> {
+  if (settingsOpening) return undefined;
   settingsOpening = true;
   try {
     await open();
+    return true;
   } catch {
-    // The notice stays; nothing else to do here.
+    // The notice stays; a caller with room can say it didn't open.
+    return false;
   } finally {
     window.setTimeout(() => {
       settingsOpening = false;
@@ -228,75 +234,96 @@ export function openPrivacyPane(kind: "camera" | "microphone") {
   });
 }
 
-/** Open Software Update in System Settings, for a Mac too old to record. */
+/** Open Software Update in System Settings, for a Mac too old to record.
+ * Resolves false when it couldn't open. */
 export function openSoftwareUpdate() {
   return openSettingsOnce(() => invoke("open_software_update"));
 }
 
-/** Camera permission, shared by the card and Setup. "asking" means we just
- * raised the macOS prompt: macOS says no until it is answered, so that isn't
- * blocked yet. */
+/** Camera permission, shared by the card and Setup. "asking" means the macOS
+ * prompt we raised is still waiting for an answer, so that isn't blocked
+ * yet. */
 export type CameraAccess = "unknown" | "allowed" | "asking" | "denied";
 const useCameraStore = create<{ access: CameraAccess }>(() => ({
   access: "unknown",
 }));
+// A module flag, like `inFlight`: we raised the macOS camera prompt and it
+// hasn't been answered yet.
+let cameraPromptUp = false;
+
+/** What macOS says about the camera, straight from the backend, so a prompt
+ * that never showed can't look like one still waiting. */
+async function cameraStatus(): Promise<"allowed" | "denied" | "not_asked"> {
+  try {
+    const status = await invoke<string>("camera_permission_status");
+    if (status === "allowed" || status === "not_asked") return status;
+    return "denied";
+  } catch {
+    // Can't tell whether macOS asked yet, so offer the fix.
+    return (await checkCameraPermission().catch(() => false))
+      ? "allowed"
+      : "denied";
+  }
+}
+
+function accessFor(status: "allowed" | "denied" | "not_asked"): CameraAccess {
+  if (status !== "not_asked") cameraPromptUp = false;
+  if (status === "allowed") return "allowed";
+  // Not asked and no prompt of ours up (say, Say Less quit while it was
+  // showing): the warning's Open System Settings raises the prompt.
+  return status === "not_asked" && cameraPromptUp ? "asking" : "denied";
+}
 
 /** Turn Show your face on or off. The card's Show my face button and Setup's
  * switch both come here, so both raise the macOS camera prompt. Returns
  * whether the change was saved. */
 export async function setShowFace(on: boolean) {
   const mac = platform() === "macos";
-  const allowed =
-    !on || !mac || (await checkCameraPermission().catch(() => false));
-  // Asking before the switch flips, so nothing says blocked while macOS asks.
-  if (!allowed) useCameraStore.setState({ access: "asking" });
+  const status = on && mac ? await cameraStatus() : null;
+  const ask = status === "not_asked";
+  // Set before the switch flips, so nothing says blocked while macOS asks,
+  // and a camera refused before says blocked right away.
+  if (ask) cameraPromptUp = true;
+  if (status) useCameraStore.setState({ access: accessFor(status) });
   const ok = await useRecordingOptions.getState().update({ webcam: on });
   if (!ok) {
-    if (!allowed) useCameraStore.setState({ access: "unknown" });
+    if (ask) cameraPromptUp = false;
+    if (status) useCameraStore.setState({ access: "unknown" });
     return false;
   }
-  if (on && mac && allowed) useCameraStore.setState({ access: "allowed" });
-  // macOS shows its own prompt the first time. useCameraAccess keeps
-  // watching for the answer.
-  if (!allowed)
-    await requestCameraPermission().catch(() =>
-      useCameraStore.setState({ access: "denied" }),
-    );
+  if (!on) {
+    cameraPromptUp = false;
+    useCameraStore.setState({ access: "unknown" });
+  }
+  // macOS shows its own prompt only when it hasn't asked before.
+  // useCameraAccess keeps checking for the answer.
+  if (ask)
+    await requestCameraPermission().catch(() => {
+      cameraPromptUp = false;
+      useCameraStore.setState({ access: "denied" });
+    });
   return true;
 }
 
 /** Camera permission while `watch` is on (the webcam is on). Checked when
  * `watch` turns on, every 1.5 seconds until allowed, and when the window gets
- * focus back. Focus coming back also ends "asking": the prompt was answered,
- * or the user is back from System Settings. */
+ * focus back, such as from System Settings. */
 export function useCameraAccess(watch: boolean): CameraAccess {
   const access = useCameraStore((state) => state.access);
   const allowed = access === "allowed";
   useEffect(() => {
     if (!watch || platform() !== "macos") return;
     let disposed = false;
-    const check = (answered: boolean) =>
-      void checkCameraPermission()
-        .catch(() => false)
-        .then((allowed) => {
-          if (disposed) return;
-          useCameraStore.setState((current) => ({
-            access: allowed
-              ? "allowed"
-              : current.access === "asking" && !answered
-                ? "asking"
-                : "denied",
-          }));
-        });
-    const onFocus = () => check(true);
-    check(false);
-    window.addEventListener("focus", onFocus);
-    const id = allowed
-      ? undefined
-      : window.setInterval(() => check(false), 1500);
+    const check = () =>
+      void cameraStatus().then((status) => {
+        if (!disposed) useCameraStore.setState({ access: accessFor(status) });
+      });
+    check();
+    window.addEventListener("focus", check);
+    const id = allowed ? undefined : window.setInterval(check, 1500);
     return () => {
       disposed = true;
-      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("focus", check);
       window.clearInterval(id);
     };
   }, [watch, allowed]);
