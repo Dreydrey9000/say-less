@@ -145,6 +145,88 @@ test("floating dock renders controls without horizontal overflow", async ({
   await page.screenshot({ path: "test-results/floating-dock.png" });
 });
 
+test("double-clicking Stop in the dock saves once and starts nothing new", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 460, height: 112 });
+  await page.goto("/tests/fixtures/app.html?dock=1&screen=recording");
+  await page.getByRole("button", { name: "Stop screen recording" }).dblclick();
+  const start = page.getByRole("button", { name: "Record screen" });
+  await expect(start).toHaveAttribute("aria-disabled", "true");
+  await expect(page.getByRole("status")).toContainText("Saved.");
+  await expect(
+    page.getByRole("button", { name: "Show in Finder" }),
+  ).toBeVisible();
+  expect(
+    await page.evaluate(() =>
+      (window as unknown as { testCommands: string[] }).testCommands.includes(
+        "start_screen_recording",
+      ),
+    ),
+  ).toBe(false);
+  // The pause is short. After it, one click records again.
+  await expect(start).not.toHaveAttribute("aria-disabled", "true");
+  await start.click();
+  await expect(
+    page.getByRole("button", { name: "Stop screen recording" }),
+  ).toBeVisible();
+});
+
+test("after Stop, the dock keeps the Screen tooltip off the Saved line", async ({
+  page,
+}) => {
+  // No fade, so a tooltip that would show is there right away.
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.setViewportSize({ width: 460, height: 112 });
+  await page.goto("/tests/fixtures/app.html?dock=1&screen=recording");
+  const stop = page.getByRole("button", { name: "Stop screen recording" });
+  await stop.hover();
+  await expect(
+    page.getByRole("tooltip", { name: "Stop screen recording" }),
+  ).toBeVisible();
+  await stop.click();
+  const tip = page.getByRole("tooltip", { name: "Record screen" });
+  await expect(tip).toBeHidden();
+  await expect(
+    page.getByRole("button", { name: "Show in Finder" }),
+  ).toBeVisible();
+  // Once the pointer leaves, the tooltip works again.
+  await page.mouse.move(0, 0);
+  await page.getByRole("button", { name: "Record screen" }).hover();
+  await expect(tip).toBeVisible();
+});
+
+test("while the screen records, the dock's Talk mic still says Talk", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.setViewportSize({ width: 460, height: 112 });
+  // Idle: the pill shows its word, so no tooltip repeats it.
+  await page.goto("/tests/fixtures/app.html?dock=1");
+  const idleTalk = page.getByRole("button", { name: "Talk", exact: true });
+  await idleTalk.hover();
+  await expect(page.locator(".dock-record-anchor .sl-tip")).toBeHidden();
+  await page.mouse.move(0, 0);
+
+  await page.goto("/tests/fixtures/app.html?dock=1&screen=recording");
+  const talk = page.getByRole("button", {
+    name: "Talk: type with your voice",
+    exact: true,
+  });
+  const tip = page.getByRole("tooltip", { name: "Talk: type with your voice" });
+  await talk.focus();
+  await expect(tip).toBeVisible();
+  await talk.blur();
+  await expect(tip).toBeHidden();
+  await talk.hover();
+  await expect(tip).toBeVisible();
+  // Stop is a filled square, so it doesn't read as a checkbox.
+  await expect(page.locator(".dock-screen.is-live svg")).toHaveAttribute(
+    "fill",
+    "currentColor",
+  );
+});
+
 test("update archive includes the real feature image", async ({ page }) => {
   await page.goto("/tests/fixtures/app.html");
   await page.getByRole("button", { name: "About", exact: true }).click();

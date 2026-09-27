@@ -1014,7 +1014,9 @@
     "transcribing": "Turning your voice into text…",
     "arming": "Starting microphone…",
     "expand": "Expand dock",
-    "collapse": "Shrink to small dock"
+    "collapse": "Shrink to small dock",
+    "talkHint": "Talk: type with your voice",
+    "recordingSetup": "Recording setup: camera and sound"
   },
   "home": {
     "title": "Home",
@@ -1332,8 +1334,8 @@
     "windowsNeedPermission": "We can list your windows once Say Less has Screen Recording permission.",
     "noWindows": "Open the window you want to record, then pick it here.",
     "soundTitle": "Sound",
-    "microphone": "Your microphone",
-    "whichMicrophone": "Microphone",
+    "microphone": "Record your voice",
+    "whichMicrophone": "Which microphone",
     "sameAsDictation": "Same as dictation",
     "systemAudio": "Computer sound",
     "cameraTitle": "Camera",

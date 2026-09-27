@@ -102,6 +102,19 @@ button:disabled {
   min-height: 44px;
   padding: 0 8px;
 }
+/* The Talk pill sits in a tooltip anchor, which takes its place in the row. */
+.floating-bar .dock-record-anchor {
+  flex: 1;
+  min-width: 32px;
+}
+/* A tooltip that must not show right now: the Talk pill already shows its
+   word, or the pointer is still on Screen right after Stop, where the tip
+   would cover the Saved line. */
+.floating-shell .sl-tip-anchor.tip-hidden > .sl-tip,
+.compact-dock .sl-tip-anchor.tip-hidden > .sl-tip {
+  visibility: hidden;
+  opacity: 0;
+}
 /* The Talk pill is the only control that shrinks, so its word clips instead
    of painting over the Screen pill. */
 .floating-bar .dock-record span {

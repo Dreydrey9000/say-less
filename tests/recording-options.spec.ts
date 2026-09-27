@@ -25,7 +25,7 @@ test("setup opens from the Record button and shows the 8GB-friendly defaults", a
     panel.getByRole("combobox", { name: "Record", exact: true }),
   ).toHaveValue("display");
   await expect(
-    panel.getByRole("switch", { name: "Your microphone" }),
+    panel.getByRole("switch", { name: "Record your voice" }),
   ).toBeChecked();
   await expect(
     panel.getByRole("switch", { name: "Computer sound" }),
@@ -69,12 +69,12 @@ test("changes save right away and survive a reload", async ({ page }) => {
   ).toHaveValue("60");
   // The microphone picker hides with the microphone.
   await expect(
-    panel.getByRole("combobox", { name: "Microphone" }),
+    panel.getByRole("combobox", { name: "Which microphone" }),
   ).toBeVisible();
-  await panel.getByRole("switch", { name: "Your microphone" }).uncheck();
-  await expect(panel.getByRole("combobox", { name: "Microphone" })).toHaveCount(
-    0,
-  );
+  await panel.getByRole("switch", { name: "Record your voice" }).uncheck();
+  await expect(
+    panel.getByRole("combobox", { name: "Which microphone" }),
+  ).toHaveCount(0);
 });
 
 test("webcam shows a live preview and remembers its corner and size", async ({
@@ -111,6 +111,44 @@ test("webcam shows a live preview and remembers its corner and size", async ({
   await panel.getByRole("switch", { name: "Show your face" }).uncheck();
   await expect(panel.getByTestId("webcam-bubble-preview")).toHaveCount(0);
   expect(await commands(page)).toContain("stop_camera_preview");
+});
+
+test("clicking a switch's title flips the switch", async ({ page }) => {
+  const panel = await openSetup(page);
+  const face = panel.getByRole("switch", { name: "Show your face" });
+  // The card's face hint focuses this switch by its id.
+  await expect(face).toHaveAttribute("id", "rec-setup-webcam");
+  await panel.getByText("Show your face", { exact: true }).click();
+  await expect(face).toBeChecked();
+  await panel.getByText("Computer sound", { exact: true }).click();
+  await expect(
+    panel.getByRole("switch", { name: "Computer sound" }),
+  ).not.toBeChecked();
+});
+
+test("wide setup stacks Camera right under What we record", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1100, height: 900 });
+  const panel = await openSetup(page);
+  const box = async (name: string) => {
+    const found = await panel
+      .getByRole("group", { name, exact: true })
+      .boundingBox();
+    if (!found) throw new Error(`${name} is not on screen`);
+    return found;
+  };
+  const what = await box("What we record");
+  const camera = await box("Camera");
+  const sound = await box("Sound");
+  const quality = await box("Quality");
+  // Two columns: Sound sits to the right of What we record.
+  expect(sound.x).toBeGreaterThan(what.x + what.width);
+  // Each column stacks with only the normal 16px gap, no hole.
+  expect(camera.x).toBe(what.x);
+  expect(camera.y - (what.y + what.height)).toBeLessThanOrEqual(17);
+  expect(quality.x).toBe(sound.x);
+  expect(quality.y - (sound.y + sound.height)).toBeLessThanOrEqual(17);
 });
 
 test("one window: picks an open window and names it", async ({ page }) => {
@@ -169,7 +207,7 @@ test("Windows shows the setup, disabled, with the same plain reason", async ({
     "Screen recording is coming to Windows soon.",
   );
   await expect(
-    panel.getByRole("switch", { name: "Your microphone" }),
+    panel.getByRole("switch", { name: "Record your voice" }),
   ).toBeDisabled();
   await expect(
     panel.getByRole("switch", { name: "Show your face" }),
@@ -182,10 +220,14 @@ test("Windows shows the setup, disabled, with the same plain reason", async ({
 
 test("dock opens Recording setup in the main window", async ({ page }) => {
   await page.goto("/tests/fixtures/app.html?dock=1");
-  const setup = page.getByRole("button", { name: "Recording setup" });
+  // The camera icon says what it opens, so it doesn't read as "record video".
+  const setup = page.getByRole("button", {
+    name: "Recording setup: camera and sound",
+    exact: true,
+  });
   await setup.focus();
   await expect(
-    page.getByRole("tooltip", { name: "Recording setup" }),
+    page.getByRole("tooltip", { name: "Recording setup: camera and sound" }),
   ).toBeVisible();
   await setup.click();
   await expect
