@@ -1,3 +1,5 @@
+import { type } from "@tauri-apps/plugin-os";
+
 export interface ReleaseNote {
   version: string;
   markdown: string;
@@ -46,6 +48,30 @@ for (const [path, markdown] of Object.entries(releaseNoteModules)) {
   });
 }
 
+/**
+ * Keeps the lines meant for this computer. Lines between `<!-- mac -->` and
+ * `<!-- /mac -->` show only on macOS; lines between `<!-- windows -->` and
+ * `<!-- /windows -->` show everywhere else. The marker lines never show.
+ */
+const filterForPlatform = (markdown: string, isMac: boolean) => {
+  let hiding = false;
+  const kept: string[] = [];
+  for (const line of markdown.split(/\r?\n/)) {
+    const marker = line.trim().match(/^<!--\s*(\/?)(mac|windows)\s*-->$/);
+    if (marker) {
+      if ((marker[2] === "mac") !== isMac) hiding = marker[1] !== "/";
+      continue;
+    }
+    if (!hiding) kept.push(line);
+  }
+  return kept.join("\n");
+};
+
+const forThisComputer = (note: ReleaseNoteRecord): ReleaseNote => ({
+  version: note.version,
+  markdown: filterForPlatform(note.markdown, type() === "macos"),
+});
+
 const compareVersions = (a: string, b: string) => {
   const parsedA = parseVersion(a);
   const parsedB = parseVersion(b);
@@ -79,7 +105,7 @@ export const findReleaseNoteToShow = ({
 
   if (!candidate) return null;
 
-  return candidate;
+  return forThisComputer(candidate);
 };
 
 export const findLatestReleaseNote = (): ReleaseNote | null => {
@@ -89,10 +115,11 @@ export const findLatestReleaseNote = (): ReleaseNote | null => {
 
   if (!candidate) return null;
 
-  return candidate;
+  return forThisComputer(candidate);
 };
 
 export const listReleaseNotes = (currentVersion: string): ReleaseNote[] =>
   Array.from(releaseNotesByVersion.values())
     .filter((note) => compareVersions(note.version, currentVersion) <= 0)
-    .sort((a, b) => compareVersions(b.version, a.version));
+    .sort((a, b) => compareVersions(b.version, a.version))
+    .map(forThisComputer);

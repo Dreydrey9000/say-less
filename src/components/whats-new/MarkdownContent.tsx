@@ -86,13 +86,14 @@ const components: Components = {
   img: ({ alt, src }) => {
     if (!src || !isSafeImageSrc(src)) return null;
 
+    // Framed, so a screenshot of buttons never reads as live buttons.
     return (
       <img
         src={src}
         alt={alt ?? ""}
         loading="lazy"
         decoding="async"
-        className="mx-auto block max-h-72 max-w-full object-contain"
+        className="mx-auto block max-h-72 max-w-full rounded-lg border border-mid-gray/20 object-contain"
       />
     );
   },
