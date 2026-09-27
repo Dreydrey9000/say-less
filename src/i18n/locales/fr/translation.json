@@ -285,6 +285,10 @@
           "transcribe_with_post_process": {
             "name": "Raccourci de post-traitement",
             "description": "Optional. Works like your Talk shortcut, but your words go through AI cleanup first. It sends text only, never audio, to the provider you set in AI cleanup."
+          },
+          "toggle_screen_recording": {
+            "name": "Record screen",
+            "description": "Appuyez une fois pour lancer un enregistrement d’écran et une seconde fois pour l’arrêter, depuis n’importe quelle app."
           }
         },
         "errors": {
@@ -1334,7 +1338,9 @@
     "reopening": "Réouverture…",
     "reopenFailed": "Nous n’avons pas pu rouvrir Say Less. Quittez-le depuis la barre des menus, puis rouvrez-le.",
     "macosTooOldSteps": "Pour vérifier votre version, ouvrez le menu Apple et choisissez À propos de ce Mac. Pour mettre à jour, allez dans Réglages Système, Général, Mise à jour logicielle. Si aucune mise à jour n’apparaît, nous ne pouvons pas enregistrer l’écran sur ce Mac, mais la dictée fonctionne toujours.",
-    "recordWithoutFace": "Enregistrer sans mon visage"
+    "recordWithoutFace": "Enregistrer sans mon visage",
+    "shortcutStartHint": "Ou appuyez sur {{shortcut}} depuis n’importe quelle app, ou dites « Say less, start recording. »",
+    "shortcutStopHint": "Quand vous avez terminé, cliquez sur « Stop », appuyez sur {{shortcut}} ou dites « Say less, stop recording. »"
   },
   "recordingSetup": {
     "button": "Setup",

@@ -285,6 +285,10 @@
           "transcribe_with_post_process": {
             "name": "Son İşlem Kısayolu",
             "description": "Optional. Works like your Talk shortcut, but your words go through AI cleanup first. It sends text only, never audio, to the provider you set in AI cleanup."
+          },
+          "toggle_screen_recording": {
+            "name": "Record screen",
+            "description": "Herhangi bir uygulamadan, ekran kaydını başlatmak için bir kez, durdurmak için tekrar basın."
           }
         },
         "errors": {
@@ -1334,7 +1338,9 @@
     "reopening": "Yeniden açılıyor…",
     "reopenFailed": "Say Less'i yeniden açamadık. Menü çubuğundan uygulamadan çıkın, sonra tekrar açın.",
     "macosTooOldSteps": "Sürümünüzü görmek için Elma menüsünü açın ve Bu Mac Hakkında'yı seçin. Güncellemek için Sistem Ayarları'nı açın, Genel'i ve ardından Yazılım Güncelleme'yi seçin. Güncelleme görünmüyorsa bu Mac'te ekranı kaydedemeyiz, ama sesle yazma yine de çalışır.",
-    "recordWithoutFace": "Yüzüm olmadan kaydet"
+    "recordWithoutFace": "Yüzüm olmadan kaydet",
+    "shortcutStartHint": "Ya da herhangi bir uygulamadan {{shortcut}} tuşlarına basın veya “Say less, start recording.” deyin.",
+    "shortcutStopHint": "İşiniz bitince “Stop” düğmesine tıklayın, {{shortcut}} tuşlarına basın veya “Say less, stop recording.” deyin."
   },
   "recordingSetup": {
     "button": "Setup",

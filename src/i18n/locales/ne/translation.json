@@ -265,6 +265,10 @@
           "transcribe_with_post_process": {
             "name": "पोस्ट-प्रोसेसिङ हटकी",
             "description": "Optional. Works like your Talk shortcut, but your words go through AI cleanup first. It sends text only, never audio, to the provider you set in AI cleanup."
+          },
+          "toggle_screen_recording": {
+            "name": "Record screen",
+            "description": "जुनसुकै एपबाट, स्क्रिन रेकर्डिङ सुरु गर्न एक पटक थिच्नुहोस् र रोक्न फेरि थिच्नुहोस्।"
           }
         },
         "errors": {
@@ -1334,7 +1338,9 @@
     "reopening": "फेरि खोल्दै…",
     "reopenFailed": "हामीले Say Less फेरि खोल्न सकेनौं। मेनु बारबाट यसलाई बन्द गर्नुहोस्, त्यसपछि फेरि खोल्नुहोस्।",
     "macosTooOldSteps": "आफ्नो संस्करण जाँच्न Apple मेनु खोल्नुहोस् र About This Mac छान्नुहोस्। अपडेट गर्न System Settings, General, Software Update मा जानुहोस्। कुनै अपडेट देखिएन भने हामी यो Mac मा स्क्रिन रेकर्ड गर्न सक्दैनौं, तर डिक्टेसन अझै पनि काम गर्छ।",
-    "recordWithoutFace": "मेरो अनुहार बिना रेकर्ड गर्नुहोस्"
+    "recordWithoutFace": "मेरो अनुहार बिना रेकर्ड गर्नुहोस्",
+    "shortcutStartHint": "वा जुनसुकै एपबाट {{shortcut}} थिच्नुहोस्, वा “Say less, start recording.” भन्नुहोस्।",
+    "shortcutStopHint": "सकिएपछि 'Stop' मा क्लिक गर्नुहोस्, {{shortcut}} थिच्नुहोस् वा “Say less, stop recording.” भन्नुहोस्।"
   },
   "recordingSetup": {
     "button": "Setup",

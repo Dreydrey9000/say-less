@@ -265,6 +265,10 @@
           "transcribe_with_post_process": {
             "name": "後處理快捷鍵",
             "description": "Optional. Works like your Talk shortcut, but your words go through AI cleanup first. It sends text only, never audio, to the provider you set in AI cleanup."
+          },
+          "toggle_screen_recording": {
+            "name": "Record screen",
+            "description": "在任何應用程式中，按一次開始錄製螢幕，再按一次停止錄製。"
           }
         },
         "errors": {
@@ -1334,7 +1338,9 @@
     "reopening": "正在重新打開…",
     "reopenFailed": "我們無法重新打開 Say Less。請從選單列結束它，然後再次打開。",
     "macosTooOldSteps": "若要查看您的版本，請打開「蘋果」選單並選擇「關於這台 Mac」。若要更新，請打開「系統設定」，點選「一般」，然後點選「軟體更新」。如果沒有出現可用的更新，我們就無法在這台 Mac 上錄製螢幕，但聽寫功能仍可正常使用。",
-    "recordWithoutFace": "不露臉錄製"
+    "recordWithoutFace": "不露臉錄製",
+    "shortcutStartHint": "或在任何應用程式中按下 {{shortcut}}，或說「Say less, start recording.」",
+    "shortcutStopHint": "完成後，請點選「Stop」、按下 {{shortcut}}，或說「Say less, stop recording.」"
   },
   "recordingSetup": {
     "button": "Setup",

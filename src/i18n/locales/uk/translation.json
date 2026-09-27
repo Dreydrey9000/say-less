@@ -265,6 +265,10 @@
           "transcribe_with_post_process": {
             "name": "Гаряча клавіша постобробки",
             "description": "Optional. Works like your Talk shortcut, but your words go through AI cleanup first. It sends text only, never audio, to the provider you set in AI cleanup."
+          },
+          "toggle_screen_recording": {
+            "name": "Record screen",
+            "description": "Натисніть один раз, щоб почати запис екрана, і ще раз, щоб зупинити його, з будь-якої програми."
           }
         },
         "errors": {
@@ -1334,7 +1338,9 @@
     "reopening": "Перезапускаємо…",
     "reopenFailed": "Не вдалося перезапустити Say Less. Вийдіть із програми через рядок меню, а потім відкрийте її знову.",
     "macosTooOldSteps": "Щоб дізнатися свою версію, відкрийте меню Apple і виберіть «Про цей комп’ютер». Щоб оновити, відкрийте «Системні параметри», виберіть «Загальні», а потім «Оновлення ПЗ». Якщо оновлення не з’являється, ми не зможемо записувати екран на цьому Mac, але диктування працюватиме.",
-    "recordWithoutFace": "Записати без мого обличчя"
+    "recordWithoutFace": "Записати без мого обличчя",
+    "shortcutStartHint": "Або натисніть {{shortcut}} у будь-якій програмі, чи скажіть «Say less, start recording.»",
+    "shortcutStopHint": "Коли закінчите, натисніть «Stop» або {{shortcut}}, чи скажіть «Say less, stop recording.»"
   },
   "recordingSetup": {
     "button": "Setup",

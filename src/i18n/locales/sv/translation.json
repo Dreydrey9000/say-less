@@ -265,6 +265,10 @@
           "transcribe_with_post_process": {
             "name": "Snabbkommando för efterbearbetning",
             "description": "Optional. Works like your Talk shortcut, but your words go through AI cleanup first. It sends text only, never audio, to the provider you set in AI cleanup."
+          },
+          "toggle_screen_recording": {
+            "name": "Record screen",
+            "description": "Tryck en gång för att starta en skärminspelning och igen för att stoppa den, från vilken app som helst."
           }
         },
         "errors": {
@@ -1334,7 +1338,9 @@
     "reopening": "Öppnar igen…",
     "reopenFailed": "Vi kunde inte öppna Say Less igen. Avsluta appen från menyraden och öppna den sedan igen.",
     "macosTooOldSteps": "Om du vill se din version öppnar du Apple-menyn och väljer Om den här datorn. Om du vill uppdatera går du till Systeminställningar, Allmänt, Programuppdatering. Om ingen uppdatering visas kan vi inte spela in skärmen på den här datorn, men diktering fungerar fortfarande.",
-    "recordWithoutFace": "Spela in utan mitt ansikte"
+    "recordWithoutFace": "Spela in utan mitt ansikte",
+    "shortcutStartHint": "Eller tryck på {{shortcut}} från vilken app som helst, eller säg ”Say less, start recording.”",
+    "shortcutStopHint": "När du är klar klickar du på ”Stop”, trycker på {{shortcut}} eller säger ”Say less, stop recording.”"
   },
   "recordingSetup": {
     "button": "Setup",

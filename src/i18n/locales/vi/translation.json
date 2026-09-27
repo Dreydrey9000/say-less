@@ -285,6 +285,10 @@
           "transcribe_with_post_process": {
             "name": "Phím tắt xử lý sau",
             "description": "Optional. Works like your Talk shortcut, but your words go through AI cleanup first. It sends text only, never audio, to the provider you set in AI cleanup."
+          },
+          "toggle_screen_recording": {
+            "name": "Record screen",
+            "description": "Nhấn một lần để bắt đầu quay màn hình và nhấn lại để dừng, từ bất kỳ ứng dụng nào."
           }
         },
         "errors": {
@@ -1334,7 +1338,9 @@
     "reopening": "Đang mở lại…",
     "reopenFailed": "Chúng tôi không thể mở lại Say Less. Hãy thoát ứng dụng từ thanh menu, rồi mở lại.",
     "macosTooOldSteps": "Để kiểm tra phiên bản, hãy mở menu Apple và chọn Giới thiệu về máy Mac này. Để cập nhật, hãy mở Cài đặt hệ thống, chọn Cài đặt chung, rồi chọn Cập nhật phần mềm. Nếu không thấy bản cập nhật nào, chúng tôi không thể quay màn hình trên máy Mac này, nhưng tính năng đọc chính tả vẫn hoạt động.",
-    "recordWithoutFace": "Quay không hiện khuôn mặt của tôi"
+    "recordWithoutFace": "Quay không hiện khuôn mặt của tôi",
+    "shortcutStartHint": "Hoặc nhấn {{shortcut}} từ bất kỳ ứng dụng nào, hoặc nói “Say less, start recording.”",
+    "shortcutStopHint": "Khi xong, hãy nhấn “Stop”, nhấn {{shortcut}} hoặc nói “Say less, stop recording.”"
   },
   "recordingSetup": {
     "button": "Setup",
