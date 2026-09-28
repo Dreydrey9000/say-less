@@ -1,5 +1,16 @@
 # Changelog
 
+## [2026-09-28]
+
+### Changed
+
+- Bot listening: the eyes become resting voice bars (short, tall, short) with a slow ripple as soon as listening starts, because a quiet mic used to look exactly like idle. The ripple stops when you talk and is off with Reduce Motion.
+- Bot happy ^^ eyes are thicker so they still show at 20px.
+
+### Fixed
+
+- The happy ^^ face and cheeks no longer get stuck on after dictating with Reduce Motion on. The class was only cleared when the animation ended, and with no animation that never happened.
+
 ## [2026-09-27]
 
 ### Release

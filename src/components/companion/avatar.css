@@ -133,6 +133,44 @@
 .avatar-bot-bars {
   transition: opacity 120ms ease-out;
 }
+/* Listening, even before you speak: the eyes are already the voice meter,
+   resting short-tall-short, so a quiet mic never looks like idle. */
+.avatar-bot.state-listening .avatar-bot-bars {
+  opacity: 1;
+}
+.avatar-bot.state-listening .avatar-bot-eye {
+  opacity: 0;
+}
+.avatar-bot-bars rect {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  /* A slow ripple through the resting bars says "go ahead, I'm ready". */
+  .avatar-bot.is-moving.state-listening:not(.is-talking) .avatar-bot-bars rect {
+    animation: bot-ready 1.8s ease-in-out infinite;
+  }
+  .avatar-bot.is-moving.state-listening:not(.is-talking)
+    .avatar-bot-bars
+    rect:nth-child(2) {
+    animation-delay: 0.18s;
+  }
+  .avatar-bot.is-moving.state-listening:not(.is-talking)
+    .avatar-bot-bars
+    rect:nth-child(3) {
+    animation-delay: 0.36s;
+  }
+}
+@keyframes bot-ready {
+  0%,
+  60%,
+  100% {
+    transform: scaleY(1);
+  }
+  25% {
+    transform: scaleY(1.5);
+  }
+}
 /* Bot personality: glances, winks, a curious tilt, happy eyes and blushing. */
 .avatar-glance {
   transform-box: view-box;
