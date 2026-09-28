@@ -339,7 +339,7 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
   if (cmd.startsWith("plugin:event|")) return 1;
   if (cmd === "plugin:os|locale") return "en-US";
   if (cmd === "plugin:app|version")
-    return query.has("whatsNew") ? "0.14.4" : "0.12.0";
+    return query.has("whatsNew") ? "0.14.5" : "0.12.0";
   if (
     cmd.includes("check_accessibility_permission") ||
     cmd.includes("check_microphone_permission")

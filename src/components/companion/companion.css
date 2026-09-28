@@ -101,7 +101,10 @@
   opacity: 0.6;
 }
 .formation-wave .particle-world {
-  transform: scale(1, var(--voice-scale, 1));
+  /* Stretches only up and down; the lines keep their thickness because of
+     non-scaling-stroke. A quick transition follows each syllable. */
+  transform: scale(1, var(--wave-gain, 1));
+  transition: transform 0.09s ease-out;
 }
 
 .bezel-glint {

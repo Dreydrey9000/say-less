@@ -4,6 +4,17 @@
 
 ### Release
 
+- Version 0.14.5: the wave line moves with your voice.
+
+### Fixed
+
+- The Wave pattern barely reacted to your voice. Its lines keep one shape and only stretched up to 28% taller, about 5% for normal speech. It now stretches up to 2.8x, around 1.5x for normal speech, and the lines keep their thickness.
+- The Appearance previews now move during a screen recording too, not only while dictating.
+
+## [2026-09-27]
+
+### Release
+
 - Version 0.14.4: the orb and dock move with your voice during a screen recording too.
 
 ### Added

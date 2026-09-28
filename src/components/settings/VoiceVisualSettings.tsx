@@ -35,7 +35,7 @@ export type AnimationPreview = ReturnType<typeof useAnimationPreview>;
  * recording, and zero otherwise.
  */
 export function useAnimationPreview() {
-  const { state, level: liveLevel } = useVoiceActivity();
+  const { level: liveLevel, listening } = useVoiceActivity();
   const [testing, setTesting] = useState(false);
   const [testRun, setTestRun] = useState(0);
   const [testValue, setTestValue] = useState(0);
@@ -55,7 +55,8 @@ export function useAnimationPreview() {
     return () => clearInterval(timer);
   }, [testRun]);
 
-  const recording = state === "recording";
+  // Dictating or narrating a screen recording.
+  const recording = listening;
   const level = testing ? testValue : recording ? liveLevel : 0;
   return {
     testing,
