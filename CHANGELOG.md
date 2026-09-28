@@ -10,6 +10,7 @@
 ### Fixed
 
 - The happy ^^ face and cheeks no longer get stuck on after dictating with Reduce Motion on. The class was only cleared when the animation ended, and with no animation that never happened.
+- The recording pop-up showed a stuck "Cancel recording" label over the voice bars or line. The pop-up window never takes focus, so macOS stops telling it where the mouse is, and the hover label stayed on after the pointer left. The x has no hover label now; screen readers still hear "Cancel recording".
 
 ## [2026-09-27]
 
