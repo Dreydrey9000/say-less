@@ -224,6 +224,7 @@ function Wave({ id }: { id: string }) {
             fill="none"
             strokeWidth={line.width}
             strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
           />
         ))}
       </g>
@@ -336,6 +337,9 @@ export function Companion({
       style={
         {
           "--voice-scale": 1 + (active && moving ? level * 0.28 : 0),
+          // The wave's lines keep one shape, so only a big stretch reads as
+          // "moving with your voice"; normal speech lands around 1.5x.
+          "--wave-gain": 1 + (active && moving ? Math.min(1, level) * 1.8 : 0),
         } as CSSProperties
       }
     >
