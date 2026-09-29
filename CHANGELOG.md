@@ -2,15 +2,15 @@
 
 ## [2026-09-29]
 
+### Release
+
+- Version 0.14.6: a real update button, the Bot's listening bars, no stuck label on the recording pop-up, and two from Luis: dock buttons for your voice actions, and a fix that waits for long screen recordings to finish saving.
+
 ### Added
 
 - Dock: your first 3 voice actions show as one-click buttons next to the screen button, so you can run them without speaking (Luis). Hidden when voice actions are off. The dock asks the app to run the saved action by its cue, so it can only open apps and sites you set up.
 
 ## [2026-09-28]
-
-### Release
-
-- Version 0.14.6: a real update button, the Bot's listening bars, no stuck label on the recording pop-up, and Luis's fix that waits for long screen recordings to finish saving.
 
 ### Changed
 
