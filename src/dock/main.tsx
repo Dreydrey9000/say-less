@@ -19,6 +19,10 @@ import {
   MonitorPlay,
   FolderOpen,
   Video,
+  Image as ImageIcon,
+  Link2,
+  ScanSearch,
+  Wand2,
 } from "lucide-react";
 import {
   OPEN_RECORDING_SETUP_EVENT,
@@ -430,6 +434,42 @@ function Dock() {
           </button>
         </Tooltip>
         <ScreenButton compact={false} dictating={state === "recording"} />
+        {/* Voice actions as one-click buttons: the same cues Speak runs,
+            clickable. App actions launch the app, website actions open the
+            URL. Icons are guessed from the cue's words; the tooltip is the
+            cue itself, which the user already knows. */}
+        {(settings.actions ?? [])
+          .slice(0, 3)
+          .map((action) => {
+            const cue = action.cue.trim();
+            const Icon = /image|picture|paint|draw/i.test(cue)
+              ? ImageIcon
+              : /record|recording|link/i.test(cue)
+                ? Link2
+                : /screen|scan|read/i.test(cue)
+                  ? ScanSearch
+                  : Wand2;
+            return (
+              <Tooltip
+                key={`${action.kind}:${action.target}:${cue}`}
+                label={cue}
+                placement="bottom"
+                align="end"
+              >
+                <button
+                  className="dock-action"
+                  aria-label={cue}
+                  onClick={() => {
+                    void invoke("open_voice_action_target", {
+                      target: action.target,
+                    }).catch(() => setError(true));
+                  }}
+                >
+                  <Icon size={16} aria-hidden="true" />
+                </button>
+              </Tooltip>
+            );
+          })}
         <Tooltip label={setupLabel} placement="bottom" align="end">
           {/* The dock never takes keyboard focus from the app you're in, so
               the setup lives in the main window, where it can. Filled with
