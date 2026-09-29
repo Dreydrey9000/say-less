@@ -29,11 +29,12 @@ const Footer: React.FC = () => {
         </div>
 
         {/* Update Status */}
-        <div className="flex items-center gap-1">
+        {/* The update control is a real button; the version beside it is
+            plain info, so it stays quiet text. */}
+        <div className="flex items-center gap-3 shrink-0">
           <UpdateChecker />
-          <span aria-hidden="true">·</span>
           {/* eslint-disable-next-line i18next/no-literal-string */}
-          <span>v{version}</span>
+          <span className="tabular-nums">v{version}</span>
         </div>
       </div>
     </div>

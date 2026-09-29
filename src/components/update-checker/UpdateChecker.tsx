@@ -6,6 +6,7 @@ import { listen } from "@tauri-apps/api/event";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { arch, platform } from "@tauri-apps/plugin-os";
 import { toast } from "sonner";
+import { BellOff, Check, Download, Loader2, RefreshCw } from "lucide-react";
 import { ProgressBar } from "../shared";
 import { useSettings } from "../../hooks/useSettings";
 import { commands } from "../../bindings";
@@ -139,9 +140,13 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
                 void installUpdate();
               },
             },
+            // Both choices look like buttons (UI-STANDARD 6.10), and Update
+            // now matches the footer's lime button so it reads as one action.
             classNames: {
               cancelButton:
-                "px-2 py-1 text-xs rounded-lg text-text/60 hover:text-text/80 cursor-pointer whitespace-nowrap",
+                "px-2 py-1 text-xs font-medium rounded-lg border border-mid-gray/40 bg-transparent text-text/80 hover:bg-mid-gray/20 cursor-pointer whitespace-nowrap",
+              actionButton:
+                "accent-action px-2 py-1 text-xs font-medium rounded-lg cursor-pointer whitespace-nowrap",
             },
           });
         }
@@ -259,7 +264,8 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
     }
     if (isChecking) return t("footer.checkingUpdates");
     if (showUpToDate) return t("footer.upToDate");
-    if (updateAvailable) return t("footer.updateAvailableShort");
+    // Name the action, not the state: the button installs it.
+    if (updateAvailable) return t("footer.updateNow");
     return t("footer.checkForUpdates");
   };
 
@@ -314,24 +320,51 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
           </div>
         </div>
       )}
-      <div className={`flex items-center gap-3 ${className}`}>
-        {isUpdateClickable ? (
-          <button
-            onClick={getUpdateStatusAction()}
-            disabled={isUpdateDisabled}
-            className={`transition-colors disabled:opacity-50 tabular-nums ${
-              updateAvailable
-                ? "text-logo-primary hover:text-logo-primary/80 font-medium"
-                : "text-text/60 hover:text-text/80"
-            }`}
-          >
-            {getUpdateStatusText()}
-          </button>
-        ) : (
-          <span className="text-text/60 tabular-nums">
-            {getUpdateStatusText()}
-          </span>
-        )}
+      <div className={`flex items-center gap-2 ${className}`}>
+        {/* Always a real button shape (UI-STANDARD 6.10): a bordered pill at
+            rest, the filled accent when an update is waiting. Busy and
+            finished states keep the same shape, disabled, so the footer
+            doesn't jump and nobody has to guess where the control went. */}
+        <button
+          type="button"
+          onClick={isUpdateClickable ? getUpdateStatusAction() : undefined}
+          disabled={!isUpdateClickable}
+          aria-busy={isChecking || isInstalling}
+          title={
+            updateAvailable && !isInstalling
+              ? t("footer.updateAvailableShort")
+              : undefined
+          }
+          className={`inline-flex items-center gap-1.5 min-h-[28px] px-2.5 rounded-lg border text-xs font-medium whitespace-nowrap tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text ${
+            updateAvailable && isUpdateClickable
+              ? "accent-action cursor-pointer"
+              : !updateChecksEnabled
+                ? "text-text/50 bg-transparent border-mid-gray/25 border-dashed cursor-not-allowed"
+                : isUpdateClickable
+                  ? "text-text bg-mid-gray/10 border-mid-gray/40 hover:bg-mid-gray/20 hover:border-logo-primary cursor-pointer"
+                  : "text-text/70 bg-mid-gray/10 border-mid-gray/25 cursor-default"
+          }`}
+        >
+          {!updateChecksEnabled ? (
+            <BellOff className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+          ) : isChecking ||
+            (isInstalling &&
+              (downloadProgress === 0 || downloadProgress === 100)) ? (
+            <Loader2
+              className="w-3.5 h-3.5 shrink-0 motion-safe:animate-spin"
+              aria-hidden="true"
+            />
+          ) : isInstalling ? (
+            <Download className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+          ) : showUpToDate ? (
+            <Check className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+          ) : updateAvailable ? (
+            <Download className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+          ) : (
+            <RefreshCw className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+          )}
+          <span>{getUpdateStatusText()}</span>
+        </button>
 
         {isInstalling && downloadProgress > 0 && downloadProgress < 100 && (
           <ProgressBar

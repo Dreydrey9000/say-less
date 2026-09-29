@@ -60,6 +60,8 @@ const settings = {
   theme: query.get("theme") || "dark",
   // `?whatsNew` turns on the What's New dialog for the current release.
   show_whats_new_on_update: query.has("whatsNew"),
+  // `?updater=none|available` turns update checks on with a fake updater.
+  update_checks_enabled: query.has("updater"),
   bindings: Object.fromEntries(
     [
       "transcribe",
@@ -348,6 +350,18 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
       !query.has("noPermissions") ||
       sessionStorage.getItem("test-permissions") === "granted"
     );
+  if (cmd === "is_update_checks_locked") return false;
+  if (cmd === "plugin:updater|check")
+    return query.get("updater") === "available"
+      ? {
+          rid: 1,
+          currentVersion: "0.14.5",
+          version: "0.14.6",
+          date: null,
+          body: "",
+          rawJson: {},
+        }
+      : null;
   if (cmd === "get_app_settings" || cmd === "get_default_settings") {
     // ?slowSettings=1 delays settings reads so tests can race a hide against
     // an in-flight show.
