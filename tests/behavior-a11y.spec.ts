@@ -392,6 +392,24 @@ test("overlay says what it is doing, and its controls are big enough", async ({
   await expect(live).toHaveText("Transcribing...");
 });
 
+test("the overlay cancel has no hover tip to stick over the voice visual", async ({
+  page,
+}) => {
+  await openOverlay(page);
+  await page.evaluate(async () => {
+    const emit = (window as unknown as TestWindow).testEmit;
+    await emit("show-overlay", "recording");
+    await emit("recording-ready");
+  });
+  // The real overlay window never takes focus, so macOS stops sending it
+  // mouse moves and a hover tip stayed on over the bars. The x keeps its name.
+  const cancel = page.getByRole("button", { name: "Cancel recording" });
+  await cancel.hover();
+  await expect(page.locator(".sstatus")).toHaveText("Listening");
+  await expect(page.getByRole("tooltip")).toHaveCount(0);
+  await expect(page.locator(".swave")).toBeVisible();
+});
+
 test("the overlay avatar is 40px with 8px clearance in the pill", async ({
   page,
 }) => {

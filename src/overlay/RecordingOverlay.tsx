@@ -12,7 +12,6 @@ import type {
 import i18n, { syncLanguageFromSettings } from "@/i18n";
 import { useStudio } from "@/lib/studio";
 import { useMotionPolicy } from "@/hooks/useMotionAllowed";
-import { Tooltip } from "@/components/ui/Tooltip";
 import { VoiceSquiggle } from "@/components/companion/VoiceSquiggle";
 import { Avatar } from "@/components/companion/Avatar";
 import { getLanguageDirection } from "@/lib/utils/rtl";
@@ -263,27 +262,30 @@ const RecordingOverlay: React.FC = () => {
     );
 
   const cancelLabel = t("ux.overlay.cancel");
+  // No hover tooltip here. The overlay window never takes focus, so macOS
+  // stops sending it mouse moves and the page can keep "hovering" long after
+  // the pointer left: the tip stuck on over the voice visual. The x is plain
+  // enough, and aria-label still names it for screen readers.
   const cancelBtn = (
-    <Tooltip label={cancelLabel} placement="left">
-      <button
-        type="button"
-        className="sx"
-        onClick={() => {
-          commands
-            .cancelOperation()
-            .catch((error) => console.error("Cancel recording failed:", error));
-        }}
-      >
-        <svg viewBox="0 0 16 16" aria-hidden="true">
-          <path
-            d="M4 4 L12 12 M12 4 L4 12"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-          />
-        </svg>
-      </button>
-    </Tooltip>
+    <button
+      type="button"
+      className="sx"
+      aria-label={cancelLabel}
+      onClick={() => {
+        commands
+          .cancelOperation()
+          .catch((error) => console.error("Cancel recording failed:", error));
+      }}
+    >
+      <svg viewBox="0 0 16 16" aria-hidden="true">
+        <path
+          d="M4 4 L12 12 M12 4 L4 12"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+        />
+      </svg>
+    </button>
   );
 
   // Status in words, so the state reads even with every animation frozen.
