@@ -1,5 +1,11 @@
 # Changelog
 
+## [2026-09-29]
+
+### Added
+
+- Dock: your first 3 voice actions show as one-click buttons next to the screen button, so you can run them without speaking (Luis). Hidden when voice actions are off. The dock asks the app to run the saved action by its cue, so it can only open apps and sites you set up.
+
 ## [2026-09-28]
 
 ### Release

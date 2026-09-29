@@ -303,6 +303,16 @@ button:disabled {
 }
 /* Recording setup: a slim button right next to the screen button, outlined
    the same way so the two read as one pair. */
+.floating-bar .dock-action {
+  min-width: 32px;
+  width: 32px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--color-text), transparent 80%);
+  border-radius: 10px;
+}
+.floating-bar .dock-action:hover {
+  border-color: color-mix(in srgb, var(--color-text), transparent 55%);
+}
 .floating-bar .dock-screen-setup {
   min-width: 32px;
   width: 32px;
