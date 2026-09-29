@@ -704,6 +704,7 @@ pub fn run(cli_args: CliArgs) {
             capture_options::stop_camera_preview,
             capture_options::open_camera_settings,
             floating::dock_toggle_recording,
+            floating::open_voice_action_target,
             floating::get_dock_state,
             correction_learning::list_learned_corrections,
             correction_learning::review_learned_correction,
