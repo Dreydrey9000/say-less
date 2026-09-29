@@ -56,7 +56,7 @@ const settings = {
   // moves straight on to picking a speech engine).
   onboarding_completed: !query.has("newUser"),
   selected_model: "test-model",
-  app_language: "en",
+  app_language: query.get("lang") || "en",
   theme: query.get("theme") || "dark",
   // `?whatsNew` turns on the What's New dialog for the current release.
   show_whats_new_on_update: query.has("whatsNew"),
