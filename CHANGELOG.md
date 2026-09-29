@@ -2,10 +2,15 @@
 
 ## [2026-09-28]
 
+### Release
+
+- Version 0.14.6: a real update button, the Bot's listening bars, no stuck label on the recording pop-up, and Luis's fix that waits for long screen recordings to finish saving.
+
 ### Changed
 
 - Bot listening: the eyes become resting voice bars (short, tall, short) with a slow ripple as soon as listening starts, because a quiet mic used to look exactly like idle. The ripple stops when you talk and is off with Reduce Motion.
 - Bot happy ^^ eyes are thicker so they still show at 20px.
+- The footer update control is a real button: a bordered pill with an icon, and a filled lime Update now when a version is waiting. It was 12px gray text that nobody recognized as clickable. The update toast's Later and Update now are real buttons too, and toasts sit above the footer instead of covering it.
 
 ### Fixed
 
