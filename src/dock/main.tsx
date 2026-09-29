@@ -437,8 +437,9 @@ function Dock() {
         {/* Voice actions as one-click buttons: the same cues Speak runs,
             clickable. App actions launch the app, website actions open the
             URL. Icons are guessed from the cue's words; the tooltip is the
-            cue itself, which the user already knows. */}
-        {(settings.actions ?? [])
+            cue itself, which the user already knows. Rust looks the cue up
+            in saved settings, so the dock can only open what the user set. */}
+        {(settings.actions_enabled ? (settings.actions ?? []) : [])
           .slice(0, 3)
           .map((action) => {
             const cue = action.cue.trim();
@@ -460,8 +461,8 @@ function Dock() {
                   className="dock-action"
                   aria-label={cue}
                   onClick={() => {
-                    void invoke("open_voice_action_target", {
-                      target: action.target,
+                    void invoke("test_voice_action", {
+                      cue: action.cue,
                     }).catch(() => setError(true));
                   }}
                 >
