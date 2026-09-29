@@ -307,7 +307,10 @@ function BotBars({ head, open }: { head: Head; open: number }) {
   return (
     <g className="avatar-bot-bars" opacity={open > 0 ? 1 : 0}>
       {[0.62, 1, 0.62].map((k, i) => {
-        const h = 6 + open * 15 * k;
+        // At rest the middle bar stands taller, so a quiet mic reads as a
+        // level meter rather than "..." (which says thinking). The lift fades
+        // out as the voice gets louder, leaving the talking bars unchanged.
+        const h = 6 + open * 15 * k + (k === 1 ? 4 * (1 - open) : 0);
         return (
           <rect
             key={i}
@@ -348,13 +351,14 @@ function BotFeelings({
         className="avatar-bot-happy"
         fill="none"
         stroke={ink}
-        strokeWidth="2.6"
+        strokeWidth="3.6"
         strokeLinecap="round"
       >
+        {/* Heavy enough to still read as ^^ at 20px, about the pill eyes' weight. */}
         {[-1, 1].map((side) => (
           <path
             key={side}
-            d={`M${cx + side * eyeDx - 3.6} ${eyeY + 2}Q${cx + side * eyeDx} ${eyeY - 4.5} ${cx + side * eyeDx + 3.6} ${eyeY + 2}`}
+            d={`M${cx + side * eyeDx - 4} ${eyeY + 2.5}Q${cx + side * eyeDx} ${eyeY - 6} ${cx + side * eyeDx + 4} ${eyeY + 2.5}`}
           />
         ))}
       </g>
@@ -492,7 +496,12 @@ export function Avatar({
     group.classList.add(cls);
     const done = () => group.classList.remove(cls);
     group.addEventListener("animationend", done, { once: true });
-    return () => group.removeEventListener("animationend", done);
+    // Reduced motion never plays the animation, so animationend never fires.
+    const fallback = setTimeout(done, 1000);
+    return () => {
+      clearTimeout(fallback);
+      group.removeEventListener("animationend", done);
+    };
   }, [state, moving]);
 
   const preset = findPreset(avatar.preset);
