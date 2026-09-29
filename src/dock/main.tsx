@@ -264,6 +264,18 @@ function Dock() {
     toggledHere.current = true;
     void save({ ...settings, dock_compact: compact });
   }
+  async function dragDock() {
+    try {
+      if (
+        settings.dock_edge !== "free" &&
+        !(await save({ ...settings, dock_edge: "free" }))
+      )
+        return;
+      await getCurrentWindow().startDragging();
+    } catch {
+      setError(true);
+    }
+  }
   useEffect(() => {
     let disposed = false;
     const unlisteners: Array<() => void> = [];
@@ -302,6 +314,27 @@ function Dock() {
     return (
       <main className="compact-dock" data-state={state}>
         <ScreenButton compact />
+        {!screen.showSaved && (
+          <button
+            className="compact-hide"
+            title={t(
+              screen.recording ? "dock.hideWhileRecording" : "dock.hide",
+            )}
+            aria-label={t(
+              screen.recording ? "dock.hideWhileRecording" : "dock.hide",
+            )}
+            aria-disabled={screen.recording || undefined}
+            onClick={() => {
+              if (screen.recording) return;
+              void useStudio.getState().save({
+                ...useStudio.getState().settings,
+                floating: false,
+              });
+            }}
+          >
+            <X size={15} aria-hidden="true" />
+          </button>
+        )}
         {screen.showSaved && (
           <Tooltip
             label={`${t("screenRecording.saved")} ${t("screenRecording.showInFinder")}`}
@@ -332,6 +365,16 @@ function Dock() {
             />
           </button>
         </Tooltip>
+        <button
+          className="compact-grip"
+          title={t("dock.drag")}
+          aria-label={t("dock.drag")}
+          onPointerDown={(event) => {
+            if (event.button === 0) void dragDock();
+          }}
+        >
+          <GripVertical size={16} aria-hidden="true" />
+        </button>
         {state === "recording" ? (
           <Tooltip
             label={t("dock.stop")}
@@ -358,16 +401,9 @@ function Dock() {
         <Tooltip label={t("dock.drag")} placement="bottom" align="start">
           <button
             className="dock-grip"
+            aria-label={t("dock.drag")}
             onPointerDown={(e) => {
-              if (e.button === 0)
-                void (async () => {
-                  if (
-                    settings.dock_edge !== "free" &&
-                    !(await save({ ...settings, dock_edge: "free" }))
-                  )
-                    return;
-                  await getCurrentWindow().startDragging();
-                })().catch(() => setError(true));
+              if (e.button === 0) void dragDock();
             }}
           >
             <GripVertical size={18} />

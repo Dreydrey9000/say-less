@@ -13,6 +13,12 @@ test("dock collapses to a small companion and expands without recording", async 
   await page.getByRole("button", { name: "Shrink to small dock" }).click();
   await page.setViewportSize({ width: 104, height: 104 });
   await expect(page.getByRole("button", { name: "Expand dock" })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Drag floating dock" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Hide floating dock" }),
+  ).toBeVisible();
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
@@ -35,6 +41,24 @@ test("dock collapses to a small companion and expands without recording", async 
       ),
     ),
   ).toBe(false);
+});
+
+test("small dock can be hidden without expanding it", async ({ page }) => {
+  await page.goto("/tests/fixtures/app.html");
+  await page.getByRole("button", { name: "Appearance", exact: true }).click();
+  await page.getByRole("switch", { name: "Show floating dock" }).check();
+  await page.setViewportSize({ width: 460, height: 112 });
+  await page.goto("/tests/fixtures/app.html?dock=1");
+  await page.getByRole("button", { name: "Shrink to small dock" }).click();
+  await page.setViewportSize({ width: 104, height: 104 });
+  await page.getByRole("button", { name: "Hide floating dock" }).click();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => JSON.parse(localStorage.getItem("test-studio") ?? "{}").floating,
+      ),
+    )
+    .toBe(false);
 });
 
 test("character choice persists and is visible in the compact dock", async ({

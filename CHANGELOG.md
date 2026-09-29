@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- The small floating dock now has a drag grip and a hide button. Showing or resizing the dock keeps it inside the current screen, and a quick off/on uses the latest saved visibility setting.
+
 ## [2026-09-29]
 
 ### Release

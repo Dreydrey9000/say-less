@@ -8,9 +8,16 @@ tauri_panel! { panel!(SayLessDockPanel { config: { can_become_key_window: false,
 pub fn set_visible(app: &AppHandle, visible: bool) -> Result<(), String> {
     let handle = app.clone();
     app.run_on_main_thread(move || {
-        if !visible {
+        // A quick off/on can queue several callbacks. Honor the latest saved
+        // preference, so an older callback cannot hide the newly shown dock.
+        let should_show = crate::studio::get_studio_settings(handle.clone())
+            .map(|settings| settings.floating)
+            .unwrap_or(visible);
+        if !should_show {
             if let Some(w) = handle.get_webview_window("say_less_dock") {
-                let _ = w.hide();
+                if let Err(error) = w.hide() {
+                    log::warn!("Cannot hide floating dock: {error}");
+                }
             }
             return;
         }
@@ -82,9 +89,15 @@ pub fn set_visible(app: &AppHandle, visible: bool) -> Result<(), String> {
             } else {
                 (460.0, 112.0)
             };
-            let _ = window.set_size(tauri::LogicalSize::new(width, height));
-            let _ = snap_to_edge(&handle);
-            let _ = window.show();
+            if let Err(error) = window.set_size(tauri::LogicalSize::new(width, height)) {
+                log::warn!("Cannot resize floating dock: {error}");
+            }
+            if let Err(error) = place_dock(&handle) {
+                log::warn!("Cannot place floating dock: {error}");
+            }
+            if let Err(error) = window.show() {
+                log::warn!("Cannot show floating dock: {error}");
+            }
         }
     })
     .map_err(|_| "dock_failed".into())
@@ -107,29 +120,35 @@ pub fn dock_toggle_recording(app: AppHandle) -> Result<(), String> {
 }
 
 /// Place inside the current monitor work area, respecting Retina scale.
-pub fn snap_to_edge(app: &AppHandle) -> Result<(), String> {
+pub fn place_dock(app: &AppHandle) -> Result<(), String> {
     let settings = crate::studio::get_studio_settings(app.clone())?;
-    if settings.dock_edge == "free" {
-        return Ok(());
-    }
     let window = app
         .get_webview_window("say_less_dock")
         .ok_or("dock_missing")?;
     let monitor = window
         .current_monitor()
         .map_err(|_| "monitor")?
+        .or(app.primary_monitor().map_err(|_| "monitor")?)
         .ok_or("monitor")?;
     let area = monitor.work_area();
     let size = window.outer_size().map_err(|_| "size")?;
     let margin = (12.0 * monitor.scale_factor()) as i32;
     let left = area.position.x + margin;
-    let right = area.position.x + area.size.width as i32 - size.width as i32 - margin;
-    let x = if settings.dock_edge == "left" {
-        left
+    let top = area.position.y + margin;
+    let right = (area.position.x + area.size.width as i32 - size.width as i32 - margin).max(left);
+    let bottom = (area.position.y + area.size.height as i32 - size.height as i32 - margin).max(top);
+    let (x, y) = if settings.dock_edge == "free" {
+        let current = window.outer_position().map_err(|_| "position")?;
+        (current.x.clamp(left, right), current.y.clamp(top, bottom))
     } else {
-        right.max(left)
+        let x = if settings.dock_edge == "left" {
+            left
+        } else {
+            right
+        };
+        let y = area.position.y + ((area.size.height as i32 - size.height as i32) / 2).max(0);
+        (x, y.clamp(top, bottom))
     };
-    let y = area.position.y + ((area.size.height as i32 - size.height as i32) / 2).max(0);
     window
         .set_position(tauri::PhysicalPosition::new(x, y))
         .map_err(|_| "position".into())
