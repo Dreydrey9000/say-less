@@ -57,3 +57,4 @@ certificate.p12
 
 # Cloudflare wrangler local state
 .wrangler/
+.downloads/
