@@ -2,6 +2,10 @@
 
 ## [2026-09-29]
 
+### Release
+
+- Version 0.14.6: a real update button, the Bot's listening bars, no stuck label on the recording pop-up, and two from Luis: dock buttons for your voice actions, and a fix that waits for long screen recordings to finish saving.
+
 ### Added
 
 - Dock: your first 3 voice actions show as one-click buttons next to the screen button, so you can run them without speaking (Luis). Hidden when voice actions are off. The dock asks the app to run the saved action by its cue, so it can only open apps and sites you set up.
@@ -12,6 +16,7 @@
 
 - Bot listening: the eyes become resting voice bars (short, tall, short) with a slow ripple as soon as listening starts, because a quiet mic used to look exactly like idle. The ripple stops when you talk and is off with Reduce Motion.
 - Bot happy ^^ eyes are thicker so they still show at 20px.
+- The footer update control is a real button: a bordered pill with an icon, and a filled lime Update now when a version is waiting. It was 12px gray text that nobody recognized as clickable. The update toast's Later and Update now are real buttons too, and toasts sit above the footer instead of covering it.
 
 ### Fixed
 

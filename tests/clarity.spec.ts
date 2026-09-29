@@ -234,3 +234,45 @@ test("a dismissed tooltip shows again when the keyboard comes back", async ({
   await expect(setup).toBeFocused();
   await expect(tip).toBeVisible();
 });
+
+test("the footer update control looks like a button in every state", async ({
+  page,
+}) => {
+  // Rule 6.10: a clickable thing has a visible shape before you hover. The
+  // old control was plain gray footer text, and nobody could find it.
+  const shape = (locator: ReturnType<typeof page.locator>) =>
+    locator.evaluate((el) => {
+      const s = getComputedStyle(el);
+      return {
+        border: parseFloat(s.borderTopWidth),
+        height: el.getBoundingClientRect().height,
+      };
+    });
+  const footer = page.locator(".border-t").last();
+
+  await page.goto("/tests/fixtures/app.html?updater=none");
+  const check = footer.getByRole("button", { name: "Check for updates" });
+  await expect(check).toBeEnabled();
+  expect(await shape(check)).toEqual(
+    expect.objectContaining({ border: 1, height: 28 }),
+  );
+  await check.click();
+  await expect(
+    footer.getByRole("button", { name: "Up to date" }),
+  ).toBeVisible();
+
+  await page.goto("/tests/fixtures/app.html?updater=available");
+  const update = footer.getByRole("button", { name: "Update now" });
+  await expect(update).toBeEnabled();
+  await expect(update).toHaveClass(/accent-action/);
+  // The "ready" toast floats above the footer instead of covering the button.
+  const toast = page.locator("[data-sonner-toast]");
+  await expect(toast).toBeVisible();
+  const toastBottom = await toast.evaluate(
+    (el) => el.getBoundingClientRect().bottom,
+  );
+  const buttonTop = await update.evaluate(
+    (el) => el.getBoundingClientRect().top,
+  );
+  expect(toastBottom).toBeLessThanOrEqual(buttonTop);
+});
