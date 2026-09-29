@@ -534,7 +534,23 @@ pub async fn stop(app: &AppHandle) -> Result<ScreenRecordingStatus, String> {
     machine().begin_stop()?;
     broadcast(app);
     let result = run_blocking(platform::stop).await?;
-    let file_exists = machine().current_file.as_ref().is_some_and(|p| p.is_file());
+    // SCRecordingOutput can report finished before the finished MP4 is visible
+    // on disk. Measured on macOS 26: after a clean stop the file appeared
+    // seconds later, and the spot check that used to run here reported a real
+    // recording as missing. Poll briefly so a saved recording is never
+    // reported as lost.
+    let file_exists = run_blocking(|| {
+        let deadline = Instant::now() + std::time::Duration::from_secs(3);
+        loop {
+            let exists = machine().current_file.as_ref().is_some_and(|p| p.is_file());
+            if exists || Instant::now() >= deadline {
+                return exists;
+            }
+            std::thread::sleep(std::time::Duration::from_millis(250));
+        }
+    })
+    .await
+    .unwrap_or(false);
     let error = result.err().map(|raw| {
         log::warn!("Screen recording stopped with a problem: {raw}");
         error_code(&raw)

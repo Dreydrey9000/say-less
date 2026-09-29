@@ -320,6 +320,7 @@ private final class Recorder: NSObject, SCStreamDelegate, SCRecordingOutputDeleg
     private var startError: String?
     private var pendingError: String?
     private var stopping = false
+    private var outputPath: String?
     private let sampleQueue = DispatchQueue(label: "say-less.screen-recorder.samples")
     private let micQueue = DispatchQueue(label: "say-less.screen-recorder.mic")
 
@@ -512,6 +513,7 @@ private final class Recorder: NSObject, SCStreamDelegate, SCRecordingOutputDeleg
         lock.lock()
         self.stream = stream
         self.output = output
+        self.outputPath = path
         started = DispatchSemaphore(value: 0)
         finished = DispatchSemaphore(value: 0)
         startError = nil
@@ -567,8 +569,19 @@ private final class Recorder: NSObject, SCStreamDelegate, SCRecordingOutputDeleg
             stopped.signal()
         }
         _ = stopped.wait(timeout: .now() + waitSeconds)
-        // The MP4 is only complete once the recording output says so.
-        let done = finished.wait(timeout: .now() + waitSeconds)
+        // The MP4 is only complete once the recording output says so. A big
+        // file needs longer to finalize: a 3.0 GB recording was still
+        // flushing after the flat 15 s window, which reported a perfect take
+        // as finish_timeout. Give the signal a window that scales with size
+        // (about +10 s per 100 MB, capped at 3 minutes).
+        lock.lock()
+        let outPath = outputPath
+        lock.unlock()
+        let bytes = outPath.flatMap {
+            (try? FileManager.default.attributesOfItem(atPath: $0))?[.size] as? Int
+        } ?? 0
+        let finishWindow = min(180.0, waitSeconds + Double(bytes) / 100_000_000.0)
+        let done = finished.wait(timeout: .now() + finishWindow)
         lock.lock()
         let failure = pendingError
         pendingError = nil
@@ -601,6 +614,7 @@ private final class Recorder: NSObject, SCStreamDelegate, SCRecordingOutputDeleg
         lock.lock()
         stream = nil
         output = nil
+        outputPath = nil
         stopping = false
         lock.unlock()
         hideBubble()
