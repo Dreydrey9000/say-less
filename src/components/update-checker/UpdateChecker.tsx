@@ -144,9 +144,9 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
             // now matches the footer's lime button so it reads as one action.
             classNames: {
               cancelButton:
-                "px-2 py-1 text-xs font-medium rounded-lg border border-mid-gray/40 bg-transparent text-text/80 hover:bg-mid-gray/20 cursor-pointer whitespace-nowrap",
+                "min-h-[28px] px-2 py-1 text-xs font-medium rounded-lg border border-mid-gray/40 bg-transparent text-text/80 hover:bg-mid-gray/20 cursor-pointer whitespace-nowrap",
               actionButton:
-                "accent-action px-2 py-1 text-xs font-medium rounded-lg cursor-pointer whitespace-nowrap",
+                "accent-action min-h-[28px] px-2 py-1 text-xs font-medium rounded-lg cursor-pointer whitespace-nowrap",
             },
           });
         }
@@ -328,14 +328,18 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
         <button
           type="button"
           onClick={isUpdateClickable ? getUpdateStatusAction() : undefined}
-          disabled={!isUpdateClickable}
+          // Only "Updates off" is truly disabled. While a check or install
+          // runs it stays focusable (aria-disabled, and the click is ignored
+          // above), so keyboard focus isn't dropped to the page.
+          disabled={!updateChecksEnabled}
+          aria-disabled={!isUpdateClickable}
           aria-busy={isChecking || isInstalling}
           title={
             updateAvailable && !isInstalling
               ? t("footer.updateAvailableShort")
               : undefined
           }
-          className={`inline-flex items-center gap-1.5 min-h-[28px] px-2.5 rounded-lg border text-xs font-medium whitespace-nowrap tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text ${
+          className={`inline-flex items-center justify-center gap-1.5 min-h-[28px] min-w-[168px] px-2.5 rounded-lg border text-xs font-medium whitespace-nowrap tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text ${
             updateAvailable && isUpdateClickable
               ? "accent-action cursor-pointer"
               : !updateChecksEnabled
@@ -365,6 +369,17 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
           )}
           <span>{getUpdateStatusText()}</span>
         </button>
+        {/* Say the result out loud too; download percents are left out so
+            screen readers aren't flooded. */}
+        <span className="sr-only" aria-live="polite">
+          {isChecking
+            ? t("footer.checkingUpdates")
+            : showUpToDate
+              ? t("footer.upToDate")
+              : updateAvailable && !isInstalling
+                ? t("footer.updateAvailableShort")
+                : ""}
+        </span>
 
         {isInstalling && downloadProgress > 0 && downloadProgress < 100 && (
           <ProgressBar

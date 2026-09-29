@@ -435,6 +435,7 @@ function App() {
       theme="system"
       // Clear the footer, so a toast never covers its Update now button.
       offset={{ bottom: 64 }}
+      mobileOffset={{ bottom: 64 }}
       toastOptions={{
         unstyled: true,
         classNames: {
