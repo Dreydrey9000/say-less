@@ -1,0 +1,11 @@
+flowchart LR
+    Boot[App or dock starts] --> English[English fallback in startup bundle]
+    Boot --> Settings[Read saved app language]
+    Settings --> Resolve[Match supported locale]
+    Picker[Language selector] --> Resolve
+    Resolve -->|English| Change[Change active i18n language]
+    Resolve -->|Other language| Import[Load its translation chunk]
+    Import -->|Success| Bundle[Add translation bundle]
+    Bundle --> Change
+    Import -->|Failure| Fallback[Keep current language and setting]
+    Change --> UI[Translate app and dock]
