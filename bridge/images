@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# images — your generated-image library: local path + cloud links.
+# Usage: images [N]   (default 10)
+set -euo pipefail
+N=${1:-10}
+PORT=$(cat "$HOME/Desktop/_Code/say-less-bridge/state/port.txt" 2>/dev/null || echo 8810)
+curl -s -m 10 "http://127.0.0.1:${PORT}/images" | jq -r --argjson n "$N" '
+  .images[:$n][] |
+  "▸ \(.name)  (\(.painter // "?"))\n   local: \(.file)\n   b2:    \(.url // "—")\n   drive: \(.drive_link // "—")\n   said:  \(.prompt[:90])\n"'

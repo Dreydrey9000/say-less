@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# title-ideas — capture the screen now and get title box options on your clipboard.
+# Usage:
+#   title-ideas                          # capture screen, generic ideas
+#   title-ideas --client ryan-magin      # grounded in that client's proven hooks
+#   title-ideas --image /path/to.png     # use an existing screenshot instead
+#   title-ideas --count 12 --extra "45s podcast clip about AI"
+set -euo pipefail
+BRIDGE_DIR="$HOME/Desktop/_Code/say-less-bridge"
+PORT=$(cat "$BRIDGE_DIR/state/port.txt" 2>/dev/null || echo 8810)
+PAYLOAD=$(python3 - "$@" <<'PY'
+import json, sys, pathlib
+cfg_path = pathlib.Path.home() / "Desktop/_Code/say-less-bridge/config.json"
+DEFAULT_CLIENT = "ryan-magin"
+try:
+    DEFAULT_CLIENT = json.loads(cfg_path.read_text()).get("default_client") or DEFAULT_CLIENT
+except Exception:
+    pass
+payload = {"count": 10, "client": DEFAULT_CLIENT}
+args = sys.argv[1:]
+i = 0
+while i < len(args):
+    if args[i] == "--client" and i + 1 < len(args):
+        payload["client"] = args[i + 1]; i += 2
+    elif args[i] == "--image" and i + 1 < len(args):
+        payload["image_path"] = args[i + 1]; i += 2
+    elif args[i] == "--count" and i + 1 < len(args):
+        payload["count"] = int(args[i + 1]); i += 2
+    elif args[i] == "--extra" and i + 1 < len(args):
+        payload["extra"] = args[i + 1]; i += 2
+    else:
+        sys.exit(f"unknown flag: {args[i]}")
+print(json.dumps(payload))
+PY
+)
+# The bridge runs under launchd without Screen Recording permission; this CLI
+# runs in your terminal, which has it. Capture here, send the file.
+if [[ -z "$(echo "$PAYLOAD" | jq -r '.image_path // empty')" ]]; then
+  SHOT="$BRIDGE_DIR/state/cli-screenshot.png"
+  if ! screencapture -x "$SHOT"; then
+    echo "FAILED: screencapture could not run. Give your terminal Screen Recording permission (System Settings > Privacy & Security > Screen Recording), or pass --image /path/to.png" >&2
+    exit 1
+  fi
+  PAYLOAD=$(jq --arg img "$SHOT" '.image_path = $img' <<< "$PAYLOAD")
+fi
+RESP=$(curl -s -m 240 -X POST "http://127.0.0.1:${PORT}/ideas" \
+  -H 'Content-Type: application/json' -d "$PAYLOAD")
+OK=$(echo "$RESP" | jq -r '.ok // false')
+if [[ "$OK" != "true" ]]; then
+  echo "FAILED: $RESP" >&2
+  exit 1
+fi
+echo "$RESP" | jq -r '.rendered'
+echo
+echo "provider: $(echo "$RESP" | jq -r '.provider')  |  clipboard: $(echo "$RESP" | jq -r '.clipboard_set')"
