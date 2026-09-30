@@ -12,10 +12,11 @@ test("dock collapses to a small companion and expands without recording", async 
   await page.screenshot({ path: "test-results/dock-expanded-0.12.0.png" });
   await page.getByRole("button", { name: "Shrink to small dock" }).click();
   await page.setViewportSize({ width: 104, height: 104 });
-  await expect(page.getByRole("button", { name: "Expand dock" })).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "Drag floating dock" }),
-  ).toBeVisible();
+  const emblem = page.getByRole("button", {
+    name: "Expand dock",
+  });
+  await expect(emblem).toBeVisible();
+  await expect(page.locator(".compact-grip")).toHaveCount(0);
   await expect(
     page.getByRole("button", { name: "Hide floating dock" }),
   ).toBeVisible();
@@ -28,7 +29,7 @@ test("dock collapses to a small companion and expands without recording", async 
     path: "test-results/dock-compact-0.12.0.png",
     omitBackground: true,
   });
-  await page.getByRole("button", { name: "Expand dock" }).focus();
+  await emblem.focus();
   await page.keyboard.press("Enter");
   await page.setViewportSize({ width: 460, height: 112 });
   await expect(
@@ -41,6 +42,35 @@ test("dock collapses to a small companion and expands without recording", async 
       ),
     ),
   ).toBe(false);
+});
+
+test("dragging the emblem moves the compact dock without expanding it", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 460, height: 112 });
+  await page.goto("/tests/fixtures/app.html?dock=1");
+  await page.getByRole("button", { name: "Shrink to small dock" }).click();
+  await page.setViewportSize({ width: 104, height: 104 });
+  const emblem = page.getByRole("button", {
+    name: "Expand dock",
+  });
+  const box = await emblem.boundingBox();
+  expect(box).not.toBeNull();
+  const x = box!.x + box!.width / 2;
+  const y = box!.y + box!.height / 2;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x + 18, y + 8, { steps: 3 });
+  await page.waitForTimeout(800);
+  await page.mouse.up();
+  await expect(page.locator(".compact-dock")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Talk", exact: true }),
+  ).toHaveCount(0);
+  await emblem.click();
+  await expect(
+    page.getByRole("button", { name: "Talk", exact: true }),
+  ).toBeVisible();
 });
 
 test("small dock can be hidden without expanding it", async ({ page }) => {
@@ -119,9 +149,7 @@ test("small dock becomes a status island for real dictation states", async ({
       .locator(".compact-phase-icon")
       .evaluate((icon) => getComputedStyle(icon).animationName),
   ).toBe("none");
-  await expect(
-    page.getByRole("button", { name: "Drag floating dock" }),
-  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Expand dock" })).toBeVisible();
   await emit("idle");
   await expect(page.locator(".compact-dock")).toHaveAttribute(
     "data-phase",
