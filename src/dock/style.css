@@ -188,8 +188,22 @@ button:disabled {
   height: 88px;
   margin: 8px;
 }
+.compact-dock.is-wide {
+  width: 204px;
+}
+.compact-dock .compact-center-anchor {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.compact-center-anchor > .compact-companion {
+  pointer-events: auto;
+}
 .compact-companion {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 88px;
   height: 88px;
   padding: 0;
@@ -209,6 +223,65 @@ button:disabled {
     0 4px 10px rgba(0, 0, 0, 0.35);
   color: var(--studio-accent);
   cursor: pointer;
+}
+.compact-companion-art {
+  display: block;
+  width: 88px;
+  height: 88px;
+}
+.compact-dock.is-wide .compact-companion {
+  position: absolute;
+  top: 0;
+  left: 38px;
+  width: 128px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border-radius: 25px;
+  background: #171a20;
+}
+.compact-phase-icon {
+  flex: none;
+  color: var(--studio-accent, #b8ff65);
+}
+.compact-phase-label {
+  max-width: 112px;
+  overflow: hidden;
+  color: #f2f4f5;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.compact-dock[data-phase="error"] .compact-phase-icon {
+  color: #ffb547;
+}
+.compact-dock[data-phase="screen"] .compact-phase-icon,
+.compact-dock[data-phase="listening"] .compact-phase-icon {
+  color: #ff626d;
+}
+.compact-dock[data-phase="saved"] .compact-phase-icon {
+  color: var(--studio-accent, #b8ff65);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .compact-dock[data-motion="on"] .compact-companion {
+    transition:
+      width 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      left 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      border-radius 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      background 180ms ease;
+  }
+  .compact-dock[data-motion="on"][data-phase="working"] .compact-phase-icon {
+    animation: compact-working 1.2s linear infinite;
+  }
+}
+@keyframes compact-working {
+  to {
+    transform: rotate(360deg);
+  }
 }
 .compact-companion::after {
   content: "";
@@ -410,6 +483,21 @@ button:disabled {
   top: 0;
   right: 0;
 }
+.compact-dock.is-wide .compact-screen-live-anchor {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+.compact-dock.is-wide .compact-screen-live .rec-time {
+  display: none;
+}
+.compact-dock.is-wide .compact-screen-live {
+  width: 36px;
+  height: 36px;
+  justify-content: center;
+  padding: 0;
+  border-radius: 50%;
+}
 .compact-hide,
 .compact-grip {
   position: absolute;
@@ -493,5 +581,8 @@ button:disabled {
 .compact-dock .compact-screen-anchor,
 .compact-dock .compact-saved-anchor,
 .compact-dock .compact-screen-live-anchor {
+  z-index: 2;
+}
+.compact-dock .compact-action-anchor {
   z-index: 2;
 }

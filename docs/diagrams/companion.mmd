@@ -13,5 +13,9 @@ flowchart TD
     Format --> Paste[Paste into destination / local history]
     Snippet -->|Matched| Paste
     Coordinator --> Events[Real recording / mic / streaming events]
-    Events --> Home[Home and floating companion]
+    Events --> Phase[Compact dock: idle / listening / working]
+    Screen[Screen recording state] --> Phase
+    Screen -->|File saved| Saved[Saved island + Show in Finder]
+    Phase --> Window[Native panel resizes and stays on screen]
+    Phase --> Home[Home and floating companion]
     Paste --> Recent[Home recent history]

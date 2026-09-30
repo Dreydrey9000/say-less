@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+- The small dock now grows into a status island for listening, processing, screen recording, a confirmed saved video, and errors. It returns to its small companion when idle. The drag, hide, and stop controls remain available; motion follows the app's animation preference and Reduce Motion.
+
 ### Fixed
 
 - The small floating dock now has a drag grip and a hide button. Showing or resizing the dock keeps it inside the current screen, and a quick off/on uses the latest saved visibility setting.

@@ -23,6 +23,10 @@ import {
   Link2,
   ScanSearch,
   Wand2,
+  AudioLines,
+  LoaderCircle,
+  Check,
+  CircleAlert,
 } from "lucide-react";
 import {
   OPEN_RECORDING_SETUP_EVENT,
@@ -249,6 +253,34 @@ function Dock() {
       ? "dock.idleTalkOnly"
       : `dock.${state}`;
   const talkHint = screen.recording && state !== "recording";
+  const compactPhase = error
+    ? "error"
+    : state === "recording"
+      ? "listening"
+      : state === "transcribing" || pending || screen.busy
+        ? "working"
+        : screen.recording
+          ? "screen"
+          : screen.showSaved
+            ? "saved"
+            : "idle";
+  const compactWide = compactPhase !== "idle";
+  useEffect(() => {
+    if (!loaded) return;
+    void invoke("dock_set_presentation", {
+      wide: settings.dock_compact && compactWide,
+    }).catch(() => setError(true));
+  }, [loaded, settings.dock_compact, compactWide]);
+  const compactLabel =
+    compactPhase === "listening"
+      ? t(ready ? "ux.overlay.listening" : "screenRecording.starting")
+      : compactPhase === "working"
+        ? t("dock.processing")
+        : compactPhase === "screen"
+          ? `${t("screenRecording.recording")} ${screen.time}`
+          : compactPhase === "saved"
+            ? t("screenRecording.saved")
+            : "";
   // Expanding or collapsing swaps the whole dock, which would drop keyboard
   // focus to <body>. When the user toggled it here, land focus on the control
   // that undoes the change.
@@ -312,7 +344,12 @@ function Dock() {
   }
   if (settings.dock_compact)
     return (
-      <main className="compact-dock" data-state={state}>
+      <main
+        className={`compact-dock ${compactWide ? "is-wide" : ""}`}
+        data-state={state}
+        data-phase={compactPhase}
+        data-motion={settings.dock_motion ? "on" : "off"}
+      >
         <ScreenButton compact />
         {!screen.showSaved && (
           <button
@@ -350,19 +387,60 @@ function Dock() {
             </button>
           </Tooltip>
         )}
-        <Tooltip label={t("dock.expand")} placement="inside">
+        <Tooltip
+          label={t("dock.expand")}
+          placement="inside"
+          className="compact-center-anchor"
+        >
           <button
             ref={expandRef}
             className="compact-companion"
             disabled={!loaded || busy}
             onClick={() => setCompact(false)}
           >
-            <Companion
-              level={level}
-              active={listening}
-              thinking={state === "transcribing"}
-              paused={!settings.floating}
-            />
+            {compactPhase === "saved" ? (
+              <Check
+                className="compact-phase-icon"
+                size={30}
+                aria-hidden="true"
+              />
+            ) : compactPhase === "working" ? (
+              <LoaderCircle
+                className="compact-phase-icon"
+                size={30}
+                aria-hidden="true"
+              />
+            ) : compactPhase === "error" ? (
+              <CircleAlert
+                className="compact-phase-icon"
+                size={30}
+                aria-hidden="true"
+              />
+            ) : compactPhase === "screen" ? (
+              <MonitorPlay
+                className="compact-phase-icon"
+                size={30}
+                aria-hidden="true"
+              />
+            ) : compactPhase === "listening" ? (
+              <AudioLines
+                className="compact-phase-icon"
+                size={30}
+                aria-hidden="true"
+              />
+            ) : (
+              <span className="compact-companion-art">
+                <Companion
+                  level={level}
+                  active={listening}
+                  thinking={state === "transcribing"}
+                  paused={!settings.floating}
+                />
+              </span>
+            )}
+            {compactLabel && (
+              <span className="compact-phase-label">{compactLabel}</span>
+            )}
           </button>
         </Tooltip>
         <button
