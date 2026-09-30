@@ -89,12 +89,11 @@ pub fn set_visible(app: &AppHandle, visible: bool) -> Result<(), String> {
     })
     .map_err(|_| "dock_failed".into())
 }
-#[tauri::command]
-#[specta::specta]
 /// Open a voice-action target from the dock: an .app path or an https URL.
 /// The dock is a panel, so this goes through Rust instead of the opener
 /// plugin's JavaScript surface.
 #[tauri::command]
+#[specta::specta]
 pub fn open_voice_action_target(app: AppHandle, target: String) -> Result<(), String> {
     use tauri_plugin_opener::OpenerExt;
     if target.starts_with("https://") || target.starts_with("http://") {
@@ -108,6 +107,8 @@ pub fn open_voice_action_target(app: AppHandle, target: String) -> Result<(), St
     }
 }
 
+#[tauri::command]
+#[specta::specta]
 pub fn dock_toggle_recording(app: AppHandle) -> Result<(), String> {
     #[cfg(target_os = "macos")]
     {
