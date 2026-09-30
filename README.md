@@ -95,6 +95,8 @@ See [personalization](docs/personalization.md) and the [editable companion workf
 
 ![Companion and dictation workflow](docs/diagrams/companion.svg)
 
+Drag the small dock by its emblem. Dropping near an edge snaps it to the nearest side or corner; **Appearance → Dock placement** offers all eight anchors. Hover or use Tab to reveal the attached action rail. See the [dock placement workflow](docs/diagrams/dock-placement.svg) ([editable source](docs/diagrams/dock-placement.mmd)).
+
 ### Voice visuals
 
 In **Appearance → Recording indicator**, switch the animation between Bars (default), a Voice line, or a talking Avatar, and (once an avatar is in use) customize it (stick figure, person, cat or dog; colors; cap, beanie, crown, headphones or sunglasses). The mouth follows voice volume, not words. Pause and Reduce Motion hold it still. See [personalization](docs/personalization.md#voice-visuals) and the [editable voice visuals diagram](docs/diagrams/voice-visuals.mmd).

@@ -1083,7 +1083,13 @@
     "edges": {
       "free": "Free · drag anywhere",
       "left": "Snap to left edge",
-      "right": "Snap to right edge"
+      "right": "Snap to right edge",
+      "top": "Aggancia al bordo superiore",
+      "bottom": "Aggancia al bordo inferiore",
+      "top_left": "Aggancia all'angolo superiore sinistro",
+      "top_right": "Aggancia all'angolo superiore destro",
+      "bottom_left": "Aggancia all'angolo inferiore sinistro",
+      "bottom_right": "Aggancia all'angolo inferiore destro"
     },
     "formations": {
       "orbit": "Orbit",

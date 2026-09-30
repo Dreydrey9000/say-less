@@ -1083,7 +1083,13 @@
     "edges": {
       "free": "Free · drag anywhere",
       "left": "Snap to left edge",
-      "right": "Snap to right edge"
+      "right": "Snap to right edge",
+      "top": "Ajusta a la vora superior",
+      "bottom": "Ajusta a la vora inferior",
+      "top_left": "Ajusta a la cantonada superior esquerra",
+      "top_right": "Ajusta a la cantonada superior dreta",
+      "bottom_left": "Ajusta a la cantonada inferior esquerra",
+      "bottom_right": "Ajusta a la cantonada inferior dreta"
     },
     "formations": {
       "orbit": "Orbit",

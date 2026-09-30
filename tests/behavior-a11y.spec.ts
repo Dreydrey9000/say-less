@@ -301,8 +301,10 @@ test("dock icon buttons are named, big enough and show a tooltip on focus", asyn
   for (const width of sizes) expect(width).toBeGreaterThanOrEqual(32);
 
   // Expanding from the compact dock keeps keyboard focus in the dock.
-  await page.getByRole("button", { name: "Shrink to small dock" }).click();
-  await page.setViewportSize({ width: 104, height: 104 });
+  const collapse = page.getByRole("button", { name: "Shrink to small dock" });
+  await collapse.focus();
+  await collapse.press("Enter");
+  await page.setViewportSize({ width: 220, height: 104 });
   const expand = page.getByRole("button", { name: "Expand dock" });
   await expect(expand).toBeFocused();
   await page.keyboard.press("Enter");

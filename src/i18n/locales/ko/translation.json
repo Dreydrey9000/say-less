@@ -1083,7 +1083,13 @@
     "edges": {
       "free": "Free · drag anywhere",
       "left": "Snap to left edge",
-      "right": "Snap to right edge"
+      "right": "Snap to right edge",
+      "top": "위쪽 가장자리에 스냅",
+      "bottom": "아래쪽 가장자리에 스냅",
+      "top_left": "왼쪽 위 모서리에 스냅",
+      "top_right": "오른쪽 위 모서리에 스냅",
+      "bottom_left": "왼쪽 아래 모서리에 스냅",
+      "bottom_right": "오른쪽 아래 모서리에 스냅"
     },
     "formations": {
       "orbit": "Orbit",

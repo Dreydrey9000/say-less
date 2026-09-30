@@ -1083,7 +1083,13 @@
     "edges": {
       "free": "Free · drag anywhere",
       "left": "Snap to left edge",
-      "right": "Snap to right edge"
+      "right": "Snap to right edge",
+      "top": "Fastgør til øverste kant",
+      "bottom": "Fastgør til nederste kant",
+      "top_left": "Fastgør til øverste venstre hjørne",
+      "top_right": "Fastgør til øverste højre hjørne",
+      "bottom_left": "Fastgør til nederste venstre hjørne",
+      "bottom_right": "Fastgør til nederste højre hjørne"
     },
     "formations": {
       "orbit": "Orbit",

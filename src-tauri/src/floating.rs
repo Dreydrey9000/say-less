@@ -1,5 +1,7 @@
 //! Nonactivating dock: clicking Record must not steal the destination app's focus.
 use std::sync::atomic::{AtomicBool, Ordering};
+#[cfg(target_os = "macos")]
+use std::time::Duration;
 use tauri::{AppHandle, Manager};
 #[cfg(target_os = "macos")]
 use tauri_nspanel::{tauri_panel, CollectionBehavior, PanelBuilder, PanelLevel, StyleMask};
@@ -24,24 +26,36 @@ fn resize_dock(app: &AppHandle, compact: bool) -> Result<(), String> {
     let window = app
         .get_webview_window("say_less_dock")
         .ok_or("dock_missing")?;
-    let old_size = window.outer_size().map_err(|_| "size")?;
-    let old_position = window.outer_position().map_err(|_| "position")?;
+    let monitor = window
+        .current_monitor()
+        .map_err(|_| "monitor")?
+        .or(app.primary_monitor().map_err(|_| "monitor")?)
+        .ok_or("monitor")?;
+    let current = window.outer_position().map_err(|_| "position")?;
+    let settings = crate::studio::get_studio_settings(app.clone())?;
     let (width, height) = dock_size(compact);
+    let target_size: tauri::PhysicalSize<u32> =
+        tauri::LogicalSize::new(width, height).to_physical(monitor.scale_factor());
+    let target_position = dock_position(
+        monitor.work_area(),
+        target_size,
+        current,
+        &settings.dock_edge,
+        compact,
+        monitor.scale_factor(),
+    );
+    // Tauri queues the resize. Reading outer_size() immediately afterward can
+    // return the old width and leave a right-anchored panel mostly offscreen.
+    // Place from the requested physical size instead.
     window
         .set_size(tauri::LogicalSize::new(width, height))
         .map_err(|_| "size")?;
-    let new_size = window.outer_size().map_err(|_| "size")?;
-    let settings = crate::studio::get_studio_settings(app.clone())?;
-    if settings.dock_edge == "free" && old_size.width != new_size.width {
-        let centered_x = old_position.x + (old_size.width as i32 - new_size.width as i32) / 2;
-        window
-            .set_position(tauri::PhysicalPosition::new(centered_x, old_position.y))
-            .map_err(|_| "position")?;
-    }
-    place_dock(app)
+    window
+        .set_position(target_position)
+        .map_err(|_| "position".into())
 }
 
-/// The compact dock grows into an island only while it has a real activity to show.
+/// Grow the compact panel for an active status or its attached control rail.
 #[tauri::command]
 #[specta::specta]
 pub fn dock_set_presentation(app: AppHandle, wide: bool) -> Result<(), String> {
@@ -169,8 +183,42 @@ pub fn dock_toggle_recording(app: AppHandle) -> Result<(), String> {
     Ok(())
 }
 
-/// Place inside the current monitor work area, respecting Retina scale.
-pub fn place_dock(app: &AppHandle) -> Result<(), String> {
+#[cfg(target_os = "macos")]
+#[link(name = "ApplicationServices", kind = "framework")]
+unsafe extern "C" {
+    fn CGEventSourceButtonState(state_id: i32, button: i32) -> bool;
+}
+
+#[cfg(target_os = "macos")]
+fn left_mouse_button_down() -> bool {
+    // kCGEventSourceStateCombinedSessionState and kCGMouseButtonLeft are both 0.
+    // This checks the real mouse state; startDragging() only queues a window
+    // message and its JavaScript Promise can resolve before the drag finishes.
+    unsafe { CGEventSourceButtonState(0, 0) }
+}
+
+/// Resolve a dock drag only after the mouse is released, using the final
+/// native panel position. The caller persists the returned placement.
+#[tauri::command]
+#[specta::specta]
+#[cfg(not(target_os = "macos"))]
+pub async fn dock_finish_drag(_app: AppHandle) -> Result<String, String> {
+    Err("dock_drag_snap_unsupported".into())
+}
+
+#[tauri::command]
+#[specta::specta]
+#[cfg(target_os = "macos")]
+pub async fn dock_finish_drag(app: AppHandle) -> Result<String, String> {
+    let started = tokio::time::Instant::now();
+    while left_mouse_button_down() {
+        if started.elapsed() > Duration::from_secs(60) {
+            return Err("dock_drag_timeout".into());
+        }
+        tokio::time::sleep(Duration::from_millis(16)).await;
+    }
+    // The final WindowMoved event can land just after the button transition.
+    tokio::time::sleep(Duration::from_millis(50)).await;
     let settings = crate::studio::get_studio_settings(app.clone())?;
     let window = app
         .get_webview_window("say_less_dock")
@@ -180,28 +228,139 @@ pub fn place_dock(app: &AppHandle) -> Result<(), String> {
         .map_err(|_| "monitor")?
         .or(app.primary_monitor().map_err(|_| "monitor")?)
         .ok_or("monitor")?;
-    let area = monitor.work_area();
+    let position = window.outer_position().map_err(|_| "position")?;
     let size = window.outer_size().map_err(|_| "size")?;
-    let margin = (12.0 * monitor.scale_factor()) as i32;
+    let edge = nearest_dock_edge(
+        monitor.work_area(),
+        position,
+        size,
+        monitor.scale_factor(),
+        &settings.dock_edge,
+        settings.dock_compact,
+    );
+    // Switching from a right-aligned emblem to a free dock changes which
+    // side of the wide panel holds the emblem. Shift the panel so the emblem
+    // remains under the pointer after the frontend switches its layout.
+    if edge == "free"
+        && settings.dock_compact
+        && matches!(
+            settings.dock_edge.as_str(),
+            "right" | "top_right" | "bottom_right"
+        )
+        && size.width > (COMPACT_SIZE.0 * monitor.scale_factor()) as u32
+    {
+        let shift = size.width as i32 - (COMPACT_SIZE.0 * monitor.scale_factor()) as i32;
+        window
+            .set_position(tauri::PhysicalPosition::new(position.x + shift, position.y))
+            .map_err(|_| "position")?;
+    }
+    Ok(edge.into())
+}
+
+fn nearest_dock_edge(
+    area: &tauri::PhysicalRect<i32, u32>,
+    position: tauri::PhysicalPosition<i32>,
+    size: tauri::PhysicalSize<u32>,
+    scale: f64,
+    current_edge: &str,
+    compact: bool,
+) -> &'static str {
+    let margin = 12.0 * scale;
+    let emblem_half = COMPACT_SIZE.0 * scale / 2.0;
+    let emblem_x = if compact {
+        if matches!(current_edge, "right" | "top_right" | "bottom_right") {
+            position.x as f64 + size.width as f64 - emblem_half
+        } else {
+            position.x as f64 + emblem_half
+        }
+    } else {
+        position.x as f64 + size.width as f64 / 2.0
+    };
+    let emblem_y = position.y as f64 + size.height as f64 / 2.0;
+    let left = area.position.x as f64 + margin + emblem_half;
+    let right = area.position.x as f64 + area.size.width as f64 - margin - emblem_half;
+    let top = area.position.y as f64 + margin + size.height as f64 / 2.0;
+    let bottom =
+        area.position.y as f64 + area.size.height as f64 - margin - size.height as f64 / 2.0;
+    let center_x = area.position.x as f64 + area.size.width as f64 / 2.0;
+    let center_y = area.position.y as f64 + area.size.height as f64 / 2.0;
+    let x_edges = [(left, 0), (right, 2)];
+    let y_edges = [(top, 0), (bottom, 2)];
+    let nearest_x_edge = x_edges
+        .into_iter()
+        .min_by(|a, b| (emblem_x - a.0).abs().total_cmp(&(emblem_x - b.0).abs()));
+    let nearest_y_edge = y_edges
+        .into_iter()
+        .min_by(|a, b| (emblem_y - a.0).abs().total_cmp(&(emblem_y - b.0).abs()));
+    let threshold = 48.0 * scale;
+    let x_snap = nearest_x_edge.filter(|(x, _)| (emblem_x - x).abs() <= threshold);
+    let y_snap = nearest_y_edge.filter(|(y, _)| (emblem_y - y).abs() <= threshold);
+    if x_snap.is_none() && y_snap.is_none() {
+        return "free";
+    }
+    let column = x_snap.map(|(_, index)| index).unwrap_or_else(|| {
+        [left, center_x, right]
+            .into_iter()
+            .enumerate()
+            .min_by(|a, b| (emblem_x - a.1).abs().total_cmp(&(emblem_x - b.1).abs()))
+            .map(|(index, _)| index)
+            .unwrap_or(1)
+    });
+    let row = y_snap.map(|(_, index)| index).unwrap_or_else(|| {
+        [top, center_y, bottom]
+            .into_iter()
+            .enumerate()
+            .min_by(|a, b| (emblem_y - a.1).abs().total_cmp(&(emblem_y - b.1).abs()))
+            .map(|(index, _)| index)
+            .unwrap_or(1)
+    });
+    match (row, column) {
+        (0, 0) => "top_left",
+        (0, 1) => "top",
+        (0, 2) => "top_right",
+        (1, 0) => "left",
+        (1, 2) => "right",
+        (2, 0) => "bottom_left",
+        (2, 1) => "bottom",
+        (2, 2) => "bottom_right",
+        _ => "free",
+    }
+}
+
+/// Compute placement from the requested panel size, not a queued resize's stale frame.
+fn dock_position(
+    area: &tauri::PhysicalRect<i32, u32>,
+    size: tauri::PhysicalSize<u32>,
+    current: tauri::PhysicalPosition<i32>,
+    edge: &str,
+    compact: bool,
+    scale: f64,
+) -> tauri::PhysicalPosition<i32> {
+    let margin = (12.0 * scale) as i32;
     let left = area.position.x + margin;
     let top = area.position.y + margin;
     let right = (area.position.x + area.size.width as i32 - size.width as i32 - margin).max(left);
     let bottom = (area.position.y + area.size.height as i32 - size.height as i32 - margin).max(top);
-    let (x, y) = if settings.dock_edge == "free" {
-        let current = window.outer_position().map_err(|_| "position")?;
+    let (x, y) = if edge == "free" {
         (current.x.clamp(left, right), current.y.clamp(top, bottom))
     } else {
-        let x = if settings.dock_edge == "left" {
-            left
-        } else {
-            right
+        let center_x = area.position.x + area.size.width as i32 / 2;
+        let center_y = area.position.y + area.size.height as i32 / 2;
+        let emblem_half = (COMPACT_SIZE.0 * scale / 2.0) as i32;
+        let x = match edge {
+            "left" | "top_left" | "bottom_left" => left,
+            "right" | "top_right" | "bottom_right" => right,
+            _ if compact => center_x - emblem_half,
+            _ => center_x - size.width as i32 / 2,
         };
-        let y = area.position.y + ((area.size.height as i32 - size.height as i32) / 2).max(0);
-        (x, y.clamp(top, bottom))
+        let y = match edge {
+            "top" | "top_left" | "top_right" => top,
+            "bottom" | "bottom_left" | "bottom_right" => bottom,
+            _ => center_y - size.height as i32 / 2,
+        };
+        (x.clamp(left, right), y.clamp(top, bottom))
     };
-    window
-        .set_position(tauri::PhysicalPosition::new(x, y))
-        .map_err(|_| "position".into())
+    tauri::PhysicalPosition::new(x, y)
 }
 
 static ACTIVITY: std::sync::atomic::AtomicU8 = std::sync::atomic::AtomicU8::new(0);
@@ -217,4 +376,110 @@ pub fn get_dock_state() -> String {
         _ => "idle",
     }
     .into()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{dock_position, nearest_dock_edge};
+    use tauri::{PhysicalPosition, PhysicalRect, PhysicalSize};
+
+    fn area() -> PhysicalRect<i32, u32> {
+        PhysicalRect {
+            position: PhysicalPosition::new(0, 0),
+            size: PhysicalSize::new(1000, 800),
+        }
+    }
+
+    #[test]
+    fn snaps_compact_emblem_to_nearby_corner_or_side() {
+        let size = PhysicalSize::new(104, 104);
+        assert_eq!(
+            nearest_dock_edge(
+                &area(),
+                PhysicalPosition::new(14, 12),
+                size,
+                1.0,
+                "free",
+                true
+            ),
+            "top_left"
+        );
+        assert_eq!(
+            nearest_dock_edge(
+                &area(),
+                PhysicalPosition::new(12, 348),
+                size,
+                1.0,
+                "free",
+                true
+            ),
+            "left"
+        );
+        assert_eq!(
+            nearest_dock_edge(
+                &area(),
+                PhysicalPosition::new(450, 696),
+                size,
+                1.0,
+                "free",
+                true
+            ),
+            "bottom"
+        );
+    }
+
+    #[test]
+    fn right_aligned_rail_uses_emblem_instead_of_panel_center() {
+        let size = PhysicalSize::new(220, 104);
+        assert_eq!(
+            nearest_dock_edge(
+                &area(),
+                PhysicalPosition::new(768, 12),
+                size,
+                1.0,
+                "top_right",
+                true
+            ),
+            "top_right"
+        );
+    }
+
+    #[test]
+    fn stays_free_outside_magnetic_distance() {
+        assert_eq!(
+            nearest_dock_edge(
+                &area(),
+                PhysicalPosition::new(250, 250),
+                PhysicalSize::new(104, 104),
+                1.0,
+                "free",
+                true
+            ),
+            "free"
+        );
+    }
+
+    #[test]
+    fn right_anchor_uses_requested_width_before_resize_settles() {
+        let current = PhysicalPosition::new(884, 12);
+        let compact = dock_position(
+            &area(),
+            PhysicalSize::new(104, 104),
+            current,
+            "top_right",
+            true,
+            1.0,
+        );
+        let expanded = dock_position(
+            &area(),
+            PhysicalSize::new(460, 112),
+            current,
+            "top_right",
+            false,
+            1.0,
+        );
+        assert_eq!(compact, PhysicalPosition::new(884, 12));
+        assert_eq!(expanded, PhysicalPosition::new(528, 12));
+        assert_eq!(expanded.x + 460, compact.x + 104);
+    }
 }

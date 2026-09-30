@@ -2,7 +2,10 @@ flowchart TD
     Settings[Appearance and Writing settings] --> Store[Local studio.json]
     Store --> Motion[Orbit / Helix / Wave / Chrome S]
     Motion --> Guards[Pause / Reduce Motion / hidden-window guard]
-    Store --> Edge[Free / left / right screen placement]
+    Store --> Edge[Free / four sides / four corners]
+    Drag[Drag emblem] --> Release[Native mouse release]
+    Release --> Magnet[Monitor work-area edge zones]
+    Magnet -->|Nearest side or corner| Store
     Keys[Hold / tap / double-tap] --> Coordinator[Transcription coordinator]
     Dock[Floating Record button] --> Coordinator
     Coordinator --> ASR[Local speech recognition]
@@ -17,5 +20,8 @@ flowchart TD
     Screen[Screen recording state] --> Phase
     Screen -->|File saved| Saved[Saved island + Show in Finder]
     Phase --> Window[Native panel resizes and stays on screen]
+    Hover[Hover / keyboard focus] --> Rail[One attached action rail]
+    Rail --> Window
+    Edge --> Window
     Phase --> Home[Home and floating companion]
     Paste --> Recent[Home recent history]

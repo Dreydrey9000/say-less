@@ -193,17 +193,24 @@ button:disabled {
 }
 .compact-dock .compact-center-anchor {
   position: absolute;
-  inset: 0;
-  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 88px;
+  height: 88px;
+  z-index: 2;
   pointer-events: none;
+}
+.compact-dock.rail-left .compact-center-anchor {
+  left: auto;
+  right: 0;
+}
+.compact-dock.has-status .compact-center-anchor {
+  width: 128px;
 }
 .compact-center-anchor > .compact-companion {
   pointer-events: auto;
 }
 .compact-companion {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 88px;
   height: 88px;
   padding: 0;
@@ -244,10 +251,7 @@ button:disabled {
   width: 88px;
   height: 88px;
 }
-.compact-dock.is-wide .compact-companion {
-  position: absolute;
-  top: 0;
-  left: 38px;
+.compact-dock.has-status .compact-companion {
   width: 128px;
   display: flex;
   flex-direction: column;
@@ -288,7 +292,6 @@ button:disabled {
   .compact-dock[data-motion="on"] .compact-companion {
     transition:
       width 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
-      left 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
       border-radius 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
       background 180ms ease;
   }
@@ -315,7 +318,7 @@ button:disabled {
   content: "";
   position: absolute;
   inset: 1px;
-  border-radius: 50%;
+  border-radius: inherit;
   background: radial-gradient(
     120% 55% at 50% 0%,
     rgba(255, 255, 255, 0.16),
@@ -332,49 +335,94 @@ button:disabled {
   outline: 2px solid var(--studio-accent);
   outline-offset: -4px;
 }
-/* The dot means state, not decoration: an 8px light set inside the disc's
-   rim. Silver when idle or working, red while recording, amber when something
-   went wrong. Recording also swaps it for the red stop button. */
-.compact-indicator {
+/* The emblem is the only round object. Actions share one attached rail. */
+.compact-rail {
   position: absolute;
-  right: 15px;
-  bottom: 15px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #c7ccd4;
-  box-shadow:
-    0 0 0 1.5px rgba(13, 15, 18, 0.9),
-    0 0 6px rgba(199, 204, 212, 0.35);
-  pointer-events: none;
+  top: 18px;
+  left: 76px;
+  /* No stacking context: tooltip labels can paint above the emblem. */
+  z-index: auto;
+  display: flex;
+  align-items: center;
+  width: 104px;
+  height: 52px;
+  padding-left: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 0 15px 15px 0;
+  background: linear-gradient(160deg, #30343b, #181b20 55%, #111318);
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.32);
 }
-.compact-dock[data-state="recording"] .compact-indicator {
-  background: #ff5a5a;
-  box-shadow:
-    0 0 0 1.5px rgba(13, 15, 18, 0.9),
-    0 0 6px rgba(255, 90, 90, 0.5);
+.compact-dock.rail-left .compact-rail {
+  left: auto;
+  right: 76px;
+  flex-direction: row-reverse;
+  padding-left: 0;
+  padding-right: 14px;
+  border-radius: 15px 0 0 15px;
 }
-.compact-indicator.has-error,
-.compact-dock[data-state] .compact-indicator.has-error {
-  background: #ffb547;
-  box-shadow:
-    0 0 0 1.5px rgba(13, 15, 18, 0.9),
-    0 0 6px rgba(255, 181, 71, 0.5);
+.compact-dock.has-status .compact-rail {
+  left: 116px;
+  width: 60px;
 }
-.compact-dock .compact-action-anchor {
-  position: absolute;
-  right: 0;
-  bottom: 0;
+.compact-dock.has-status.rail-left .compact-rail {
+  left: auto;
+  right: 116px;
 }
-.compact-action {
+.compact-rail .sl-tip-anchor {
+  display: block;
+  flex: none;
   width: 44px;
   height: 44px;
+}
+.compact-rail .sl-tip-anchor[data-placement="bottom"] > .sl-tip {
+  top: calc(100% + 2px);
+}
+.compact-dock.rail-right .compact-rail .sl-tip {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+.compact-dock.rail-left .compact-rail .sl-tip {
+  left: 0;
+  right: auto;
+  transform: none;
+}
+.compact-rail button {
   display: grid;
   place-items: center;
-  border: 2px solid #151820;
-  border-radius: 50%;
-  background: #ff626d;
-  color: #151820;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #e7eaee;
+}
+.compact-rail .sl-tip-anchor + .sl-tip-anchor {
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+}
+.compact-dock.rail-left .compact-rail .sl-tip-anchor + .sl-tip-anchor {
+  border-left: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+}
+.compact-rail button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.compact-rail button:focus-visible {
+  outline: 2px solid var(--studio-accent);
+  outline-offset: -3px;
+}
+.compact-rail .compact-action,
+.compact-rail .compact-screen-live {
+  color: #ff7078;
+}
+.compact-status-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 .floating-bar .dock-companion {
   width: 48px;
@@ -505,96 +553,4 @@ button:disabled {
   display: grid;
   place-items: center;
   min-width: 24px;
-}
-.compact-dock .compact-screen-anchor {
-  position: absolute;
-  top: 0;
-  right: 0;
-}
-.compact-dock.is-wide .compact-screen-live-anchor {
-  left: auto;
-  right: 0;
-  transform: none;
-}
-.compact-dock.is-wide .compact-screen-live .rec-time {
-  display: none;
-}
-.compact-dock.is-wide .compact-screen-live {
-  width: 36px;
-  height: 36px;
-  justify-content: center;
-  padding: 0;
-  border-radius: 50%;
-}
-.compact-hide {
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 2;
-  width: 36px;
-  height: 36px;
-  display: grid;
-  place-items: center;
-  border: 2px solid #151820;
-  border-radius: 50%;
-  background: #2a2e35;
-  color: #e7eaee;
-}
-.compact-hide[aria-disabled="true"] {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-.compact-hide:focus-visible {
-  outline: 2px solid var(--studio-accent);
-  outline-offset: 2px;
-}
-.compact-dock .compact-saved-anchor {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-.compact-screen,
-.compact-saved {
-  width: 32px;
-  height: 32px;
-  display: grid;
-  place-items: center;
-  border: 2px solid #151820;
-  border-radius: 50%;
-  background: #2a2e35;
-  color: #e7eaee;
-}
-.compact-dock .compact-screen-live-anchor {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-}
-.compact-screen-live {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  height: 26px;
-  padding: 0 9px;
-  border: 2px solid #151820;
-  border-radius: 13px;
-  background: var(--color-red-600, oklch(57.7% 0.245 27.325));
-  color: #fff;
-  font-size: 12px;
-  font-weight: 700;
-}
-.compact-screen:focus-visible,
-.compact-saved:focus-visible,
-.compact-screen-live:focus-visible {
-  outline: 2px solid var(--studio-accent);
-  outline-offset: 2px;
-}
-/* Corner controls sit above the companion disc. */
-.compact-dock .compact-screen-anchor,
-.compact-dock .compact-saved-anchor,
-.compact-dock .compact-screen-live-anchor {
-  z-index: 2;
-}
-.compact-dock .compact-action-anchor {
-  z-index: 2;
 }

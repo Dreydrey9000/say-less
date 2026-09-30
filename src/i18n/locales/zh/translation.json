@@ -1083,7 +1083,13 @@
     "edges": {
       "free": "Free · drag anywhere",
       "left": "Snap to left edge",
-      "right": "Snap to right edge"
+      "right": "Snap to right edge",
+      "top": "吸附到顶部边缘",
+      "bottom": "吸附到底部边缘",
+      "top_left": "吸附到左上角",
+      "top_right": "吸附到右上角",
+      "bottom_left": "吸附到左下角",
+      "bottom_right": "吸附到右下角"
     },
     "formations": {
       "orbit": "Orbit",

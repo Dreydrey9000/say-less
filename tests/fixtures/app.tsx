@@ -210,6 +210,7 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
   ).testCommands ??= []);
   calls.push(cmd);
   if (cmd === "get_dock_state") return "idle";
+  if (cmd === "dock_finish_drag") return query.get("snap") ?? "free";
   if (cmd === "screen_recording_status") return screenStatus;
   if (cmd === "get_recording_options") return recordingOptions;
   if (cmd === "save_recording_options") {

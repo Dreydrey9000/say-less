@@ -1083,7 +1083,13 @@
     "edges": {
       "free": "Free · drag anywhere",
       "left": "Snap to left edge",
-      "right": "Snap to right edge"
+      "right": "Snap to right edge",
+      "top": "माथिल्लो किनारामा सटाउनुहोस्",
+      "bottom": "तल्लो किनारामा सटाउनुहोस्",
+      "top_left": "माथिल्लो बायाँ कुनामा सटाउनुहोस्",
+      "top_right": "माथिल्लो दायाँ कुनामा सटाउनुहोस्",
+      "bottom_left": "तल्लो बायाँ कुनामा सटाउनुहोस्",
+      "bottom_right": "तल्लो दायाँ कुनामा सटाउनुहोस्"
     },
     "formations": {
       "orbit": "Orbit",

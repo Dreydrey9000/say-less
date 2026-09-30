@@ -706,6 +706,7 @@ pub fn run(cli_args: CliArgs) {
             floating::dock_toggle_recording,
             floating::get_dock_state,
             floating::dock_set_presentation,
+            floating::dock_finish_drag,
             correction_learning::list_learned_corrections,
             correction_learning::review_learned_correction,
             wispr_import::preview_wispr_import,
