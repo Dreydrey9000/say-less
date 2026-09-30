@@ -1,0 +1,24 @@
+{
+  "b2_bucket": "luis-personal",
+  "b2_prefix": "say-less-recordings/",
+  "b2_secrets_file": "/Users/luiscarrillo/.claude/secrets/b2-cloud-storage.env",
+  "presign_days": 7,
+  "drive_enabled": true,
+  "drive_remote": "gdrive-luis",
+  "drive_folder": "SayLess-Recordings",
+  "delete_local_after_upload": true,
+  "watch_enabled": true,
+  "watch_interval_seconds": 10,
+  "ideas_provider_chain": [
+    "agy",
+    "zai_big",
+    "zai_small",
+    "groq"
+  ],
+  "zai_secrets_file": "/Users/luiscarrillo/.claude/secrets/zai.env",
+  "groq_secrets_file": "/Users/luiscarrillo/.claude/secrets/groq.env",
+  "agy_bin": "/Users/luiscarrillo/.local/bin/agy",
+  "agy_timeout_seconds": 170,
+  "ideas_port": 8810,
+  "default_client": "ryan-magin"
+}
