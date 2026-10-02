@@ -21,21 +21,33 @@ proper later.
    (by month), on your clipboard, and in B2 + Drive, registered in
    `state/images.json`.
 
-## Run it
+## Install / update (one command)
 
 ```bash
-python3 bridge/bridge.py            # serves 127.0.0.1 (port in state/port.txt)
+bash bridge/install.sh
 ```
 
-Or install the LaunchAgent from `extras/`. CLIs (also in this folder, add to
-PATH): `title-ideas`, `images`, `recordings`, `bridge-bucket <bucket>`
-(switch the B2 bucket; current default `luis-personal`).
+This repo's `bridge/` folder is the **only** copy of the code. The command copies
+it into the runtime folder (`~/Desktop/_Code/say-less-bridge`, holds your
+`config.json` and `state/`) and reloads the LaunchAgent. Run it again after any
+change. Only one bridge can run: a lock file makes a second copy exit quietly,
+and launchd only restarts it after a crash.
+
+CLIs (also in this folder, add to PATH): `title-ideas`, `images`, `recordings`,
+`bridge-bucket <bucket>` (switch the B2 bucket; current default `luis-personal`).
+
+Tests: `python3 -m unittest discover -s bridge/tests -v` (no network, no B2, no Drive).
 
 ## HTTP API
 
 `GET /health` · `GET /recordings` · `GET /images` · `POST /upload {path}` ·
 `POST /ideas {image_path?, client?, count?, extra?}` ·
 `POST /image-register {path, prompt, painter}`
+
+Only `127.0.0.1`/`localhost` are answered. POSTs must be `application/json` and
+carry no `Origin` header, so a web page cannot drive the bridge. `/upload`
+accepts only videos inside `~/Movies`; `/image-register` and `/ideas` accept
+only images inside your home folder.
 
 ## Configuration
 
@@ -45,7 +57,7 @@ in this repo**. `state/` is runtime-only (registries, logs, port file).
 
 ## Extras
 
-- `extras/com.user.say-less-bridge.plist` — LaunchAgent (edit the username).
+- `extras/com.luis.say-less-bridge.plist.template` — LaunchAgent template, filled in by `install.sh`.
 - `extras/hammerspoon-init.lua` — global hotkeys for the four companion
   launcher apps (Title Ideas / Say Less Image / Say Less Recordings /
   Read Screens) built from these scripts.
@@ -60,3 +72,14 @@ in this repo**. `state/` is runtime-only (registries, logs, port file).
 Tested end-to-end on macOS 26.1 / M1 Pro: 59 s and 2 h15 m recordings
 uploaded 74 s after stop, links verified (HTTP 206), title ideas generated
 live from a CapCut session.
+
+## When something looks wrong
+
+- **Google Drive links missing**: `curl -s http://127.0.0.1:$(cat ~/Desktop/_Code/say-less-bridge/state/port.txt)/health`
+  shows `"drive": {"ok": false, "error": "... rclone config reconnect gdrive-luis:"}`.
+  Run that command once (it opens a Google sign-in). B2 uploads keep working meanwhile.
+- **Dead links after a week**: B2 links last `presign_days`; the bridge re-signs
+  any link in its last day, so the Recordings app never shows an expired one.
+- **Title Ideas says the screen cannot be captured**: the bridge runs in the
+  background and macOS will not let it screenshot. Use the `title-ideas` command
+  (it captures in your terminal) or the Title Ideas app.

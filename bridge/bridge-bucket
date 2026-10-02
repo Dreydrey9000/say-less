@@ -5,12 +5,12 @@
 # they expire (they point at the old bucket).
 set -euo pipefail
 if [[ $# -ne 1 ]]; then
-  current=$(jq -r '.b2_bucket' "$HOME/Desktop/_Code/say-less-bridge/config.json" 2>/dev/null || echo "viral-editz (default)")
+  current=$(jq -r '.b2_bucket' "${SAYLESS_BRIDGE_HOME:-$HOME/Desktop/_Code/say-less-bridge}/config.json" 2>/dev/null || echo "viral-editz (default)")
   echo "Current bucket: $current"
   echo "Usage: bridge-bucket <bucket-name>"
   exit 0
 fi
-CONFIG="$HOME/Desktop/_Code/say-less-bridge/config.json"
+CONFIG="${SAYLESS_BRIDGE_HOME:-$HOME/Desktop/_Code/say-less-bridge}/config.json"
 python3 - "$1" <<PY
 import json
 from pathlib import Path

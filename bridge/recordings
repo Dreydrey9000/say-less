@@ -3,7 +3,7 @@
 # Usage: recordings [N]        (default 10)
 set -euo pipefail
 N=${1:-10}
-PORT=$(cat "$HOME/Desktop/_Code/say-less-bridge/state/port.txt" 2>/dev/null || echo 8810)
+PORT=$(cat "${SAYLESS_BRIDGE_HOME:-$HOME/Desktop/_Code/say-less-bridge}/state/port.txt" 2>/dev/null || echo 8810)
 curl -s -m 10 "http://127.0.0.1:${PORT}/recordings" | jq -r --argjson n "$N" '
   .recordings[:$n][] |
   "▸ \(.name)\n   local:  \(.file)\n   b2:     \(.b2.bucket)/\(.b2.key)\n   link:   \(.url // "re-sign with b2 creds")\n   drive:  \(.drive_link // "off")\n   when:   \(.uploaded_at)"

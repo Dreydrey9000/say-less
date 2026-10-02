@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Filled in by bridge/install.sh. Do not load this file directly. -->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.luis.say-less-bridge</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>__PYTHON__</string>
+        <string>__BRIDGE_HOME__/bridge.py</string>
+    </array>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>SAYLESS_BRIDGE_HOME</key>
+        <string>__BRIDGE_HOME__</string>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    </dict>
+    <key>RunAtLoad</key>
+    <true/>
+    <!-- Restart only after a crash. A second copy exits 0 on purpose
+         (it finds the lock) and must NOT be restarted in a loop. -->
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+    </dict>
+    <key>ThrottleInterval</key>
+    <integer>30</integer>
+    <key>ProcessType</key>
+    <string>Background</string>
+    <!-- bridge.py already writes state/bridge.log; keep stdout out of a second file -->
+    <key>StandardOutPath</key>
+    <string>/dev/null</string>
+    <key>StandardErrorPath</key>
+    <string>__BRIDGE_HOME__/state/launchd.err.log</string>
+</dict>
+</plist>

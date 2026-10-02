@@ -1,0 +1,31 @@
+# Local builds without breaking the installed app
+
+macOS remembers permissions (Accessibility, Screen Recording, Input Monitoring)
+for **one exact build** of an app. `tauri build` signs local builds ad hoc, so
+every build has a different identity. If a local build shares the installed
+app's bundle id (`com.dreythomas.sayless`) and gets copied over
+`/Applications/Say Less.app`, macOS keeps a stale permission row that looks on
+but does not match the running app. Re-adding it does not help. That is the
+"Accessibility: Allow, no matter how many times I add it" bug.
+
+## Rules
+
+1. Build test copies with `bun run build:local`. It makes **Say Less Dev**
+   (`com.dreythomas.sayless.dev`): own settings, own permissions, never the
+   installed app.
+2. Never copy a local build into `/Applications`. Releases come from the GitHub
+   **Release** workflow (signed and notarized), see `docs/RELEASING.md`.
+3. If macOS knows about stray copies: `bash scripts/one-copy.sh` lists them,
+   `bash scripts/one-copy.sh --fix` forgets them (files are not deleted).
+4. If Accessibility is stuck anyway: `bash scripts/fix-permissions.sh`
+   (you run it; it resets that one permission and reopens Settings).
+
+## Known issues
+
+- **Homebrew `xattr` breaks bundling.** `which xattr` printing `/opt/homebrew/bin/xattr`
+  makes `tauri build` stop with "failed to run xattr". `scripts/local-build.sh`
+  puts `/usr/bin` first for you.
+- **Extra "Say Less" tiles in the Dock (macOS 27 beta).** Each window the app
+  opens after its first (the recording pill, the rewrite preview, the floating
+  dock) leaves one more tile, and the tiles stay after you quit. Same family as
+  cjpais/Handy#2132. `bash scripts/clear-dock-ghosts.sh` removes them.

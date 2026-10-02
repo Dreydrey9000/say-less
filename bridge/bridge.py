@@ -9,9 +9,11 @@ Jobs:
      (question / statement / statistic / story styles), grounded in the
      client's proven hooks from ve-social.db, copied to the clipboard.
 
-Runs on http://127.0.0.1:8799. No secrets are ever printed to stdout.
+Runs on http://127.0.0.1:8810 (port in state/port.txt). Only ONE bridge can run:
+a lock file stops a second copy from starting. No secrets are ever printed.
 """
 import base64
+import fcntl
 import json
 import os
 import re
@@ -26,14 +28,17 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 HOME = Path.home()
-BRIDGE_DIR = HOME / "Desktop" / "_Code" / "say-less-bridge"
+# Config + state live here, outside the repo. Override with SAYLESS_BRIDGE_HOME.
+BRIDGE_DIR = Path(os.environ.get("SAYLESS_BRIDGE_HOME")
+                  or HOME / "Desktop" / "_Code" / "say-less-bridge")
 STATE_DIR = BRIDGE_DIR / "state"
 REGISTRY_PATH = STATE_DIR / "recordings.json"
 CONFIG_PATH = BRIDGE_DIR / "config.json"
 WATCH_DIR = HOME / "Movies" / "Say Less"
 IMAGES_DIR = HOME / "Pictures" / "Say Less Images"
 IMAGES_REGISTRY_PATH = STATE_DIR / "images.json"
-VE_DB = HOME / "Desktop" / "_Code" / "frictionless" / "data" / "ve-social.db"
+VE_DB = Path(os.environ.get("SAYLESS_VE_DB")
+             or HOME / "Desktop" / "_Code" / "frictionless" / "data" / "ve-social.db")
 SECRETS = HOME / ".claude" / "secrets"
 LOG_PATH = STATE_DIR / "bridge.log"
 
@@ -106,6 +111,63 @@ def read_env_file(path):
     except OSError:
         pass
     return env
+
+
+VIDEO_SUFFIXES = {".mp4", ".mov", ".m4v"}
+IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp", ".heic"}
+MAX_BODY_BYTES = 1_000_000
+
+
+def safe_path(raw, suffixes, roots):
+    """Resolve `raw` (symlinks followed) and return it only if it is a file with
+    an allowed suffix inside one of `roots`. Otherwise None. This keeps a stray
+    local request from asking the bridge to upload or read an arbitrary file."""
+    try:
+        p = Path(str(raw)).expanduser().resolve()
+    except (OSError, RuntimeError, ValueError):
+        return None
+    if p.suffix.lower() not in suffixes or not p.is_file():
+        return None
+    for root in roots:
+        try:
+            p.relative_to(Path(root).resolve())
+            return p
+        except ValueError:
+            continue
+    return None
+
+
+def video_roots():
+    return [WATCH_DIR, HOME / "Movies"] + [Path(x) for x in CONFIG.get("extra_allowed_dirs", [])]
+
+
+def image_roots():
+    # Screenshots can live anywhere under the home folder; the bridge's own
+    # state dir is included for the title-ideas capture.
+    return [HOME, STATE_DIR]
+
+
+def acquire_singleton_lock():
+    """Only one bridge may run. Returns the open lock file (keep a reference),
+    or None if another bridge already holds it."""
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    fh = open(STATE_DIR / "bridge.lock", "a+")
+    try:
+        fcntl.flock(fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        fh.close()
+        return None
+    fh.seek(0)
+    fh.truncate()
+    fh.write(str(os.getpid()))
+    fh.flush()
+    return fh
+
+
+def backoff_seconds(failures):
+    """30 s, 60 s, 120 s ... capped at 1 hour, so a failing upload of a 2-hour
+    recording is not retried every 10 seconds forever."""
+    return min(3600, 30 * (2 ** max(0, failures - 1)))
 
 
 def registry_read():
@@ -182,13 +244,32 @@ def b2_presign(remote_key, days):
     return f"{base}/file/{CONFIG['b2_bucket']}/{quote(remote_key)}?Authorization={token}"
 
 
+DRIVE = {"ok": None, "error": None, "paused_until": 0.0}
+
+
 def drive_upload(local_path, name):
+    """Mirror to Google Drive with rclone. A dead login (invalid_grant) is
+    reported once, clearly, and Drive is skipped for an hour so every upload
+    does not wait on a call that cannot work."""
+    if time.time() < DRIVE["paused_until"]:
+        raise RuntimeError(DRIVE["error"] or "drive paused")
     remote = CONFIG["drive_remote"]
     folder = CONFIG["drive_folder"]
-    subprocess.run(
+    proc = subprocess.run(
         ["/opt/homebrew/bin/rclone", "copyto", str(local_path), f"{remote}:{folder}/{name}"],
-        capture_output=True, text=True, timeout=1800, check=True,
+        capture_output=True, text=True, timeout=1800,
     )
+    if proc.returncode != 0:
+        err = (proc.stderr or "").strip()
+        if "invalid_grant" in err or "token expired" in err:
+            DRIVE["ok"] = False
+            DRIVE["error"] = (f"Google Drive login expired. Run: "
+                              f"rclone config reconnect {remote}:")
+            DRIVE["paused_until"] = time.time() + 3600
+            log(DRIVE["error"])
+            raise RuntimeError(DRIVE["error"])
+        raise RuntimeError(f"rclone copyto failed: {err[-300:]}")
+    DRIVE["ok"], DRIVE["error"] = True, None
     link = subprocess.run(
         ["/opt/homebrew/bin/rclone", "link", f"{remote}:{folder}/{name}"],
         capture_output=True, text=True, timeout=120,
@@ -258,6 +339,7 @@ def upload_recording(path, source="watcher"):
         "size_bytes": path.stat().st_size,
         "uploaded_at": now.isoformat(timespec="seconds"),
         "source": source,
+        "b2_size_bytes": info.get("contentLength", info.get("size")),
         "b2": {
             "bucket": CONFIG["b2_bucket"],
             "key": remote_key,
@@ -279,9 +361,65 @@ def upload_recording(path, source="watcher"):
     return entry
 
 
+def _entry_time(entry):
+    raw = entry.get("uploaded_at") or entry.get("created_at")
+    try:
+        return datetime.fromisoformat(raw)
+    except (TypeError, ValueError):
+        return None
+
+
+def refresh_expiring_urls(now=None):
+    """Presigned B2 links expire after `presign_days`. Re-sign any link that is
+    in its last day so the Recordings app and agents never hand out a dead link."""
+    now = now or datetime.now(timezone.utc)
+    days = CONFIG["presign_days"]
+    refreshed = 0
+    def write_images(entries):
+        with _registry_lock:
+            IMAGES_REGISTRY_PATH.write_text(json.dumps(entries, indent=2))
+
+    # registry_write takes the lock itself; never hold it while calling it.
+    for reader, writer in (
+        (registry_read, registry_write),
+        (images_registry_read, write_images),
+    ):
+        entries = reader()
+        changed = False
+        for e in entries:
+            key = (e.get("b2") or {}).get("key")
+            made = _entry_time(e)
+            stamp = e.get("url_refreshed_at")
+            if stamp:
+                try:
+                    made = datetime.fromisoformat(stamp)
+                except ValueError:
+                    pass
+            if not key or not made:
+                continue
+            if made.tzinfo is None:
+                made = made.replace(tzinfo=timezone.utc)
+            if (now - made).total_seconds() < (days - 1) * 86400:
+                continue
+            try:
+                e["url"] = b2_presign(key, days)
+                e["url_refreshed_at"] = now.isoformat(timespec="seconds")
+                changed = True
+                refreshed += 1
+            except Exception as ex:
+                log(f"link refresh failed for {e.get('name')}: {ex}")
+        if changed:
+            writer(entries)
+    if refreshed:
+        log(f"re-signed {refreshed} expiring link(s)")
+    return refreshed
+
+
 def watcher_loop():
     log(f"watching {WATCH_DIR}")
     seen = {}
+    failures = {}   # name -> (count, retry_after_epoch)
+    last_refresh = 0.0
     while True:
         try:
             if WATCH_DIR.is_dir():
@@ -292,18 +430,28 @@ def watcher_loop():
                         continue
                     known = seen.get(p.name)
                     if known is not None and known == size1 and size1 > 0:
+                        count, retry_at = failures.get(p.name, (0, 0))
                         already = any(
                             e.get("file") == str(p) for e in registry_read()
                         )
-                        if not already:
+                        if not already and time.time() >= retry_at:
                             try:
                                 entry = upload_recording(p, source="watcher")
-                                if entry and CONFIG["delete_local_after_upload"]:
+                                failures.pop(p.name, None)
+                                # Delete only when B2 holds the exact same number of bytes.
+                                if (entry and CONFIG["delete_local_after_upload"]
+                                        and entry.get("b2_size_bytes") == size1):
                                     p.unlink(missing_ok=True)
                                     log(f"local copy deleted after upload: {p.name}")
                             except Exception as e:
-                                log(f"upload failed {p.name}: {e}")
+                                count += 1
+                                wait = backoff_seconds(count)
+                                failures[p.name] = (count, time.time() + wait)
+                                log(f"upload failed {p.name} (try {count}, next in {wait}s): {e}")
                     seen[p.name] = size1
+            if time.time() - last_refresh > 3600:
+                last_refresh = time.time()
+                refresh_expiring_urls()
         except Exception as e:
             log(f"watcher error: {e}")
         time.sleep(CONFIG["watch_interval_seconds"])
@@ -317,11 +465,16 @@ def ve_hooks(client, limit=10):
         return []
     try:
         con = sqlite3.connect(f"file:{VE_DB}?mode=ro", uri=True)
+        # Own work = client_roster.relationship, never posts.is_competitor
+        # (that column is wrong both ways; past clients are still our work).
         rows = con.execute(
-            "SELECT verbatim_hook, CAST(views AS INTEGER) FROM posts "
-            "WHERE client=? AND is_competitor='0' AND verbatim_hook IS NOT NULL "
-            "AND verbatim_hook != '' AND CAST(views AS INTEGER) > 20000 "
-            "ORDER BY CAST(views AS INTEGER) DESC LIMIT ?",
+            "SELECT p.verbatim_hook, CAST(p.views AS INTEGER) FROM posts p "
+            "JOIN client_roster r ON r.slug = p.client "
+            "WHERE p.client=? "
+            "AND r.relationship IN ('current_client','past_client','internal') "
+            "AND p.verbatim_hook IS NOT NULL "
+            "AND p.verbatim_hook != '' AND CAST(p.views AS INTEGER) > 20000 "
+            "ORDER BY CAST(p.views AS INTEGER) DESC LIMIT ?",
             (client, limit),
         ).fetchall()
         con.close()
@@ -498,9 +651,17 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _host_ok(self):
+        host = (self.headers.get("Host") or "").split(":")[0].lower()
+        return host in ("127.0.0.1", "localhost", "[::1]")
+
     def do_GET(self):
+        if not self._host_ok():
+            return self._send(403, {"error": "bad host"})
         if self.path in ("/health", "/"):
             return self._send(200, {"ok": True, "service": "say-less-bridge",
+                                    "pid": os.getpid(),
+                                    "drive": {"ok": DRIVE["ok"], "error": DRIVE["error"]},
                                     "watch_dir": str(WATCH_DIR),
                                     "registry": str(REGISTRY_PATH)})
         if self.path == "/recordings":
@@ -510,7 +671,19 @@ class Handler(BaseHTTPRequestHandler):
         return self._send(404, {"error": "not found"})
 
     def do_POST(self):
-        length = int(self.headers.get("Content-Length", 0))
+        # Browsers cannot send these: a web page must not be able to make the
+        # bridge upload files or spend model credits. Our CLIs and apps (curl,
+        # urllib) send no Origin and set the JSON content type themselves.
+        if not self._host_ok() or self.headers.get("Origin"):
+            return self._send(403, {"error": "forbidden"})
+        if "application/json" not in (self.headers.get("Content-Type") or ""):
+            return self._send(415, {"error": "content-type must be application/json"})
+        try:
+            length = int(self.headers.get("Content-Length", 0))
+        except ValueError:
+            return self._send(400, {"error": "bad length"})
+        if length > MAX_BODY_BYTES:
+            return self._send(413, {"error": "body too large"})
         try:
             payload = json.loads(self.rfile.read(length) or b"{}")
         except ValueError:
@@ -519,6 +692,9 @@ class Handler(BaseHTTPRequestHandler):
             p = payload.get("path")
             if not p:
                 return self._send(400, {"error": "path required"})
+            p = safe_path(p, VIDEO_SUFFIXES, video_roots())
+            if not p:
+                return self._send(403, {"error": "path must be a video inside ~/Movies"})
             try:
                 entry = upload_recording(p, source="api")
                 return self._send(200, {"ok": True, "entry": entry})
@@ -528,6 +704,9 @@ class Handler(BaseHTTPRequestHandler):
             p = payload.get("path")
             if not p:
                 return self._send(400, {"error": "path required"})
+            p = safe_path(p, IMAGE_SUFFIXES, image_roots())
+            if not p:
+                return self._send(403, {"error": "path must be an image inside your home folder"})
             entry = register_image(p, prompt=payload.get("prompt", ""),
                                    painter=payload.get("painter", ""))
             return self._send(200, {"ok": True, "entry": entry})
@@ -535,9 +714,20 @@ class Handler(BaseHTTPRequestHandler):
             image = payload.get("image_path")
             tmp = None
             try:
-                if not image:
+                if image:
+                    image = safe_path(image, IMAGE_SUFFIXES, image_roots())
+                    if not image:
+                        return self._send(403, {"error": "image_path must be an image inside your home folder"})
+                    image = str(image)
+                else:
                     tmp = STATE_DIR / f"screenshot-{int(time.time())}.png"
-                    capture_screen(tmp)
+                    try:
+                        capture_screen(tmp)
+                    except (subprocess.CalledProcessError, OSError):
+                        return self._send(500, {"error": (
+                            "The bridge runs in the background and macOS will not let it capture "
+                            "the screen. Run `title-ideas` in your terminal (it captures there), "
+                            "or send image_path.")})
                     image = str(tmp)
                 result = generate_ideas(
                     image,
@@ -566,6 +756,17 @@ class Handler(BaseHTTPRequestHandler):
 
 def main():
     STATE_DIR.mkdir(parents=True, exist_ok=True)
+    # A restart hands over from the old copy to the new one: give the old copy
+    # a few seconds to let go of the lock before concluding it is a duplicate.
+    lock = None
+    for _ in range(15):
+        lock = acquire_singleton_lock()
+        if lock is not None:
+            break
+        time.sleep(1)
+    if lock is None:
+        log("another say-less-bridge is already running; this copy exits")
+        sys.exit(0)
     if CONFIG["watch_enabled"]:
         threading.Thread(target=watcher_loop, daemon=True).start()
     candidates = [CONFIG.get("ideas_port", 8810), 8812, 8815, 8821, 8833]
@@ -582,8 +783,11 @@ def main():
         log(f"FATAL: no port available from {candidates}")
         sys.exit(1)
     (STATE_DIR / "port.txt").write_text(str(chosen))
-    log(f"say-less-bridge listening on 127.0.0.1:{chosen}")
-    server.serve_forever()
+    log(f"say-less-bridge listening on 127.0.0.1:{chosen} (pid {os.getpid()})")
+    try:
+        server.serve_forever()
+    finally:
+        lock.close()
 
 
 if __name__ == "__main__":

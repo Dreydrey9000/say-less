@@ -2,8 +2,18 @@
 
 ## [Unreleased]
 
+### Added
+
+- `bridge/install.sh`, `bridge/tests/`, `scripts/local-build.sh` (`bun run build:local`), `scripts/one-copy.sh`, `scripts/fix-permissions.sh`, `scripts/clear-dock-ghosts.sh`, `docs/LOCAL-BUILDS.md`.
+
 ### Fixed
 
+- Bridge: only one copy can run (a lock file); a second launch exits quietly instead of moving to another port. LaunchAgent restarts it only after a crash.
+- Bridge: failed uploads back off (30 s up to 1 h) instead of retrying every 10 seconds; a local recording is deleted only when B2 reports the exact same size.
+- Bridge: B2 links are re-signed in their last day, so the Recordings app never shows an expired link.
+- Bridge: an expired Google Drive login is named in the log and in `/health` with the fix command, and Drive is skipped for an hour instead of failing every upload.
+- Bridge: title ideas read hooks by `client_roster.relationship`, not `is_competitor` (past clients are still our work).
+- Bridge: a web page can no longer make the bridge upload or read files (Origin and content-type checks, folder allow-list).
 - Home usage statistics show readable labels, durations, and the typing-speed estimate instead of missing translation keys. These new strings use English fallback text in all interface languages.
 
 ## [0.14.8] - 2026-10-02
