@@ -61,6 +61,8 @@ bun run tauri dev      # run locally
 bun run tauri build    # make an installer for this OS
 ```
 
+[Localization load flow](docs/diagrams/localization.mmd) · [QuickSilver startup measurement](docs/performance/quicksilver-locales.md)
+
 ## Website and releases
 
 ```mermaid
@@ -94,6 +96,8 @@ See [appearance, floating dock, voice actions, and Wispr import](docs/personaliz
 See [personalization](docs/personalization.md) and the [editable companion workflow](docs/diagrams/companion.mmd) for animations, screen-edge placement, hold/tap gestures, and formatting with spelling corrections.
 
 ![Companion and dictation workflow](docs/diagrams/companion.svg)
+
+Drag the small dock by its emblem. Dropping near an edge snaps it to the nearest side or corner; **Appearance → Dock placement** offers all eight anchors. Hover or use Tab to reveal the attached action rail. See the [dock placement workflow](docs/diagrams/dock-placement.svg) ([editable source](docs/diagrams/dock-placement.mmd)).
 
 ### Voice visuals
 

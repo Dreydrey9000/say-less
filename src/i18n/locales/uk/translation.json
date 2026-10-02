@@ -1083,7 +1083,13 @@
     "edges": {
       "free": "Free · drag anywhere",
       "left": "Snap to left edge",
-      "right": "Snap to right edge"
+      "right": "Snap to right edge",
+      "top": "Прикріпити до верхнього краю",
+      "bottom": "Прикріпити до нижнього краю",
+      "top_left": "Прикріпити до верхнього лівого кута",
+      "top_right": "Прикріпити до верхнього правого кута",
+      "bottom_left": "Прикріпити до нижнього лівого кута",
+      "bottom_right": "Прикріпити до нижнього правого кута"
     },
     "formations": {
       "orbit": "Orbit",

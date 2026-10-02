@@ -8,6 +8,17 @@ import { ToggleSwitch } from "../ui/ToggleSwitch";
 const characters = ["orb", "emblem", "buddy", "both", "avatar"] as const;
 /** Looks that draw the silver particles, so the pattern choice matters. */
 const withParticles = ["orb", "emblem", "both"];
+const dockEdges = [
+  "free",
+  "left",
+  "right",
+  "top",
+  "bottom",
+  "top_left",
+  "top_right",
+  "bottom_left",
+  "bottom_right",
+] as const;
 
 /**
  * Floating dock rows. "Dock look" picks what sits in the middle; "Particle
@@ -39,7 +50,7 @@ export function CompanionSettings() {
       />
       <SettingContainer title={t("companion.edge")} description="" grouped>
         <Dropdown
-          options={["free", "left", "right"].map((edge) => ({
+          options={dockEdges.map((edge) => ({
             value: edge,
             label: t(`companion.edges.${edge}`),
           }))}

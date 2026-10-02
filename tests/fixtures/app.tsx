@@ -56,7 +56,7 @@ const settings = {
   // moves straight on to picking a speech engine).
   onboarding_completed: !query.has("newUser"),
   selected_model: "test-model",
-  app_language: "en",
+  app_language: query.get("language") || "en",
   theme: query.get("theme") || "dark",
   // `?whatsNew` turns on the What's New dialog for the current release.
   show_whats_new_on_update: query.has("whatsNew"),
@@ -210,6 +210,7 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
   ).testCommands ??= []);
   calls.push(cmd);
   if (cmd === "get_dock_state") return "idle";
+  if (cmd === "dock_finish_drag") return query.get("snap") ?? "free";
   if (cmd === "screen_recording_status") return screenStatus;
   if (cmd === "get_recording_options") return recordingOptions;
   if (cmd === "save_recording_options") {

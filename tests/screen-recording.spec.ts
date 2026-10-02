@@ -714,7 +714,7 @@ test("dock labels Talk and Screen, and says Stop while the screen records", asyn
   expect(await noPageOverflow()).toBe(true);
 });
 
-test("compact dock offers recording from a small corner button", async ({
+test("compact dock offers recording from its attached action rail", async ({
   page,
 }) => {
   await page.addInitScript(() =>
@@ -748,7 +748,9 @@ test("compact dock offers recording from a small corner button", async ({
       }),
     ),
   );
+  await page.setViewportSize({ width: 220, height: 104 });
   await page.goto("/tests/fixtures/app.html?dock=1");
+  await page.getByRole("button", { name: "Expand dock" }).hover();
   await page.getByRole("button", { name: "Record screen" }).click();
   await expect(
     page.getByRole("button", { name: "Stop screen recording" }),

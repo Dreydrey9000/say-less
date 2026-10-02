@@ -268,11 +268,15 @@ test("the footer update control looks like a button in every state", async ({
   // The "ready" toast floats above the footer instead of covering the button.
   const toast = page.locator("[data-sonner-toast]");
   await expect(toast).toBeVisible();
-  const toastBottom = await toast.evaluate(
-    (el) => el.getBoundingClientRect().bottom,
-  );
-  const buttonTop = await update.evaluate(
-    (el) => el.getBoundingClientRect().top,
-  );
-  expect(toastBottom).toBeLessThanOrEqual(buttonTop);
+  await expect
+    .poll(async () => {
+      const toastBottom = await toast.evaluate(
+        (el) => el.getBoundingClientRect().bottom,
+      );
+      const buttonTop = await update.evaluate(
+        (el) => el.getBoundingClientRect().top,
+      );
+      return toastBottom <= buttonTop;
+    })
+    .toBe(true);
 });

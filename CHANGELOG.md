@@ -1,14 +1,20 @@
 # Changelog
 
-## Unreleased
+## [0.14.8] - 2026-10-02
 
 ### Added
 
 - The small dock now grows into a status island for listening, processing, screen recording, a confirmed saved video, and errors. It returns to its small companion when idle. The drag, hide, and stop controls remain available; motion follows the app's animation preference and Reduce Motion.
+- On Mac, dragging the dock near a screen edge snaps it to the nearest side or corner after release. Appearance also lets you choose any of the eight anchors.
+
+### Changed
+
+- Small-dock actions now share one attached rectangular rail, revealed on hover or keyboard focus. Stop and Show in Finder join the active status island. The rail opens inward at right-side anchors, and the emblem stays in place when controls appear.
 
 ### Fixed
 
 - The small floating dock can be dragged directly by its emblem and has a hide button. Showing or resizing the dock keeps it inside the current screen, and a quick off/on uses the latest saved visibility setting.
+- Dock and app startup load English first and fetch another interface language only when selected, instead of parsing every translation at launch.
 
 ## [2026-09-29]
 

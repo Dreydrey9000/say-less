@@ -187,13 +187,16 @@ function ScreenButton({
           aria-busy={rec.busy || undefined}
           onPointerLeave={() => setQuietTip(false)}
           onClick={(event) => void press(event.detail > 0)}
+          aria-label={compact ? t("screenRecording.stopLabel") : undefined}
         >
-          <span className="rec-dot" aria-hidden="true" />
-          <span className="rec-time" role="timer">
-            {rec.time}
-          </span>
-          {!compact && (
+          {compact ? (
+            <Square size={17} fill="currentColor" aria-hidden="true" />
+          ) : (
             <>
+              <span className="rec-dot" aria-hidden="true" />
+              <span className="rec-time" role="timer">
+                {rec.time}
+              </span>
               <Square size={14} fill="currentColor" aria-hidden="true" />
               {/* While dictating, the Talk pill owns the word Stop. */}
               {!dictating && <span>{t("dock.stop")}</span>}
@@ -271,12 +274,24 @@ function Dock() {
             ? "saved"
             : "idle";
   const compactWide = compactPhase !== "idle";
+  const [controlsHovered, setControlsHovered] = useState(false);
+  const [controlsFocused, setControlsFocused] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const controlsOpen = controlsHovered || controlsFocused || dragging;
+  const railVisible =
+    controlsOpen ||
+    state === "recording" ||
+    screen.recording ||
+    screen.showSaved;
+  const railToLeft = ["right", "top_right", "bottom_right"].includes(
+    settings.dock_edge,
+  );
   useEffect(() => {
     if (!loaded) return;
     void invoke("dock_set_presentation", {
-      wide: settings.dock_compact && compactWide,
+      wide: settings.dock_compact && (compactWide || controlsOpen),
     }).catch(() => setError(true));
-  }, [loaded, settings.dock_compact, compactWide]);
+  }, [loaded, settings.dock_compact, compactWide, controlsOpen]);
   const compactLabel =
     compactPhase === "listening"
       ? t(ready ? "ux.overlay.listening" : "screenRecording.starting")
@@ -305,19 +320,36 @@ function Dock() {
     toggledHere.current = false;
     (settings.dock_compact ? expandRef : collapseRef).current?.focus();
   }, [settings.dock_compact]);
-  function setCompact(compact: boolean) {
-    toggledHere.current = true;
+  function setCompact(compact: boolean, restoreFocus = true) {
+    toggledHere.current = restoreFocus;
+    setControlsHovered(false);
+    setControlsFocused(false);
     void save({ ...settings, dock_compact: compact });
   }
   async function dragDock() {
+    setDragging(true);
     try {
+      if (platform() !== "macos") {
+        // These platforms do not expose a reliable native mouse-up here.
+        // Unpin before dragging; named placement is still available in Appearance.
+        if (
+          useStudio.getState().settings.dock_edge !== "free" &&
+          !(await save({ ...useStudio.getState().settings, dock_edge: "free" }))
+        )
+          throw Error("dock_settings");
+        await getCurrentWindow().startDragging();
+        return;
+      }
       await getCurrentWindow().startDragging();
-      // Save the free position after the native drag finishes. Saving first
-      // can resize/reposition the panel before the pointer begins moving.
-      if (settings.dock_edge !== "free")
-        await save({ ...useStudio.getState().settings, dock_edge: "free" });
+      // startDragging only queues the native drag. Rust waits for mouse-up,
+      // then reads the final window position before choosing a snap anchor.
+      const dock_edge = await invoke<string>("dock_finish_drag");
+      if (!(await save({ ...useStudio.getState().settings, dock_edge })))
+        setError(true);
     } catch {
       setError(true);
+    } finally {
+      setDragging(false);
     }
   }
   function compactPointerDown(event: PointerEvent<HTMLButtonElement>) {
@@ -333,13 +365,7 @@ function Dock() {
   }
   function compactPointerMove(event: PointerEvent<HTMLButtonElement>) {
     const pointer = compactPointer.current;
-    if (
-      !pointer ||
-      pointer.id !== event.pointerId ||
-      pointer.dragged ||
-      !event.buttons
-    )
-      return;
+    if (!pointer || pointer.id !== event.pointerId || pointer.dragged) return;
     if (Math.hypot(event.clientX - pointer.x, event.clientY - pointer.y) < 6)
       return;
     pointer.dragged = true;
@@ -391,48 +417,23 @@ function Dock() {
   if (settings.dock_compact)
     return (
       <main
-        className={`compact-dock ${compactWide ? "is-wide" : ""}`}
+        className={`compact-dock ${compactWide || controlsOpen ? "is-wide" : ""} ${compactWide ? "has-status" : ""} ${railVisible ? "has-rail" : ""} ${railToLeft ? "rail-left" : "rail-right"}`}
         data-state={state}
         data-phase={compactPhase}
         data-motion={settings.dock_motion ? "on" : "off"}
+        onPointerEnter={() => setControlsHovered(true)}
+        onPointerLeave={() => setControlsHovered(false)}
+        onFocusCapture={(event) => {
+          if (event.target.matches(":focus-visible")) setControlsFocused(true);
+        }}
+        onKeyDownCapture={(event) => {
+          if (event.key === "Tab") setControlsFocused(true);
+        }}
+        onBlurCapture={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget))
+            setControlsFocused(false);
+        }}
       >
-        <ScreenButton compact />
-        {!screen.showSaved && (
-          <button
-            className="compact-hide"
-            title={t(
-              screen.recording ? "dock.hideWhileRecording" : "dock.hide",
-            )}
-            aria-label={t(
-              screen.recording ? "dock.hideWhileRecording" : "dock.hide",
-            )}
-            aria-disabled={screen.recording || undefined}
-            onClick={() => {
-              if (screen.recording) return;
-              void useStudio.getState().save({
-                ...useStudio.getState().settings,
-                floating: false,
-              });
-            }}
-          >
-            <X size={15} aria-hidden="true" />
-          </button>
-        )}
-        {screen.showSaved && (
-          <Tooltip
-            label={`${t("screenRecording.saved")} ${t("screenRecording.showInFinder")}`}
-            placement="bottom"
-            align="start"
-            className="compact-saved-anchor"
-          >
-            <button
-              className="compact-saved"
-              onClick={() => void screen.reveal()}
-            >
-              <FolderOpen size={15} aria-hidden="true" />
-            </button>
-          </Tooltip>
-        )}
         <Tooltip
           label={t("dock.expand")}
           placement="inside"
@@ -453,7 +454,7 @@ function Dock() {
                 return;
               }
               suppressExpandClick.current = false;
-              setCompact(false);
+              setCompact(false, event.detail === 0);
             }}
           >
             <span
@@ -506,24 +507,66 @@ function Dock() {
             )}
           </button>
         </Tooltip>
-        {state === "recording" ? (
-          <Tooltip
-            label={t("dock.stop")}
-            placement="top"
-            align="end"
-            className="compact-action-anchor"
-          >
-            <button className="compact-action" onClick={() => void record()}>
-              <Square size={14} fill="currentColor" />
-            </button>
-          </Tooltip>
-        ) : (
-          <span
-            className={`compact-indicator ${error ? "has-error" : ""}`}
-            role="status"
-            aria-label={t(error ? "dock.error" : stateKey)}
-          />
+        {railVisible && (
+          <div className="compact-rail">
+            {state === "recording" ? (
+              <Tooltip
+                label={t("dock.stop")}
+                placement="bottom"
+                className="compact-action-anchor"
+              >
+                <button
+                  className="compact-action"
+                  aria-label={t("dock.stop")}
+                  onClick={() => void record()}
+                >
+                  <Square size={17} fill="currentColor" aria-hidden="true" />
+                </button>
+              </Tooltip>
+            ) : screen.recording ? (
+              <ScreenButton compact />
+            ) : screen.showSaved ? (
+              <Tooltip
+                label={t("screenRecording.showInFinder")}
+                placement="bottom"
+                className="compact-saved-anchor"
+              >
+                <button
+                  className="compact-saved"
+                  aria-label={t("screenRecording.showInFinder")}
+                  onClick={() => void screen.reveal()}
+                >
+                  <FolderOpen size={18} aria-hidden="true" />
+                </button>
+              </Tooltip>
+            ) : (
+              <>
+                {compactPhase === "idle" && <ScreenButton compact />}
+                <Tooltip
+                  label={t("dock.hide")}
+                  placement="bottom"
+                  className="compact-hide-anchor"
+                >
+                  <button
+                    className="compact-hide"
+                    aria-label={t("dock.hide")}
+                    onClick={() => {
+                      void useStudio.getState().save({
+                        ...useStudio.getState().settings,
+                        floating: false,
+                      });
+                    }}
+                  >
+                    <X size={18} aria-hidden="true" />
+                  </button>
+                </Tooltip>
+              </>
+            )}
+          </div>
         )}
+        <span className="compact-status-text" role="status">
+          {error ? t("dock.error") : t(stateKey)}
+        </span>
       </main>
     );
   return (
@@ -664,7 +707,7 @@ function Dock() {
             ref={collapseRef}
             aria-label={t("dock.collapse")}
             disabled={!loaded || busy}
-            onClick={() => setCompact(true)}
+            onClick={(event) => setCompact(true, event.detail === 0)}
           >
             <ChevronDown size={18} />
           </button>

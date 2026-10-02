@@ -194,7 +194,18 @@ fn validate(settings: &StudioSettings) -> Result<(), String> {
         return Err("too_many".into());
     }
     if !["orbit", "helix", "wave", "emblem"].contains(&settings.dock_animation.as_str())
-        || !["free", "left", "right"].contains(&settings.dock_edge.as_str())
+        || ![
+            "free",
+            "left",
+            "right",
+            "top",
+            "bottom",
+            "top_left",
+            "top_right",
+            "bottom_left",
+            "bottom_right",
+        ]
+        .contains(&settings.dock_edge.as_str())
         || !["emblem", "orb", "buddy", "both", "avatar"].contains(&settings.dock_character.as_str())
     {
         return Err("invalid_dock".into());

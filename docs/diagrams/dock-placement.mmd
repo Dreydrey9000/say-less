@@ -1,0 +1,17 @@
+flowchart TD
+    Emblem[Emblem moves after 6px drag threshold] --> OS[Tauri starts native window drag]
+    OS --> Release[Wait for actual mouse release on macOS]
+    Release --> Area[Read final position and monitor work area]
+    Area --> Zones{Within 48pt of an edge?}
+    Zones -->|Yes| Anchor[Nearest of four sides and four corners]
+    Zones -->|No| Free[Free placement]
+    Anchor --> Save[Save dock_edge in local studio.json]
+    Free --> Save
+    Settings[Appearance placement picker] --> Save
+    Save --> Place[Clamp dock inside work area with 12pt inset]
+    Hover[Hover or keyboard focus] --> Rail[Attached action rail opens inward]
+    Events[Real voice and screen recording state] --> Status[Status island and Stop or saved action]
+    Rail --> Resize[Native compact panel changes size]
+    Status --> Resize
+    Resize --> Place
+    Place --> Keep[Preserve emblem position and selected anchor]

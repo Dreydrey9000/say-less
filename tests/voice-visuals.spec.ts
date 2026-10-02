@@ -243,13 +243,15 @@ test("talking avatar reads in the 104px compact dock", async ({ page }) => {
   await page.goto("/tests/fixtures/app.html?dock=1");
   const face = page.locator(".companion-avatar svg.avatar");
   await expect(face).toBeVisible();
-  expect((await face.boundingBox())?.width ?? 0).toBeGreaterThanOrEqual(64);
-  // The status dot means state (neutral when idle), not a copy of the accent.
-  expect(
-    await page
-      .locator(".compact-indicator")
-      .evaluate((el) => getComputedStyle(el).backgroundColor),
-  ).toBe("rgb(199, 204, 212)");
+  await expect
+    .poll(async () => (await face.boundingBox())?.width ?? 0)
+    .toBeGreaterThanOrEqual(64);
+  await expect(page.locator(".compact-dock")).toHaveAttribute(
+    "data-phase",
+    "idle",
+  );
+  await expect(page.getByRole("status")).not.toBeEmpty();
+  await expect(page.locator(".compact-indicator")).toHaveCount(0);
   await page.screenshot({ path: "test-results/dock-avatar-104.png" });
 });
 
@@ -346,9 +348,9 @@ for (const dock_compact of [true, false]) {
     ).toBeVisible();
     await expect(center.locator(".companion-orb")).toHaveCount(0);
     if (dock_compact) {
-      const dot = page.locator(".compact-indicator");
-      await expect(dot).toHaveAttribute("aria-label", /.+/);
-      expect(Math.round((await dot.boundingBox())?.width ?? 0)).toBe(8);
+      await expect(page.locator(".compact-indicator")).toHaveCount(0);
+      await expect(page.getByRole("status")).not.toBeEmpty();
+      await expect(center).toHaveAccessibleName("Expand dock");
     } else {
       await expect(
         page.getByRole("button", { name: "Shrink to small dock" }),
@@ -497,7 +499,9 @@ test("painted avatar fills the 104px dock", async ({ page }) => {
     "href",
     "/avatars/fox-256.webp",
   );
-  expect((await face.boundingBox())?.width ?? 0).toBeGreaterThanOrEqual(64);
+  await expect
+    .poll(async () => (await face.boundingBox())?.width ?? 0)
+    .toBeGreaterThanOrEqual(64);
   // The image really loaded (a missing file would leave it 0x0).
   expect(
     await page.evaluate(async () => {

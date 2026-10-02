@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="650" viewBox="0 0 900 650" role="img" aria-labelledby="title desc">
+  <title id="title">Say Less dock placement and attached controls</title>
+  <desc id="desc">Dragging waits for native mouse release before selecting a side, corner, or free position. The saved anchor and work-area bounds also control resizing when actions or status appear.</desc>
+  <rect width="900" height="650" fill="#111317"/>
+  <g font-family="system-ui,sans-serif" fill="#f2f4f5">
+    <text x="36" y="42" font-size="24" fill="#b8ff65">Say Less · dock placement</text>
+    <g fill="#20242a" stroke="#626c78">
+      <rect x="36" y="70" width="390" height="78" rx="10"/>
+      <rect x="36" y="180" width="390" height="78" rx="10"/>
+      <rect x="36" y="290" width="390" height="90" rx="10"/>
+      <rect x="36" y="416" width="390" height="78" rx="10"/>
+      <rect x="474" y="180" width="390" height="78" rx="10"/>
+      <rect x="474" y="290" width="390" height="90" rx="10"/>
+      <rect x="474" y="416" width="390" height="78" rx="10"/>
+      <rect x="36" y="542" width="828" height="78" rx="10"/>
+    </g>
+    <g font-size="19">
+      <text x="54" y="99">Drag the emblem</text>
+      <text x="54" y="209">Native drag → actual mouse release</text>
+      <text x="54" y="319">Read monitor work area + final position</text>
+      <text x="54" y="445">Save local dock_edge preference</text>
+      <text x="492" y="209">Hover / keyboard focus</text>
+      <text x="492" y="319">Voice / screen recording events</text>
+      <text x="492" y="445">Resize the native panel</text>
+      <text x="54" y="571">Keep the emblem and anchor in place</text>
+    </g>
+    <g font-size="14" fill="#d3d7df">
+      <text x="54" y="126">6px threshold distinguishes a drag from a click</text>
+      <text x="54" y="236">Mouse state is checked on macOS; no timer-based drop</text>
+      <text x="54" y="347">Within 48pt of an edge → nearest side / corner</text>
+      <text x="54" y="368">Else → free placement</text>
+      <text x="54" y="473">Appearance picker uses the same eight anchors</text>
+      <text x="492" y="236">One attached rail; right-side rails open to the left</text>
+      <text x="492" y="347">Status island carries Stop or Show in Finder</text>
+      <text x="492" y="368">Saved appears only after the recorder confirms a file</text>
+      <text x="492" y="473">Compact 104px / revealed 220px / full dock 460px</text>
+      <text x="54" y="599">Clamp inside usable screen bounds with a 12pt inset; clear the menu bar and macOS Dock</text>
+    </g>
+    <g fill="none" stroke="#b8ff65" stroke-width="2">
+      <path d="M231 148v32m-5-6 5 6 5-6 M231 258v32m-5-6 5 6 5-6 M231 380v36m-5-6 5 6 5-6 M231 494v48m-5-6 5 6 5-6"/>
+      <path d="M669 258v32m-5-6 5 6 5-6 M669 380v36m-5-6 5 6 5-6 M669 494v48m-5-6 5 6 5-6"/>
+    </g>
+  </g>
+</svg>

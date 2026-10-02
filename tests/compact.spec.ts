@@ -17,9 +17,8 @@ test("dock collapses to a small companion and expands without recording", async 
   });
   await expect(emblem).toBeVisible();
   await expect(page.locator(".compact-grip")).toHaveCount(0);
-  await expect(
-    page.getByRole("button", { name: "Hide floating dock" }),
-  ).toBeVisible();
+  await page.mouse.move(0, 0);
+  await expect(page.locator(".compact-rail")).toHaveCount(0);
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
@@ -29,7 +28,10 @@ test("dock collapses to a small companion and expands without recording", async 
     path: "test-results/dock-compact-0.12.0.png",
     omitBackground: true,
   });
-  await emblem.focus();
+  await page.keyboard.press("Tab");
+  await expect(emblem).toBeFocused();
+  await page.setViewportSize({ width: 220, height: 104 });
+  await expect(page.locator(".compact-rail")).toBeVisible();
   await page.keyboard.press("Enter");
   await page.setViewportSize({ width: 460, height: 112 });
   await expect(
@@ -48,9 +50,9 @@ test("dragging the emblem moves the compact dock without expanding it", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 460, height: 112 });
-  await page.goto("/tests/fixtures/app.html?dock=1");
+  await page.goto("/tests/fixtures/app.html?dock=1&snap=bottom_right");
   await page.getByRole("button", { name: "Shrink to small dock" }).click();
-  await page.setViewportSize({ width: 104, height: 104 });
+  await page.setViewportSize({ width: 220, height: 104 });
   const emblem = page.getByRole("button", {
     name: "Expand dock",
   });
@@ -63,6 +65,13 @@ test("dragging the emblem moves the compact dock without expanding it", async ({
   await page.mouse.move(x + 18, y + 8, { steps: 3 });
   await page.waitForTimeout(800);
   await page.mouse.up();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => JSON.parse(localStorage.getItem("test-studio") ?? "{}").dock_edge,
+      ),
+    )
+    .toBe("bottom_right");
   await expect(page.locator(".compact-dock")).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Talk", exact: true }),
@@ -81,6 +90,8 @@ test("small dock can be hidden without expanding it", async ({ page }) => {
   await page.goto("/tests/fixtures/app.html?dock=1");
   await page.getByRole("button", { name: "Shrink to small dock" }).click();
   await page.setViewportSize({ width: 104, height: 104 });
+  await page.getByRole("button", { name: "Expand dock" }).hover();
+  await page.setViewportSize({ width: 220, height: 104 });
   await page.getByRole("button", { name: "Hide floating dock" }).click();
   await expect
     .poll(() =>
@@ -200,6 +211,83 @@ test("character choice persists and is visible in the compact dock", async ({
     path: "test-results/dock-character-0.12.0.png",
     omitBackground: true,
   });
+});
+
+test("compact actions form one inward rail and close after the pointer leaves", async ({
+  page,
+}) => {
+  await page.goto("/tests/fixtures/app.html");
+  await page.getByRole("button", { name: "Appearance", exact: true }).click();
+  await page
+    .getByRole("combobox", { name: "Dock placement" })
+    .selectOption("bottom_right");
+  await page.getByRole("switch", { name: "Small dock" }).check();
+  await page.setViewportSize({ width: 104, height: 104 });
+  await page.goto("/tests/fixtures/app.html?dock=1");
+  const emblem = page.getByRole("button", { name: "Expand dock" });
+  await expect(page.locator(".compact-rail")).toHaveCount(0);
+  await emblem.hover();
+  await page.setViewportSize({ width: 220, height: 104 });
+  const rail = page.locator(".compact-rail");
+  await expect(rail).toBeVisible();
+  const railBox = await rail.boundingBox();
+  const emblemBox = await emblem.boundingBox();
+  expect(railBox!.x).toBeLessThan(emblemBox!.x);
+  const buttons = await rail.locator("button").evaluateAll((nodes) =>
+    nodes.map((node) => ({
+      width: node.getBoundingClientRect().width,
+      height: node.getBoundingClientRect().height,
+      radius: getComputedStyle(node).borderRadius,
+    })),
+  );
+  expect(buttons).toHaveLength(2);
+  for (const button of buttons) {
+    expect(button.width).toBeGreaterThanOrEqual(44);
+    expect(button.height).toBeGreaterThanOrEqual(44);
+    expect(button.radius).toBe("0px");
+  }
+  await page.getByRole("button", { name: "Hide floating dock" }).hover();
+  const tip = page
+    .getByRole("tooltip")
+    .filter({ hasText: "Hide floating dock" });
+  await expect(tip).toBeVisible();
+  const tipBox = await tip.boundingBox();
+  expect(tipBox!.x).toBeGreaterThanOrEqual(0);
+  expect(tipBox!.x + tipBox!.width).toBeLessThanOrEqual(220);
+  expect(tipBox!.y + tipBox!.height).toBeLessThanOrEqual(104);
+  await page.keyboard.press("Escape");
+  await page.screenshot({
+    path: "test-results/dock-attached-rail.png",
+    omitBackground: true,
+  });
+  await page.mouse.move(0, 0);
+  await expect(rail).toHaveCount(0);
+  await page.setViewportSize({ width: 104, height: 104 });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+});
+
+test("keyboard focus reveals and reaches the compact action rail", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 460, height: 112 });
+  await page.goto("/tests/fixtures/app.html?dock=1");
+  await page.getByRole("button", { name: "Shrink to small dock" }).click();
+  await page.mouse.move(0, 0);
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("button", { name: "Expand dock" })).toBeFocused();
+  await page.setViewportSize({ width: 220, height: 104 });
+  await page.keyboard.press("Tab");
+  await expect(
+    page.getByRole("button", { name: "Record screen", exact: true }),
+  ).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(
+    page.getByRole("button", { name: "Hide floating dock" }),
+  ).toBeFocused();
 });
 
 test("observed corrections can be kept and removed", async ({ page }) => {
