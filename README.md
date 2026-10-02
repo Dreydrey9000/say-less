@@ -61,6 +61,8 @@ bun run tauri dev      # run locally
 bun run tauri build    # make an installer for this OS
 ```
 
+[Localization load flow](docs/diagrams/localization.mmd) · [QuickSilver startup measurement](docs/performance/quicksilver-locales.md)
+
 ## Website and releases
 
 ```mermaid

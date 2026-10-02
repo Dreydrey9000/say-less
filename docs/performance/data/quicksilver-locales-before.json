@@ -1,0 +1,411 @@
+{
+  "app": "Say Less compact dock",
+  "label": "before",
+  "n": 60,
+  "readyMedianMs": 89.59999999962747,
+  "readyP95Ms": 149.40000000037253,
+  "samples": [
+    {
+      "readyMs": 149.40000000037253,
+      "fcpMs": null,
+      "dclMs": 61.90000000037253
+    },
+    {
+      "readyMs": 110.19999999925494,
+      "fcpMs": null,
+      "dclMs": 22
+    },
+    {
+      "readyMs": 122,
+      "fcpMs": null,
+      "dclMs": 23.90000000037253
+    },
+    {
+      "readyMs": 96.59999999962747,
+      "fcpMs": null,
+      "dclMs": 19.09999999962747
+    },
+    {
+      "readyMs": 97.19999999925494,
+      "fcpMs": null,
+      "dclMs": 18.199999999254942
+    },
+    {
+      "readyMs": 85.20000000111759,
+      "fcpMs": null,
+      "dclMs": 15.900000000372529
+    },
+    {
+      "readyMs": 85.30000000074506,
+      "fcpMs": null,
+      "dclMs": 15.200000001117587
+    },
+    {
+      "readyMs": 87.09999999962747,
+      "fcpMs": null,
+      "dclMs": 15.5
+    },
+    {
+      "readyMs": 88.80000000074506,
+      "fcpMs": null,
+      "dclMs": 15.599999999627471
+    },
+    {
+      "readyMs": 89.5,
+      "fcpMs": null,
+      "dclMs": 17.40000000037253
+    },
+    {
+      "readyMs": 88.19999999925494,
+      "fcpMs": null,
+      "dclMs": 16.5
+    },
+    {
+      "readyMs": 87.10000000149012,
+      "fcpMs": null,
+      "dclMs": 15.600000001490116
+    },
+    {
+      "readyMs": 82.5,
+      "fcpMs": null,
+      "dclMs": 15
+    },
+    {
+      "readyMs": 97.69999999925494,
+      "fcpMs": null,
+      "dclMs": 28.59999999962747
+    },
+    {
+      "readyMs": 86.30000000074506,
+      "fcpMs": null,
+      "dclMs": 15.300000000745058
+    },
+    {
+      "readyMs": 94.40000000037253,
+      "fcpMs": null,
+      "dclMs": 17.200000001117587
+    },
+    {
+      "readyMs": 84.39999999850988,
+      "fcpMs": null,
+      "dclMs": 15.399999998509884
+    },
+    {
+      "readyMs": 87,
+      "fcpMs": null,
+      "dclMs": 15.800000000745058
+    },
+    {
+      "readyMs": 94.19999999925494,
+      "fcpMs": null,
+      "dclMs": 18.299999998882413
+    },
+    {
+      "readyMs": 101.5,
+      "fcpMs": null,
+      "dclMs": 17.799999998882413
+    },
+    {
+      "readyMs": 151.09999999962747,
+      "fcpMs": null,
+      "dclMs": 15.800000000745058
+    },
+    {
+      "readyMs": 97.69999999925494,
+      "fcpMs": null,
+      "dclMs": 19.699999999254942
+    },
+    {
+      "readyMs": 98.5,
+      "fcpMs": null,
+      "dclMs": 20.40000000037253
+    },
+    {
+      "readyMs": 113.39999999850988,
+      "fcpMs": null,
+      "dclMs": 18.699999999254942
+    },
+    {
+      "readyMs": 127.39999999850988,
+      "fcpMs": null,
+      "dclMs": 22.5
+    },
+    {
+      "readyMs": 118.90000000037253,
+      "fcpMs": null,
+      "dclMs": 22.5
+    },
+    {
+      "readyMs": 120.30000000074506,
+      "fcpMs": null,
+      "dclMs": 25.800000000745058
+    },
+    {
+      "readyMs": 101.5,
+      "fcpMs": null,
+      "dclMs": 18.40000000037253
+    },
+    {
+      "readyMs": 85.60000000149012,
+      "fcpMs": null,
+      "dclMs": 15.600000001490116
+    },
+    {
+      "readyMs": 89.59999999962747,
+      "fcpMs": null,
+      "dclMs": 19.700000001117587
+    },
+    {
+      "readyMs": 89.09999999962747,
+      "fcpMs": null,
+      "dclMs": 16
+    },
+    {
+      "readyMs": 272.2999999988824,
+      "fcpMs": null,
+      "dclMs": 22.299999998882413
+    },
+    {
+      "readyMs": 95.80000000074506,
+      "fcpMs": null,
+      "dclMs": 17.09999999962747
+    },
+    {
+      "readyMs": 84,
+      "fcpMs": null,
+      "dclMs": 14.400000000372529
+    },
+    {
+      "readyMs": 96.29999999888241,
+      "fcpMs": null,
+      "dclMs": 18.199999999254942
+    },
+    {
+      "readyMs": 95.69999999925494,
+      "fcpMs": null,
+      "dclMs": 16.90000000037253
+    },
+    {
+      "readyMs": 95.79999999888241,
+      "fcpMs": null,
+      "dclMs": 17.09999999962747
+    },
+    {
+      "readyMs": 90.90000000037253,
+      "fcpMs": null,
+      "dclMs": 18
+    },
+    {
+      "readyMs": 85,
+      "fcpMs": null,
+      "dclMs": 15.099999999627471
+    },
+    {
+      "readyMs": 82.09999999962747,
+      "fcpMs": null,
+      "dclMs": 14.699999999254942
+    },
+    {
+      "readyMs": 81.5,
+      "fcpMs": null,
+      "dclMs": 15.199999999254942
+    },
+    {
+      "readyMs": 82,
+      "fcpMs": null,
+      "dclMs": 13.699999999254942
+    },
+    {
+      "readyMs": 89.59999999962747,
+      "fcpMs": null,
+      "dclMs": 19.09999999962747
+    },
+    {
+      "readyMs": 81,
+      "fcpMs": null,
+      "dclMs": 19.200000001117587
+    },
+    {
+      "readyMs": 85.19999999925494,
+      "fcpMs": null,
+      "dclMs": 15.299999998882413
+    },
+    {
+      "readyMs": 90.09999999962747,
+      "fcpMs": null,
+      "dclMs": 18.09999999962747
+    },
+    {
+      "readyMs": 96.5,
+      "fcpMs": null,
+      "dclMs": 15.599999999627471
+    },
+    {
+      "readyMs": 91.09999999962747,
+      "fcpMs": null,
+      "dclMs": 16.5
+    },
+    {
+      "readyMs": 89.5,
+      "fcpMs": null,
+      "dclMs": 14.599999999627471
+    },
+    {
+      "readyMs": 85.5,
+      "fcpMs": null,
+      "dclMs": 14.800000000745058
+    },
+    {
+      "readyMs": 87.5,
+      "fcpMs": null,
+      "dclMs": 16.600000001490116
+    },
+    {
+      "readyMs": 77.89999999850988,
+      "fcpMs": null,
+      "dclMs": 14.199999999254942
+    },
+    {
+      "readyMs": 82.90000000037253,
+      "fcpMs": null,
+      "dclMs": 15.300000000745058
+    },
+    {
+      "readyMs": 86.5,
+      "fcpMs": null,
+      "dclMs": 16.100000001490116
+    },
+    {
+      "readyMs": 107.59999999962747,
+      "fcpMs": null,
+      "dclMs": 17.800000000745058
+    },
+    {
+      "readyMs": 89.40000000037253,
+      "fcpMs": null,
+      "dclMs": 16.800000000745058
+    },
+    {
+      "readyMs": 78.90000000037253,
+      "fcpMs": null,
+      "dclMs": 15.200000001117587
+    },
+    {
+      "readyMs": 83.5,
+      "fcpMs": null,
+      "dclMs": 17.699999999254942
+    },
+    {
+      "readyMs": 81.29999999888241,
+      "fcpMs": null,
+      "dclMs": 13.699999999254942
+    },
+    {
+      "readyMs": 96.09999999962747,
+      "fcpMs": null,
+      "dclMs": 16.699999999254942
+    }
+  ],
+  "assets": [
+    {
+      "name": "main-rYZ8IrIA.js",
+      "bytes": 5820,
+      "gzipBytes": 2410
+    },
+    {
+      "name": "react-cLQRt21Z.js",
+      "bytes": 1081,
+      "gzipBytes": 642
+    },
+    {
+      "name": "theme-DER6iVeW.js",
+      "bytes": 650,
+      "gzipBytes": 405
+    },
+    {
+      "name": "main-IYyl8TxK.js",
+      "bytes": 26981,
+      "gzipBytes": 7439
+    },
+    {
+      "name": "command-HZMrqFCo.js",
+      "bytes": 1875,
+      "gzipBytes": 853
+    },
+    {
+      "name": "VoiceSquiggle-DsFj0cr7.js",
+      "bytes": 4339,
+      "gzipBytes": 1835
+    },
+    {
+      "name": "bindings-SgOcknt9.js",
+      "bytes": 25701,
+      "gzipBytes": 3556
+    },
+    {
+      "name": "App-B1EXP9X3.js",
+      "bytes": 506330,
+      "gzipBytes": 148862
+    },
+    {
+      "name": "event-Qx4nqcn6.js",
+      "bytes": 3158,
+      "gzipBytes": 1344
+    },
+    {
+      "name": "client-BrO_WgQJ.js",
+      "bytes": 196,
+      "gzipBytes": 164
+    },
+    {
+      "name": "main-CJ4PQe8i.js",
+      "bytes": 1003,
+      "gzipBytes": 597
+    },
+    {
+      "name": "Avatar-Ddd0dNEb.js",
+      "bytes": 13152,
+      "gzipBytes": 4761
+    },
+    {
+      "name": "Tooltip-t0ezw1M6.js",
+      "bytes": 20501,
+      "gzipBytes": 7102
+    },
+    {
+      "name": "index-Bpz2gU7X.js",
+      "bytes": 141723,
+      "gzipBytes": 45994
+    },
+    {
+      "name": "useTranslation-brBcdLgw.js",
+      "bytes": 6785,
+      "gzipBytes": 3277
+    },
+    {
+      "name": "jsx-runtime-CPBaoRNP.js",
+      "bytes": 1002,
+      "gzipBytes": 623
+    },
+    {
+      "name": "fixture-BIfYnfb_.js",
+      "bytes": 15933,
+      "gzipBytes": 6297
+    },
+    {
+      "name": "index-dQyPOMWT.js",
+      "bytes": 1623983,
+      "gzipBytes": 543473
+    },
+    {
+      "name": "modelStore-CXgA6p_R.js",
+      "bytes": 48115,
+      "gzipBytes": 14675
+    },
+    {
+      "name": "modulepreload-polyfill-B5Qt9EMX.js",
+      "bytes": 711,
+      "gzipBytes": 400
+    }
+  ]
+}

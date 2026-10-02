@@ -14,6 +14,7 @@
 ### Fixed
 
 - The small floating dock can be dragged directly by its emblem and has a hide button. Showing or resizing the dock keeps it inside the current screen, and a quick off/on uses the latest saved visibility setting.
+- Dock and app startup load English first and fetch another interface language only when selected, instead of parsing every translation at launch.
 
 ## [2026-09-29]
 

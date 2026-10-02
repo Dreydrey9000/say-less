@@ -2,6 +2,7 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import { locale } from "@tauri-apps/plugin-os";
 import { LANGUAGE_METADATA } from "./languages";
+import english from "./locales/en/translation.json";
 import { commands } from "@/bindings";
 import {
   getLanguageDirection,
@@ -9,23 +10,23 @@ import {
   updateDocumentLanguage,
 } from "@/lib/utils/rtl";
 
-// Auto-discover translation files using Vite's glob import
-const localeModules = import.meta.glob<{ default: Record<string, unknown> }>(
+// Discover available languages without bundling every translation into the
+// startup chunk. English remains local so the first render has a fallback.
+const localeModules = import.meta.glob<{ default: Record<string, unknown> }>([
   "./locales/*/translation.json",
-  { eager: true },
-);
+  "!./locales/en/translation.json",
+]);
 
-// Build resources from discovered locale files
-const resources: Record<string, { translation: Record<string, unknown> }> = {};
-for (const [path, module] of Object.entries(localeModules)) {
-  const langCode = path.match(/\.\/locales\/(.+)\/translation\.json/)?.[1];
-  if (langCode) {
-    resources[langCode] = { translation: module.default };
-  }
-}
+const languageCode = (path: string) =>
+  path.match(/\.\/locales\/(.+)\/translation\.json/)?.[1];
+const resources = { en: { translation: english } };
 
 // Build supported languages list from discovered locales + metadata
-export const SUPPORTED_LANGUAGES = Object.keys(resources)
+export const SUPPORTED_LANGUAGES = [
+  "en",
+  ...Object.keys(localeModules).map(languageCode),
+]
+  .filter((code): code is string => !!code)
   .map((code) => {
     const meta = LANGUAGE_METADATA[code];
     if (!meta) {
@@ -99,6 +100,25 @@ i18n.use(initReactI18next).init({
   },
 });
 
+let languageRequest = 0;
+export const changeAppLanguage = async (code: string): Promise<boolean> => {
+  const request = ++languageRequest;
+  if (!i18n.hasResourceBundle(code, "translation")) {
+    const load = localeModules[`./locales/${code}/translation.json`];
+    if (!load) throw new Error(`No translation for locale "${code}"`);
+    try {
+      const module = await load();
+      i18n.addResourceBundle(code, "translation", module.default);
+    } catch (error) {
+      console.warn(`Failed to load locale "${code}":`, error);
+      throw error;
+    }
+  }
+  if (request !== languageRequest) return false;
+  await i18n.changeLanguage(code);
+  return true;
+};
+
 // Sync language from app settings
 export const syncLanguageFromSettings = async () => {
   try {
@@ -106,14 +126,14 @@ export const syncLanguageFromSettings = async () => {
     if (result.status === "ok" && result.data.app_language) {
       const supported = getSupportedLanguage(result.data.app_language);
       if (supported && supported !== i18n.language) {
-        await i18n.changeLanguage(supported);
+        await changeAppLanguage(supported);
       }
     } else {
       // Fall back to system locale detection if no saved preference
       const systemLocale = await locale();
       const supported = getSupportedLanguage(systemLocale);
       if (supported && supported !== i18n.language) {
-        await i18n.changeLanguage(supported);
+        await changeAppLanguage(supported);
       }
     }
   } catch (e) {
