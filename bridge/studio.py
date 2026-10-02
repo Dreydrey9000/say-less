@@ -710,7 +710,7 @@ class Studio:
 
     def _get(self, h, path, q):
         if path in ("/app", "/app/"):
-            return self.static(h, UI_DIR / "index.html")
+            return self.index(h)
         if path.startswith("/app/"):
             target = (UI_DIR / unquote(path[5:])).resolve()
             if UI_DIR.resolve() not in target.parents or not target.is_file():
@@ -851,6 +851,31 @@ class Studio:
         return True
 
     # ------------------------------------------------------------- files
+
+    def index(self, h):
+        """The whole first screen in ONE response: page, styles, script and the boot data.
+
+        On a busy Mac every request waits its turn for the CPU; five requests meant five
+        waits before anything appeared. One request means one wait."""
+        page = (UI_DIR / "index.html").read_text()
+        css = (UI_DIR / "studio.css").read_text()
+        js = (UI_DIR / "studio.js").read_text().replace("</script", "<\\/script")
+        try:
+            boot = json.dumps(self.boot()).replace("</", "<\\/")
+        except Exception as e:                      # the page still opens; it asks for boot itself
+            self.b.log(f"index: boot data not inlined: {e}")
+            boot = "null"
+        page = page.replace('<link rel="stylesheet" href="/app/studio.css" />', "<style>" + css + "</style>")
+        page = page.replace('<script src="/app/studio.js"></script>',
+                            "<script>window.__BOOT__=" + boot + ";</script><script>" + js + "</script>")
+        data = page.encode()
+        h.send_response(200)
+        h.send_header("Content-Type", "text/html; charset=utf-8")
+        h.send_header("Content-Length", str(len(data)))
+        h.send_header("Cache-Control", "no-cache")
+        h.end_headers()
+        h.wfile.write(data)
+        return True
 
     def static(self, h, path):
         data = path.read_bytes()

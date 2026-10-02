@@ -267,6 +267,25 @@ class Origin(StudioCase):
         self.assertEqual(self.call("GET", "/api/refs", None, {"Origin": "https://evil.example"})[0], 403)
 
 
+class FirstScreenIsOneRequest(StudioCase):
+    def test_app_page_carries_styles_script_and_boot_data(self):
+        conn = http.client.HTTPConnection("127.0.0.1", self.port, timeout=10)
+        conn.request("GET", "/app")
+        r = conn.getresponse()
+        body = r.read().decode()
+        conn.close()
+        self.assertEqual(r.status, 200)
+        self.assertNotIn('href="/app/studio.css"', body)
+        self.assertNotIn('src="/app/studio.js"', body)
+        self.assertIn("<style>", body)
+        self.assertIn("window.__BOOT__=", body)
+        raw = body.split("window.__BOOT__=", 1)[1].split(";</script>", 1)[0]
+        boot = json.loads(raw.replace("<\\/", "</"))
+        for key in ("refs", "recent", "recordings", "drive"):
+            self.assertIn(key, boot)
+        self.assertEqual(body.count("</script>"), 2, "the script text must not close its own tag")
+
+
 class SlowDiskNeverBlocksTheFirstScreen(StudioCase):
     def test_boot_answers_at_once_from_the_last_snapshot_while_a_slow_rebuild_runs(self):
         st = self.studio

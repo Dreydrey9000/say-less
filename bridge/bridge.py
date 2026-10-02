@@ -13,10 +13,12 @@ Runs on http://127.0.0.1:8810 (port in state/port.txt). Only ONE bridge can run:
 a lock file stops a second copy from starting. No secrets are ever printed.
 """
 import base64
+import faulthandler
 import fcntl
 import json
 import os
 import re
+import signal
 import sqlite3
 import subprocess
 import sys
@@ -816,6 +818,8 @@ class StudioServer(ThreadingHTTPServer):
 
 def main():
     STATE_DIR.mkdir(parents=True, exist_ok=True)
+    # `kill -USR1 <pid>` writes every thread's stack to state/stacks.log: the way to see why a request is slow
+    faulthandler.register(signal.SIGUSR1, file=open(STATE_DIR / "stacks.log", "a"), all_threads=True)
     # A restart hands over from the old copy to the new one: give the old copy
     # a few seconds to let go of the lock before concluding it is a duplicate.
     lock = None

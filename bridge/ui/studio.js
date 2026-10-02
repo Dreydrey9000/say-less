@@ -324,6 +324,14 @@
     if (job && job.status === "running" && job._t0) return Math.max(0, (Date.now() - job._t0) / 1000);
     return (job && job.elapsed) || 0;
   }
+  // The seconds counter belongs to the screen, not to the network: one timer rewrites every
+  // running counter from the local clock, so it moves even when the bridge is too busy to answer.
+  setInterval(() => {
+    for (const el of document.querySelectorAll(".time[data-t0]")) {
+      const t0 = Number(el.dataset.t0);
+      if (t0) el.textContent = `${Math.max(0, Math.round((Date.now() - t0) / 1000))} s`;
+    }
+  }, 500);
   function trackJob(job, view, apply) {
     job._t0 = Date.now() - (job.elapsed || 0) * 1000;
     tracker.jobs.set(job.id, { job, view, apply, fails: 0, last: 0 });
@@ -1251,7 +1259,7 @@
             { class: "working" },
             h("div", { class: "label" }, "Painting"),
             h("div", { class: "big" }, job.stage || "Painting"),
-            h("div", { class: "time" }, `${Math.round(secs(job))} s`),
+            h("div", { class: "time", "data-t0": job.status === "running" ? String(job._t0 || "") : "" }, `${Math.round(secs(job))} s`),
             h("div", { class: "hint selectable" }, imgState.prompt),
           ),
         );
@@ -1856,7 +1864,10 @@
       if (current === "image") paintLower(fresh);
     }
     paintLower(snap); // instant, from the last visit
-    api("/api/boot")
+    // The page came with its boot data already inside it: no request, no wait.
+    const injected = window.__BOOT__;
+    window.__BOOT__ = null;
+    (injected ? Promise.resolve(injected) : api("/api/boot"))
       .then((fresh) => {
         // then the truth
         if (JSON.stringify(fresh) !== JSON.stringify(snap)) {
@@ -2118,7 +2129,7 @@
             { class: "working", style: "margin-top:0" },
             h("div", { class: "label" }, "Reading your screen"),
             h("div", { class: "big" }, job.stage),
-            h("div", { class: "time" }, `${Math.round(secs(job))} s`),
+            h("div", { class: "time", "data-t0": job.status === "running" ? String(job._t0 || "") : "" }, `${Math.round(secs(job))} s`),
             h(
               "div",
               { class: "hint" },
@@ -2684,7 +2695,7 @@
             { class: "working", style: "margin-top:0" },
             h("div", { class: "label" }, "Reading"),
             h("div", { class: "big" }, job.stage),
-            h("div", { class: "time" }, `${Math.round(secs(job))} s`),
+            h("div", { class: "time", "data-t0": job.status === "running" ? String(job._t0 || "") : "" }, `${Math.round(secs(job))} s`),
           ),
         );
       if (job && job.partial && job.partial.length)
@@ -2914,9 +2925,11 @@
   }
 
   // ------------------------------------------------------------ status rail
+  let firstStatus = window.__BOOT__ && window.__BOOT__.drive ? window.__BOOT__.drive : null;
   async function pollStatus() {
     try {
-      const s = await api("/api/state");
+      const s = firstStatus ? { drive: firstStatus } : await api("/api/state");
+      firstStatus = null;
       $("#bridge-dot").className = "dot ok";
       $("#bridge-dot").title = "Bridge running";
       const d = s.drive || {};
