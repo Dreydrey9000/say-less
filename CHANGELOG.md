@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- Home usage statistics show readable labels, durations, and the typing-speed estimate instead of missing translation keys. These new strings use English fallback text in all interface languages.
+
 ## [0.14.8] - 2026-10-02
 
 ### Added
