@@ -404,18 +404,12 @@ class Studio:
         folder = self.b.IMAGES_DIR / f"{stamp:%Y/%m}"
         folder.mkdir(parents=True, exist_ok=True)
         out = folder / f"say-less-image-{stamp:%d-%H%M%S}.png"
-        cmd = [sp, "image", prompt, str(out), "--painter", painter]
-        for s in sets:
-            cmd += ["--refs", s]
-        for f in files:
-            cmd += ["--ref", f]
-        if size:
-            cmd += ["--size", size]
-        job["stage"] = {"council": "All your painters are painting the same prompt",
-                        "chatgpt": "ChatGPT is painting (about 1 to 2 minutes)",
-                        "antigravity": "Nano Banana is painting (about 30 seconds)",
-                        "grok": "Grok is painting (about 40 seconds)"}.get(
-                            painter, "Painting (30 seconds to 2 minutes)")
+        stages = {"council": "All your painters are painting the same prompt",
+                  "chatgpt": "ChatGPT is painting (about 1 to 2 minutes)",
+                  "antigravity": "Nano Banana is painting (about 30 seconds)",
+                  "grok": "Grok is painting (about 40 seconds)",
+                  "auto": "Painting with the first painter that answers"}
+
         def found():
             return sorted(p for p in folder.glob(out.stem + "*")
                           if p.suffix.lower() in (".png", ".jpg", ".jpeg", ".webp")
@@ -423,21 +417,43 @@ class Studio:
         env = dict(os.environ)
         env["PATH"] = ":".join([str(Path.home() / ".local/bin"), str(Path.home() / ".claude/skills/subpowers/bin"),
                                 "/opt/homebrew/bin", "/usr/local/bin", "/usr/bin", "/bin", env.get("PATH", "")])
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env)
-        started = time.time()
-        while proc.poll() is None:
-            if time.time() - started > 900:
-                proc.kill()
-                return self.finish(job, status="error", error="That took over 15 minutes, so I stopped it. Try again.")
-            time.sleep(0.6)
-            seen = found()
-            if seen:   # compare-all paints several: show each one the moment it lands
-                with self.lock:
-                    job["outputs"] = [{"path": str(p), "name": p.name} for p in seen]
-        r = finished_process(proc)
-        outputs = found()
+
+        def run_once(which):
+            cmd = [sp, "image", prompt, str(out), "--painter", which]
+            for s_ in sets:
+                cmd += ["--refs", s_]
+            for f in files:
+                cmd += ["--ref", f]
+            if size:
+                cmd += ["--size", size]
+            job["stage"] = stages.get(which, "Painting (30 seconds to 2 minutes)")
+            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env)
+            started = time.time()
+            while proc.poll() is None:
+                if time.time() - started > 900:
+                    proc.kill()
+                    return None, "That took over 15 minutes, so I stopped it. Try again."
+                time.sleep(0.6)
+                seen = found()
+                if seen:   # compare-all paints several: show each one the moment it lands
+                    with self.lock:
+                        job["outputs"] = [{"path": str(p), "name": p.name} for p in seen]
+            r = finished_process(proc)
+            return found(), (r.stderr or r.stdout or "").strip()
+
+        outputs, said = run_once(painter)
+        if outputs is None:
+            return self.finish(job, status="error", error=said)
+        if not outputs and painter not in ("auto", "council"):
+            # The painter you picked did not answer (a busy Mac makes its login check time out).
+            # Try whichever painter does answer, and say so, instead of failing the job.
+            self.b.log(f"painter {painter} gave no image ({said[-120:]}); trying auto")
+            job["note"] = f"{stages.get(painter, painter).split(' is ')[0]} did not answer, so another painter took over."
+            outputs, said = run_once("auto")
+            if outputs is None:
+                return self.finish(job, status="error", error=said)
         if not outputs:
-            tail = (r.stderr or r.stdout or "").strip().splitlines()[-3:]
+            tail = said.splitlines()[-3:]
             return self.finish(job, status="error", error=(
                 "No image came back. " + " ".join(tail)[:300] +
                 " Run `subpowers doctor` to see which painter needs attention."))

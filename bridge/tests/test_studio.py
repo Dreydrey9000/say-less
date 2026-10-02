@@ -161,6 +161,20 @@ class ImageJobs(StudioCase):
         self.assertNotIn("../bad", args)
         self.assertIn("--size 1536x1024", args)
 
+    def test_painter_that_does_not_answer_hands_over_to_another(self):
+        # a busy Mac makes the Nano Banana login check time out, so subpowers skips it
+        sp = self.fake_subpowers('#!/bin/bash\nif [[ "$*" == *"--painter antigravity"* ]]; then\n'
+                                 "  echo 'subpowers: antigravity is not connected (paused or logged out); skipping' >&2; exit 1\nfi\n"
+                                 'python3 -c "import os; from PIL import Image; Image.frombytes(\'RGB\',(60,60),os.urandom(60*60*3)).save(\'$3\')"\n')
+        with mock.patch.object(self.studio, "find_bin", side_effect=lambda n, extra=(): str(sp) if n == "subpowers" else None), \
+             mock.patch.object(self.studio, "_register"):
+            time.sleep(1.1)   # file names carry the second; do not share one with the previous test
+            st, d = self.call("POST", "/api/image", {"prompt": "a red apple", "painter": "antigravity"})
+            job = self.wait(d["job"]["id"])
+        self.assertEqual(job["status"], "done", job)
+        self.assertEqual(len(job["outputs"]), 1)
+        self.assertIn("another painter took over", job.get("note", ""))
+
     def test_failed_painter_gives_a_plain_error(self):
         sp = self.fake_subpowers("#!/bin/bash\necho 'no painter is connected' >&2\nexit 1\n")
         with mock.patch.object(self.studio, "find_bin", side_effect=lambda n, extra=(): str(sp) if n == "subpowers" else None):

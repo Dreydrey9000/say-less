@@ -83,7 +83,7 @@
     return null;
   }
 
-  async function api(path, opts) {
+  async function api(path, opts, jobView) {
     const res = await fetch(path, opts);
     let data = {};
     try {
@@ -91,6 +91,8 @@
     } catch (e) {
       /* non-JSON error body */
     }
+    // A job that failed is still a good answer: its view carries the reason in `error`.
+    if (jobView && res.ok && data.status) return data;
     if (!res.ok || data.error)
       throw new Error(data.error || `The bridge answered ${res.status}.`);
     return data;
@@ -282,7 +284,7 @@
     (async function tick() {
       if (stopped) return;
       try {
-        const job = await api("/api/jobs/" + id);
+        const job = await api("/api/jobs/" + id, undefined, true);
         onUpdate(job);
         if (job.status === "running") setTimeout(tick, 1200);
       } catch (e) {
@@ -1260,6 +1262,7 @@
             h("div", { class: "label" }, "Painting"),
             h("div", { class: "big" }, job.stage || "Painting"),
             h("div", { class: "time", "data-t0": job.status === "running" ? String(job._t0 || "") : "" }, `${Math.round(secs(job))} s`),
+            job.note && h("div", { class: "hint" }, job.note),
             h("div", { class: "hint selectable" }, imgState.prompt),
           ),
         );
