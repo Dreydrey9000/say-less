@@ -1027,6 +1027,16 @@
     "closeSaved": "إغلاق هذه الرسالة"
   },
   "home": {
+    "stats": {
+      "title": "Your dictation activity",
+      "words": "Words dictated",
+      "saved": "Estimated typing time saved",
+      "streak": "Daily streak",
+      "minutes": "{{n}} min",
+      "hours": "{{h}} h",
+      "hoursMinutes": "{{h}} h {{m}} min",
+      "note": "Based on {{dictations}} dictations and a typing speed of {{wpm}} words per minute."
+    },
     "title": "Home",
     "local": "Speech recognition runs on this computer",
     "headline": "Speak. We'll type.",

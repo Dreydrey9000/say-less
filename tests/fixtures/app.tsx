@@ -209,6 +209,12 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
     window as unknown as { testCommands: string[] }
   ).testCommands ??= []);
   calls.push(cmd);
+  if (cmd === "get_usage_stats")
+    return {
+      words: Number(query.get("statsWords") ?? 0),
+      dictations: query.has("statsWords") ? 12 : 0,
+      streak_days: query.has("statsWords") ? 3 : 0,
+    };
   if (cmd === "get_dock_state") return "idle";
   if (cmd === "dock_finish_drag") return query.get("snap") ?? "free";
   if (cmd === "screen_recording_status") return screenStatus;
