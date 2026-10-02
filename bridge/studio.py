@@ -57,6 +57,7 @@ class Studio:
         self.jobs = {}
         self._cache = {}
         self.lock = threading.Lock()
+        self._stale, self._flights, self._refreshing = {}, {}, set()
         self.thumb_slots = threading.Semaphore(3)     # never stampede the CPU with thumbnails
         state = bridge.STATE_DIR
         self.uploads = state / "uploads"
@@ -73,17 +74,45 @@ class Studio:
 
     # ------------------------------------------------------------ helpers
 
-    def cached(self, key, ttl, fn):
-        """Tiny in-memory cache so a burst of requests does the work once."""
+    def cached(self, key, ttl, fn, swr=False):
+        """Tiny in-memory cache so a burst of requests does the work once.
+
+        swr=True: once a value exists it is ALWAYS answered at once, even when old; a
+        single background thread refreshes it. The first screen never waits on disk."""
         now = time.time()
         with self.lock:
             hit = self._cache.get(key)
             if hit and now - hit[0] < ttl:
                 return hit[1]
-        value = fn()
-        with self.lock:
-            self._cache[key] = (time.time(), value)
-        return value
+            stale = self._stale.get(key)
+            if swr and stale is not None:
+                if key not in self._refreshing:
+                    self._refreshing.add(key)
+                    threading.Thread(target=self._refresh, args=(key, fn), daemon=True).start()
+                return stale
+            flight = self._flights.setdefault(key, threading.Lock())
+        with flight:                      # one build at a time; everyone else waits for it
+            with self.lock:
+                hit = self._cache.get(key)
+                if hit and time.time() - hit[0] < ttl:
+                    return hit[1]
+            value = fn()
+            with self.lock:
+                self._cache[key] = (time.time(), value)
+                self._stale[key] = value
+            return value
+
+    def _refresh(self, key, fn):
+        try:
+            value = fn()
+            with self.lock:
+                self._cache[key] = (time.time(), value)
+                self._stale[key] = value
+        except Exception as e:
+            self.b.log(f"background refresh of {key} failed: {e}")
+        finally:
+            with self.lock:
+                self._refreshing.discard(key)
 
     def invalidate(self):
         with self.lock:
@@ -233,6 +262,7 @@ class Studio:
         """Build thumbnails for the newest pictures in the background, so the first screen is already cached."""
         def work():
             try:
+                self.boot()                 # the first screen is ready before anyone asks
                 items, _ = self._library("", "mine", limit)
                 for it in items:
                     for w in (260, 440):
@@ -252,7 +282,7 @@ class Studio:
             recs = self.recordings(light=True)
             return {"refs": self.list_refs(), "recent": items, "recordings": recs[:6], "recording_count": len(recs),
                     "history": self.title_history()[:3], "drive": self.b.DRIVE}
-        return self.cached(("boot",), 2.0, build)
+        return self.cached(("boot",), 3.0, build, swr=True)
 
     # --------------------------------------------------------------- jobs
 

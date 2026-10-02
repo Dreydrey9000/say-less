@@ -267,5 +267,46 @@ class Origin(StudioCase):
         self.assertEqual(self.call("GET", "/api/refs", None, {"Origin": "https://evil.example"})[0], 403)
 
 
+class SlowDiskNeverBlocksTheFirstScreen(StudioCase):
+    def test_boot_answers_at_once_from_the_last_snapshot_while_a_slow_rebuild_runs(self):
+        st = self.studio
+        gate = threading.Event()
+        calls = []
+
+        def build():
+            calls.append(1)
+            if len(calls) > 1:
+                gate.wait(5)          # the second build is the slow disk
+            return {"n": len(calls)}
+
+        self.assertEqual(st.cached(("t-swr",), 0.0, build, swr=True), {"n": 1})
+        t0 = time.time()
+        for _ in range(20):           # a burst of page loads while the rebuild is stuck
+            self.assertEqual(st.cached(("t-swr",), 0.0, build, swr=True), {"n": 1})
+        self.assertLess(time.time() - t0, 0.5)
+        time.sleep(0.1)
+        self.assertEqual(len(calls), 2, "only one background rebuild may run at a time")
+        gate.set()
+        for _ in range(50):
+            if st.cached(("t-swr",), 0.0, build, swr=True) == {"n": 2}:
+                break
+            time.sleep(0.05)
+        self.assertEqual(st.cached(("t-swr",), 0.0, build, swr=True)["n"], 2)
+
+    def test_concurrent_cold_requests_build_once(self):
+        st = self.studio
+        calls = []
+
+        def build():
+            calls.append(1)
+            time.sleep(0.3)
+            return "ok"
+
+        threads = [threading.Thread(target=lambda: st.cached(("t-cold",), 5.0, build)) for _ in range(8)]
+        [t.start() for t in threads]
+        [t.join() for t in threads]
+        self.assertEqual(len(calls), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

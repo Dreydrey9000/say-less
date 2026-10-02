@@ -318,39 +318,66 @@
   // a toast tells you when it lands, with a way back.
   const viewHooks = {};
   const tracker = { jobs: new Map(), timer: 0 };
+  // Seconds a running job has been going, from OUR clock: the number keeps ticking even
+  // while the bridge is too busy to answer a poll.
+  function secs(job) {
+    if (job && job.status === "running" && job._t0) return Math.max(0, (Date.now() - job._t0) / 1000);
+    return (job && job.elapsed) || 0;
+  }
   function trackJob(job, view, apply) {
-    tracker.jobs.set(job.id, { job, view, apply });
+    job._t0 = Date.now() - (job.elapsed || 0) * 1000;
+    tracker.jobs.set(job.id, { job, view, apply, fails: 0, last: 0 });
     paintPill();
     if (!tracker.timer) tracker.timer = setInterval(tickJobs, 1000);
   }
+  // One poll in flight at a time. A slow bridge must never be answered with a pile of requests.
   async function tickJobs() {
-    for (const [id, t] of [...tracker.jobs]) {
-      try {
-        const job = await api("/api/jobs/" + id);
-        t.job = job;
-        t.apply(job);
-        if (job.status !== "running") {
-          tracker.jobs.delete(id);
-          if (current !== t.view)
-            toast(
-              job.status === "done"
-                ? (t.view === "image"
-                    ? "Your image is ready"
-                    : t.view === "titles"
-                      ? "Your titles are ready"
-                      : "Done") + ". Click to open."
-                : "That did not finish. Click to see why.",
-              job.status === "done" ? "ok" : "bad",
-              () => {
-                location.hash = "#/" + t.view;
-              },
-            );
+    if (tracker.busy) {
+      paintPill();
+      return;
+    }
+    tracker.busy = true;
+    try {
+      for (const [id, t] of [...tracker.jobs]) {
+        if (Date.now() - t.last < 2000) {
+          t.apply(t.job); // keep the clock moving between polls
+          continue;
         }
-      } catch (e) {
-        t.apply({ id, status: "error", error: e.message });
-        tracker.jobs.delete(id);
+        t.last = Date.now();
+        try {
+          const job = await api("/api/jobs/" + id);
+          job._t0 = t.job._t0;
+          t.job = job;
+          t.fails = 0;
+          t.apply(job);
+          if (job.status !== "running") {
+            tracker.jobs.delete(id);
+            if (current !== t.view)
+              toast(
+                job.status === "done"
+                  ? (t.view === "image"
+                      ? "Your image is ready"
+                      : t.view === "titles"
+                        ? "Your titles are ready"
+                        : "Done") + ". Click to open."
+                  : "That did not finish. Click to see why.",
+                job.status === "done" ? "ok" : "bad",
+                () => {
+                  location.hash = "#/" + t.view;
+                },
+              );
+          }
+        } catch (e) {
+          // A slow answer is not a failed job. Give up only after a long run of misses.
+          if (++t.fails >= 40) {
+            t.apply({ id, status: "error", error: "The bridge stopped answering. " + e.message });
+            tracker.jobs.delete(id);
+          }
+        }
+        if (current === t.view && viewHooks[t.view]) viewHooks[t.view]();
       }
-      if (current === t.view && viewHooks[t.view]) viewHooks[t.view]();
+    } finally {
+      tracker.busy = false;
     }
     paintPill();
     if (!tracker.jobs.size) {
@@ -379,7 +406,7 @@
               ? "Reading screen"
               : "Working",
           " · ",
-          `${Math.round(t.job.elapsed || 0)} s`,
+          `${Math.round(secs(t.job))} s`,
         ),
       ),
     );
@@ -1191,7 +1218,7 @@
       closePop();
       imgState.error = null;
       imgState.results = null;
-      imgState.job = { status: "running", stage: "Starting", elapsed: 0 }; // the card is on screen before the bridge even answers
+      imgState.job = { status: "running", stage: "Starting", elapsed: 0, _t0: Date.now() }; // the card is on screen before the bridge even answers
       paintStage();
       try {
         const sets = Object.keys(imgState.useSets).filter(
@@ -1224,7 +1251,7 @@
             { class: "working" },
             h("div", { class: "label" }, "Painting"),
             h("div", { class: "big" }, job.stage || "Painting"),
-            h("div", { class: "time" }, `${Math.round(job.elapsed || 0)} s`),
+            h("div", { class: "time" }, `${Math.round(secs(job))} s`),
             h("div", { class: "hint selectable" }, imgState.prompt),
           ),
         );
@@ -2061,6 +2088,7 @@
         status: "running",
         stage: "Reading the screen",
         elapsed: 0,
+        _t0: Date.now(),
       };
       paintOut();
       try {
@@ -2090,7 +2118,7 @@
             { class: "working", style: "margin-top:0" },
             h("div", { class: "label" }, "Reading your screen"),
             h("div", { class: "big" }, job.stage),
-            h("div", { class: "time" }, `${Math.round(job.elapsed || 0)} s`),
+            h("div", { class: "time" }, `${Math.round(secs(job))} s`),
             h(
               "div",
               { class: "hint" },
@@ -2656,7 +2684,7 @@
             { class: "working", style: "margin-top:0" },
             h("div", { class: "label" }, "Reading"),
             h("div", { class: "big" }, job.stage),
-            h("div", { class: "time" }, `${Math.round(job.elapsed || 0)} s`),
+            h("div", { class: "time" }, `${Math.round(secs(job))} s`),
           ),
         );
       if (job && job.partial && job.partial.length)
@@ -2726,6 +2754,7 @@
         status: "running",
         stage: "Starting",
         elapsed: 0,
+        _t0: Date.now(),
         partial: [],
       };
       paintOut(sState.job);
