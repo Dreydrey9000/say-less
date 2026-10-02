@@ -39,16 +39,16 @@ IMAGES_DIR = HOME / "Pictures" / "Say Less Images"
 IMAGES_REGISTRY_PATH = STATE_DIR / "images.json"
 VE_DB = Path(os.environ.get("SAYLESS_VE_DB")
              or HOME / "Desktop" / "_Code" / "frictionless" / "data" / "ve-social.db")
-SECRETS = HOME / ".claude" / "secrets"
+SECRETS = Path(os.environ.get("SAYLESS_SECRETS") or HOME / ".say-less")
 LOG_PATH = STATE_DIR / "bridge.log"
 
 DEFAULT_CONFIG = {
-    "b2_bucket": "viral-editz",
+    "b2_bucket": "say-less",
     "b2_prefix": "say-less-recordings/",
     "b2_secrets_file": str(SECRETS / "b2-cloud-storage.env"),
     "presign_days": 7,
     "drive_enabled": True,
-    "drive_remote": "gdrive-luis",
+    "drive_remote": "gdrive",
     "drive_folder": "SayLess-Recordings",
     "delete_local_after_upload": False,
     "watch_enabled": True,
@@ -86,6 +86,9 @@ def load_config():
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     if not CONFIG_PATH.exists():
         CONFIG_PATH.write_text(json.dumps(cfg, indent=2))
+    for key, val in list(cfg.items()):       # allow ~ in paths
+        if isinstance(val, str) and val.startswith("~") and (key.endswith("_file") or key.endswith("_bin")):
+            cfg[key] = os.path.expanduser(val)
     return cfg
 
 
@@ -642,22 +645,62 @@ def set_clipboard(text):
 
 # ------------------------------------------------------------------ server
 
+_STUDIO = None
+_STUDIO_LOCK = threading.Lock()
+
+
+def studio_instance():
+    """The Say Less Studio (pages + API for the mini apps), created on first use."""
+    global _STUDIO
+    with _STUDIO_LOCK:
+        if _STUDIO is None:
+            import studio
+            _STUDIO = studio.Studio(sys.modules[__name__])
+        return _STUDIO
+
+
 class Handler(BaseHTTPRequestHandler):
+    # Keep-alive: a page that asks for 30 thumbnails reuses one connection instead of opening 30.
+    protocol_version = "HTTP/1.1"
+
+    def handle(self):
+        try:
+            super().handle()
+        except (ConnectionResetError, BrokenPipeError):
+            pass     # the page closed the connection; not worth a traceback
+
     def _send(self, code, obj):
         body = json.dumps(obj).encode()
-        self.send_response(code)
-        self.send_header("Content-Type", "application/json")
-        self.send_header("Content-Length", str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
+        try:
+            self.send_response(code)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            if self.close_connection:
+                self.send_header("Connection", "close")
+            self.end_headers()
+            self.wfile.write(body)
+        except (BrokenPipeError, ConnectionResetError):
+            pass     # the caller gave up waiting
 
     def _host_ok(self):
         host = (self.headers.get("Host") or "").split(":")[0].lower()
         return host in ("127.0.0.1", "localhost", "[::1]")
 
+    def _origin_ok(self):
+        """No Origin (curl, the CLIs) or the bridge's own pages. Never another site."""
+        origin = self.headers.get("Origin")
+        if not origin:
+            return True
+        port = self.server.server_address[1]
+        return origin in (f"http://127.0.0.1:{port}", f"http://localhost:{port}")
+
     def do_GET(self):
         if not self._host_ok():
             return self._send(403, {"error": "bad host"})
+        if not self._origin_ok():
+            return self._send(403, {"error": "forbidden"})
+        if studio_instance().handle(self, "GET", self.path):
+            return
         if self.path in ("/health", "/"):
             return self._send(200, {"ok": True, "service": "say-less-bridge",
                                     "pid": os.getpid(),
@@ -671,11 +714,14 @@ class Handler(BaseHTTPRequestHandler):
         return self._send(404, {"error": "not found"})
 
     def do_POST(self):
-        # Browsers cannot send these: a web page must not be able to make the
-        # bridge upload files or spend model credits. Our CLIs and apps (curl,
-        # urllib) send no Origin and set the JSON content type themselves.
-        if not self._host_ok() or self.headers.get("Origin"):
+        # A web page on another site must not be able to make the bridge upload
+        # files or spend model credits. Our CLIs send no Origin; the Studio
+        # pages send the bridge's own origin. Anything else is refused.
+        self.close_connection = True      # bodies may go unread on a refusal; never reuse this connection
+        if not self._host_ok() or not self._origin_ok():
             return self._send(403, {"error": "forbidden"})
+        if self.path.startswith("/api/") and studio_instance().handle(self, "POST", self.path):
+            return
         if "application/json" not in (self.headers.get("Content-Type") or ""):
             return self._send(415, {"error": "content-type must be application/json"})
         try:
@@ -750,8 +796,22 @@ class Handler(BaseHTTPRequestHandler):
                     tmp.unlink(missing_ok=True)
         return self._send(404, {"error": "not found"})
 
+    def do_DELETE(self):
+        self.close_connection = True
+        if not self._host_ok() or not self._origin_ok():
+            return self._send(403, {"error": "forbidden"})
+        if self.path.startswith("/api/") and studio_instance().handle(self, "DELETE", self.path):
+            return
+        return self._send(404, {"error": "not found"})
+
     def log_message(self, fmt, *args):
         pass
+
+
+class StudioServer(ThreadingHTTPServer):
+    """A page can ask for dozens of thumbnails at once; the default queue of 5 drops them."""
+    request_queue_size = 128
+    daemon_threads = True
 
 
 def main():
@@ -774,7 +834,7 @@ def main():
     chosen = None
     for port in candidates:
         try:
-            server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
+            server = StudioServer(("127.0.0.1", port), Handler)
             chosen = port
             break
         except OSError:
@@ -783,6 +843,7 @@ def main():
         log(f"FATAL: no port available from {candidates}")
         sys.exit(1)
     (STATE_DIR / "port.txt").write_text(str(chosen))
+    threading.Thread(target=lambda: (time.sleep(2), studio_instance().warm()), daemon=True).start()
     log(f"say-less-bridge listening on 127.0.0.1:{chosen} (pid {os.getpid()})")
     try:
         server.serve_forever()

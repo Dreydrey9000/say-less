@@ -34,9 +34,31 @@ change. Only one bridge can run: a lock file makes a second copy exit quietly,
 and launchd only restarts it after a crash.
 
 CLIs (also in this folder, add to PATH): `title-ideas`, `images`, `recordings`,
-`bridge-bucket <bucket>` (switch the B2 bucket; current default `luis-personal`).
+`bridge-bucket <bucket>` (switch the B2 bucket).
 
 Tests: `python3 -m unittest discover -s bridge/tests -v` (no network, no B2, no Drive).
+
+## Say Less Studio (the mini apps)
+
+Open `http://127.0.0.1:8810/app` (the port is in `state/port.txt`). One web app with five views:
+
+| View    | What it does                                                                                                                                                                                                |
+| ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Create  | A big prompt box. `@shelf` pulls in your reference pictures, `+` adds pictures or picks from the library, drop pictures anywhere. Paint with Nano Banana (default, fastest), ChatGPT, Grok, or compare all. |
+| Titles  | Capture the frame you are editing (or drop or paste a screenshot). Click a title to copy it.                                                                                                                |
+| Videos  | Your screen recordings in the cloud, with thumbnails, a player, and copy link.                                                                                                                              |
+| Screens | Pick screenshots and get what each one shows.                                                                                                                                                               |
+| Library | Everything you made, searchable, with Recreate and the cloud link.                                                                                                                                          |
+
+References live in `~/.subpowers/refs/<shelf>/`, the same folders `subpowers --refs <shelf>` reads, so every agent shares them. They never leave your Mac except to the painter you choose, while it paints.
+
+Four small native apps open one view each in a real window (Title Ideas, Say Less Image, Say Less Recordings, Read Screens):
+
+```bash
+bash bridge/launcher/build-launchers.sh --install   # builds from bridge/launcher, backs up any old copy
+```
+
+Speed: the page paints from its last snapshot at once and refreshes behind it; thumbnails are pre-built and cached forever by the browser; painting and reading jobs run in the background and tell you when they finish, even if you switched tabs.
 
 ## HTTP API
 
@@ -76,7 +98,7 @@ live from a CapCut session.
 ## When something looks wrong
 
 - **Google Drive links missing**: `curl -s http://127.0.0.1:$(cat ~/Desktop/_Code/say-less-bridge/state/port.txt)/health`
-  shows `"drive": {"ok": false, "error": "... rclone config reconnect gdrive-luis:"}`.
+  shows `"drive": {"ok": false, "error": "... rclone config reconnect <your-drive-remote>:"}`.
   Run that command once (it opens a Google sign-in). B2 uploads keep working meanwhile.
 - **Dead links after a week**: B2 links last `presign_days`; the bridge re-signs
   any link in its last day, so the Recordings app never shows an expired one.

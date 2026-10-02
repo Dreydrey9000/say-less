@@ -5,7 +5,7 @@
 # they expire (they point at the old bucket).
 set -euo pipefail
 if [[ $# -ne 1 ]]; then
-  current=$(jq -r '.b2_bucket' "${SAYLESS_BRIDGE_HOME:-$HOME/Desktop/_Code/say-less-bridge}/config.json" 2>/dev/null || echo "viral-editz (default)")
+  current=$(jq -r '.b2_bucket' "${SAYLESS_BRIDGE_HOME:-$HOME/Desktop/_Code/say-less-bridge}/config.json" 2>/dev/null || echo "say-less (default)")
   echo "Current bucket: $current"
   echo "Usage: bridge-bucket <bucket-name>"
   exit 0

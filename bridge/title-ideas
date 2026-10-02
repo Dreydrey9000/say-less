@@ -2,7 +2,7 @@
 # title-ideas — capture the screen now and get title box options on your clipboard.
 # Usage:
 #   title-ideas                          # capture screen, generic ideas
-#   title-ideas --client ryan-magin      # grounded in that client's proven hooks
+#   title-ideas --client some-client     # grounded in that client's proven hooks
 #   title-ideas --image /path/to.png     # use an existing screenshot instead
 #   title-ideas --count 12 --extra "45s podcast clip about AI"
 set -euo pipefail
@@ -11,7 +11,7 @@ PORT=$(cat "$BRIDGE_DIR/state/port.txt" 2>/dev/null || echo 8810)
 PAYLOAD=$(python3 - "$@" <<'PY'
 import json, sys, pathlib
 cfg_path = pathlib.Path(__import__("os").environ.get("SAYLESS_BRIDGE_HOME") or pathlib.Path.home() / "Desktop/_Code/say-less-bridge") / "config.json"
-DEFAULT_CLIENT = "ryan-magin"
+DEFAULT_CLIENT = ""
 try:
     DEFAULT_CLIENT = json.loads(cfg_path.read_text()).get("default_client") or DEFAULT_CLIENT
 except Exception:

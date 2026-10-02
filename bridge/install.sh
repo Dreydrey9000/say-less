@@ -17,6 +17,8 @@ mkdir -p "$RUNTIME/state" "$RUNTIME/extras"
 for f in bridge.py title-ideas images recordings bridge-bucket; do
   install -m 0755 "$SRC/$f" "$RUNTIME/$f"
 done
+install -m 0644 "$SRC/studio.py" "$RUNTIME/studio.py"
+rm -rf "$RUNTIME/ui" && cp -R "$SRC/ui" "$RUNTIME/ui"
 cp "$SRC/config.example.json" "$RUNTIME/config.example.json"
 cp "$SRC/extras/"* "$RUNTIME/extras/"
 [ -f "$RUNTIME/config.json" ] || cp "$SRC/config.example.json" "$RUNTIME/config.json"
@@ -32,9 +34,10 @@ for _ in 1 2 3 4 5 6 7 8 9 10; do   # let the old copy exit before starting the 
 done
 launchctl bootstrap "gui/$(id -u)" "$PLIST"
 
-for _ in 1 2 3 4 5 6 7 8 9 10; do
+for _ in $(seq 1 25); do
   PORT="$(cat "$RUNTIME/state/port.txt" 2>/dev/null || true)"
   if [ -n "$PORT" ] && curl -fs -m 3 "http://127.0.0.1:$PORT/health" >/dev/null; then
+    echo "Say Less Studio: http://127.0.0.1:$PORT/app"
     echo "bridge is up on port $PORT:"
     curl -s -m 3 "http://127.0.0.1:$PORT/health"; echo
     exit 0
