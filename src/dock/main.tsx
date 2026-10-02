@@ -1,5 +1,11 @@
 import ReactDOM from "react-dom/client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent,
+} from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { emit, listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
@@ -23,6 +29,10 @@ import {
   Link2,
   ScanSearch,
   Wand2,
+  AudioLines,
+  LoaderCircle,
+  Check,
+  CircleAlert,
 } from "lucide-react";
 import {
   OPEN_RECORDING_SETUP_EVENT,
@@ -249,12 +259,47 @@ function Dock() {
       ? "dock.idleTalkOnly"
       : `dock.${state}`;
   const talkHint = screen.recording && state !== "recording";
+  const compactPhase = error
+    ? "error"
+    : state === "recording"
+      ? "listening"
+      : state === "transcribing" || pending || screen.busy
+        ? "working"
+        : screen.recording
+          ? "screen"
+          : screen.showSaved
+            ? "saved"
+            : "idle";
+  const compactWide = compactPhase !== "idle";
+  useEffect(() => {
+    if (!loaded) return;
+    void invoke("dock_set_presentation", {
+      wide: settings.dock_compact && compactWide,
+    }).catch(() => setError(true));
+  }, [loaded, settings.dock_compact, compactWide]);
+  const compactLabel =
+    compactPhase === "listening"
+      ? t(ready ? "ux.overlay.listening" : "screenRecording.starting")
+      : compactPhase === "working"
+        ? t("dock.processing")
+        : compactPhase === "screen"
+          ? `${t("screenRecording.recording")} ${screen.time}`
+          : compactPhase === "saved"
+            ? t("screenRecording.saved")
+            : "";
   // Expanding or collapsing swaps the whole dock, which would drop keyboard
   // focus to <body>. When the user toggled it here, land focus on the control
   // that undoes the change.
   const toggledHere = useRef(false);
   const expandRef = useRef<HTMLButtonElement>(null);
   const collapseRef = useRef<HTMLButtonElement>(null);
+  const compactPointer = useRef<{
+    id: number;
+    x: number;
+    y: number;
+    dragged: boolean;
+  } | null>(null);
+  const suppressExpandClick = useRef(false);
   useEffect(() => {
     if (!toggledHere.current) return;
     toggledHere.current = false;
@@ -266,15 +311,48 @@ function Dock() {
   }
   async function dragDock() {
     try {
-      if (
-        settings.dock_edge !== "free" &&
-        !(await save({ ...settings, dock_edge: "free" }))
-      )
-        return;
       await getCurrentWindow().startDragging();
+      // Save the free position after the native drag finishes. Saving first
+      // can resize/reposition the panel before the pointer begins moving.
+      if (settings.dock_edge !== "free")
+        await save({ ...useStudio.getState().settings, dock_edge: "free" });
     } catch {
       setError(true);
     }
+  }
+  function compactPointerDown(event: PointerEvent<HTMLButtonElement>) {
+    if (event.button !== 0) return;
+    suppressExpandClick.current = false;
+    compactPointer.current = {
+      id: event.pointerId,
+      x: event.clientX,
+      y: event.clientY,
+      dragged: false,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  }
+  function compactPointerMove(event: PointerEvent<HTMLButtonElement>) {
+    const pointer = compactPointer.current;
+    if (
+      !pointer ||
+      pointer.id !== event.pointerId ||
+      pointer.dragged ||
+      !event.buttons
+    )
+      return;
+    if (Math.hypot(event.clientX - pointer.x, event.clientY - pointer.y) < 6)
+      return;
+    pointer.dragged = true;
+    suppressExpandClick.current = true;
+    if (event.currentTarget.hasPointerCapture(event.pointerId))
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    void dragDock();
+  }
+  function compactPointerEnd(event: PointerEvent<HTMLButtonElement>) {
+    if (compactPointer.current?.id === event.pointerId)
+      compactPointer.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId))
+      event.currentTarget.releasePointerCapture(event.pointerId);
   }
   useEffect(() => {
     let disposed = false;
@@ -312,7 +390,12 @@ function Dock() {
   }
   if (settings.dock_compact)
     return (
-      <main className="compact-dock" data-state={state}>
+      <main
+        className={`compact-dock ${compactWide ? "is-wide" : ""}`}
+        data-state={state}
+        data-phase={compactPhase}
+        data-motion={settings.dock_motion ? "on" : "off"}
+      >
         <ScreenButton compact />
         {!screen.showSaved && (
           <button
@@ -350,31 +433,79 @@ function Dock() {
             </button>
           </Tooltip>
         )}
-        <Tooltip label={t("dock.expand")} placement="inside">
+        <Tooltip
+          label={t("dock.expand")}
+          placement="inside"
+          className="compact-center-anchor"
+        >
           <button
             ref={expandRef}
             className="compact-companion"
+            aria-description={t("dock.drag")}
             disabled={!loaded || busy}
-            onClick={() => setCompact(false)}
+            onPointerDown={compactPointerDown}
+            onPointerMove={compactPointerMove}
+            onPointerUp={compactPointerEnd}
+            onPointerCancel={compactPointerEnd}
+            onClick={(event) => {
+              if (suppressExpandClick.current && event.detail > 0) {
+                suppressExpandClick.current = false;
+                return;
+              }
+              suppressExpandClick.current = false;
+              setCompact(false);
+            }}
           >
-            <Companion
-              level={level}
-              active={listening}
-              thinking={state === "transcribing"}
-              paused={!settings.floating}
-            />
+            <span
+              key={compactPhase}
+              className={`compact-phase-art ${compactWide ? "is-active" : ""}`}
+            >
+              {compactPhase === "saved" ? (
+                <Check
+                  className="compact-phase-icon"
+                  size={30}
+                  aria-hidden="true"
+                />
+              ) : compactPhase === "working" ? (
+                <LoaderCircle
+                  className="compact-phase-icon"
+                  size={30}
+                  aria-hidden="true"
+                />
+              ) : compactPhase === "error" ? (
+                <CircleAlert
+                  className="compact-phase-icon"
+                  size={30}
+                  aria-hidden="true"
+                />
+              ) : compactPhase === "screen" ? (
+                <MonitorPlay
+                  className="compact-phase-icon"
+                  size={30}
+                  aria-hidden="true"
+                />
+              ) : compactPhase === "listening" ? (
+                <AudioLines
+                  className="compact-phase-icon"
+                  size={30}
+                  aria-hidden="true"
+                />
+              ) : (
+                <span className="compact-companion-art">
+                  <Companion
+                    level={level}
+                    active={listening}
+                    thinking={state === "transcribing"}
+                    paused={!settings.floating}
+                  />
+                </span>
+              )}
+            </span>
+            {compactLabel && (
+              <span className="compact-phase-label">{compactLabel}</span>
+            )}
           </button>
         </Tooltip>
-        <button
-          className="compact-grip"
-          title={t("dock.drag")}
-          aria-label={t("dock.drag")}
-          onPointerDown={(event) => {
-            if (event.button === 0) void dragDock();
-          }}
-        >
-          <GripVertical size={16} aria-hidden="true" />
-        </button>
         {state === "recording" ? (
           <Tooltip
             label={t("dock.stop")}

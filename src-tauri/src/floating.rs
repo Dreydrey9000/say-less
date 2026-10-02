@@ -1,9 +1,67 @@
 //! Nonactivating dock: clicking Record must not steal the destination app's focus.
+use std::sync::atomic::{AtomicBool, Ordering};
 use tauri::{AppHandle, Manager};
 #[cfg(target_os = "macos")]
 use tauri_nspanel::{tauri_panel, CollectionBehavior, PanelBuilder, PanelLevel, StyleMask};
 #[cfg(target_os = "macos")]
 tauri_panel! { panel!(SayLessDockPanel { config: { can_become_key_window: false, is_floating_panel: true } }) }
+
+const COMPACT_SIZE: (f64, f64) = (104.0, 104.0);
+const ACTIVE_SIZE: (f64, f64) = (220.0, 104.0);
+static ACTIVE_PRESENTATION: AtomicBool = AtomicBool::new(false);
+
+fn dock_size(compact: bool) -> (f64, f64) {
+    if !compact {
+        (460.0, 112.0)
+    } else if ACTIVE_PRESENTATION.load(Ordering::Relaxed) {
+        ACTIVE_SIZE
+    } else {
+        COMPACT_SIZE
+    }
+}
+
+fn resize_dock(app: &AppHandle, compact: bool) -> Result<(), String> {
+    let window = app
+        .get_webview_window("say_less_dock")
+        .ok_or("dock_missing")?;
+    let old_size = window.outer_size().map_err(|_| "size")?;
+    let old_position = window.outer_position().map_err(|_| "position")?;
+    let (width, height) = dock_size(compact);
+    window
+        .set_size(tauri::LogicalSize::new(width, height))
+        .map_err(|_| "size")?;
+    let new_size = window.outer_size().map_err(|_| "size")?;
+    let settings = crate::studio::get_studio_settings(app.clone())?;
+    if settings.dock_edge == "free" && old_size.width != new_size.width {
+        let centered_x = old_position.x + (old_size.width as i32 - new_size.width as i32) / 2;
+        window
+            .set_position(tauri::PhysicalPosition::new(centered_x, old_position.y))
+            .map_err(|_| "position")?;
+    }
+    place_dock(app)
+}
+
+/// The compact dock grows into an island only while it has a real activity to show.
+#[tauri::command]
+#[specta::specta]
+pub fn dock_set_presentation(app: AppHandle, wide: bool) -> Result<(), String> {
+    ACTIVE_PRESENTATION.store(wide, Ordering::Relaxed);
+    let handle = app.clone();
+    app.run_on_main_thread(move || {
+        let settings = crate::studio::get_studio_settings(handle.clone());
+        if let Ok(settings) = settings {
+            if settings.floating
+                && settings.dock_compact
+                && handle.get_webview_window("say_less_dock").is_some()
+            {
+                if let Err(error) = resize_dock(&handle, true) {
+                    log::warn!("Cannot resize active dock: {error}");
+                }
+            }
+        }
+    })
+    .map_err(|_| "dock_failed".into())
+}
 
 pub fn set_visible(app: &AppHandle, visible: bool) -> Result<(), String> {
     let handle = app.clone();
@@ -84,16 +142,8 @@ pub fn set_visible(app: &AppHandle, visible: bool) -> Result<(), String> {
             let compact = crate::studio::get_studio_settings(handle.clone())
                 .map(|s| s.dock_compact)
                 .unwrap_or(true);
-            let (width, height) = if compact {
-                (104.0, 104.0)
-            } else {
-                (460.0, 112.0)
-            };
-            if let Err(error) = window.set_size(tauri::LogicalSize::new(width, height)) {
-                log::warn!("Cannot resize floating dock: {error}");
-            }
-            if let Err(error) = place_dock(&handle) {
-                log::warn!("Cannot place floating dock: {error}");
+            if let Err(error) = resize_dock(&handle, compact) {
+                log::warn!("Cannot resize or place floating dock: {error}");
             }
             if let Err(error) = window.show() {
                 log::warn!("Cannot show floating dock: {error}");
