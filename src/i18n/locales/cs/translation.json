@@ -592,8 +592,8 @@
         "empty": "Čekání na logy… Záznamy se zde zobrazí, jakmile je aplikace vygeneruje."
       },
       "updateChecks": {
-        "label": "Kontrolovat aktualizace",
-        "description": "Automaticky kontrolovat nové verze Say Less",
+        "label": "Automatic updates",
+        "description": "Check for new releases and download signed updates automatically. You choose when to restart. Portable installs use a manual download.",
         "lockedDescription": "Zakázáno systémovou konfigurací (HANDY_DISABLE_UPDATER)"
       },
       "soundTheme": {
@@ -765,7 +765,11 @@
     "updateFailed": "Say Less se nám nepodařilo aktualizovat",
     "updateFailedMacDescription": "Stáhněte novou verzi a přetáhněte ji do složky Aplikace.",
     "updateFailedDescription": "Stáhněte novou verzi z našeho webu a nainstalujte ji.",
-    "updateFailedAction": "Stáhnout"
+    "updateFailedAction": "Stáhnout",
+    "restartToUpdate": "Restart to update",
+    "updateDownloaded": "Say Less v{{version}} is downloaded. Restart when you are ready.",
+    "downloadingBackground": "Downloading update…",
+    "updateBusy": "Finish dictation or screen recording before restarting to update."
   },
   "common": {
     "loading": "Načítání...",

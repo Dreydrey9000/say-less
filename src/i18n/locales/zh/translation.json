@@ -592,8 +592,8 @@
         "empty": "正在等待日志…… 应用产生日志时将显示在此处。"
       },
       "updateChecks": {
-        "label": "检查更新",
-        "description": "自动检查 Say Less 的新版本",
+        "label": "Automatic updates",
+        "description": "Check for new releases and download signed updates automatically. You choose when to restart. Portable installs use a manual download.",
         "lockedDescription": "已被系统配置禁用 (HANDY_DISABLE_UPDATER)"
       },
       "soundTheme": {
@@ -765,7 +765,11 @@
     "updateFailed": "无法更新 Say Less",
     "updateFailedMacDescription": "请下载新版本，然后将它拖到“应用程序”文件夹中。",
     "updateFailedDescription": "请从我们的网站下载新版本并安装。",
-    "updateFailedAction": "下载"
+    "updateFailedAction": "下载",
+    "restartToUpdate": "Restart to update",
+    "updateDownloaded": "Say Less v{{version}} is downloaded. Restart when you are ready.",
+    "downloadingBackground": "Downloading update…",
+    "updateBusy": "Finish dictation or screen recording before restarting to update."
   },
   "common": {
     "loading": "加载中...",

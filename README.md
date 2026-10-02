@@ -71,12 +71,20 @@ flowchart LR
   C[Run Release workflow<br/>manual] --> D[Draft GitHub release<br/>Mac + Windows installers<br/>+ latest.json]
   D -->|you click Publish| E[Public release]
   E --> F[saylessvoice.com<br/>download buttons]
-  E --> G[Installed apps<br/>auto-update via latest.json]
+  E --> G[Installed apps check latest.json<br/>launch, every 6 hours, focus after 30 minutes]
+  G --> H[Download and verify signed package<br/>automatic updates enabled]
+  H --> I[User chooses Restart to update<br/>dictation and screen recorder idle]
+  I --> J[Install and relaunch]
+  G --> P[Portable install<br/>manual installer link]
   K[(GitHub secrets<br/>updater key, Apple cert)] -.signs.-> B
   K -.signs.-> D
 ```
 
 [Editable diagram](docs/diagrams/release.mmd)
+
+Installed apps check on launch, every six hours, and on focus after at least 30 minutes. With **Advanced → Automatic updates** enabled, signed packages download in the background; **Restart to update** installs them when you choose. Finish dictation and screen recording first. Turning the setting off stops new checks and discards any pending package; an already running download is released when it finishes. Portable installs use a manual installer. Packages are held for the current app session and downloaded again if you quit without installing. Older versions need one update through their existing **Update now** flow to gain this behavior.
+
+[Updater verification and release checklist](docs/verification/automatic-updates.md)
 
 - **Website** lives in `site/` (one HTML file) and is hosted on Cloudflare Pages project `say-less` at [saylessvoice.com](https://saylessvoice.com). Deploy with `cd site && npx wrangler pages deploy . --project-name say-less --branch main`. When a release is published, set the installer links in the `DOWNLOADS` object at the bottom of `site/index.html`.
 - **Releases:** GitHub > Actions > Release > Run workflow. It builds a draft release named after the version in `src-tauri/tauri.conf.json`. Test the installers, then click Publish.

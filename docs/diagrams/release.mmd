@@ -3,6 +3,10 @@ flowchart LR
   C[Run Release workflow<br/>manual] --> D[Draft GitHub release<br/>Mac + Windows installers<br/>+ latest.json]
   D -->|you click Publish| E[Public release]
   E --> F[saylessvoice.com<br/>download buttons]
-  E --> G[Installed apps<br/>auto-update via latest.json]
+  E --> G[Installed apps check latest.json<br/>launch, every 6 hours, focus after 30 minutes]
+  G --> H[Download and verify signed package<br/>automatic updates enabled]
+  H --> I[User chooses Restart to update<br/>dictation and screen recorder idle]
+  I --> J[Install and relaunch]
+  G --> P[Portable install<br/>manual installer link]
   K[(GitHub secrets<br/>updater key, Apple cert)] -.signs.-> B
   K -.signs.-> D

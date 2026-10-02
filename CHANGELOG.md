@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Signed updates download automatically in the background. Choose **Restart to update** when ready; active dictation or screen recording blocks that restart. Automatic updates can be turned off, and portable installs keep their manual installer flow.
+
 ### Fixed
 
 - Home usage statistics show readable labels, durations, and the typing-speed estimate instead of missing translation keys. These new strings use English fallback text in all interface languages.

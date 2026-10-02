@@ -592,8 +592,8 @@
         "empty": "Venter på logs… Poster vises her, når appen udsender dem."
       },
       "updateChecks": {
-        "label": "Tjek for opdateringer",
-        "description": "Tjek automatisk for nye versioner af Say Less",
+        "label": "Automatic updates",
+        "description": "Check for new releases and download signed updates automatically. You choose when to restart. Portable installs use a manual download.",
         "lockedDescription": "Deaktiveret af systemkonfiguration (HANDY_DISABLE_UPDATER)"
       },
       "whatsNewPreview": {
@@ -765,7 +765,11 @@
     "updateFailed": "Vi kunne ikke opdatere Say Less",
     "updateFailedMacDescription": "Download den nye version, og træk den til mappen Programmer.",
     "updateFailedDescription": "Download den nye version fra vores hjemmeside, og installer den.",
-    "updateFailedAction": "Download"
+    "updateFailedAction": "Download",
+    "restartToUpdate": "Restart to update",
+    "updateDownloaded": "Say Less v{{version}} is downloaded. Restart when you are ready.",
+    "downloadingBackground": "Downloading update…",
+    "updateBusy": "Finish dictation or screen recording before restarting to update."
   },
   "whatsNew": {
     "title": "Nyt i Say Less v{{version}}",
