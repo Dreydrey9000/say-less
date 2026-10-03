@@ -29,7 +29,7 @@ test("Studio opens inside the app and exposes all five tools", async ({
       contentType: "text/css",
     }),
   );
-  await page.goto("/tests/fixtures/app.html?version=0.14.12");
+  await page.goto("/tests/fixtures/app.html?version=0.14.13");
   await page.getByRole("button", { name: "Studio", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Studio", exact: true }),
@@ -50,7 +50,7 @@ test("Studio opens inside the app and exposes all five tools", async ({
     ),
   ).not.toBeChecked();
   await page.getByText("Studio connections", { exact: true }).click();
-  await page.screenshot({ path: "public/release-notes/0.14.12/studio.png" });
+  await page.screenshot({ path: "public/release-notes/0.14.13/studio.png" });
 });
 
 test("failed startup explains recovery and provides retry", async ({
