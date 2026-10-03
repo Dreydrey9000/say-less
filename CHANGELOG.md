@@ -10,6 +10,7 @@
 
 ### Fixed
 
+- Bridge: the LaunchAgent ran as `ProcessType: Background`, which gave the bridge and every image painter it starts the lowest CPU and IO priority. The same Compare all took 348 s through the Studio and 77 s from a terminal; as `Interactive` it takes 66 s. Run `bridge/install.sh` again to pick it up.
 - Bridge: only one copy can run (a lock file); a second launch exits quietly instead of moving to another port. LaunchAgent restarts it only after a crash.
 - Bridge: failed uploads back off (30 s up to 1 h) instead of retrying every 10 seconds; a local recording is deleted only when B2 reports the exact same size.
 - Bridge: B2 links are re-signed in their last day, so the Recordings app never shows an expired link.

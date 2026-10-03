@@ -28,8 +28,10 @@
     </dict>
     <key>ThrottleInterval</key>
     <integer>30</integer>
+    <!-- A window is waiting on this service and on the painters it starts. Background made macOS run
+         them at the lowest CPU and IO priority: the same job took 348 s here and 77 s from a terminal. -->
     <key>ProcessType</key>
-    <string>Background</string>
+    <string>Interactive</string>
     <!-- bridge.py already writes state/bridge.log; keep stdout out of a second file -->
     <key>StandardOutPath</key>
     <string>/dev/null</string>
