@@ -34,13 +34,17 @@ test("voice visuals default to bars and the avatar builder persists", async ({
   await expect(
     page.getByRole("button", { name: "Bars", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
-  const look = page.getByRole("combobox", { name: "Dock look" });
-  await expect(look).toHaveValue("emblem");
+  const look = page.getByRole("radiogroup", { name: "Dock look" });
+  await expect(
+    look.getByRole("radio", { name: "Say Less emblem" }),
+  ).toBeChecked();
   // Neither surface uses an avatar yet, so there is nothing to customize.
   await expect(
     page.getByRole("heading", { name: "Customize your avatar" }),
   ).toHaveCount(0);
-  await look.selectOption("avatar");
+  await look
+    .getByRole("radio", { name: "Your avatar (talks when you do)" })
+    .check();
   await expect
     .poll(async () => (await studio(page))?.dock_character)
     .toBe("avatar");
@@ -78,9 +82,9 @@ test("voice visuals default to bars and the avatar builder persists", async ({
   await expect(page.getByLabel("Accessory", { exact: true })).toHaveValue(
     "crown",
   );
-  await expect(page.getByRole("combobox", { name: "Dock look" })).toHaveValue(
-    "avatar",
-  );
+  await expect(
+    page.getByRole("radio", { name: "Your avatar (talks when you do)" }),
+  ).toBeChecked();
   // A face hides the particles, so there is no pattern to pick.
   await expect(page.locator(".formation-grid")).toHaveCount(0);
   await expect(page.getByText("This look has no particles")).toBeVisible();
@@ -363,7 +367,7 @@ test("every select is one 40px control that fits its content", async ({
   page,
 }) => {
   await openAppearance(page);
-  for (const name of ["Theme", "Dock placement", "Dock look"]) {
+  for (const name of ["Theme", "Dock placement"]) {
     const box = await page.getByRole("combobox", { name }).boundingBox();
     expect(Math.round(box!.height)).toBe(40);
     expect(box!.width).toBeLessThanOrEqual(280);

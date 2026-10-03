@@ -107,6 +107,8 @@ See [personalization](docs/personalization.md) and the [editable companion workf
 
 Drag the small dock by its emblem. Dropping near an edge snaps it to the nearest side or corner; **Appearance → Dock placement** offers all eight anchors. Hover or use Tab to reveal the attached action rail. See the [dock placement workflow](docs/diagrams/dock-placement.svg) ([editable source](docs/diagrams/dock-placement.mmd)).
 
+**Appearance → Dock look** shows the five available looks in a horizontal preview gallery. Scroll sideways and click a card, or focus the selected card and use the arrow keys. Your choice is saved and used by the floating dock. See the [dock appearance and visibility workflow](docs/diagrams/dock-appearance.mmd).
+
 ### Voice visuals
 
 In **Appearance → Recording indicator**, switch the animation between Bars (default), a Voice line, or a talking Avatar, and (once an avatar is in use) customize it (stick figure, person, cat or dog; colors; cap, beanie, crown, headphones or sunglasses). The mouth follows voice volume, not words. Pause and Reduce Motion hold it still. See [personalization](docs/personalization.md#voice-visuals) and the [editable voice visuals diagram](docs/diagrams/voice-visuals.mmd).

@@ -202,7 +202,7 @@ test("character choice persists and is visible in the compact dock", async ({
 }) => {
   await page.goto("/tests/fixtures/app.html");
   await page.getByRole("button", { name: "Appearance", exact: true }).click();
-  await page.getByRole("combobox", { name: "Dock look" }).selectOption("both");
+  await page.getByRole("radio", { name: "Buddy with particles" }).check();
   await page.getByRole("switch", { name: "Small dock" }).check();
   await page.goto("/tests/fixtures/app.html?dock=1");
   await page.setViewportSize({ width: 104, height: 104 });

@@ -1,0 +1,16 @@
+flowchart TD
+    Home[Home: Show floating dock] --> Save[Save studio settings locally]
+    Appearance[Appearance: Show floating dock switch] --> Save
+    Gallery[Horizontal gallery: five real dock previews] --> Pick[Click a card or use arrow keys]
+    Pick --> Save
+    Save --> Sync[Studio changed event refreshes all windows]
+    Save --> Queue[Main thread reads latest floating setting]
+    Queue --> Visible{Show dock?}
+    Visible -->|No| Hide[Hide only the dock window]
+    Visible -->|Yes| Exists{Dock exists?}
+    Exists -->|No on Mac| Create[Build hidden non-focusable NSPanel]
+    Create --> Policy[Keep app activation policy unchanged]
+    Policy --> Resize[Resize and place within monitor work area]
+    Exists -->|Yes| Resize
+    Resize --> Show[Tauri shows panel and resumes WebKit]
+    Sync --> Render[Dock renders saved look and animation]
