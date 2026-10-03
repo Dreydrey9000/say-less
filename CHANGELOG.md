@@ -10,6 +10,7 @@
 
 ### Changed
 
+- The large dock shows your first 4 voice actions as one-click buttons (it showed 3), so image, titles, recordings and screens all fit. The small dock still shows only Screen and Hide.
 - The main window passes file drops through to the page, so pictures can be dropped onto Create. Nothing else in the window used the native file-drop events.
 - Opening Create grows the window to fit it when it is smaller. It never shrinks the window.
 

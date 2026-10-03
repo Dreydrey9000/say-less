@@ -375,13 +375,18 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
   if (cmd === "plugin:os|locale") return "en-US";
   if (cmd === "plugin:app|version")
     return query.has("whatsNew") ? "0.14.6" : "0.12.0";
-  if (
-    cmd.includes("check_accessibility_permission") ||
-    cmd.includes("check_microphone_permission")
-  )
+  // ?noPermissions denies the microphone and Accessibility.
+  // ?noAccessibility denies only Accessibility; the microphone stays granted.
+  // sessionStorage test-permissions=granted stands in for a later grant.
+  if (cmd.includes("check_accessibility_permission"))
     return (
-      !query.has("noPermissions") ||
-      sessionStorage.getItem("test-permissions") === "granted"
+      sessionStorage.getItem("test-permissions") === "granted" ||
+      (!query.has("noPermissions") && !query.has("noAccessibility"))
+    );
+  if (cmd.includes("check_microphone_permission"))
+    return (
+      sessionStorage.getItem("test-permissions") === "granted" ||
+      !query.has("noPermissions")
     );
   if (cmd === "is_update_checks_locked") return query.has("updatesLocked");
   if (cmd === "is_portable") return query.has("portable");

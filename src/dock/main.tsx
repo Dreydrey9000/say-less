@@ -650,7 +650,7 @@ function Dock() {
             cue itself, which the user already knows. Rust looks the cue up
             in saved settings, so the dock can only open what the user set. */}
         {(settings.actions_enabled ? (settings.actions ?? []) : [])
-          .slice(0, 3)
+          .slice(0, 4)
           .map((action) => {
             const cue = action.cue.trim();
             const Icon = /image|picture|paint|draw/i.test(cue)
