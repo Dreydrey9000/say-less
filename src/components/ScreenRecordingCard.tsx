@@ -93,7 +93,7 @@ export function ScreenRecordingCard() {
     let frames = 0;
     let frame = requestAnimationFrame(function find() {
       const choice = document.querySelector<HTMLElement>(
-        "#recording-setup .rec-cam-controls input:checked",
+        '#recording-setup .rec-cam-controls input[name="recording-setup-corner"]:checked',
       );
       const target =
         choice ??

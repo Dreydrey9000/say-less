@@ -202,6 +202,7 @@ pub struct BridgeOptions {
     pub camera_id: Option<String>,
     pub webcam_corner: String,
     pub webcam_size: String,
+    pub webcam_shape: String,
     pub max_width: Option<u32>,
     pub max_height: Option<u32>,
     pub fps: u32,
@@ -230,6 +231,7 @@ pub fn bridge_options(options: &RecordingOptions, dictation_mic: Option<String>)
         camera_id: options.camera_id.clone(),
         webcam_corner: word(&options.webcam_corner),
         webcam_size: word(&options.webcam_size),
+        webcam_shape: word(&options.webcam_shape),
         max_width,
         max_height,
         fps: options.fps,
@@ -926,7 +928,7 @@ mod tests {
 
     #[test]
     fn saved_options_reach_the_recorder() {
-        use crate::capture_options::{RecordingQuality, WebcamCorner, WebcamSize};
+        use crate::capture_options::{RecordingQuality, WebcamCorner, WebcamShape, WebcamSize};
         let defaults = bridge_options(&RecordingOptions::default(), None);
         assert_eq!(defaults.source, "display");
         assert!(defaults.microphone && defaults.system_audio && !defaults.webcam);
@@ -937,6 +939,7 @@ mod tests {
         assert_eq!(defaults.fps, 30);
         assert_eq!(defaults.webcam_corner, "bottom_right");
         assert_eq!(defaults.webcam_size, "medium");
+        assert_eq!(defaults.webcam_shape, "circle");
         // No recording mic picked: follow the dictation mic, but "default"
         // means the system default.
         let o = RecordingOptions::default();
@@ -958,10 +961,13 @@ mod tests {
         o.camera_id = Some("cam-1".into());
         o.webcam_corner = WebcamCorner::TopLeft;
         o.webcam_size = WebcamSize::Large;
+        o.webcam_shape = WebcamShape::Square;
         o.quality = RecordingQuality::Native;
         o.fps = 60;
         let b = bridge_options(&o, Some("USB Mic".into()));
         assert_eq!(b.source, "window");
+        assert_eq!(b.webcam_shape, "square");
+        assert_eq!(serde_json::to_value(&b).unwrap()["webcamShape"], "square");
         assert_eq!(b.window_id, Some(7));
         assert_eq!(b.microphone_name.as_deref(), Some("Studio Mic"));
         assert_eq!(b.camera_id.as_deref(), Some("cam-1"));

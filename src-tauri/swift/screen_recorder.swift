@@ -2,7 +2,7 @@
 // (macOS 15+). Apple captures the screen, system audio and the microphone and
 // writes one hardware-encoded MP4, so no frames ever pass through our code.
 //
-// The webcam is a small round window (a "bubble") that floats above other
+// The webcam is a small circle or square window that floats above other
 // apps. The recording includes that one Say Less window while still leaving
 // out the dock and overlay, so the face is burned into the video by the same
 // hardware encoder, with no compositing code of ours.
@@ -66,6 +66,7 @@ struct RecordOptions: Decodable {
     var cameraId: String?
     var webcamCorner: String
     var webcamSize: String
+    var webcamShape: String? = nil
     var maxWidth: Int?
     var maxHeight: Int?
     var fps: Int
@@ -111,7 +112,7 @@ private func cocoaRect(_ rect: CGRect) -> NSRect {
 // MARK: Webcam bubble
 
 private final class BubbleView: NSView {
-    // Drag anywhere on the circle to move it.
+    // Drag anywhere on the camera overlay to move it.
     override var mouseDownCanMoveWindow: Bool { true }
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
 }
@@ -144,6 +145,12 @@ func bubbleOrigin(corner: String, area: CGRect, diameter: Double) -> CGPoint {
     }
 }
 
+/// Native clipping for both the floating camera and its captured window.
+/// Missing/unknown shape names preserve the circle used by older clients.
+func cameraCornerRadius(shape: String?, diameter: Double) -> Double {
+    return shape == "square" ? 0 : diameter / 2
+}
+
 private final class CameraBubble {
     private var panel: NSPanel?
     private var session: AVCaptureSession?
@@ -154,7 +161,7 @@ private final class CameraBubble {
 
     /// Start the camera and show the bubble in `area` (Cocoa coordinates).
     /// Call from a background thread. Returns an error code or nil.
-    func show(cameraId: String?, corner: String, size: String, area: NSRect) -> String? {
+    func show(cameraId: String?, corner: String, size: String, shape: String?, area: NSRect) -> String? {
         guard cameraAllowed() else { return "camera_denied" }
         guard let device = camera(id: cameraId) else { return "camera_missing" }
         let session = AVCaptureSession()
@@ -197,10 +204,10 @@ private final class CameraBubble {
             let view = BubbleView(frame: NSRect(origin: .zero, size: rect.size))
             let root = CALayer()
             root.frame = view.bounds
-            root.cornerRadius = diameter / 2
+            root.cornerRadius = cameraCornerRadius(shape: shape, diameter: diameter)
             root.masksToBounds = true
             root.backgroundColor = NSColor.black.cgColor
-            // Drawn above the video: a thin light ring so the circle reads on
+            // Drawn above the video: a thin light outline so the camera reads on
             // dark and light screens.
             root.borderWidth = 3
             root.borderColor = NSColor.white.withAlphaComponent(0.9).cgColor
@@ -395,6 +402,7 @@ private final class Recorder: NSObject, SCStreamDelegate, SCRecordingOutputDeleg
                 cameraId: options.cameraId,
                 corner: options.webcamCorner,
                 size: options.webcamSize,
+                shape: options.webcamShape,
                 area: area
             ) {
                 bubble.hide()

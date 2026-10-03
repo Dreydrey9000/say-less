@@ -1390,7 +1390,7 @@
     "cameraTitle": "Camera",
     "webcam": "Show your face",
     "whichCamera": "Camera",
-    "previewLabel": "Camera preview. Position: {{corner}}. Size: {{size}}.",
+    "previewLabel": "Camera preview. Position: {{corner}}. Size: {{size}}. Shape: {{shape}}.",
     "position": "Position",
     "bubbleSize": "Size",
     "corner": {
@@ -1404,7 +1404,7 @@
       "medium": "Medium",
       "large": "Large"
     },
-    "webcamHint": "Your face shows in a small circle on screen and in the video. Drag the circle to move it while you record.",
+    "webcamHint": "Your face shows on screen and in the video in the shape you choose. Drag the camera overlay to move it while you record.",
     "cameraAsking": "Allow the camera in the macOS prompt. If you said no before, turn on Say Less in System Settings.",
     "cameraDenied": "我们需要摄像头权限才能显示您的脸。请在“系统设置”中开启 Say Less，或者不露脸录制。",
     "previewFailed": "We couldn't start the camera preview. Another app may be using the camera.",
@@ -1418,6 +1418,11 @@
     "fps60": "60 (smoother, bigger file)",
     "qualityHint": "1080p at 30 frames looks sharp and stays light on 8GB laptops.",
     "saveFailed": "We couldn't save that change. Try again.",
-    "webcamHintWindow": "您的脸会显示在屏幕上和视频中的一个小圆圈里。录制时请保持窗口不动，并让圆圈留在窗口内。"
+    "webcamHintWindow": "Your face shows on screen and in the video in the shape you choose. Keep the window still and the camera overlay inside it while you record.",
+    "cameraShape": "Shape",
+    "shape": {
+      "circle": "Circle",
+      "square": "Square"
+    }
   }
 }

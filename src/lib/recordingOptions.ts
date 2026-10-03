@@ -10,6 +10,7 @@ import type {
   RecordingSources,
   WebcamCorner,
   WebcamSize,
+  WebcamShape,
 } from "@/bindings";
 
 export type {
@@ -17,6 +18,7 @@ export type {
   RecordingSources,
   WebcamCorner,
   WebcamSize,
+  WebcamShape,
 } from "@/bindings";
 
 /** Same shape and defaults as `RecordingOptions::default()` in Rust. */
@@ -32,6 +34,7 @@ export const DEFAULT_RECORDING_OPTIONS: RecordingOptions = {
   camera_id: null,
   webcam_corner: "bottom_right",
   webcam_size: "medium",
+  webcam_shape: "circle",
   quality: "p1080",
   fps: 30,
 };
@@ -42,6 +45,7 @@ export const WEBCAM_CORNERS: WebcamCorner[] = [
   "bottom_left",
   "bottom_right",
 ];
+export const WEBCAM_SHAPES: WebcamShape[] = ["circle", "square"];
 export const WEBCAM_SIZES: WebcamSize[] = ["small", "medium", "large"];
 
 /** "Safari: Start page", or just the app when the window has no title. */

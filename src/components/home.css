@@ -625,6 +625,9 @@
   background: #1c1f26;
   box-shadow: 0 2px 6px #0006;
 }
+.rec-cam-bubble[data-shape="square"] {
+  border-radius: 0;
+}
 .rec-cam-bubble[data-size="small"] {
   height: 30%;
 }

@@ -1447,7 +1447,7 @@ microphone_name: string | null; system_audio: boolean; webcam: boolean;
 /**
  * Camera unique id. None uses the default camera.
  */
-camera_id: string | null; webcam_corner: WebcamCorner; webcam_size: WebcamSize; quality: RecordingQuality; 
+camera_id: string | null; webcam_corner: WebcamCorner; webcam_size: WebcamSize; webcam_shape: WebcamShape; quality: RecordingQuality;
 /**
  * 30 or 60.
  */
@@ -1618,6 +1618,7 @@ export type VadBackend = "silero" | "earshot"
 export type VoiceAction = { cue: string; kind: string; target: string }
 export type VoiceSnippet = { trigger: string; expansion: string }
 export type WebcamCorner = "top_left" | "top_right" | "bottom_left" | "bottom_right"
+export type WebcamShape = "circle" | "square"
 export type WebcamSize = "small" | "medium" | "large"
 export type WindowInfo = { id: number; app: string; title: string }
 export type WindowsMicrophonePermissionStatus = { supported: boolean; overall_access: PermissionAccess; device_access: PermissionAccess; app_access: PermissionAccess; desktop_app_access: PermissionAccess }

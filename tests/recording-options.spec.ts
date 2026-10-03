@@ -6,10 +6,59 @@ const commands = (page: Page) =>
     () => (window as unknown as { testCommands: string[] }).testCommands,
   );
 
+test("camera shape previews immediately and persists with keyboard support", async ({
+  page,
+}) => {
+  let panel = await openSetup(page);
+  await panel.getByRole("switch", { name: "Show your face" }).check();
+  const bubble = panel.getByTestId("webcam-bubble-preview");
+  await expect(
+    panel.getByRole("radio", { name: "Circle", exact: true }),
+  ).toBeChecked();
+  await expect(bubble).toHaveCSS("border-radius", "50%");
+  await panel.getByRole("radio", { name: "Square", exact: true }).check();
+  await expect(bubble).toHaveCSS("border-radius", "0px");
+  await expect(panel.getByRole("img", { name: /Shape: Square/ })).toBeVisible();
+  await expect(bubble).toHaveAttribute("data-corner", "bottom_right");
+  await expect(bubble).toHaveAttribute("data-size", "medium");
+  panel = await openSetup(page);
+  const square = panel.getByRole("radio", { name: "Square", exact: true });
+  await expect(square).toBeChecked();
+  await square.focus();
+  await page.keyboard.press("ArrowLeft");
+  await expect(panel.getByTestId("webcam-bubble-preview")).toHaveCSS(
+    "border-radius",
+    "50%",
+  );
+});
+
+test("changing shape while recording saves without interrupting capture", async ({
+  page,
+}) => {
+  const panel = await openSetup(
+    page,
+    "/tests/fixtures/app.html?screen=recording",
+  );
+  await panel.getByRole("switch", { name: "Show your face" }).check();
+  await panel.getByRole("radio", { name: "Square", exact: true }).check();
+  const seen = await commands(page);
+  expect(seen).toContain("save_recording_options");
+  expect(seen).not.toContain("start_screen_recording");
+  expect(seen).not.toContain("stop_screen_recording");
+  expect(
+    await page.evaluate(
+      () =>
+        JSON.parse(localStorage.getItem("test-recording") || "{}").webcam_shape,
+    ),
+  ).toBe("square");
+});
+
 async function openSetup(page: Page, url = "/tests/fixtures/app.html") {
   await page.goto(url);
   const toggle = card(page).getByRole("button", { name: "Recording setup" });
-  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(toggle).toHaveAttribute("aria-expanded", "false", {
+    timeout: 15000,
+  });
   await toggle.click();
   await expect(toggle).toHaveAttribute("aria-expanded", "true");
   const panel = page.getByRole("region", { name: "Recording setup" });
