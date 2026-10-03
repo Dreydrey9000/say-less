@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" data-recipe="keynote">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Say Less Studio</title>
+    <link rel="stylesheet" href="/app/studio.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <nav class="rail" aria-label="Say Less Studio">
+        <div class="brand" aria-hidden="true">S</div>
+        <div id="nav"></div>
+        <div class="rail-foot">
+          <span
+            class="dot"
+            id="bridge-dot"
+            role="img"
+            aria-label="Bridge status"
+          ></span>
+          <span
+            class="dot"
+            id="drive-dot"
+            role="img"
+            aria-label="Google Drive status"
+          ></span>
+        </div>
+      </nav>
+      <main class="main" id="main" tabindex="-1"></main>
+    </div>
+    <div class="dropveil">
+      <div>
+        Drop pictures to use as references<small
+          >Drop them on a shelf to keep them for every image</small
+        >
+      </div>
+    </div>
+    <div id="overlay"></div>
+    <div class="pill" id="pill" aria-live="polite"></div>
+    <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+    <script src="/app/studio.js"></script>
+  </body>
+</html>

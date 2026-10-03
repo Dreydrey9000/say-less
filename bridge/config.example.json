@@ -1,0 +1,20 @@
+{
+  "b2_bucket": "your-bucket",
+  "b2_prefix": "say-less-recordings/",
+  "b2_secrets_file": "~/.say-less/b2.env",
+  "presign_days": 7,
+  "drive_enabled": true,
+  "drive_remote": "gdrive",
+  "drive_folder": "SayLess-Recordings",
+  "delete_local_after_upload": false,
+  "watch_enabled": true,
+  "watch_interval_seconds": 10,
+  "ideas_provider_chain": ["zai_small", "agy"],
+  "zai_base_url": "https://api.z.ai/api/coding/paas/v4",
+  "zai_secrets_file": "~/.say-less/zai.env",
+  "groq_secrets_file": "~/.say-less/groq.env",
+  "agy_bin": "~/.local/bin/agy",
+  "agy_timeout_seconds": 170,
+  "ideas_port": 8810,
+  "default_client": ""
+}

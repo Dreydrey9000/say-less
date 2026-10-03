@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# bridge-bucket — change which B2 bucket recordings upload to.
+# Usage: bridge-bucket <bucket-name>
+# New uploads go there immediately; old registry links keep working until
+# they expire (they point at the old bucket).
+set -euo pipefail
+if [[ $# -ne 1 ]]; then
+  current=$(jq -r '.b2_bucket' "${SAYLESS_BRIDGE_HOME:-$HOME/Desktop/_Code/say-less-bridge}/config.json" 2>/dev/null || echo "say-less (default)")
+  echo "Current bucket: $current"
+  echo "Usage: bridge-bucket <bucket-name>"
+  exit 0
+fi
+CONFIG="${SAYLESS_BRIDGE_HOME:-$HOME/Desktop/_Code/say-less-bridge}/config.json"
+python3 - "$1" <<PY
+import json
+from pathlib import Path
+p = Path("$CONFIG")
+cfg = json.loads(p.read_text()) if p.exists() else {}
+cfg["b2_bucket"] = "$1"
+p.write_text(json.dumps(cfg, indent=2))
+print("bucket set to:", cfg["b2_bucket"])
+PY
+launchctl kickstart -k gui/$(id -u)/com.luis.say-less-bridge
+sleep 2
+echo "bridge restarted — new uploads go to $1"
