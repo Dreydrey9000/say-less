@@ -10,6 +10,7 @@
 
 ### Changed
 
+- Studio: the first tab is named Images (the page and its first tab were both called Create). Inside the Say Less window the Studio hides its own logo and the two status dots, and the "browsing settings" notice no longer sits on top of the Studio page.
 - A returning user who has the microphone but is missing only Accessibility lands in the existing browse mode instead of the full-screen setup. Shortcuts stay off until Accessibility is granted.
 
 ### Studio integration

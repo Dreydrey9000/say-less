@@ -39,7 +39,7 @@ test("Studio opens inside the app and exposes all five tools", async ({
     page.getByRole("heading", { name: "Studio", exact: true }),
   ).toBeVisible();
   const studio = page.frameLocator('iframe[title="Say Less Studio tools"]');
-  for (const name of ["Create", "Titles", "Videos", "Screens", "Library"]) {
+  for (const name of ["Images", "Titles", "Videos", "Screens", "Library"]) {
     await expect(
       studio.locator("#nav").getByRole("button", { name, exact: true }),
     ).toBeVisible();
