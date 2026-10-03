@@ -35,6 +35,19 @@ const defaultStudio = {
 let studio = JSON.parse(
   localStorage.getItem("test-studio") || JSON.stringify(defaultStudio),
 );
+// ?dockActions: five saved voice actions, to check the dock shows four.
+if (query.has("dockActions"))
+  studio = {
+    ...studio,
+    actions_enabled: true,
+    actions: [
+      { cue: "make an image", kind: "create", target: "image" },
+      { cue: "title ideas", kind: "create", target: "titles" },
+      { cue: "my recordings", kind: "create", target: "recordings" },
+      { cue: "read my screens", kind: "create", target: "screens" },
+      { cue: "my library", kind: "create", target: "library" },
+    ],
+  };
 let imported = false;
 let helperUp = query.has("helperRunning");
 let learned = query.has("learned")
@@ -375,13 +388,18 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
   if (cmd === "plugin:os|locale") return "en-US";
   if (cmd === "plugin:app|version")
     return query.has("whatsNew") ? "0.14.6" : "0.12.0";
-  if (
-    cmd.includes("check_accessibility_permission") ||
-    cmd.includes("check_microphone_permission")
-  )
+  // ?noPermissions denies the microphone and Accessibility.
+  // ?noAccessibility denies only Accessibility; the microphone stays granted.
+  // sessionStorage test-permissions=granted stands in for a later grant.
+  if (cmd.includes("check_accessibility_permission"))
     return (
-      !query.has("noPermissions") ||
-      sessionStorage.getItem("test-permissions") === "granted"
+      sessionStorage.getItem("test-permissions") === "granted" ||
+      (!query.has("noPermissions") && !query.has("noAccessibility"))
+    );
+  if (cmd.includes("check_microphone_permission"))
+    return (
+      sessionStorage.getItem("test-permissions") === "granted" ||
+      !query.has("noPermissions")
     );
   if (cmd === "is_update_checks_locked") return query.has("updatesLocked");
   if (cmd === "is_portable") return query.has("portable");

@@ -6,7 +6,7 @@ test("Create turns on with one click and then shows the page inside the app", as
   page,
 }) => {
   await page.goto("/tests/fixtures/app.html");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
+  await page.getByRole("button", { name: "Studio", exact: true }).click();
   await expect(
     page.getByRole("heading", {
       name: "Create pictures, titles and video notes",
@@ -32,7 +32,7 @@ test("Create goes straight to the page when the helper is already running", asyn
   page,
 }) => {
   await page.goto("/tests/fixtures/app.html?helperRunning=1");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
+  await page.getByRole("button", { name: "Studio", exact: true }).click();
   await expect(page.locator(`iframe[title="${FRAME}"]`)).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Turn on Create" }),
@@ -43,7 +43,7 @@ test("Create says plainly what is missing and lets you try again", async ({
   page,
 }) => {
   await page.goto("/tests/fixtures/app.html?helperStartFails=python_missing");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
+  await page.getByRole("button", { name: "Studio", exact: true }).click();
   await page.getByRole("button", { name: "Turn on Create" }).click();
   await expect(page.getByRole("alert")).toContainText("needs Python 3");
   await expect(page.getByRole("button", { name: "Try again" })).toBeEnabled();
@@ -53,7 +53,7 @@ test("Create explains that it needs a Mac when it cannot start here", async ({
   page,
 }) => {
   await page.goto("/tests/fixtures/app.html?helperNoStart=1");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
+  await page.getByRole("button", { name: "Studio", exact: true }).click();
   await expect(page.getByRole("alert")).toContainText("works on Mac");
   await expect(
     page.getByRole("button", { name: "Turn on Create" }),
@@ -77,7 +77,7 @@ test("only the Create page's own frame can ask the app to capture the screen", a
     }),
   );
   await page.goto("/tests/fixtures/app.html?helperRunning=1");
-  await page.getByRole("button", { name: "Create", exact: true }).click();
+  await page.getByRole("button", { name: "Studio", exact: true }).click();
   const body = page.frameLocator(`iframe[title="${FRAME}"]`).locator("body");
   await expect(body).toContainText('"ok":true');
   await expect(body).toContainText("/Users/t/state/captures/capture-1.png");
@@ -121,7 +121,7 @@ test("a cancelled region capture is passed on as cancelled", async ({
   await page.goto(
     "/tests/fixtures/app.html?helperRunning=1&captureCancelled=1",
   );
-  await page.getByRole("button", { name: "Create", exact: true }).click();
+  await page.getByRole("button", { name: "Studio", exact: true }).click();
   await expect(
     page.frameLocator(`iframe[title="${FRAME}"]`).locator("body"),
   ).toContainText('"error":"cancelled"');

@@ -388,9 +388,21 @@ function App() {
               checkAccessibilityPermission(),
               checkMicrophonePermission(),
             ]);
-            if (!hasAccessibility || !hasMicrophone) {
+            // The microphone is how dictation hears the user, so setup stays
+            // up until that grant exists. "Browse settings first" is still there.
+            if (!hasMicrophone) {
               await revealMainWindowForPermissions();
               setOnboardingStep("accessibility");
+              return;
+            }
+            // Accessibility is only how Say Less types into other apps. Create
+            // does not need it. A returning user missing just that permission
+            // is not kept on the setup screen: this is the same browse mode as
+            // "Browse settings first", and it does not start shortcuts until
+            // Accessibility is actually granted.
+            if (!hasAccessibility) {
+              setSettingsOnly(true);
+              setOnboardingStep("done");
               return;
             }
           } catch (e) {
@@ -581,7 +593,7 @@ function App() {
                       : "contents"
                   }
                 >
-                  {settingsOnly ? (
+                  {fullBleed ? null : settingsOnly ? (
                     <div
                       role="status"
                       className="w-full max-w-3xl rounded-xl border border-mid-gray/30 p-3 text-sm flex flex-wrap items-center gap-3"

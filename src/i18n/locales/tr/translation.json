@@ -1435,7 +1435,7 @@
     }
   },
   "create": {
-    "title": "Create",
+    "title": "Studio",
     "frameTitle": "Create: pictures, titles, videos and your library",
     "captureFailed": "Screen capture did not produce an image. Allow Screen Recording for Say Less in System Settings > Privacy & Security > Screen Recording, then try again.",
     "actionFailed": "That did not work. Try again.",

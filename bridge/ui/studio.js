@@ -666,7 +666,7 @@
 
   // -------------------------------------------------------------- routing
   const VIEWS = [
-    { id: "image", label: "Create", icon: "create", key: "1" },
+    { id: "image", label: "Images", icon: "create", key: "1" },
     { id: "titles", label: "Titles", icon: "title", key: "2" },
     { id: "recordings", label: "Videos", icon: "film", key: "3" },
     { id: "screens", label: "Screens", icon: "screen", key: "4" },

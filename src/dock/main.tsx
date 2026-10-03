@@ -25,6 +25,7 @@ import {
   MonitorPlay,
   FolderOpen,
   Video,
+  Film,
   Image as ImageIcon,
   Link2,
   ScanSearch,
@@ -57,6 +58,22 @@ import {
 } from "@/lib/utils/theme";
 import "@/i18n";
 import "./style.css";
+
+/** Icons are guessed from the cue's words; the tooltip is the cue itself. */
+function actionIcon(cue: string) {
+  return /image|picture|paint|draw/i.test(cue)
+    ? ImageIcon
+    : /record|recording|video/i.test(cue)
+      ? Film
+      : /link/i.test(cue)
+        ? Link2
+        : /screen|scan|read/i.test(cue)
+          ? ScanSearch
+          : Wand2;
+}
+
+/** The dock shows this many voice actions as one-click buttons. */
+const DOCK_ACTIONS = 4;
 applyTheme(getStoredTheme());
 void syncThemeFromSettings();
 void startStudioSync();
@@ -286,12 +303,19 @@ function Dock() {
   const railToLeft = ["right", "top_right", "bottom_right"].includes(
     settings.dock_edge,
   );
+  const compactActions = (
+    settings.actions_enabled ? (settings.actions ?? []) : []
+  ).slice(0, DOCK_ACTIONS);
+  // Room for the action buttons only while the idle rail is open.
+  const actionSlots =
+    controlsOpen && compactPhase === "idle" ? compactActions.length : 0;
   useEffect(() => {
     if (!loaded) return;
     void invoke("dock_set_presentation", {
       wide: settings.dock_compact && (compactWide || controlsOpen),
+      actions: settings.dock_compact ? actionSlots : 0,
     }).catch(() => setError(true));
-  }, [loaded, settings.dock_compact, compactWide, controlsOpen]);
+  }, [loaded, settings.dock_compact, compactWide, controlsOpen, actionSlots]);
   const compactLabel =
     compactPhase === "listening"
       ? t(ready ? "ux.overlay.listening" : "screenRecording.starting")
@@ -421,6 +445,7 @@ function Dock() {
         data-state={state}
         data-phase={compactPhase}
         data-motion={settings.dock_motion ? "on" : "off"}
+        style={{ "--action-slots": actionSlots } as React.CSSProperties}
         onPointerEnter={() => setControlsHovered(true)}
         onPointerLeave={() => setControlsHovered(false)}
         onFocusCapture={(event) => {
@@ -542,6 +567,31 @@ function Dock() {
             ) : (
               <>
                 {compactPhase === "idle" && <ScreenButton compact />}
+                {compactPhase === "idle" &&
+                  compactActions.map((action) => {
+                    const cue = action.cue.trim();
+                    const Icon = actionIcon(cue);
+                    return (
+                      <Tooltip
+                        key={`${action.kind}:${action.target}:${cue}`}
+                        label={cue}
+                        placement="bottom"
+                        className="compact-action-anchor"
+                      >
+                        <button
+                          className="compact-voice-action"
+                          aria-label={cue}
+                          onClick={() => {
+                            void invoke("test_voice_action", {
+                              cue: action.cue,
+                            }).catch(() => setError(true));
+                          }}
+                        >
+                          <Icon size={17} aria-hidden="true" />
+                        </button>
+                      </Tooltip>
+                    );
+                  })}
                 <Tooltip
                   label={t("dock.hide")}
                   placement="bottom"
@@ -650,16 +700,10 @@ function Dock() {
             cue itself, which the user already knows. Rust looks the cue up
             in saved settings, so the dock can only open what the user set. */}
         {(settings.actions_enabled ? (settings.actions ?? []) : [])
-          .slice(0, 3)
+          .slice(0, DOCK_ACTIONS)
           .map((action) => {
             const cue = action.cue.trim();
-            const Icon = /image|picture|paint|draw/i.test(cue)
-              ? ImageIcon
-              : /record|recording|link/i.test(cue)
-                ? Link2
-                : /screen|scan|read/i.test(cue)
-                  ? ScanSearch
-                  : Wand2;
+            const Icon = actionIcon(cue);
             return (
               <Tooltip
                 key={`${action.kind}:${action.target}:${cue}`}

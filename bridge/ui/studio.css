@@ -1595,3 +1595,7 @@ html.embed .shell {
 html.embed .brand {
   display: none;
 }
+/* The two status dots are for the standalone page; the app shows its own state. */
+html.embed .rail-foot {
+  display: none;
+}
