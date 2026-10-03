@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.14.12] - 2026-10-03
 
 - Mac: Studio opens inside the existing Say Less window with Create, Titles, Videos, Screens, and Library. Python and the Studio UI are bundled with the app and update together.
 - Existing companion settings and library indexes are imported once without removing the originals. Studio connections control optional B2 uploads and Drive mirroring.

@@ -47,11 +47,15 @@ class RuntimeTests(unittest.TestCase):
                                            "token": token, "version": "0.14.11"}) + "\n")
         cls.process.stdin.close()
         port_file = cls.home / "state/port.txt"
-        deadline = time.time() + 20
+        deadline = time.time() + 45
         while not port_file.exists():
             if cls.process.poll() is not None:
                 raise RuntimeError(cls.process.stderr.read())
             if time.time() > deadline:
+                os.killpg(cls.process.pid, signal.SIGTERM)
+                cls.process.wait(timeout=10)
+                cls.process.stderr.close()
+                cls.temp.cleanup()
                 raise RuntimeError("Studio did not start")
             time.sleep(0.1)
         cls.origin = "http://127.0.0.1:" + port_file.read_text()

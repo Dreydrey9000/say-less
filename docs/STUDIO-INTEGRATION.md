@@ -61,5 +61,7 @@ bun run test:playwright -- tests/creative-studio.spec.ts tests/automatic-updates
 Windows/Linux display an explicit availability message; the initial integrated
 Studio runtime targets Mac because Luis's capture, clipboard, painter and
 cloud tooling is Mac-specific. Native Windows/Linux parity is not implemented.
-This branch is implementation work, not a published release. Signed installer
-and installed-app verification are required before claiming it shipped.
+The signed release includes the helper's Python and dependency license notices.
+First launch can take longer while macOS verifies and extracts the helper;
+subsequent Studio view changes reuse the same running process. Signed installer
+and installed-app verification are required for each release.

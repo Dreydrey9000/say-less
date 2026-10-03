@@ -134,7 +134,8 @@ fn start(app: &AppHandle) -> Result<StudioSession, String> {
     let ready = (|| {
         let mut stdin = child.stdin.take().ok_or("studio_unavailable")?;
         writeln!(stdin, "{options}").map_err(|_| "studio_unavailable")?;
-        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(20);
+        // First launch can include macOS verification and one-file extraction.
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(45);
         while std::time::Instant::now() < deadline {
             if child
                 .try_wait()

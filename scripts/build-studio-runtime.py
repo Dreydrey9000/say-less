@@ -3,8 +3,11 @@ import hashlib
 import json
 import os
 import platform
+import shutil
 import subprocess
 import sys
+import sysconfig
+from importlib import metadata
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,6 +19,22 @@ def main():
     target = os.environ.get("STUDIO_TARGET_ARCH") or (
         "arm64" if platform.machine() == "arm64" else "x86_64")
     output = ROOT / "src-tauri/resources/studio-runtime"
+    output.mkdir(parents=True, exist_ok=True)
+    notices = output / "licenses"
+    notices.mkdir(exist_ok=True)
+    python_license = Path(sysconfig.get_path("stdlib")) / "LICENSE.txt"
+    if not python_license.is_file():
+        python_license = Path(sys.base_prefix) / "LICENSE.txt"
+    if not python_license.is_file():
+        raise RuntimeError("Python license notice missing from build runtime")
+    shutil.copyfile(python_license, notices / "Python-LICENSE.txt")
+    for name in ("pyinstaller", "setuptools", "packaging", "altgraph", "macholib", "pyinstaller-hooks-contrib"):
+        distribution = metadata.distribution(name)
+        for entry in distribution.files or ():
+            if Path(str(entry)).name.upper().startswith(("LICENSE", "COPYING")):
+                source = Path(distribution.locate_file(entry))
+                if source.is_file():
+                    shutil.copyfile(source, notices / (name + "-" + source.name))
     sources = sorted((ROOT / "bridge").glob("*.py")) + sorted((ROOT / "bridge/ui").glob("*"))
     identity = os.environ.get("APPLE_SIGNING_IDENTITY")
     digest = hashlib.sha256((target + "|" + (identity or "adhoc")).encode())
