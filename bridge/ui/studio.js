@@ -719,6 +719,14 @@
     }[current](host);
     loading.remove();
   }
+  window.addEventListener("message", (event) => {
+    if (window.parent === window || event.source !== window.parent) return;
+    if (
+      event.data?.type === "studio-view" &&
+      VIEWS.some((view) => view.id === event.data.view)
+    )
+      location.hash = "#/" + event.data.view;
+  });
   window.addEventListener("hashchange", render);
   document.addEventListener("keydown", (e) => {
     if ((e.metaKey || e.ctrlKey) && /^[1-5]$/.test(e.key)) {

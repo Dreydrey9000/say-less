@@ -22,6 +22,11 @@ The v0.14.12 candidate remained private and was superseded by this release.
 - Restart-to-update waits for Studio generation, screenshot capture, metadata jobs, and uploads. New work pauses during installation; failed installs resume it.
 - Windows/Linux explain that integrated Studio currently requires Mac. Painter, vision, and storage connections still require their existing tools/accounts.
 
+### Fixed
+
+- Repeating a Create voice action restores its Studio page after manual navigation, without restarting the runtime or discarding the current page unnecessarily.
+- Engineering: a cancelled build can reuse an empty private draft of the same version. Published or partially built releases cannot be rewritten through this retry path.
+
 ## [0.14.11] - 2026-10-03
 
 ### Changed

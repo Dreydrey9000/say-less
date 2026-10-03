@@ -39,12 +39,18 @@ export function CreativeStudio() {
   // A spoken action can ask for a page while the Studio is already open.
   useEffect(() => {
     const onView = (event: Event) => {
-      setView((event as CustomEvent<string>).detail);
+      const requested = (event as CustomEvent<string>).detail;
+      if (url)
+        frame.current?.contentWindow?.postMessage(
+          { type: "studio-view", view: requested },
+          new URL(url).origin,
+        );
+      setView(requested);
       consumeStudioView();
     };
     window.addEventListener(STUDIO_VIEW_EVENT, onView);
     return () => window.removeEventListener(STUDIO_VIEW_EVENT, onView);
-  }, []);
+  }, [url]);
 
   useEffect(() => {
     if (!url) return;

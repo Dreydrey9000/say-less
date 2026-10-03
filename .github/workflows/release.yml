@@ -1,6 +1,16 @@
 name: "Release"
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      empty-draft-id:
+        description: "Reuse an empty private draft after a cancelled build"
+        required: false
+        type: string
+
+concurrency:
+  group: say-less-release
+  cancel-in-progress: false
 
 jobs:
   create-release:
@@ -27,6 +37,19 @@ jobs:
         uses: actions/github-script@v9
         with:
           script: |
+            const reuse = context.payload.inputs?.['empty-draft-id'];
+            if (reuse) {
+              if (!/^[0-9]+$/.test(reuse)) throw new Error('Invalid draft ID');
+              const params = {...context.repo, release_id: Number(reuse)};
+              const { data: existing } = await github.rest.repos.getRelease(params);
+              if (!existing.draft || existing.assets.length ||
+                  existing.tag_name !== `v${{ steps.get-version.outputs.version }}`)
+                throw new Error('Only an empty private draft of this version can be reused');
+              const { data } = await github.rest.repos.updateRelease({
+                ...params, target_commitish: context.sha
+              });
+              return data.id;
+            }
             const { data } = await github.rest.repos.createRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,

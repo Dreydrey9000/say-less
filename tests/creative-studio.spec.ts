@@ -1,9 +1,7 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 import path from "node:path";
 
-test("Studio opens inside the app and exposes all five tools", async ({
-  page,
-}) => {
+async function serveStudio(page: Page) {
   await page.route("**/api/**", (route) =>
     route.fulfill({
       json: {
@@ -29,6 +27,12 @@ test("Studio opens inside the app and exposes all five tools", async ({
       contentType: "text/css",
     }),
   );
+}
+
+test("Studio opens inside the app and exposes all five tools", async ({
+  page,
+}) => {
+  await serveStudio(page);
   await page.goto("/tests/fixtures/app.html?version=0.14.13");
   await page.getByRole("button", { name: "Studio", exact: true }).click();
   await expect(
@@ -51,6 +55,34 @@ test("Studio opens inside the app and exposes all five tools", async ({
   ).not.toBeChecked();
   await page.getByText("Studio connections", { exact: true }).click();
   await page.screenshot({ path: "public/release-notes/0.14.13/studio.png" });
+});
+
+test("repeating a spoken page cue restores it after manual Studio navigation", async ({
+  page,
+}) => {
+  await serveStudio(page);
+  await page.goto("/tests/fixtures/app.html?events");
+  await page.waitForFunction(() => "testEmit" in window);
+  const openTitles = () =>
+    page.evaluate(() =>
+      (
+        window as unknown as { testEmit: (e: string, p: string) => void }
+      ).testEmit("open-create", "titles"),
+    );
+  await openTitles();
+  const studio = page.frameLocator('iframe[title="Say Less Studio tools"]');
+  const nav = studio.locator("#nav");
+  await expect(
+    nav.getByRole("button", { name: "Titles", exact: true }),
+  ).toHaveAttribute("aria-current", "page");
+  await nav.getByRole("button", { name: "Create", exact: true }).click();
+  await expect(
+    nav.getByRole("button", { name: "Create", exact: true }),
+  ).toHaveAttribute("aria-current", "page");
+  await openTitles();
+  await expect(
+    nav.getByRole("button", { name: "Titles", exact: true }),
+  ).toHaveAttribute("aria-current", "page");
 });
 
 test("failed startup explains recovery and provides retry", async ({
