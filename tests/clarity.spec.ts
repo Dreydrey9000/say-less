@@ -8,14 +8,16 @@ test("the dock look is one control, and particle patterns only show when they ap
   await expect(
     page.getByRole("heading", { name: "Appearance", level: 1 }),
   ).toBeVisible();
-  const look = page.getByRole("combobox", { name: "Dock look" });
+  const look = page.getByRole("radiogroup", { name: "Dock look" });
   await expect(look).toHaveCount(1);
   await expect(page.getByText("Companion style")).toHaveCount(0);
   // Exactly one pattern reads as chosen.
   await expect(
     page.locator('.formation-grid > button[aria-pressed="true"]'),
   ).toHaveCount(1);
-  await look.selectOption("buddy");
+  await look
+    .getByRole("radio", { name: "Buddy (animated)", exact: true })
+    .check();
   await expect(page.locator(".formation-grid")).toHaveCount(0);
   await expect(page.getByText("This look has no particles")).toBeVisible();
   // Pause is a switch with one fixed name, set in one place.
