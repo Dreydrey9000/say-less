@@ -48,6 +48,7 @@ class StudioCase(unittest.TestCase):
         bridge.WATCH_DIR.mkdir(parents=True, exist_ok=True)
         cls.studio = studio.Studio(bridge)
         cls.studio.sp_library = ROOT / "library.jsonl"
+        cls.studio.titler.enabled = False      # no vision calls from tests, except the ones that ask for it
         bridge._STUDIO = cls.studio
         cls.server = ThreadingHTTPServer(("127.0.0.1", 0), bridge.Handler)
         cls.port = cls.server.server_address[1]
@@ -279,6 +280,67 @@ class Origin(StudioCase):
         bad = self.call("POST", "/api/refs-new", {"name": "origin-bad"}, {"Origin": "https://evil.example"})
         self.assertEqual(bad[0], 403)
         self.assertEqual(self.call("GET", "/api/refs", None, {"Origin": "https://evil.example"})[0], 403)
+
+
+class TitlesSayWhatIsInIt(StudioCase):
+    def test_a_plain_title_comes_from_the_prompt_until_the_vision_title_lands(self):
+        import titler
+        self.assertEqual(titler.title_from_prompt(
+            "Photoreal portrait of me at a standing desk with a mic and a green screen behind, soft key light"),
+            "Portrait of Me at a Standing Desk")
+        self.assertEqual(titler.title_from_prompt("godzilla komodo dragon as pet in living room"),
+                         "Godzilla Komodo Dragon as Pet in Living Room")
+        self.assertEqual(titler.title_from_prompt(""), "")
+        self.assertEqual(titler.slug("Portrait of Me at a Standing Desk"), "portrait-of-me-at-a-standing-desk")
+        f = self.studio.titler.image_fields("/nowhere/x.png", "a red apple on a white table")
+        self.assertEqual((f["title"], f["src"]), ("Red Apple on a White Table", "prompt"))
+        self.assertEqual(self.studio.titler.image_fields("/nowhere/y.png", "")["title"], "Untitled picture")
+
+    def test_vision_title_is_kept_in_three_places(self):
+        import titler
+        img = bridge.IMAGES_DIR / "2026" / "10" / "apple-shot-02-100000.png"
+        img.parent.mkdir(parents=True, exist_ok=True)
+        Image.new("RGB", (80, 80), (200, 20, 20)).save(img)
+        bridge.IMAGES_REGISTRY_PATH.parent.mkdir(parents=True, exist_ok=True)
+        bridge.IMAGES_REGISTRY_PATH.write_text(json.dumps([{"file": str(img), "name": img.name, "prompt": "a red apple"}]))
+        said = '{"title": "Red Apple On A White Table", "summary": "A single red apple sits on a white table.", "tags": ["apple", "red", "fruit"]}'
+        t = self.studio.titler
+        t.enabled = True
+        try:
+            with mock.patch.object(bridge, "vision_text", create=True, return_value=("agy:test", said)):
+                info = t.describe_image(str(img), "a red apple")
+            self.assertEqual(info["title"], "Red Apple On A White Table")
+            t.save("img", str(img), info)
+        finally:
+            t.enabled = False
+        self.assertEqual(t.image_fields(str(img), "a red apple")["src"], "vision")
+        self.assertEqual(json.loads(bridge.IMAGES_REGISTRY_PATH.read_text())[0]["title"], "Red Apple On A White Table")
+        side = json.loads(img.with_name(img.stem + ".meta.json").read_text())
+        self.assertEqual(side["tags"], ["apple", "red", "fruit"])
+        st, lib = self.call("GET", "/api/library?q=fruit")
+        self.assertEqual([i["title"] for i in lib["items"]], ["Red Apple On A White Table"])
+        self.assertEqual(lib["items"][0]["title_src"], "vision")
+
+    def test_a_title_that_names_the_medium_or_says_nothing_is_refused(self):
+        import titler
+        for bad in ("Image of a dog", "AI generated screenshot", "Dog", "x" * 120):
+            self.assertFalse(titler.valid_title(bad), bad)
+        self.assertTrue(titler.valid_title("Komodo Dragon Lounging In A Living Room"))
+        self.assertEqual(titler.clean_title('"Big Idea \u2014 Small Desk."'), "Big Idea: Small Desk")
+
+    def test_placeholder_prompts_are_replaced_by_the_receipt_beside_the_file(self):
+        import titler
+        img = bridge.IMAGES_DIR / "2026" / "10" / "receipt-shot-02-110000.png"
+        img.parent.mkdir(parents=True, exist_ok=True)
+        Image.new("RGB", (40, 40), (10, 10, 10)).save(img)
+        img.with_suffix(".prompt.txt").write_text("PROMPT (as given):\nA bald man talking into a mic\n\nprovenance:\n  door: x\n")
+        self.assertEqual(titler.Titler.real_prompt(str(img), "Earlier generated image"), "A bald man talking into a mic")
+        self.assertEqual(self.studio.titler.image_fields(str(img), "")["title"], "Bald Man Talking into a Mic")
+
+    def test_recording_without_a_title_is_called_a_screen_recording_with_its_date(self):
+        f = self.studio.titler.video_fields("x.mp4", "2026-09-28T23:24:00+00:00")
+        self.assertTrue(f["title"].startswith("Screen Recording"))
+        self.assertEqual(f["src"], "pending")
 
 
 class FirstScreenIsOneRequest(StudioCase):

@@ -18,6 +18,7 @@ for f in bridge.py title-ideas images recordings bridge-bucket; do
   install -m 0755 "$SRC/$f" "$RUNTIME/$f"
 done
 install -m 0644 "$SRC/studio.py" "$RUNTIME/studio.py"
+install -m 0644 "$SRC/titler.py" "$RUNTIME/titler.py"
 rm -rf "$RUNTIME/ui" && cp -R "$SRC/ui" "$RUNTIME/ui"
 cp "$SRC/config.example.json" "$RUNTIME/config.example.json"
 cp "$SRC/extras/"* "$RUNTIME/extras/"

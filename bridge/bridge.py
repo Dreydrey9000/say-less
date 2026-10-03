@@ -55,7 +55,9 @@ DEFAULT_CONFIG = {
     "delete_local_after_upload": False,
     "watch_enabled": True,
     "watch_interval_seconds": 10,
-    "ideas_provider_chain": ["agy", "zai_big", "zai_small", "groq"],
+    "ideas_provider_chain": ["claude", "agy", "zai_big", "zai_small", "groq"],
+    "claude_vision_model": "claude-haiku-4-5-20251001",
+    "claude_timeout_seconds": 240,
     "zai_secrets_file": str(SECRETS / "zai.env"),
     "groq_secrets_file": str(SECRETS / "groq.env"),
     "agy_bin": str(HOME / ".local" / "bin" / "agy"),
@@ -506,7 +508,7 @@ Curiosity Gap, Contrarian, Story/Confession.
 Return ONLY a JSON array, one object per option: {{"style": "...", "text": "..."}}"""
 
 
-def call_agy(image_path, prompt):
+def call_agy(image_path, prompt, tail="Answer with ONLY the JSON array, no other text."):
     """Antigravity CLI: reads the screenshot natively (view_file) with the
     image path in the prompt. Uses Luis's Antigravity subscription, no key."""
     bin_path = CONFIG.get("agy_bin", str(HOME / ".local" / "bin" / "agy"))
@@ -514,7 +516,7 @@ def call_agy(image_path, prompt):
         raise RuntimeError("agy CLI not found")
     full_prompt = (
         f"First use your view_file tool to look at this image: {image_path}\n\n"
-        f"{prompt}\n\nAnswer with ONLY the JSON array, no other text."
+        f"{prompt}\n\n{tail}"
     )
     proc = subprocess.run(
         [bin_path, "-p", full_prompt, "--effort", "low",
@@ -524,6 +526,26 @@ def call_agy(image_path, prompt):
     if proc.returncode != 0 and not proc.stdout.strip():
         raise RuntimeError(f"agy failed: {proc.stderr.strip()[:200]}")
     return "agy antigravity", proc.stdout.strip()
+
+
+def call_claude(image_path, prompt, tail="Answer with ONLY the JSON, no other text."):
+    """Claude's own CLI (your Claude plan, no API key): reads the picture with its Read tool.
+    The reliable one: it answers in seconds even when the Mac is busy."""
+    import shutil
+    exe = CONFIG.get("claude_bin") or shutil.which("claude") or "/opt/homebrew/bin/claude"
+    if not Path(exe).exists():
+        raise RuntimeError("claude CLI not found")
+    full = f"First use your Read tool to look at this image: {image_path}\n\n{prompt}\n\n{tail}"
+    env = dict(os.environ)
+    env["PATH"] = ":".join(["/opt/homebrew/bin", "/usr/local/bin", str(HOME / ".local" / "bin"), "/usr/bin", "/bin", env.get("PATH", "")])
+    proc = subprocess.run(
+        [exe, "-p", full, "--model", CONFIG["claude_vision_model"], "--allowedTools", "Read",
+         "--add-dir", str(Path(image_path).parent), "--no-session-persistence", "--output-format", "text"],
+        capture_output=True, text=True, timeout=CONFIG["claude_timeout_seconds"], cwd="/tmp", env=env,
+    )
+    if proc.returncode != 0 and not proc.stdout.strip():
+        raise RuntimeError(f"claude failed: {proc.stderr.strip()[:200]}")
+    return CONFIG["claude_vision_model"], proc.stdout.strip()
 
 
 def call_zai(image_path, prompt, model_env_key):
@@ -615,7 +637,9 @@ def generate_ideas(image_path, client=None, count=10, extra=None):
     errors = []
     for provider in CONFIG["ideas_provider_chain"]:
         try:
-            if provider == "agy":
+            if provider == "claude":
+                model, text = call_claude(image_path, prompt)
+            elif provider == "agy":
                 model, text = call_agy(image_path, prompt)
             elif provider == "zai_big":
                 model, text = call_zai(image_path, prompt, "ZAI_BIG_MODEL")
@@ -634,6 +658,48 @@ def generate_ideas(image_path, client=None, count=10, extra=None):
             errors.append(f"{provider}: {e}")
             log(f"ideas provider {provider} failed: {e}")
     raise RuntimeError("all providers failed: " + " | ".join(errors))
+
+
+def vision_text(image_path, prompt):
+    """Ask a vision model about one picture. Same provider chain as the title ideas."""
+    errors = []
+    for provider in CONFIG["ideas_provider_chain"]:
+        try:
+            if provider == "claude":
+                model, text = call_claude(image_path, prompt, tail="Answer with ONLY the JSON object, no other text.")
+            elif provider == "agy":
+                model, text = call_agy(image_path, prompt, tail="Answer with ONLY the JSON object, no other text.")
+            elif provider == "zai_big":
+                model, text = call_zai(image_path, prompt, "ZAI_BIG_MODEL")
+            elif provider == "zai_small":
+                model, text = call_zai(image_path, prompt, "ZAI_SMALL_MODEL")
+            elif provider == "groq":
+                model, text = call_groq(image_path, prompt)
+            else:
+                continue
+            if text and text.strip():
+                return f"{provider}:{model}", text
+            errors.append(f"{provider}: empty answer")
+        except Exception as e:
+            errors.append(f"{provider}: {e}")
+    raise RuntimeError("all vision providers failed: " + " | ".join(errors))
+
+
+def registry_annotate(kind, ident, fields):
+    """Write a title, summary and tags onto the saved entry for an image (by path) or a recording (by name)."""
+    with _registry_lock:
+        if kind == "img":
+            entries, path, match = images_registry_read(), IMAGES_REGISTRY_PATH, lambda e: e.get("file") == ident
+        else:
+            entries, path, match = registry_read(), REGISTRY_PATH, lambda e: e.get("name") == ident
+        hit = False
+        for e in entries:
+            if match(e):
+                e.update(fields)
+                hit = True
+        if hit:
+            path.write_text(json.dumps(entries, indent=2))
+    return hit
 
 
 def capture_screen(out_path):

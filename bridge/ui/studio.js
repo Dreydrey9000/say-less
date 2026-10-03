@@ -525,13 +525,21 @@
           { class: "big-pic" },
           h("img", {
             src: mediaUrl(item.path),
-            alt: item.prompt || item.name || "Image",
+            alt: item.title || item.prompt || item.name || "Image",
           }),
         ),
         h(
           "aside",
           {},
           h("div", { class: "label" }, fmtWhen(item.ts) || "Image"),
+          item.title && h("h2", { class: "selectable", style: "margin:4px 0 8px" }, item.title),
+          item.summary && h("p", { class: "selectable" }, item.summary),
+          item.tags && item.tags.length
+            ? h("div", { class: "row", style: "gap:6px;flex-wrap:wrap" }, item.tags.map((t) => h("span", { class: "chip" }, t)))
+            : null,
+          item.prompt
+            ? h("div", { class: "label", style: "margin-top:14px" }, "What you asked for")
+            : null,
           item.prompt
             ? h("p", { class: "selectable" }, item.prompt)
             : h("p", { class: "dim" }, "No prompt saved for this one."),
@@ -1912,7 +1920,7 @@
           class: "tile",
           role: "button",
           tabindex: "0",
-          "aria-label": it.prompt || it.name,
+          "aria-label": it.title || it.prompt || it.name,
           onclick: () => lightbox(it),
           onkeydown: (e) => {
             if (e.key === "Enter") lightbox(it);
@@ -1920,10 +1928,11 @@
         },
         h("img", {
           src: thumbUrl(it.path, 440, it.v),
-          alt: "",
+          alt: it.title || "",
           loading: "lazy",
           decoding: "async",
         }),
+        it.title && h("div", { class: "cap" }, h("span", {}, it.title)),
         h(
           "div",
           { class: "corner" },
@@ -2442,7 +2451,7 @@
     function paint() {
       const q = search.value.toLowerCase().trim();
       const rows = data.recordings.filter(
-        (r) => !q || r.name.toLowerCase().includes(q),
+        (r) => !q || `${r.name} ${r.title || ""} ${r.summary || ""} ${(r.tags || []).join(" ")}`.toLowerCase().includes(q),
       );
       grid.replaceChildren(
         ...(rows.length
@@ -2455,7 +2464,7 @@
                   {
                     class: "media",
                     onclick: () => play(r),
-                    "aria-label": "Play " + prettyName(r.name),
+                    "aria-label": "Play " + (r.title || prettyName(r.name)),
                   },
                   h("img", {
                     src: r.local
@@ -2482,7 +2491,8 @@
                   h(
                     "div",
                     {},
-                    h("h3", {}, prettyName(r.name)),
+                    h("h3", {}, r.title || prettyName(r.name)),
+                    r.summary && h("div", { class: "hint selectable", style: "margin:2px 0 6px" }, r.summary),
                     h(
                       "div",
                       { class: "hint mono" },
@@ -2558,15 +2568,22 @@
       );
     }
     search.addEventListener("input", paint);
-    api("/api/recordings")
-      .then((fresh) => {
-        if (JSON.stringify(fresh) !== JSON.stringify(data)) {
-          data = fresh;
-          store("swr.recordings", fresh);
-          if (current === "recordings") paint();
-        }
-      })
-      .catch(() => {});
+    let recPolls = 0;
+    function refreshRecordings() {
+      api("/api/recordings")
+        .then((fresh) => {
+          if (JSON.stringify(fresh) !== JSON.stringify(data)) {
+            data = fresh;
+            store("swr.recordings", fresh);
+            if (current === "recordings") paint();
+          }
+          // titles are written in the background; look again until they have all landed
+          const waiting = (fresh.items || fresh.recordings || []).some((r) => r.title_src && r.title_src !== "vision");
+          if (waiting && current === "recordings" && ++recPolls < 12) setTimeout(refreshRecordings, 20000);
+        })
+        .catch(() => {});
+    }
+    refreshRecordings();
     main.append(
       h(
         "div",
@@ -2866,7 +2883,8 @@
         ),
       ),
     );
-    let timer = 0;
+    let timer = 0,
+      libPolls = 0;
     async function load() {
       try {
         const url = `/api/library?scope=${lState.scope}&limit=160&q=${encodeURIComponent(lState.q)}`;
@@ -2876,6 +2894,8 @@
         const d = await api(url);
         if (!lState.q && lState.scope === "mine") store("swr.library", d);
         paintGrid(d);
+        if (d.items.some((i) => i.title_src && i.title_src !== "vision") && current === "library" && ++libPolls < 12)
+          setTimeout(load, 20000);
       } catch (e) {
         holder.replaceChildren(errBox(e.message));
       }

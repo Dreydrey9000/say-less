@@ -9,7 +9,7 @@
   "delete_local_after_upload": false,
   "watch_enabled": true,
   "watch_interval_seconds": 10,
-  "ideas_provider_chain": ["agy", "zai_big", "zai_small", "groq"],
+  "ideas_provider_chain": ["claude", "agy", "zai_big", "zai_small", "groq"],
   "zai_secrets_file": "~/.say-less/zai.env",
   "groq_secrets_file": "~/.say-less/groq.env",
   "agy_bin": "~/.local/bin/agy",

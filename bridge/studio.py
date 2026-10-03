@@ -69,8 +69,11 @@ class Studio:
         self.refs_root = Path(os.environ.get("SUBPOWERS_REFS")
                               or Path.home() / ".subpowers" / "refs")
         self.sp_library = Path.home() / ".subpowers" / "library.jsonl"
+        self.state = state
         for d in (self.uploads, self.thumbs, self.captures, self.screens_dir):
             d.mkdir(parents=True, exist_ok=True)
+        import titler
+        self.titler = titler.Titler(self)
 
     # ------------------------------------------------------------ helpers
 
@@ -403,7 +406,9 @@ class Studio:
         stamp = datetime.now()
         folder = self.b.IMAGES_DIR / f"{stamp:%Y/%m}"
         folder.mkdir(parents=True, exist_ok=True)
-        out = folder / f"say-less-image-{stamp:%d-%H%M%S}.png"
+        import titler
+        words = titler.slug(titler.title_from_prompt(prompt) or "picture")
+        out = folder / f"{words}-{stamp:%d-%H%M%S}.png"
         stages = {"council": "All your painters are painting the same prompt",
                   "chatgpt": "ChatGPT is painting (about 1 to 2 minutes)",
                   "antigravity": "Nano Banana is painting (about 30 seconds)",
@@ -519,7 +524,8 @@ class Studio:
         for path, it in items.items():
             if scope == "mine" and not str(Path(path).resolve()).startswith(mine_root):
                 continue
-            hay = f"{it['prompt']} {Path(path).name}".lower()
+            known = self.titler.info("img", path) or {}
+            hay = f"{it['prompt']} {Path(path).name} {known.get('title', '')} {known.get('summary', '')} {' '.join(known.get('tags', []))}".lower()
             if q and q not in hay:
                 continue
             e = registry.get(path) or {}
@@ -531,9 +537,16 @@ class Studio:
                         "drive": bool(e.get("drive_link")), "url": e.get("url"),
                         "drive_link": e.get("drive_link")})
         out.sort(key=lambda x: x.get("ts") or "", reverse=True)
+        for it in out[:limit]:
+            f = self.titler.image_fields(it["path"], it["prompt"], it["ts"])
+            it.update(title=f["title"], summary=f["summary"], tags=f["tags"], title_src=f["src"])
         return out[:limit], len(out)
 
     # ---------------------------------------------------------- recordings
+
+    def _rec_title(self, name, when):
+        f = self.titler.video_fields(name, when or "")
+        return {"title": f["title"], "summary": f["summary"], "tags": f["tags"], "title_src": f["src"]}
 
     def recordings(self, light=False):
         out = []
@@ -550,6 +563,7 @@ class Studio:
                 "when": e.get("uploaded_at"), "url": e.get("url"),
                 "drive_link": e.get("drive_link"), "cloud": bool(e.get("b2")),
                 "status": "uploaded",
+                **self._rec_title(e.get("name") or f.name, e.get("uploaded_at")),
             })
         if self.b.WATCH_DIR.is_dir():
             for f in sorted(self.b.WATCH_DIR.glob("*.mp4")):
@@ -561,7 +575,8 @@ class Studio:
                             "when": datetime.fromtimestamp(st.st_mtime, timezone.utc)
                             .isoformat(timespec="seconds"),
                             "url": None, "drive_link": None, "cloud": False,
-                            "status": "waiting"})
+                            "status": "waiting",
+                            **self._rec_title(f.name, datetime.fromtimestamp(st.st_mtime, timezone.utc).isoformat())})
         out.sort(key=lambda r: r.get("when") or "", reverse=True)
         return out
 
