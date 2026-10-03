@@ -14,6 +14,17 @@ export CMAKE_POLICY_VERSION_MINIMUM=3.5
 bun run tauri build --debug --bundles app --config src-tauri/tauri.dev-build.conf.json
 APP="src-tauri/target/debug/bundle/macos/Say Less Dev.app"
 /usr/bin/xattr -crs "$APP"
-codesign --force --deep -s - "$APP"
+
+# Same certificate on every rebuild, so the designated requirement does not
+# change and macOS can keep the Accessibility grant. Undo:
+#   bash scripts/undo-local-signing.sh
+bash scripts/setup-local-signing.sh
+PASS_FILE="${HOME}/Library/Application Support/Say Less Dev/signing/keychain.password"
+KEYCHAIN="${HOME}/Library/Keychains/say-less-local-dev.keychain-db"
+/usr/bin/security unlock-keychain -p "$(/bin/cat "$PASS_FILE")" "$KEYCHAIN"
+/usr/bin/codesign --force --deep --timestamp=none -s "Say Less Local Dev" "$APP"
+
 echo "Built: $APP"
 echo "Open it with:  open -n \"$APP\""
+echo "Designated requirement:"
+/usr/bin/codesign -dr - "$APP"

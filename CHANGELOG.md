@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Voice action type **Create (in Say Less)**: say "Say Less, make an image" (or title ideas, my recordings, read my screens, library) and the Studio opens on that page, no separate mini app needed.
+- The floating dock shows your first four voice actions as one-click buttons on the large dock, and on the small dock's rail when you hover it (it showed three, and none on the small dock). Recordings uses a film icon.
+- `scripts/setup-local-signing.sh` and `scripts/undo-local-signing.sh`: local test builds sign with a stable self-signed identity in their own keychain, so macOS keeps the Accessibility grant across rebuilds (`bun run build:local`).
+
+### Changed
+
+- A returning user who has the microphone but is missing only Accessibility lands in the existing browse mode instead of the full-screen setup. Shortcuts stay off until Accessibility is granted.
+
 ## [0.14.12] - 2026-10-03
 
 - Mac: Studio opens inside the existing Say Less window with Create, Titles, Videos, Screens, and Library. Python and the Studio UI are bundled with the app and update together.

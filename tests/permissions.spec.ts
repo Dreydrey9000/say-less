@@ -1,5 +1,46 @@
 import { test, expect } from "@playwright/test";
 
+const STUDIO_FRAME = "Say Less Studio tools";
+
+test("a returning user missing only Accessibility can open the Studio", async ({
+  page,
+}) => {
+  await page.goto("/tests/fixtures/app.html?noAccessibility=1");
+  // Wait for the app shell. The loading state has neither of these, so a
+  // count check alone would pass before onboarding decided.
+  await expect(
+    page.getByText("You are browsing settings.", { exact: false }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Two permissions, then you're talking" }),
+  ).toHaveCount(0);
+  await page.getByRole("button", { name: "Studio", exact: true }).click();
+  await expect(page.locator(`iframe[title="${STUDIO_FRAME}"]`)).toBeVisible();
+  expect(
+    await page.evaluate(() =>
+      (window as unknown as { testCommands: string[] }).testCommands.some(
+        (cmd) =>
+          cmd === "initialize_shortcuts" ||
+          cmd === "initialize_enigo" ||
+          cmd.includes("request_accessibility") ||
+          cmd.includes("request_microphone"),
+      ),
+    ),
+  ).toBe(false);
+});
+
+test("a new user missing only Accessibility can still leave setup for the Studio", async ({
+  page,
+}) => {
+  await page.goto("/tests/fixtures/app.html?newUser=1&noAccessibility=1");
+  await expect(
+    page.getByRole("heading", { name: "Two permissions, then you're talking" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Browse settings first" }).click();
+  await page.getByRole("button", { name: "Studio", exact: true }).click();
+  await expect(page.locator(`iframe[title="${STUDIO_FRAME}"]`)).toBeVisible();
+});
+
 test("denied permission stops waiting and retains a recovery path", async ({
   page,
 }) => {

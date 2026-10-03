@@ -191,9 +191,9 @@ async getDockState() : Promise<string> {
 /**
  * Grow the compact panel for an active status or its attached control rail.
  */
-async dockSetPresentation(wide: boolean) : Promise<Result<null, string>> {
+async dockSetPresentation(wide: boolean, actions: number | null) : Promise<Result<null, string>> {
     try {
-    return { status: "ok", data: await TAURI_INVOKE("dock_set_presentation", { wide }) };
+    return { status: "ok", data: await TAURI_INVOKE("dock_set_presentation", { wide, actions }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };

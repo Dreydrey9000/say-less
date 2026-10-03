@@ -4,12 +4,14 @@ import { platform } from "@tauri-apps/plugin-os";
 import { useTranslation } from "react-i18next";
 import "./creative-studio.css";
 import { StudioConnections } from "./StudioConnections";
+import { STUDIO_VIEW_EVENT, consumeStudioView } from "@/lib/studio-view";
 
 export function CreativeStudio() {
   const { t } = useTranslation();
   const [url, setUrl] = useState<string>();
   const [error, setError] = useState<string>();
   const [attempt, setAttempt] = useState(0);
+  const [view, setView] = useState<string | null>(consumeStudioView);
   const frame = useRef<HTMLIFrameElement>(null);
   const supported = platform() === "macos";
   useEffect(() => {
@@ -33,6 +35,16 @@ export function CreativeStudio() {
       active = false;
     };
   }, [attempt, supported]);
+
+  // A spoken action can ask for a page while the Studio is already open.
+  useEffect(() => {
+    const onView = (event: Event) => {
+      setView((event as CustomEvent<string>).detail);
+      consumeStudioView();
+    };
+    window.addEventListener(STUDIO_VIEW_EVENT, onView);
+    return () => window.removeEventListener(STUDIO_VIEW_EVENT, onView);
+  }, []);
 
   useEffect(() => {
     if (!url) return;
@@ -105,7 +117,7 @@ export function CreativeStudio() {
       ) : url ? (
         <iframe
           ref={frame}
-          src={url}
+          src={view ? `${url}#/${view}` : url}
           title={t("creative.frame")}
           sandbox="allow-scripts allow-same-origin allow-forms allow-downloads"
           allow="clipboard-write"

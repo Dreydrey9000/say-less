@@ -1,5 +1,5 @@
 //! Nonactivating dock: clicking Record must not steal the destination app's focus.
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 #[cfg(target_os = "macos")]
 use std::time::Duration;
 use tauri::{AppHandle, Manager};
@@ -10,13 +10,22 @@ tauri_panel! { panel!(SayLessDockPanel { config: { can_become_key_window: false,
 
 const COMPACT_SIZE: (f64, f64) = (104.0, 104.0);
 const ACTIVE_SIZE: (f64, f64) = (220.0, 104.0);
+/// Width of one action button on the compact dock's rail.
+const ACTION_SLOT_WIDTH: f64 = 44.0;
+/// The compact rail shows at most this many voice actions.
+const MAX_ACTION_SLOTS: u32 = 4;
 static ACTIVE_PRESENTATION: AtomicBool = AtomicBool::new(false);
+static ACTION_SLOTS: AtomicU32 = AtomicU32::new(0);
 
 fn dock_size(compact: bool) -> (f64, f64) {
     if !compact {
         (460.0, 112.0)
     } else if ACTIVE_PRESENTATION.load(Ordering::Relaxed) {
-        ACTIVE_SIZE
+        let slots = ACTION_SLOTS.load(Ordering::Relaxed).min(MAX_ACTION_SLOTS);
+        (
+            ACTIVE_SIZE.0 + ACTION_SLOT_WIDTH * f64::from(slots),
+            ACTIVE_SIZE.1,
+        )
     } else {
         COMPACT_SIZE
     }
@@ -58,8 +67,16 @@ fn resize_dock(app: &AppHandle, compact: bool) -> Result<(), String> {
 /// Grow the compact panel for an active status or its attached control rail.
 #[tauri::command]
 #[specta::specta]
-pub fn dock_set_presentation(app: AppHandle, wide: bool) -> Result<(), String> {
+pub fn dock_set_presentation(
+    app: AppHandle,
+    wide: bool,
+    actions: Option<u32>,
+) -> Result<(), String> {
     ACTIVE_PRESENTATION.store(wide, Ordering::Relaxed);
+    ACTION_SLOTS.store(
+        actions.unwrap_or(0).min(MAX_ACTION_SLOTS),
+        Ordering::Relaxed,
+    );
     let handle = app.clone();
     app.run_on_main_thread(move || {
         let settings = crate::studio::get_studio_settings(handle.clone());
@@ -383,7 +400,11 @@ pub fn get_dock_state() -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::{dock_position, nearest_dock_edge};
+    use super::{
+        dock_position, dock_size, nearest_dock_edge, ACTION_SLOTS, ACTION_SLOT_WIDTH,
+        ACTIVE_PRESENTATION, ACTIVE_SIZE, COMPACT_SIZE,
+    };
+    use std::sync::atomic::Ordering;
     use tauri::{PhysicalPosition, PhysicalRect, PhysicalSize};
 
     fn area() -> PhysicalRect<i32, u32> {
@@ -484,5 +505,24 @@ mod tests {
         assert_eq!(compact, PhysicalPosition::new(884, 12));
         assert_eq!(expanded, PhysicalPosition::new(528, 12));
         assert_eq!(expanded.x + 460, compact.x + 104);
+    }
+
+    #[test]
+    fn open_rail_grows_one_slot_per_action_and_never_past_four() {
+        ACTIVE_PRESENTATION.store(false, Ordering::Relaxed);
+        ACTION_SLOTS.store(4, Ordering::Relaxed);
+        // Idle: the emblem stays small no matter how many actions exist.
+        assert_eq!(dock_size(true), COMPACT_SIZE);
+        ACTIVE_PRESENTATION.store(true, Ordering::Relaxed);
+        ACTION_SLOTS.store(0, Ordering::Relaxed);
+        assert_eq!(dock_size(true), ACTIVE_SIZE);
+        ACTION_SLOTS.store(4, Ordering::Relaxed);
+        assert_eq!(dock_size(true).0, ACTIVE_SIZE.0 + 4.0 * ACTION_SLOT_WIDTH);
+        ACTION_SLOTS.store(9, Ordering::Relaxed);
+        assert_eq!(dock_size(true).0, ACTIVE_SIZE.0 + 4.0 * ACTION_SLOT_WIDTH);
+        // The large dock ignores slots.
+        assert_eq!(dock_size(false), (460.0, 112.0));
+        ACTIVE_PRESENTATION.store(false, Ordering::Relaxed);
+        ACTION_SLOTS.store(0, Ordering::Relaxed);
     }
 }
