@@ -564,7 +564,8 @@ function App() {
           <div className="settings-content flex-1 min-w-0 flex flex-col overflow-hidden">
             <div ref={scrollerRef} className="flex-1 overflow-y-auto">
               <div className="page-frame flex flex-col items-center gap-4">
-                {settingsOnly ? (
+                {settingsOnly &&
+                currentSection === "creative" ? null : settingsOnly ? (
                   <div
                     role="status"
                     className="w-full max-w-3xl rounded-xl border border-mid-gray/30 p-3 text-sm flex flex-wrap items-center gap-3"
