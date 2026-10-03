@@ -176,6 +176,27 @@ class ImageJobs(StudioCase):
         self.assertEqual(len(job["outputs"]), 1)
         self.assertIn("another painter took over", job.get("note", ""))
 
+    def test_a_slow_job_shows_what_the_painters_say_and_can_be_stopped(self):
+        sp = self.fake_subpowers("#!/bin/bash\necho 'subpowers: antigravity is not connected; skipping' >&2\nsleep 30\n")
+        with mock.patch.object(self.studio, "find_bin", side_effect=lambda n, extra=(): str(sp) if n == "subpowers" else None), \
+             mock.patch.object(self.studio, "_register"):
+            time.sleep(1.1)
+            st, d = self.call("POST", "/api/image", {"prompt": "a slow one", "painter": "council"})
+            jid = d["job"]["id"]
+            for _ in range(40):
+                st, j = self.call("GET", f"/api/jobs/{jid}")
+                if j.get("log"):
+                    break
+                time.sleep(0.2)
+            self.assertIn("antigravity is not connected", " ".join(j["log"]))
+            self.assertEqual(j["status"], "running")
+            t0 = time.time()
+            self.assertEqual(self.call("POST", f"/api/jobs/{jid}/cancel", {})[0], 200)
+            done = self.wait(jid, 10)
+        self.assertLess(time.time() - t0, 8)
+        self.assertEqual(done["status"], "error")
+        self.assertIn("Stopped", done["error"])
+
     def test_failed_painter_gives_a_plain_error(self):
         sp = self.fake_subpowers("#!/bin/bash\necho 'no painter is connected' >&2\nexit 1\n")
         with mock.patch.object(self.studio, "find_bin", side_effect=lambda n, extra=(): str(sp) if n == "subpowers" else None):

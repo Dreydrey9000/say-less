@@ -299,6 +299,25 @@ class Studio:
                 self.jobs.pop(jid, None)
         return job
 
+    def stop_job_process(self, job):
+        """End a running job's whole process group (the painters are children of the subpowers script)."""
+        import signal
+        pid = job.get("pid")
+        if not pid:
+            return
+        try:
+            os.killpg(pid, signal.SIGTERM)
+        except (ProcessLookupError, PermissionError):
+            pass
+
+    def cancel_job(self, job_id):
+        job = self.jobs.get(job_id)
+        if not job:
+            return False
+        job["cancelled"] = True
+        self.stop_job_process(job)
+        return True
+
     def finish(self, job, **fields):
         with self.lock:
             job.update(fields)
@@ -409,7 +428,7 @@ class Studio:
         import titler
         words = titler.slug(titler.title_from_prompt(prompt) or "picture")
         out = folder / f"{words}-{stamp:%d-%H%M%S}.png"
-        stages = {"council": "All your painters are painting the same prompt",
+        stages = {"council": "Compare all: each picture appears the moment it lands. The slowest painter can take minutes",
                   "chatgpt": "ChatGPT is painting (about 1 to 2 minutes)",
                   "antigravity": "Nano Banana is painting (about 30 seconds)",
                   "grok": "Grok is painting (about 40 seconds)",
@@ -432,19 +451,48 @@ class Studio:
             if size:
                 cmd += ["--size", size]
             job["stage"] = stages.get(which, "Painting (30 seconds to 2 minutes)")
-            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env)
-            started = time.time()
+            logfile = self.state / f"job-{job['id']}.log"
+            errf = open(logfile, "w")
+            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=errf, text=True, env=env,
+                                    start_new_session=True)
+            job["pid"] = proc.pid
+            started, seen_lines = time.time(), 0
+
+            def hear():
+                """What the painters are saying, so the card can show it."""
+                nonlocal seen_lines
+                try:
+                    lines = [ln.strip() for ln in logfile.read_text(errors="ignore").splitlines() if ln.strip()]
+                except OSError:
+                    return
+                if len(lines) != seen_lines:
+                    seen_lines = len(lines)
+                    with self.lock:
+                        job["log"] = [ln[:200] for ln in lines[-4:]]
             while proc.poll() is None:
+                if job.get("cancelled"):
+                    self.stop_job_process(job)
+                    break
                 if time.time() - started > 900:
-                    proc.kill()
+                    self.stop_job_process(job)
+                    errf.close()
                     return None, "That took over 15 minutes, so I stopped it. Try again."
                 time.sleep(0.6)
+                hear()
                 seen = found()
                 if seen:   # compare-all paints several: show each one the moment it lands
                     with self.lock:
                         job["outputs"] = [{"path": str(p), "name": p.name} for p in seen]
-            r = finished_process(proc)
-            return found(), (r.stderr or r.stdout or "").strip()
+            errf.close()
+            hear()
+            if job.get("cancelled"):
+                return None, "Stopped. Nothing more will be made from that request."
+            stdout_text = proc.communicate()[0]
+            try:
+                err = logfile.read_text(errors="ignore").strip()
+            except OSError:
+                err = ""
+            return found(), (err or (stdout_text or "").strip())
 
         outputs, said = run_once(painter)
         if outputs is None:
@@ -860,6 +908,8 @@ class Studio:
             h._send(200, {"ok": True, "name": name})
         elif route == "image":
             h._send(200, {"ok": True, "job": self.job_view(self.start_image(payload))})
+        elif re.match(r"^jobs/[0-9a-f]+/cancel$", route):
+            h._send(200 if self.cancel_job(route.split("/")[1]) else 404, {"ok": True})
         elif route == "titles":
             h._send(200, {"ok": True, "job": self.job_view(self.start_titles(payload))})
         elif route == "screens/gather":

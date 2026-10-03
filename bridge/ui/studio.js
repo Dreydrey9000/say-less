@@ -323,7 +323,8 @@
   // Seconds a running job has been going, from OUR clock: the number keeps ticking even
   // while the bridge is too busy to answer a poll.
   function secs(job) {
-    if (job && job.status === "running" && job._t0) return Math.max(0, (Date.now() - job._t0) / 1000);
+    if (job && job.status === "running" && job._t0)
+      return Math.max(0, (Date.now() - job._t0) / 1000);
     return (job && job.elapsed) || 0;
   }
   // The seconds counter belongs to the screen, not to the network: one timer rewrites every
@@ -331,7 +332,8 @@
   setInterval(() => {
     for (const el of document.querySelectorAll(".time[data-t0]")) {
       const t0 = Number(el.dataset.t0);
-      if (t0) el.textContent = `${Math.max(0, Math.round((Date.now() - t0) / 1000))} s`;
+      if (t0)
+        el.textContent = `${Math.max(0, Math.round((Date.now() - t0) / 1000))} s`;
     }
   }, 500);
   function trackJob(job, view, apply) {
@@ -380,7 +382,11 @@
         } catch (e) {
           // A slow answer is not a failed job. Give up only after a long run of misses.
           if (++t.fails >= 40) {
-            t.apply({ id, status: "error", error: "The bridge stopped answering. " + e.message });
+            t.apply({
+              id,
+              status: "error",
+              error: "The bridge stopped answering. " + e.message,
+            });
             tracker.jobs.delete(id);
           }
         }
@@ -532,13 +538,26 @@
           "aside",
           {},
           h("div", { class: "label" }, fmtWhen(item.ts) || "Image"),
-          item.title && h("h2", { class: "selectable", style: "margin:4px 0 8px" }, item.title),
+          item.title &&
+            h(
+              "h2",
+              { class: "selectable", style: "margin:4px 0 8px" },
+              item.title,
+            ),
           item.summary && h("p", { class: "selectable" }, item.summary),
           item.tags && item.tags.length
-            ? h("div", { class: "row", style: "gap:6px;flex-wrap:wrap" }, item.tags.map((t) => h("span", { class: "chip" }, t)))
+            ? h(
+                "div",
+                { class: "row", style: "gap:6px;flex-wrap:wrap" },
+                item.tags.map((t) => h("span", { class: "chip" }, t)),
+              )
             : null,
           item.prompt
-            ? h("div", { class: "label", style: "margin-top:14px" }, "What you asked for")
+            ? h(
+                "div",
+                { class: "label", style: "margin-top:14px" },
+                "What you asked for",
+              )
             : null,
           item.prompt
             ? h("p", { class: "selectable" }, item.prompt)
@@ -1236,7 +1255,12 @@
       closePop();
       imgState.error = null;
       imgState.results = null;
-      imgState.job = { status: "running", stage: "Starting", elapsed: 0, _t0: Date.now() }; // the card is on screen before the bridge even answers
+      imgState.job = {
+        status: "running",
+        stage: "Starting",
+        elapsed: 0,
+        _t0: Date.now(),
+      }; // the card is on screen before the bridge even answers
       paintStage();
       try {
         const sets = Object.keys(imgState.useSets).filter(
@@ -1269,8 +1293,30 @@
             { class: "working" },
             h("div", { class: "label" }, "Painting"),
             h("div", { class: "big" }, job.stage || "Painting"),
-            h("div", { class: "time", "data-t0": job.status === "running" ? String(job._t0 || "") : "" }, `${Math.round(secs(job))} s`),
+            h(
+              "div",
+              {
+                class: "time",
+                "data-t0":
+                  job.status === "running" ? String(job._t0 || "") : "",
+              },
+              `${Math.round(secs(job))} s`,
+            ),
             job.note && h("div", { class: "hint" }, job.note),
+            ...(job.log || [])
+              .slice(-3)
+              .map((ln) => h("div", { class: "hint mono" }, ln)),
+            h(
+              "button",
+              {
+                class: "chip",
+                type: "button",
+                style: "margin-top:12px",
+                onclick: () =>
+                  post(`/api/jobs/${job.id}/cancel`).catch(() => {}),
+              },
+              "Stop",
+            ),
             h("div", { class: "hint selectable" }, imgState.prompt),
           ),
         );
@@ -2141,7 +2187,15 @@
             { class: "working", style: "margin-top:0" },
             h("div", { class: "label" }, "Reading your screen"),
             h("div", { class: "big" }, job.stage),
-            h("div", { class: "time", "data-t0": job.status === "running" ? String(job._t0 || "") : "" }, `${Math.round(secs(job))} s`),
+            h(
+              "div",
+              {
+                class: "time",
+                "data-t0":
+                  job.status === "running" ? String(job._t0 || "") : "",
+              },
+              `${Math.round(secs(job))} s`,
+            ),
             h(
               "div",
               { class: "hint" },
@@ -2451,7 +2505,11 @@
     function paint() {
       const q = search.value.toLowerCase().trim();
       const rows = data.recordings.filter(
-        (r) => !q || `${r.name} ${r.title || ""} ${r.summary || ""} ${(r.tags || []).join(" ")}`.toLowerCase().includes(q),
+        (r) =>
+          !q ||
+          `${r.name} ${r.title || ""} ${r.summary || ""} ${(r.tags || []).join(" ")}`
+            .toLowerCase()
+            .includes(q),
       );
       grid.replaceChildren(
         ...(rows.length
@@ -2492,7 +2550,12 @@
                     "div",
                     {},
                     h("h3", {}, r.title || prettyName(r.name)),
-                    r.summary && h("div", { class: "hint selectable", style: "margin:2px 0 6px" }, r.summary),
+                    r.summary &&
+                      h(
+                        "div",
+                        { class: "hint selectable", style: "margin:2px 0 6px" },
+                        r.summary,
+                      ),
                     h(
                       "div",
                       { class: "hint mono" },
@@ -2578,8 +2641,11 @@
             if (current === "recordings") paint();
           }
           // titles are written in the background; look again until they have all landed
-          const waiting = (fresh.items || fresh.recordings || []).some((r) => r.title_src && r.title_src !== "vision");
-          if (waiting && current === "recordings" && ++recPolls < 12) setTimeout(refreshRecordings, 20000);
+          const waiting = (fresh.items || fresh.recordings || []).some(
+            (r) => r.title_src && r.title_src !== "vision",
+          );
+          if (waiting && current === "recordings" && ++recPolls < 12)
+            setTimeout(refreshRecordings, 20000);
         })
         .catch(() => {});
     }
@@ -2715,7 +2781,15 @@
             { class: "working", style: "margin-top:0" },
             h("div", { class: "label" }, "Reading"),
             h("div", { class: "big" }, job.stage),
-            h("div", { class: "time", "data-t0": job.status === "running" ? String(job._t0 || "") : "" }, `${Math.round(secs(job))} s`),
+            h(
+              "div",
+              {
+                class: "time",
+                "data-t0":
+                  job.status === "running" ? String(job._t0 || "") : "",
+              },
+              `${Math.round(secs(job))} s`,
+            ),
           ),
         );
       if (job && job.partial && job.partial.length)
@@ -2894,7 +2968,11 @@
         const d = await api(url);
         if (!lState.q && lState.scope === "mine") store("swr.library", d);
         paintGrid(d);
-        if (d.items.some((i) => i.title_src && i.title_src !== "vision") && current === "library" && ++libPolls < 12)
+        if (
+          d.items.some((i) => i.title_src && i.title_src !== "vision") &&
+          current === "library" &&
+          ++libPolls < 12
+        )
           setTimeout(load, 20000);
       } catch (e) {
         holder.replaceChildren(errBox(e.message));
@@ -2948,7 +3026,8 @@
   }
 
   // ------------------------------------------------------------ status rail
-  let firstStatus = window.__BOOT__ && window.__BOOT__.drive ? window.__BOOT__.drive : null;
+  let firstStatus =
+    window.__BOOT__ && window.__BOOT__.drive ? window.__BOOT__.drive : null;
   async function pollStatus() {
     try {
       const s = firstStatus ? { drive: firstStatus } : await api("/api/state");
