@@ -2,8 +2,11 @@
 
 ## [Unreleased]
 
+## [0.14.9] - 2026-10-03
+
 ### Added
 
+- Signed updates download automatically in the background. Choose **Restart to update** when ready; active dictation or screen recording blocks that restart. Automatic updates can be turned off, and portable installs keep their manual installer flow.
 - Say Less Studio in the bridge (`/app`): Create (prompt box with @shelves, references, painter picker), Titles (click a title to copy), Videos, Screens and Library, in one fast page that paints from its last snapshot. Four native launcher apps open one view each (`bridge/launcher`).
 - Reference shelves shared with `subpowers --refs`, drag and drop anywhere, kept on this Mac.
 - `bridge/install.sh`, `bridge/tests/`, `scripts/local-build.sh` (`bun run build:local`), `scripts/one-copy.sh`, `scripts/fix-permissions.sh`, `scripts/clear-dock-ghosts.sh`, `docs/LOCAL-BUILDS.md`.

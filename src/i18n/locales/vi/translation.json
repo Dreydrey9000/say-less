@@ -592,8 +592,8 @@
         "empty": "Đang chờ nhật ký… Các mục sẽ xuất hiện ở đây khi ứng dụng phát ra."
       },
       "updateChecks": {
-        "label": "Kiểm tra cập nhật",
-        "description": "Tự động kiểm tra phiên bản mới của Say Less",
+        "label": "Automatic updates",
+        "description": "Check for new releases and download signed updates automatically. You choose when to restart. Portable installs use a manual download.",
         "lockedDescription": "Đã bị vô hiệu hóa bởi cấu hình hệ thống (HANDY_DISABLE_UPDATER)"
       },
       "soundTheme": {
@@ -765,7 +765,11 @@
     "updateFailed": "Không thể cập nhật Say Less",
     "updateFailedMacDescription": "Hãy tải về phiên bản mới rồi kéo vào thư mục Ứng dụng.",
     "updateFailedDescription": "Hãy tải về phiên bản mới từ trang web của chúng tôi rồi cài đặt.",
-    "updateFailedAction": "Tải về"
+    "updateFailedAction": "Tải về",
+    "restartToUpdate": "Restart to update",
+    "updateDownloaded": "Say Less v{{version}} is downloaded. Restart when you are ready.",
+    "downloadingBackground": "Downloading update…",
+    "updateBusy": "Finish dictation or screen recording before restarting to update."
   },
   "common": {
     "loading": "Đang tải...",

@@ -592,8 +592,8 @@
         "empty": "S'estan esperant registres… Les entrades apareixeran aquí a mesura que l'aplicació les emeti."
       },
       "updateChecks": {
-        "label": "Comproveu si hi ha actualitzacions",
-        "description": "Comprova automàticament si hi ha versions noves del Say Less",
+        "label": "Automatic updates",
+        "description": "Check for new releases and download signed updates automatically. You choose when to restart. Portable installs use a manual download.",
         "lockedDescription": "Desactivat per la configuració del sistema (HANDY_DISABLE_UPDATER)"
       },
       "whatsNewPreview": {
@@ -765,7 +765,11 @@
     "updateFailed": "No hem pogut actualitzar el Say Less",
     "updateFailedMacDescription": "Baixeu la versió nova i arrossegueu-la a la carpeta Aplicacions.",
     "updateFailedDescription": "Baixeu la versió nova des del nostre lloc web i instal·leu-la.",
-    "updateFailedAction": "Baixa"
+    "updateFailedAction": "Baixa",
+    "restartToUpdate": "Restart to update",
+    "updateDownloaded": "Say Less v{{version}} is downloaded. Restart when you are ready.",
+    "downloadingBackground": "Downloading update…",
+    "updateBusy": "Finish dictation or screen recording before restarting to update."
   },
   "whatsNew": {
     "title": "Novetats del Say Less v{{version}}",

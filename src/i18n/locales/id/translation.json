@@ -592,8 +592,8 @@
         "empty": "Menunggu log… Entri akan muncul di sini saat aplikasi menghasilkannya."
       },
       "updateChecks": {
-        "label": "Periksa Pembaruan",
-        "description": "Periksa versi baru Say Less secara otomatis",
+        "label": "Automatic updates",
+        "description": "Check for new releases and download signed updates automatically. You choose when to restart. Portable installs use a manual download.",
         "lockedDescription": "Dinonaktifkan oleh konfigurasi sistem (HANDY_DISABLE_UPDATER)"
       },
       "whatsNewPreview": {
@@ -765,7 +765,11 @@
     "updateFailed": "Kami tidak dapat memperbarui Say Less",
     "updateFailedMacDescription": "Unduh versi baru, lalu seret ke folder Aplikasi Anda.",
     "updateFailedDescription": "Unduh versi baru dari situs web kami, lalu instal.",
-    "updateFailedAction": "Unduh"
+    "updateFailedAction": "Unduh",
+    "restartToUpdate": "Restart to update",
+    "updateDownloaded": "Say Less v{{version}} is downloaded. Restart when you are ready.",
+    "downloadingBackground": "Downloading update…",
+    "updateBusy": "Finish dictation or screen recording before restarting to update."
   },
   "whatsNew": {
     "title": "Baru di Say Less v{{version}}",

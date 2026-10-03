@@ -592,8 +592,8 @@
         "empty": "Loglar bekleniyor… Uygulama logları ürettikçe girişler burada görünür."
       },
       "updateChecks": {
-        "label": "Güncellemeleri Kontrol Et",
-        "description": "Say Less için yeni sürümleri otomatik olarak kontrol eder",
+        "label": "Automatic updates",
+        "description": "Check for new releases and download signed updates automatically. You choose when to restart. Portable installs use a manual download.",
         "lockedDescription": "Sistem yapılandırması tarafından devre dışı bırakıldı (HANDY_DISABLE_UPDATER)"
       },
       "soundTheme": {
@@ -765,7 +765,11 @@
     "updateFailed": "Say Less güncellenemedi",
     "updateFailedMacDescription": "Yeni sürümü indirin ve Uygulamalar klasörünüze sürükleyin.",
     "updateFailedDescription": "Yeni sürümü web sitemizden indirip yükleyin.",
-    "updateFailedAction": "İndir"
+    "updateFailedAction": "İndir",
+    "restartToUpdate": "Restart to update",
+    "updateDownloaded": "Say Less v{{version}} is downloaded. Restart when you are ready.",
+    "downloadingBackground": "Downloading update…",
+    "updateBusy": "Finish dictation or screen recording before restarting to update."
   },
   "common": {
     "loading": "Yükleniyor...",

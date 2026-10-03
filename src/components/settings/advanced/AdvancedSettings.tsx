@@ -4,6 +4,7 @@ import { ModelUnloadTimeoutSetting } from "../ModelUnloadTimeout";
 import { SettingsGroup } from "../../ui/SettingsGroup";
 import { PageHeader } from "../../ui/PageHeader";
 import { MovedNote } from "../../ui/MovedNote";
+import { UpdateChecksToggle } from "../UpdateChecksToggle";
 import { StartHidden } from "../StartHidden";
 import { AutostartToggle } from "../AutostartToggle";
 import { ShowTrayIcon } from "../ShowTrayIcon";
@@ -34,6 +35,7 @@ export const AdvancedSettings: React.FC = () => {
         description={t("settings.advanced.description")}
       />
       <SettingsGroup title={t("settings.advanced.groups.app")}>
+        <UpdateChecksToggle descriptionMode="inline" grouped={true} />
         <StartHidden descriptionMode="tooltip" grouped={true} />
         <AutostartToggle descriptionMode="tooltip" grouped={true} />
         <ShowTrayIcon descriptionMode="tooltip" grouped={true} />

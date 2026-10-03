@@ -592,8 +592,8 @@
         "empty": "लॉग का इंतज़ार है… ऐप से लॉग आते ही एंट्री यहां दिखेंगी."
       },
       "updateChecks": {
-        "label": "अपडेट जांचें",
-        "description": "Say Less के नए वर्शन की अपने आप जांच करें",
+        "label": "Automatic updates",
+        "description": "Check for new releases and download signed updates automatically. You choose when to restart. Portable installs use a manual download.",
         "lockedDescription": "सिस्टम कॉन्फ़िगरेशन द्वारा अक्षम (HANDY_DISABLE_UPDATER)"
       },
       "whatsNewPreview": {
@@ -765,7 +765,11 @@
     "updateFailed": "हम Say Less को अपडेट नहीं कर सके",
     "updateFailedMacDescription": "नया वर्शन डाउनलोड करें और उसे अपने ऐप्लिकेशन फ़ोल्डर में ड्रैग करें.",
     "updateFailedDescription": "हमारी वेबसाइट से नया वर्शन डाउनलोड करें और उसे इंस्टॉल करें.",
-    "updateFailedAction": "डाउनलोड करें"
+    "updateFailedAction": "डाउनलोड करें",
+    "restartToUpdate": "Restart to update",
+    "updateDownloaded": "Say Less v{{version}} is downloaded. Restart when you are ready.",
+    "downloadingBackground": "Downloading update…",
+    "updateBusy": "Finish dictation or screen recording before restarting to update."
   },
   "whatsNew": {
     "title": "Say Less v{{version}} में नया क्या है",

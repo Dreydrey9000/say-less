@@ -262,7 +262,7 @@ test("the footer update control looks like a button in every state", async ({
   ).toBeVisible();
 
   await page.goto("/tests/fixtures/app.html?updater=available");
-  const update = footer.getByRole("button", { name: "Update now" });
+  const update = footer.getByRole("button", { name: "Restart to update" });
   await expect(update).toBeEnabled();
   await expect(update).toHaveClass(/accent-action/);
   // The "ready" toast floats above the footer instead of covering the button.

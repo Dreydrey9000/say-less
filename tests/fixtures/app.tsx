@@ -215,9 +215,13 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
       dictations: query.has("statsWords") ? 12 : 0,
       streak_days: query.has("statsWords") ? 3 : 0,
     };
-  if (cmd === "get_dock_state") return "idle";
+  if (cmd === "get_dock_state") return query.get("updateDictation") ?? "idle";
   if (cmd === "dock_finish_drag") return query.get("snap") ?? "free";
-  if (cmd === "screen_recording_status") return screenStatus;
+  if (cmd === "screen_recording_status")
+    return {
+      ...screenStatus,
+      state: query.get("updateScreen") ?? screenStatus.state,
+    };
   if (cmd === "get_recording_options") return recordingOptions;
   if (cmd === "save_recording_options") {
     const next = payload?.options as typeof recordingOptions;
@@ -357,7 +361,31 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
       !query.has("noPermissions") ||
       sessionStorage.getItem("test-permissions") === "granted"
     );
-  if (cmd === "is_update_checks_locked") return false;
+  if (cmd === "is_update_checks_locked") return query.has("updatesLocked");
+  if (cmd === "is_portable") return query.has("portable");
+  if (cmd === "plugin:updater|download") {
+    return new Promise((resolve, reject) => {
+      const finish = () => {
+        if (
+          query.has("downloadFails") &&
+          calls.filter((c) => c === cmd).length === 1
+        )
+          reject(new Error("Download interrupted"));
+        else resolve(2);
+      };
+      if (query.has("holdDownload"))
+        (
+          window as unknown as { finishUpdateDownload: () => void }
+        ).finishUpdateDownload = finish;
+      else setTimeout(finish, 300);
+    });
+  }
+  if (cmd === "plugin:updater|install" && query.has("installFails"))
+    throw new Error("Installer failed");
+  if (cmd === "change_update_checks_setting") {
+    settings.update_checks_enabled = Boolean(payload?.enabled);
+    return null;
+  }
   if (cmd === "plugin:updater|check")
     return query.get("updater") === "available"
       ? {

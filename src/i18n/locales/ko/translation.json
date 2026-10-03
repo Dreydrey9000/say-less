@@ -592,8 +592,8 @@
         "empty": "로그 대기 중… 앱이 로그를 출력하면 여기에 표시됩니다."
       },
       "updateChecks": {
-        "label": "업데이트 확인",
-        "description": "Say Less의 새 버전을 자동으로 확인합니다",
+        "label": "Automatic updates",
+        "description": "Check for new releases and download signed updates automatically. You choose when to restart. Portable installs use a manual download.",
         "lockedDescription": "시스템 구성에 의해 비활성화됨 (HANDY_DISABLE_UPDATER)"
       },
       "soundTheme": {
@@ -765,7 +765,11 @@
     "updateFailed": "Say Less를 업데이트하지 못했습니다",
     "updateFailedMacDescription": "새 버전을 다운로드한 다음 응용 프로그램 폴더로 드래그하세요.",
     "updateFailedDescription": "웹사이트에서 새 버전을 다운로드해 설치하세요.",
-    "updateFailedAction": "다운로드"
+    "updateFailedAction": "다운로드",
+    "restartToUpdate": "Restart to update",
+    "updateDownloaded": "Say Less v{{version}} is downloaded. Restart when you are ready.",
+    "downloadingBackground": "Downloading update…",
+    "updateBusy": "Finish dictation or screen recording before restarting to update."
   },
   "common": {
     "loading": "로딩 중...",

@@ -592,8 +592,8 @@
         "empty": "In attesa di log… Le voci appariranno qui man mano che l'app le emette."
       },
       "updateChecks": {
-        "label": "Controlla aggiornamenti",
-        "description": "Controlla automaticamente la disponibilità di nuove versioni di Say Less",
+        "label": "Automatic updates",
+        "description": "Check for new releases and download signed updates automatically. You choose when to restart. Portable installs use a manual download.",
         "lockedDescription": "Disabilitato dalla configurazione di sistema (HANDY_DISABLE_UPDATER)"
       },
       "soundTheme": {
@@ -765,7 +765,11 @@
     "updateFailed": "Non siamo riusciti ad aggiornare Say Less",
     "updateFailedMacDescription": "Scarica la nuova versione e trascinala nella cartella Applicazioni.",
     "updateFailedDescription": "Scarica la nuova versione dal nostro sito web e installala.",
-    "updateFailedAction": "Scarica"
+    "updateFailedAction": "Scarica",
+    "restartToUpdate": "Restart to update",
+    "updateDownloaded": "Say Less v{{version}} is downloaded. Restart when you are ready.",
+    "downloadingBackground": "Downloading update…",
+    "updateBusy": "Finish dictation or screen recording before restarting to update."
   },
   "common": {
     "loading": "Caricamento...",

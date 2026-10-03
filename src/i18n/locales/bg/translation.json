@@ -592,8 +592,8 @@
         "empty": "Изчакване на логове… Записите ще се появят тук, щом приложението ги генерира."
       },
       "updateChecks": {
-        "label": "Проверка за актуализации",
-        "description": "Автоматична проверка за нови версии на Say Less",
+        "label": "Automatic updates",
+        "description": "Check for new releases and download signed updates automatically. You choose when to restart. Portable installs use a manual download.",
         "lockedDescription": "Деактивирано от системната конфигурация (HANDY_DISABLE_UPDATER)"
       },
       "soundTheme": {
@@ -765,7 +765,11 @@
     "updateFailed": "Не успяхме да актуализираме Say Less",
     "updateFailedMacDescription": "Изтеглете новата версия и я плъзнете в папката „Applications“.",
     "updateFailedDescription": "Изтеглете новата версия от нашия уебсайт и я инсталирайте.",
-    "updateFailedAction": "Изтегляне"
+    "updateFailedAction": "Изтегляне",
+    "restartToUpdate": "Restart to update",
+    "updateDownloaded": "Say Less v{{version}} is downloaded. Restart when you are ready.",
+    "downloadingBackground": "Downloading update…",
+    "updateBusy": "Finish dictation or screen recording before restarting to update."
   },
   "common": {
     "loading": "Зареждане...",

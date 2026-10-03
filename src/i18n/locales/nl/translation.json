@@ -592,8 +592,8 @@
         "empty": "Wachten op logboeken... Meldingen verschijnen hier zodra de app ze genereert."
       },
       "updateChecks": {
-        "label": "Controleren op updates",
-        "description": "Automatisch controleren op nieuwe versies van Say Less",
+        "label": "Automatic updates",
+        "description": "Check for new releases and download signed updates automatically. You choose when to restart. Portable installs use a manual download.",
         "lockedDescription": "Uitgeschakeld door systeemconfiguratie (HANDY_DISABLE_UPDATER)"
       },
       "whatsNewPreview": {
@@ -765,7 +765,11 @@
     "updateFailed": "We konden Say Less niet bijwerken",
     "updateFailedMacDescription": "Download de nieuwe versie en sleep deze naar de map 'Apps'.",
     "updateFailedDescription": "Download de nieuwe versie via onze website en installeer deze.",
-    "updateFailedAction": "Downloaden"
+    "updateFailedAction": "Downloaden",
+    "restartToUpdate": "Restart to update",
+    "updateDownloaded": "Say Less v{{version}} is downloaded. Restart when you are ready.",
+    "downloadingBackground": "Downloading update…",
+    "updateBusy": "Finish dictation or screen recording before restarting to update."
   },
   "whatsNew": {
     "title": "Nieuw in Say Less v{{version}}",

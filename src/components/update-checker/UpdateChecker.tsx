@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { check } from "@tauri-apps/plugin-updater";
+import { check, type Update } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { listen } from "@tauri-apps/api/event";
 import { openUrl } from "@tauri-apps/plugin-opener";
@@ -37,6 +37,7 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
   const [isChecking, setIsChecking] = useState(false);
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
+  const [isDownloaded, setIsDownloaded] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [showUpToDate, setShowUpToDate] = useState(false);
   const [showPortableUpdateDialog, setShowPortableUpdateDialog] =
@@ -65,16 +66,34 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
   // from an older render, and they still need to see an install in progress.
   const isInstallingRef = useRef(false);
   const lastCheckRef = useRef(0);
+  const isCheckingRef = useRef(false);
+  const pendingUpdateRef = useRef<Update | null>(null);
+  const generationRef = useRef(0);
+  const activeRef = useRef(false);
+  const enabledRef = useRef(false);
+  enabledRef.current = settingsLoaded && updateChecksEnabled;
+
+  const closeUpdate = (update: Update) => {
+    void update
+      .close()
+      .catch((error) =>
+        console.error("Failed to release update resources:", error),
+      );
+  };
 
   useEffect(() => {
     // Wait for settings to load before doing anything
     if (!settingsLoaded) return;
+    activeRef.current = true;
 
     if (!updateChecksEnabled) {
       if (upToDateTimeoutRef.current) {
         clearTimeout(upToDateTimeoutRef.current);
       }
       setIsChecking(false);
+      setIsInstalling(false);
+      setIsDownloaded(false);
+      notifiedVersionRef.current = null;
       setUpdateAvailable(false);
       setShowUpToDate(false);
       toast.dismiss(UPDATE_READY_TOAST_ID);
@@ -95,6 +114,12 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
     });
 
     return () => {
+      activeRef.current = false;
+      generationRef.current += 1;
+      toast.dismiss(UPDATE_READY_TOAST_ID);
+      const pending = pendingUpdateRef.current;
+      pendingUpdateRef.current = null;
+      if (pending) closeUpdate(pending);
       if (upToDateTimeoutRef.current) {
         clearTimeout(upToDateTimeoutRef.current);
       }
@@ -104,147 +129,227 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
     };
   }, [settingsLoaded, updateChecksEnabled]);
 
-  // Update checking functions
-  const checkForUpdates = async () => {
-    if (!updateChecksEnabled || isChecking) return;
+  const showReady = (version: string, downloaded: boolean) => {
+    if (!isManualCheckRef.current && notifiedVersionRef.current === version)
+      return;
+    notifiedVersionRef.current = version;
+    toast(
+      t(downloaded ? "footer.updateDownloaded" : "footer.updateReady", {
+        version,
+      }),
+      {
+        id: UPDATE_READY_TOAST_ID,
+        duration: Infinity,
+        cancel: { label: t("footer.updateLater"), onClick: () => {} },
+        action: {
+          label: t(downloaded ? "footer.restartToUpdate" : "footer.updateNow"),
+          onClick: () => {
+            void installUpdate();
+          },
+        },
+        classNames: {
+          cancelButton:
+            "min-h-[28px] px-2 py-1 text-xs font-medium rounded-lg border border-mid-gray/40 bg-transparent text-text/80 hover:bg-mid-gray/20 cursor-pointer whitespace-nowrap",
+          actionButton:
+            "accent-action min-h-[28px] px-2 py-1 text-xs font-medium rounded-lg cursor-pointer whitespace-nowrap",
+        },
+      },
+    );
+  };
 
+  const showFailure = () => {
+    toast.error(t("footer.updateFailed"), {
+      id: UPDATE_FAILED_TOAST_ID,
+      description:
+        platform() === "macos"
+          ? t("footer.updateFailedMacDescription")
+          : t("footer.updateFailedDescription"),
+      duration: 15000,
+      action: {
+        label: t("footer.updateFailedAction"),
+        onClick: () => openUrl(DOWNLOAD_PAGE_URL),
+      },
+    });
+  };
+
+  const checkForUpdates = async () => {
+    if (
+      !enabledRef.current ||
+      !activeRef.current ||
+      isCheckingRef.current ||
+      isInstallingRef.current
+    )
+      return;
+    // Keep the verified package until the user chooses to restart. A focus
+    // event or manual check must not allocate another copy of it.
+    if (pendingUpdateRef.current) {
+      showReady(pendingUpdateRef.current.version, true);
+      isManualCheckRef.current = false;
+      return;
+    }
+    isCheckingRef.current = true;
+    const generation = generationRef.current;
+    const current = () =>
+      activeRef.current &&
+      enabledRef.current &&
+      generation === generationRef.current;
+    let update: Update | null = null;
     try {
       lastCheckRef.current = Date.now();
       setIsChecking(true);
-      const update = await check();
-
+      toast.dismiss(UPDATE_FAILED_TOAST_ID);
+      update = await check({ timeout: 30000 });
+      if (!current()) return;
       if (update) {
         setUpdateAvailable(true);
         setShowUpToDate(false);
-        // Portable installs can't self-update in place — the manual dialog links
-        // straight at the matching installer from this manifest instead.
         setPortableInstallerUrl(
           resolvePortableInstallerUrl(update.rawJson, platform(), arch()),
         );
-        // The footer label is small and easy to miss, so also say it in a
-        // toast: once per version, and again on every manual check. Never
-        // while an install is running, or its button would start a second one.
-        if (
-          !isInstallingRef.current &&
-          (isManualCheckRef.current ||
-            notifiedVersionRef.current !== update.version)
-        ) {
-          notifiedVersionRef.current = update.version;
-          toast(t("footer.updateReady", { version: update.version }), {
-            id: UPDATE_READY_TOAST_ID,
-            duration: Infinity,
-            cancel: { label: t("footer.updateLater"), onClick: () => {} },
-            action: {
-              label: t("footer.updateNow"),
-              onClick: () => {
-                void installUpdate();
-              },
-            },
-            // Both choices look like buttons (UI-STANDARD 6.10), and Update
-            // now matches the footer's lime button so it reads as one action.
-            classNames: {
-              cancelButton:
-                "min-h-[28px] px-2 py-1 text-xs font-medium rounded-lg border border-mid-gray/40 bg-transparent text-text/80 hover:bg-mid-gray/20 cursor-pointer whitespace-nowrap",
-              actionButton:
-                "accent-action min-h-[28px] px-2 py-1 text-xs font-medium rounded-lg cursor-pointer whitespace-nowrap",
-            },
-          });
+        const portable = await commands.isPortable();
+        if (!current()) return;
+        if (portable) {
+          showReady(update.version, false);
+          return;
         }
+        setIsInstalling(true);
+        setDownloadProgress(0);
+        downloadedBytesRef.current = 0;
+        contentLengthRef.current = 0;
+        // download() verifies the signature but does not replace or restart
+        // the running app. install() is only called by the user's button.
+        await update.download(
+          (event) => {
+            if (!current()) return;
+            if (event.event === "Started") {
+              downloadedBytesRef.current = 0;
+              contentLengthRef.current = event.data.contentLength ?? 0;
+            } else if (event.event === "Progress") {
+              downloadedBytesRef.current += event.data.chunkLength;
+              setDownloadProgress(
+                contentLengthRef.current > 0
+                  ? Math.min(
+                      100,
+                      Math.round(
+                        (downloadedBytesRef.current /
+                          contentLengthRef.current) *
+                          100,
+                      ),
+                    )
+                  : 0,
+              );
+            }
+          },
+          { timeout: 120000 },
+        );
+        if (!current()) return;
+        pendingUpdateRef.current = update;
+        setIsDownloaded(true);
+        showReady(update.version, true);
+        update = null; // Ownership moves to pendingUpdateRef until install/cleanup.
       } else {
         setUpdateAvailable(false);
-
         if (isManualCheckRef.current) {
           setShowUpToDate(true);
-          if (upToDateTimeoutRef.current) {
+          if (upToDateTimeoutRef.current)
             clearTimeout(upToDateTimeoutRef.current);
-          }
-          upToDateTimeoutRef.current = setTimeout(() => {
-            setShowUpToDate(false);
-          }, 3000);
+          upToDateTimeoutRef.current = setTimeout(
+            () => setShowUpToDate(false),
+            3000,
+          );
         }
       }
     } catch (error) {
-      console.error("Failed to check for updates:", error);
+      console.error("Failed to prepare update:", error);
+      if (current()) showFailure();
     } finally {
-      setIsChecking(false);
+      if (update) closeUpdate(update);
+      isCheckingRef.current = false;
+      if (current()) {
+        setIsChecking(false);
+        setIsInstalling(false);
+      }
       isManualCheckRef.current = false;
+      // Settings/StrictMode may have replaced the effect while IPC was in
+      // flight. Release that result before starting the new effect's check.
+      if (
+        activeRef.current &&
+        enabledRef.current &&
+        generation !== generationRef.current
+      )
+        void checkForUpdates();
     }
   };
 
   const handleManualUpdateCheck = () => {
-    if (!updateChecksEnabled) return;
+    if (!enabledRef.current) return;
     isManualCheckRef.current = true;
-    checkForUpdates();
+    void checkForUpdates();
   };
 
   const installUpdate = async () => {
-    if (!updateChecksEnabled || isInstallingRef.current) return;
+    if (
+      !enabledRef.current ||
+      !activeRef.current ||
+      isCheckingRef.current ||
+      isInstallingRef.current
+    )
+      return;
     isInstallingRef.current = true;
-    // Starting from the footer label must not leave a second "Update now"
-    // button on screen that would start another download.
-    toast.dismiss(UPDATE_READY_TOAST_ID);
-
+    const generation = generationRef.current;
+    let update: Update | null = null;
     try {
       const portable = await commands.isPortable();
+      if (
+        !enabledRef.current ||
+        !activeRef.current ||
+        generation !== generationRef.current
+      )
+        return;
       if (portable) {
         setShowPortableUpdateDialog(true);
         return;
       }
-
-      setIsInstalling(true);
-      setDownloadProgress(0);
-      downloadedBytesRef.current = 0;
-      contentLengthRef.current = 0;
-      const update = await check();
-
-      if (!update) {
-        console.log("No update available during install attempt");
+      if (!pendingUpdateRef.current) {
+        isInstallingRef.current = false;
+        await checkForUpdates();
         return;
       }
-
-      await update.downloadAndInstall((event) => {
-        switch (event.event) {
-          case "Started":
-            downloadedBytesRef.current = 0;
-            contentLengthRef.current = event.data.contentLength ?? 0;
-            break;
-          case "Progress":
-            downloadedBytesRef.current += event.data.chunkLength;
-            const progress =
-              contentLengthRef.current > 0
-                ? Math.round(
-                    (downloadedBytesRef.current / contentLengthRef.current) *
-                      100,
-                  )
-                : 0;
-            setDownloadProgress(Math.min(progress, 100));
-            break;
-        }
-      });
+      const [dictation, screen] = await Promise.all([
+        commands.getDockState(),
+        commands.screenRecordingStatus(),
+      ]);
+      if (
+        !enabledRef.current ||
+        !activeRef.current ||
+        generation !== generationRef.current
+      )
+        return;
+      if (dictation !== "idle" || screen.state !== "idle") {
+        toast.info(t("footer.updateBusy"));
+        return;
+      }
+      update = pendingUpdateRef.current;
+      pendingUpdateRef.current = null;
+      setIsInstalling(true);
+      setDownloadProgress(100);
+      toast.dismiss(UPDATE_READY_TOAST_ID);
+      await update.install();
       await relaunch();
     } catch (error) {
       console.error("Failed to install update:", error);
-      // Otherwise the label just snaps back to "Update available" with no
-      // reason. On a Mac this usually means the app is running from the disk
-      // image instead of Applications, so point at a fresh download.
-      toast.error(t("footer.updateFailed"), {
-        id: UPDATE_FAILED_TOAST_ID,
-        description:
-          platform() === "macos"
-            ? t("footer.updateFailedMacDescription")
-            : t("footer.updateFailedDescription"),
-        duration: 15000,
-        action: {
-          label: t("footer.updateFailedAction"),
-          onClick: () => openUrl(DOWNLOAD_PAGE_URL),
-        },
-      });
+      if (activeRef.current) showFailure();
     } finally {
+      if (update) {
+        closeUpdate(update);
+        setIsDownloaded(false);
+        notifiedVersionRef.current = null;
+      }
       isInstallingRef.current = false;
-      setIsInstalling(false);
-      setDownloadProgress(0);
-      downloadedBytesRef.current = 0;
-      contentLengthRef.current = 0;
+      if (activeRef.current) {
+        setIsInstalling(false);
+        setDownloadProgress(0);
+      }
     }
   };
 
@@ -254,6 +359,7 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
       return t("footer.updateCheckingDisabled");
     }
     if (isInstalling) {
+      if (isChecking) return t("footer.downloadingBackground");
       return downloadProgress > 0 && downloadProgress < 100
         ? t("footer.downloading", {
             progress: downloadProgress.toString().padStart(3),
@@ -265,6 +371,7 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
     if (isChecking) return t("footer.checkingUpdates");
     if (showUpToDate) return t("footer.upToDate");
     // Name the action, not the state: the button installs it.
+    if (isDownloaded) return t("footer.restartToUpdate");
     if (updateAvailable) return t("footer.updateNow");
     return t("footer.checkForUpdates");
   };
@@ -336,7 +443,11 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
           aria-busy={isChecking || isInstalling}
           title={
             updateAvailable && !isInstalling
-              ? t("footer.updateAvailableShort")
+              ? t(
+                  isDownloaded
+                    ? "footer.restartToUpdate"
+                    : "footer.updateAvailableShort",
+                )
               : undefined
           }
           className={`inline-flex items-center justify-center gap-1.5 min-h-[28px] min-w-[168px] px-2.5 rounded-lg border text-xs font-medium whitespace-nowrap tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text ${
@@ -377,7 +488,11 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
             : showUpToDate
               ? t("footer.upToDate")
               : updateAvailable && !isInstalling
-                ? t("footer.updateAvailableShort")
+                ? t(
+                    isDownloaded
+                      ? "footer.restartToUpdate"
+                      : "footer.updateAvailableShort",
+                  )
                 : ""}
         </span>
 
