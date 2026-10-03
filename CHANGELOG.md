@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Choose Circle or Square for your webcam overlay in Recording setup. The preview matches your saved choice, and changes apply to the next recording.
+
 ## [0.14.9] - 2026-10-03
 
 ### Added

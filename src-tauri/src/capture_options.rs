@@ -44,6 +44,14 @@ pub enum WebcamSize {
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, Type, PartialEq, Eq, Default)]
 #[serde(rename_all = "snake_case")]
+pub enum WebcamShape {
+    #[default]
+    Circle,
+    Square,
+}
+
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, Type, PartialEq, Eq, Default)]
+#[serde(rename_all = "snake_case")]
 pub enum RecordingQuality {
     P720,
     #[default]
@@ -72,6 +80,7 @@ pub struct RecordingOptions {
     pub camera_id: Option<String>,
     pub webcam_corner: WebcamCorner,
     pub webcam_size: WebcamSize,
+    pub webcam_shape: WebcamShape,
     pub quality: RecordingQuality,
     /// 30 or 60.
     pub fps: u32,
@@ -91,6 +100,7 @@ impl Default for RecordingOptions {
             camera_id: None,
             webcam_corner: WebcamCorner::BottomRight,
             webcam_size: WebcamSize::Medium,
+            webcam_shape: WebcamShape::Circle,
             quality: RecordingQuality::P1080,
             fps: 30,
         }
@@ -330,6 +340,7 @@ mod tests {
         assert_eq!(d.max_size(), Some((1920, 1080)));
         assert_eq!(d.webcam_corner, WebcamCorner::BottomRight);
         assert_eq!(d.webcam_size, WebcamSize::Medium);
+        assert_eq!(d.webcam_shape, WebcamShape::Circle);
         assert!(d.validate().is_ok());
     }
 
@@ -385,6 +396,22 @@ mod tests {
         o.quality = RecordingQuality::Native;
         assert!(o.validate().is_ok());
         assert_eq!(o.max_size(), None);
+    }
+
+    #[test]
+    fn camera_shape_survives_save_and_old_or_invalid_values_default_to_circle() {
+        let square =
+            from_saved(json!({ "webcam": true, "webcam_shape": "square", "webcam_size": "large" }));
+        assert_eq!(square.webcam_shape, WebcamShape::Square);
+        assert_eq!(from_saved(serde_json::to_value(&square).unwrap()), square);
+        for saved in [
+            json!({ "webcam": true }),
+            json!({ "webcam": true, "webcam_shape": "triangle" }),
+        ] {
+            let loaded = from_saved(saved);
+            assert!(loaded.webcam);
+            assert_eq!(loaded.webcam_shape, WebcamShape::Circle);
+        }
     }
 
     #[test]

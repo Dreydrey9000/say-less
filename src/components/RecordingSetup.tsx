@@ -5,6 +5,7 @@ import { RefreshCw } from "lucide-react";
 import {
   WEBCAM_CORNERS,
   WEBCAM_SIZES,
+  WEBCAM_SHAPES,
   useRecordingOptions,
   windowLabel,
   type RecordingOptions,
@@ -310,12 +311,14 @@ export function RecordingSetup({
                         `recordingSetup.corner.${options.webcam_corner}`,
                       ),
                       size: t(`recordingSetup.size.${options.webcam_size}`),
+                      shape: t(`recordingSetup.shape.${options.webcam_shape}`),
                     })}
                   >
                     <div
                       className="rec-cam-bubble"
                       data-corner={options.webcam_corner}
                       data-size={options.webcam_size}
+                      data-shape={options.webcam_shape}
                       data-testid="webcam-bubble-preview"
                     >
                       {thumbnail.frame ? (
@@ -326,6 +329,28 @@ export function RecordingSetup({
                     </div>
                   </div>
                   <div className="rec-cam-controls">
+                    <div
+                      role="radiogroup"
+                      aria-label={t("recordingSetup.cameraShape")}
+                      className="rec-choice"
+                    >
+                      <span className="rec-choice-label" aria-hidden="true">
+                        {t("recordingSetup.cameraShape")}
+                      </span>
+                      {WEBCAM_SHAPES.map((shape) => (
+                        <label key={shape}>
+                          <input
+                            type="radio"
+                            name={`${id}-shape`}
+                            value={shape}
+                            checked={options.webcam_shape === shape}
+                            disabled={disabled}
+                            onChange={() => save({ webcam_shape: shape })}
+                          />
+                          <span>{t(`recordingSetup.shape.${shape}`)}</span>
+                        </label>
+                      ))}
+                    </div>
                     <div
                       role="radiogroup"
                       aria-label={t("recordingSetup.position")}

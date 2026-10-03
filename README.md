@@ -123,7 +123,9 @@ To check the real recorder by hand on a Mac: `cargo test real_recording -- --ign
 
 ![Screen recording flow](docs/diagrams/screen-recording.svg)
 
-[Editable diagram](docs/diagrams/screen-recording.mmd) · Code: `src-tauri/src/screen_recorder.rs`, `src-tauri/src/capture_options.rs`, `src-tauri/swift/screen_recorder.swift`, `src/components/RecordingSetup.tsx`
+[Editable diagram](docs/diagrams/screen-recording.mmd)
+
+In **Home → Recording setup → Show your face → Shape**, choose **Circle** or **Square**. The preview matches the saved choice. Shape changes during a recording apply to the next recording. · Code: `src-tauri/src/screen_recorder.rs`, `src-tauri/src/capture_options.rs`, `src-tauri/swift/screen_recorder.swift`, `src/components/RecordingSetup.tsx`
 
 ## Say less, stress less
 

@@ -153,12 +153,14 @@ const defaultRecording = {
   camera_id: null,
   webcam_corner: "bottom_right",
   webcam_size: "medium",
+  webcam_shape: "circle",
   quality: "p1080",
   fps: 30,
 };
-let recordingOptions = JSON.parse(
-  localStorage.getItem("test-recording") || JSON.stringify(defaultRecording),
-);
+let recordingOptions = {
+  ...defaultRecording,
+  ...JSON.parse(localStorage.getItem("test-recording") || "{}"),
+};
 const recordingSources = {
   displays: [
     {
