@@ -9,6 +9,7 @@ work (painting an image, reading a screen) runs as a job you can poll, and
 references you add stay on this Mac in ~/.subpowers/refs.
 """
 import hashlib
+from contextlib import nullcontext
 import json
 import mimetypes
 import os
@@ -67,8 +68,8 @@ class Studio:
         self.history_path = state / "title-history.json"
         self.meta_path = state / "media-meta.json"
         self.refs_root = Path(os.environ.get("SUBPOWERS_REFS")
-                              or Path.home() / ".subpowers" / "refs")
-        self.sp_library = Path.home() / ".subpowers" / "library.jsonl"
+                              or bridge.HOME / ".subpowers" / "refs")
+        self.sp_library = bridge.HOME / ".subpowers" / "library.jsonl"
         self.state = state
         for d in (self.uploads, self.thumbs, self.captures, self.screens_dir):
             d.mkdir(parents=True, exist_ok=True)
@@ -292,7 +293,10 @@ class Studio:
     def new_job(self, kind, **fields):
         job = {"id": uuid.uuid4().hex[:12], "kind": kind, "status": "running",
                "stage": "Starting", "created": time.time(), "partial": [], **fields}
-        with self.lock:
+        activity = getattr(self.b, "DESKTOP_ACTIVITY_LOCK", nullcontext())
+        with activity, self.lock:
+            if getattr(self.b, "DESKTOP_PAUSED", False):
+                raise ValueError("Say Less is updating. Retry after it restarts.")
             self.jobs[job["id"]] = job
             for jid in [k for k, v in self.jobs.items()
                         if time.time() - v["created"] > 6 * 3600]:
@@ -689,7 +693,9 @@ class Studio:
     # ------------------------------------------------------------- screens
 
     def screen_dirs(self):
-        base = Path.home() / "Desktop" / "Screenshots"
+        if getattr(self.b, "DESKTOP_TOKEN", None):
+            return [self.screens_dir, self.captures, self.uploads]
+        base = self.b.HOME / "Desktop" / "Screenshots"
         return sorted((d for d in base.glob("*") if d.is_dir()), reverse=True)[:3] if base.is_dir() else []
 
     def list_screens(self, limit=36):
@@ -697,15 +703,15 @@ class Studio:
         for d in self.screen_dirs():
             files += [p for p in d.glob("*") if p.suffix.lower() in self.b.IMAGE_SUFFIXES]
         files.sort(key=lambda p: p.stat().st_mtime, reverse=True)
-        loose = self.loose_screenshots()
+        loose = [] if getattr(self.b, "DESKTOP_TOKEN", None) else self.loose_screenshots()
         return {"screens": [{"path": str(p), "name": p.name,
                              "when": datetime.fromtimestamp(p.stat().st_mtime).astimezone().isoformat(timespec="seconds")}
                             for p in files[:limit]], "loose": len(loose)}
 
     def loose_screenshots(self):
-        home = Path.home()
+        home = self.b.HOME
         found = []
-        for src in [*(home / "Desktop").glob("*/"), home / "Desktop", home / "Downloads"]:
+        for src in [home / "Desktop", home / "Downloads"]:
             if not src.is_dir():
                 continue
             for pat in ("Screen Shot*.png", "Screenshot*.png", "CleanShot*.png"):
@@ -713,13 +719,13 @@ class Studio:
         return found
 
     def gather_screens(self):
-        dest = Path.home() / "Desktop" / "Screenshots" / datetime.now().strftime("%Y-%m-%d")
+        dest = self.screens_dir if getattr(self.b, "DESKTOP_TOKEN", None) else self.b.HOME / "Desktop" / "Screenshots" / datetime.now().strftime("%Y-%m-%d")
         dest.mkdir(parents=True, exist_ok=True)
         moved = 0
         for p in self.loose_screenshots():
             target = dest / p.name
             if not target.exists():
-                shutil.move(str(p), str(target))
+                shutil.copy2(p, target)
                 moved += 1
         return moved
 
@@ -836,6 +842,7 @@ class Studio:
                           "folder": str(self.b.IMAGES_DIR)})
         elif route == "recordings":
             h._send(200, {"recordings": self.recordings(), "drive": self.b.DRIVE,
+                          "watch_enabled": self.b.CONFIG["watch_enabled"],
                           "folder": str(self.b.WATCH_DIR)})
         elif route == "titles/history":
             h._send(200, {"history": self.title_history()})
@@ -947,8 +954,10 @@ class Studio:
             self.b.log(f"index: boot data not inlined: {e}")
             boot = "null"
         page = page.replace('<link rel="stylesheet" href="/app/studio.css" />', "<style>" + css + "</style>")
+        base = "/s/" + self.b.DESKTOP_TOKEN if getattr(self.b, "DESKTOP_TOKEN", None) else ""
         page = page.replace('<script src="/app/studio.js"></script>',
-                            "<script>window.__BOOT__=" + boot + ";</script><script>" + js + "</script>")
+                            "<script>window.__STUDIO_BASE__=" + json.dumps(base) +
+                            ";window.__BOOT__=" + boot + ";</script><script>" + js + "</script>")
         data = page.encode()
         h.send_response(200)
         h.send_header("Content-Type", "text/html; charset=utf-8")

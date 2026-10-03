@@ -3,6 +3,7 @@
    set with textContent, never innerHTML. */
 (() => {
   "use strict";
+  const studioUrl = (path) => (window.__STUDIO_BASE__ || "") + path;
 
   // ---------------------------------------------------------------- helpers
   const $ = (sel, root = document) => root.querySelector(sel);
@@ -84,7 +85,7 @@
   }
 
   async function api(path, opts, jobView) {
-    const res = await fetch(path, opts);
+    const res = await fetch(studioUrl(path), opts);
     let data = {};
     try {
       data = await res.json();
@@ -117,11 +118,14 @@
   const native = (() => {
     const pending = new Map();
     let n = 0;
-    const has = !!(
-      window.webkit &&
-      window.webkit.messageHandlers &&
-      window.webkit.messageHandlers.sayless
-    );
+    const embedded = !!window.__STUDIO_BASE__ && window.parent !== window;
+    const has =
+      embedded ||
+      !!(
+        window.webkit &&
+        window.webkit.messageHandlers &&
+        window.webkit.messageHandlers.sayless
+      );
     window.__saylessNative = (id, res) => {
       const p = pending.get(id);
       if (p) {
@@ -129,22 +133,36 @@
         p(res);
       }
     };
+    if (embedded)
+      window.addEventListener("message", (event) => {
+        if (
+          event.source === window.parent &&
+          event.data?.type === "studio-reply"
+        )
+          window.__saylessNative(event.data.id, event.data.result);
+      });
     function call(action, params) {
       return new Promise((resolve) => {
         if (!has) return resolve({ ok: false, error: "not-in-app" });
         const id = String(++n);
         pending.set(id, resolve);
-        window.webkit.messageHandlers.sayless.postMessage({
+        const message = {
           id,
           action,
           ...(params || {}),
-        });
-        setTimeout(() => {
-          if (pending.has(id)) {
-            pending.delete(id);
-            resolve({ ok: false, error: "The app did not answer." });
-          }
-        }, 30000);
+        };
+        if (embedded)
+          window.parent.postMessage({ type: "studio-native", ...message }, "*");
+        else window.webkit.messageHandlers.sayless.postMessage(message);
+        setTimeout(
+          () => {
+            if (pending.has(id)) {
+              pending.delete(id);
+              resolve({ ok: false, error: "The app did not answer." });
+            }
+          },
+          action === "capture" ? 130000 : 30000,
+        );
       });
     }
     return { has, call };
@@ -229,13 +247,15 @@
     }
   }
 
-  const mediaUrl = (p) => "/media?path=" + encodeURIComponent(p);
+  const mediaUrl = (p) => studioUrl("/media?path=" + encodeURIComponent(p));
   const thumbUrl = (p, w, v) =>
-    "/thumb?w=" +
-    (w || 480) +
-    "&path=" +
-    encodeURIComponent(p) +
-    (v ? "&v=" + v : "");
+    studioUrl(
+      "/thumb?w=" +
+        (w || 480) +
+        "&path=" +
+        encodeURIComponent(p) +
+        (v ? "&v=" + v : ""),
+    );
   function fmtBytes(n) {
     if (!n) return "";
     const u = ["B", "KB", "MB", "GB"];
@@ -1854,7 +1874,11 @@
               "div",
               { class: "t" },
               h("b", {}, "Screen videos"),
-              h("span", {}, `${d.recording_count || recs.length} in the cloud`),
+              h(
+                "span",
+                {},
+                `${d.recording_count || recs.length} saved recordings`,
+              ),
             ),
             h(
               "div",
@@ -2527,7 +2551,9 @@
                   h("img", {
                     src: r.local
                       ? thumbUrl(r.path, 560)
-                      : "/rec-thumb?name=" + encodeURIComponent(r.name),
+                      : studioUrl(
+                          "/rec-thumb?name=" + encodeURIComponent(r.name),
+                        ),
                     alt: "",
                     loading: "lazy",
                     onerror: (e) => {
@@ -2568,7 +2594,13 @@
                     "div",
                     { class: "row", style: "gap:6px" },
                     r.status === "waiting"
-                      ? h("span", { class: "chip warn" }, "Waiting to upload")
+                      ? h(
+                          "span",
+                          { class: "chip warn" },
+                          data.watch_enabled
+                            ? "Waiting to upload"
+                            : "Saved on this Mac",
+                        )
                       : h(
                           "span",
                           { class: "chip ok" },
@@ -2656,7 +2688,7 @@
         { class: "page" },
         pageHead(
           "Screen videos",
-          `${data.recordings.length} recording${data.recordings.length === 1 ? "" : "s"}, uploaded and ready to share.`,
+          `${data.recordings.length} saved recording${data.recordings.length === 1 ? "" : "s"}. Open a video to play it; connected cloud recordings also have share links.`,
           search,
           h(
             "button",
@@ -2766,7 +2798,7 @@
             { style: "grid-column:1/-1" },
             emptyBox(
               "No screenshots found",
-              "Take screenshots as usual, then gather them here and I read what each one shows.",
+              "Add screenshots, or gather them from Desktop and Downloads, then choose which ones to read.",
             ),
           ),
         );
@@ -2882,7 +2914,7 @@
         const r = await post("/api/screens/gather", {});
         toast(
           r.moved
-            ? `Moved ${r.moved} screenshot${r.moved === 1 ? "" : "s"} into today's folder`
+            ? `Added ${r.moved} screenshot${r.moved === 1 ? "" : "s"}. Your originals stay where they are.`
             : "Nothing new to gather",
         );
         if (r.moved) await render();
@@ -2890,6 +2922,26 @@
         toast(e.message, "bad");
       }
     }
+    const screenFiles = h("input", {
+      type: "file",
+      accept: "image/*",
+      multiple: true,
+      class: "sr-only",
+      onchange: async (event) => {
+        const files = [...event.target.files].slice(0, 12);
+        event.target.value = "";
+        try {
+          for (const file of files) {
+            const saved = await upload("/api/upload", file);
+            sState.picked.add(saved.path);
+          }
+          store("swr.screens", await api("/api/screens"));
+          await render();
+        } catch (error) {
+          toast(error.message, "bad");
+        }
+      },
+    });
     main.append(
       h(
         "div",
@@ -2897,16 +2949,24 @@
         pageHead(
           "Read screens",
           "Pick screenshots and get what each one shows, any formulas or steps, and why you took it.",
-          data.loose > 0 &&
-            h(
-              "button",
-              { class: "btn", onclick: gather },
-              icon("folder"),
-              `Gather ${data.loose} from Desktop and Downloads`,
-            ),
+          h(
+            "button",
+            { class: "btn", onclick: () => screenFiles.click() },
+            icon("plus"),
+            "Add screenshots",
+          ),
+          h(
+            "button",
+            { class: "btn", onclick: gather },
+            icon("folder"),
+            data.loose > 0
+              ? `Gather ${data.loose} from Desktop and Downloads`
+              : "Gather Desktop screenshots",
+          ),
           readBtn,
         ),
         h("div", { style: "height:22px" }),
+        screenFiles,
         h("div", { class: "stack" }, grid, out),
       ),
     );

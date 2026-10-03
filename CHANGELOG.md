@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.14.12] - 2026-10-03
+
+- Mac: Studio opens inside the existing Say Less window with Create, Titles, Videos, Screens, and Library. Python and the Studio UI are bundled with the app and update together.
+- Existing companion settings and library indexes are imported once without removing the originals. Studio connections control optional B2 uploads and Drive mirroring.
+- Restart-to-update waits for Studio generation, screenshot capture, metadata jobs, and uploads. New work pauses during installation; failed installs resume it.
+- Windows/Linux explain that integrated Studio currently requires Mac. Painter, vision, and storage connections still require their existing tools/accounts.
+
 ## [0.14.11] - 2026-10-03
 
 ### Changed

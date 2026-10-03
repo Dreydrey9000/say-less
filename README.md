@@ -1,5 +1,7 @@
 # Say Less
 
+**Studio on Mac:** [setup and limitations](docs/STUDIO-INTEGRATION.md) · [architecture diagram](docs/diagrams/studio-integrated.mmd).
+
 <img src="public/brand/say-less-emblem.png" width="96" alt="Say Less emblem" />
 
 ## See it first

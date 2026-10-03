@@ -76,7 +76,7 @@ img {
 /* ---- shell: a slim icon rail and one scrolling canvas ---- */
 .shell {
   display: grid;
-  grid-template-columns: 76px 1fr;
+  grid-template-columns: 76px minmax(0, 1fr);
   height: 100vh;
   padding-top: 28px;
 }
@@ -368,6 +368,7 @@ select {
 /* ---- the composer: the centrepiece ---- */
 .hero {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   justify-items: center;
   text-align: center;
   padding: 38px 0 6px;
@@ -474,6 +475,7 @@ select {
 }
 .composer .bar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   margin-top: 10px;
@@ -485,8 +487,8 @@ select {
   height: 38px;
   padding: 0 13px;
   border-radius: 999px;
-  background: none;
-  border: 0;
+  background: var(--card-3);
+  border: 1px solid var(--line-hi);
   cursor: pointer;
   color: var(--text);
   font-weight: 600;

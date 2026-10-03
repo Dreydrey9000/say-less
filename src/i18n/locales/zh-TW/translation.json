@@ -1424,5 +1424,34 @@
       "circle": "Circle",
       "square": "Square"
     }
+  },
+  "creative": {
+    "title": "Studio",
+    "description": "Create images, find titles, read screenshots, and browse your recordings and library in Say Less.",
+    "frame": "Say Less Studio tools",
+    "starting": "Opening your Studio…",
+    "missing": "Studio is missing from this installation. Install the latest complete Say Less update, then try again.",
+    "failed": "Studio could not open. Try again; if it still fails, restart Say Less. Your saved files are unchanged.",
+    "retry": "Try again",
+    "platform": "Studio is currently available on Mac. Dictation and your other Say Less tools still work here.",
+    "captureFailed": "The screenshot could not be captured. Allow Say Less in System Settings → Privacy & Security → Screen Recording, then retry, or drop a screenshot.",
+    "actionFailed": "That action could not finish. Try again, or use the file in your library.",
+    "updateBusy": "Finish or cancel your Studio jobs before restarting to update.",
+    "connections": "Studio connections",
+    "connectionHelp": "Studio runs inside Say Less. Image generation uses your connected Subpowers painters; titles and screenshot reading use your configured vision tools. Cloud upload uses B2 and an optional rclone Google Drive connection. Local files remain available without cloud storage.",
+    "connectionsFailed": "The connections could not be saved or loaded. Check the bucket name, credentials file inside your home folder, and installed B2 or Drive connection, then try again.",
+    "saved": "Studio connections saved.",
+    "imageReady": "Image tool installed. Its painter accounts must also be signed in.",
+    "imageMissing": "Image generation needs Subpowers installed with a painter account signed in. Your local library and recordings still work.",
+    "cloudReady": "B2 tool and credentials file found. The next upload will check your connection.",
+    "cloudMissing": "To upload, install the B2 tool and choose your B2 credentials file. Uploads stay off until you enable them.",
+    "bucket": "B2 bucket",
+    "credentials": "B2 credentials file (.env)",
+    "autoUpload": "Upload recordings automatically while Say Less is running",
+    "driveRemote": "Configured Google Drive remote",
+    "driveMirror": "Mirror uploads to Google Drive",
+    "save": "Save connections",
+    "saving": "Saving…",
+    "autoTitles": "Automatically describe saved media using my connected vision provider"
   }
 }
