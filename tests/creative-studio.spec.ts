@@ -75,9 +75,9 @@ test("repeating a spoken page cue restores it after manual Studio navigation", a
   await expect(
     nav.getByRole("button", { name: "Titles", exact: true }),
   ).toHaveAttribute("aria-current", "page");
-  await nav.getByRole("button", { name: "Create", exact: true }).click();
+  await nav.getByRole("button", { name: "Images", exact: true }).click();
   await expect(
-    nav.getByRole("button", { name: "Create", exact: true }),
+    nav.getByRole("button", { name: "Images", exact: true }),
   ).toHaveAttribute("aria-current", "page");
   await openTitles();
   await expect(
