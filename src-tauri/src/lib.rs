@@ -10,6 +10,7 @@ pub mod cli;
 mod clipboard;
 mod commands;
 mod correction_learning;
+mod creative_studio;
 mod floating;
 mod helpers;
 mod input;
@@ -682,6 +683,11 @@ pub fn run(cli_args: CliArgs) {
 
     let specta_builder = Builder::<tauri::Wry>::new()
         .commands(collect_commands![
+            creative_studio::creative_studio_session,
+            creative_studio::creative_studio_busy,
+            creative_studio::creative_studio_native,
+            creative_studio::creative_studio_connections,
+            creative_studio::creative_studio_prepare_update,
             snippets::list_voice_snippets,
             snippets::save_voice_snippets,
             studio::get_studio_settings,
@@ -967,6 +973,7 @@ pub fn run(cli_args: CliArgs) {
             Some(vec![]),
         ))
         .manage(cli_args.clone())
+        .manage(creative_studio::StudioRuntime::default())
         .setup(move |app| {
             #[cfg(target_os = "windows")]
             log::info!(
@@ -1196,6 +1203,7 @@ pub fn run(cli_args: CliArgs) {
         }
         // Teardown transcribe.cpp before exit
         tauri::RunEvent::Exit => {
+            creative_studio::stop(app);
             if let Some(tm) = app.try_state::<Arc<TranscriptionManager>>() {
                 let _ = tm.unload_model();
             }

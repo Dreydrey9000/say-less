@@ -211,6 +211,24 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
     window as unknown as { testCommands: string[] }
   ).testCommands ??= []);
   calls.push(cmd);
+  if (cmd === "creative_studio_prepare_update") return query.has("studioBusy");
+  if (cmd === "creative_studio_connections")
+    return JSON.stringify({
+      watch_enabled: false,
+      b2_bucket: "",
+      b2_secrets_file: "~/.say-less/b2.env",
+      drive_enabled: false,
+      drive_remote: "gdrive",
+      image_tool: false,
+      cloud_tool: false,
+      drive_tool: false,
+      cloud_credentials: false,
+    });
+  if (cmd === "creative_studio_busy") return query.has("studioBusy");
+  if (cmd === "creative_studio_session") {
+    if (query.has("studioFails")) throw "studio_unavailable";
+    return { url: new URL("/bridge/ui/index.html", location.origin).href };
+  }
   if (cmd === "get_usage_stats")
     return {
       words: Number(query.get("statsWords") ?? 0),
@@ -354,7 +372,9 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
   if (cmd.startsWith("plugin:event|")) return 1;
   if (cmd === "plugin:os|locale") return "en-US";
   if (cmd === "plugin:app|version")
-    return query.has("whatsNew") ? "0.14.6" : "0.12.0";
+    return (
+      query.get("version") || (query.has("whatsNew") ? "0.14.6" : "0.12.0")
+    );
   if (
     cmd.includes("check_accessibility_permission") ||
     cmd.includes("check_microphone_permission")

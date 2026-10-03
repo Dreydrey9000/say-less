@@ -58,3 +58,5 @@ certificate.p12
 # Cloudflare wrangler local state
 .wrangler/
 .downloads/
+.studio-build/
+src-tauri/resources/studio-runtime/

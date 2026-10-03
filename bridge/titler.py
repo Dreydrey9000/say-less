@@ -16,6 +16,7 @@ the screen you are looking at.
 """
 
 import hashlib
+from contextlib import nullcontext
 import json
 import os
 import queue
@@ -80,7 +81,7 @@ class Titler:
         self.queued = set()
         self.tries = {}
         self.worker = None
-        self.enabled = True
+        self.enabled = self.b.CONFIG.get("auto_titles_enabled", not getattr(self.b, "DESKTOP_TOKEN", None))
 
     # ----------------------------------------------------------- lookup
 
@@ -147,10 +148,12 @@ class Titler:
     # ----------------------------------------------------------- queue
 
     def want(self, kind, ident, payload):
-        if not self.enabled:
+        if not self.enabled or getattr(self.b, "DESKTOP_PAUSED", False):
             return
         k = self.key(kind, ident)
-        with self.lock:
+        with getattr(self.b, "DESKTOP_ACTIVITY_LOCK", nullcontext()), self.lock:
+            if getattr(self.b, "DESKTOP_PAUSED", False):
+                return
             if k in self.queued or self.tries.get(k, (0, 0))[0] >= 3:
                 return
             n, last = self.tries.get(k, (0, 0))

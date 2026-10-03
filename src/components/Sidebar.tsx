@@ -16,6 +16,7 @@ import {
   Lightbulb,
 } from "lucide-react";
 import { Home } from "./Home";
+import { CreativeStudio } from "./creative-studio/CreativeStudio";
 import { Insights } from "./insights/Insights";
 import { StudioSettings } from "./settings/StudioSettings";
 import { VoiceActions } from "./settings/VoiceActions";
@@ -61,6 +62,12 @@ export const SECTIONS_CONFIG = {
     labelKey: "sidebar.general",
     icon: AudioLines,
     component: GeneralSettings,
+    enabled: () => true,
+  },
+  creative: {
+    labelKey: "creative.title",
+    icon: WandSparkles,
+    component: CreativeStudio,
     enabled: () => true,
   },
   history: {

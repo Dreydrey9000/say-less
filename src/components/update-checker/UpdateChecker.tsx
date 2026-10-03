@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { check, type Update } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { listen } from "@tauri-apps/api/event";
+import { invoke } from "@tauri-apps/api/core";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { arch, platform } from "@tauri-apps/plugin-os";
 import { toast } from "sonner";
@@ -315,9 +316,10 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
         await checkForUpdates();
         return;
       }
-      const [dictation, screen] = await Promise.all([
+      const [dictation, screen, studioBusy] = await Promise.all([
         commands.getDockState(),
         commands.screenRecordingStatus(),
+        invoke<boolean>("creative_studio_busy"),
       ]);
       if (
         !enabledRef.current ||
@@ -329,6 +331,18 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
         toast.info(t("footer.updateBusy"));
         return;
       }
+      if (studioBusy) {
+        toast.info(t("creative.updateBusy"));
+        return;
+      }
+      if (
+        await invoke<boolean>("creative_studio_prepare_update", {
+          resume: false,
+        })
+      ) {
+        toast.info(t("creative.updateBusy"));
+        return;
+      }
       update = pendingUpdateRef.current;
       pendingUpdateRef.current = null;
       setIsInstalling(true);
@@ -337,6 +351,9 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
       await update.install();
       await relaunch();
     } catch (error) {
+      void invoke("creative_studio_prepare_update", { resume: true }).catch(
+        () => {},
+      );
       console.error("Failed to install update:", error);
       if (activeRef.current) showFailure();
     } finally {

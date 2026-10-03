@@ -1,0 +1,16 @@
+flowchart LR
+  User[Say Less sidebar: Studio] --> React[Studio shell in main window]
+  React --> IPC[Tauri commands: start / capture / clipboard / connections]
+  IPC --> Runtime[App-owned frozen Python runtime]
+  React --> Frame[Sandboxed Studio frame: no Tauri permissions]
+  Frame --> Session[Private loopback session: random token per launch]
+  Session --> Runtime
+  Runtime --> Tools[Create / Titles / Videos / Screens / Library]
+  Runtime --> Data[App data: settings / media indexes / job state]
+  Legacy[Existing bridge settings and indexes] -->|copy once, originals kept| Data
+  Tools --> Files[Local recordings / images / reference shelves]
+  Tools --> Providers[Configured Subpowers and vision tools]
+  Runtime -->|only when enabled| Cloud[Configured B2 and Drive tools]
+  Update[Signed desktop updater] --> Gate[Wait for dictation, recording, Studio jobs and uploads]
+  Gate -->|pause new Studio work| Runtime
+  Gate --> Replace[Replace app and bundled Studio runtime together]

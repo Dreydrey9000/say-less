@@ -1,0 +1,98 @@
+.creative-studio {
+  min-width: 0;
+  width: 100%;
+}
+.creative-studio header {
+  margin-bottom: 16px;
+}
+.creative-studio h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+.creative-studio header p {
+  opacity: 0.8;
+  margin-top: 8px;
+}
+.creative-studio iframe {
+  display: block;
+  width: 100%;
+  height: max(620px, 75vh);
+  border: 1px solid var(--color-mid-gray);
+  border-radius: 16px;
+  background: #141414;
+}
+.creative-message {
+  padding: 24px;
+  border: 1px solid var(--color-mid-gray);
+  border-radius: 16px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.creative-connections {
+  border: 1px solid var(--color-mid-gray);
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+.creative-connections summary {
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-mid-gray) 14%, transparent);
+  border: 1px solid var(--color-mid-gray);
+}
+.creative-connections summary:focus-visible,
+.creative-connections input:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 3px;
+}
+.creative-connections p {
+  margin: 12px 0;
+}
+.creative-connections form {
+  display: grid;
+  gap: 12px;
+}
+.creative-connections label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.creative-connections input:not([type="checkbox"]) {
+  width: 100%;
+  min-width: 0;
+  padding: 8px 12px;
+  background: var(--color-background);
+  border: 1px solid var(--color-mid-gray);
+  border-radius: 8px;
+}
+.creative-connections button {
+  justify-self: start;
+}
+.creative-orb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-text);
+  box-shadow: 0 0 16px currentColor;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .creative-orb {
+    animation: creative-pulse 1.6s ease-in-out infinite alternate;
+  }
+}
+@keyframes creative-pulse {
+  to {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+}
+@media (max-width: 560px) {
+  .creative-studio iframe {
+    height: 78vh;
+    min-height: 540px;
+  }
+}

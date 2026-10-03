@@ -15,6 +15,9 @@ a lock file stops a second copy from starting. No secrets are ever printed.
 import base64
 import faulthandler
 import fcntl
+import hmac
+import functools
+import shutil
 import json
 import os
 import re
@@ -30,7 +33,7 @@ from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-HOME = Path.home()
+HOME = Path(os.environ.get("SAYLESS_MEDIA_HOME") or Path.home())
 # Config + state live here, outside the repo. Override with SAYLESS_BRIDGE_HOME.
 BRIDGE_DIR = Path(os.environ.get("SAYLESS_BRIDGE_HOME")
                   or HOME / "Desktop" / "_Code" / "say-less-bridge")
@@ -70,6 +73,40 @@ DEFAULT_CONFIG = {
 
 _registry_lock = threading.Lock()
 _b2_cache = {}
+DESKTOP_TOKEN = None
+DESKTOP_VERSION = None
+_desktop_uploads = set()
+DESKTOP_PAUSED = False
+DESKTOP_ACTIVITY_LOCK = threading.RLock()
+
+
+def desktop_connections():
+    path = ":".join([str(HOME / ".local/bin"), str(HOME / ".claude/skills/subpowers/bin"),
+                     "/opt/homebrew/bin", "/usr/local/bin", os.environ.get("PATH", "")])
+    return {"watch_enabled": CONFIG["watch_enabled"], "b2_bucket": CONFIG["b2_bucket"],
+            "auto_titles_enabled": CONFIG.get("auto_titles_enabled", False),
+            "b2_secrets_file": CONFIG["b2_secrets_file"], "drive_enabled": CONFIG["drive_enabled"],
+            "drive_remote": CONFIG["drive_remote"],
+            "image_tool": bool(shutil.which("subpowers", path=path)),
+            "cloud_tool": bool(shutil.which("b2", path=path)),
+            "drive_tool": bool(shutil.which("rclone", path=path)),
+            "cloud_credentials": Path(CONFIG["b2_secrets_file"]).is_file()}
+
+
+def track_upload(fn):
+    @functools.wraps(fn)
+    def tracked(*args, **kwargs):
+        task = object()
+        with DESKTOP_ACTIVITY_LOCK:
+            if DESKTOP_PAUSED:
+                raise RuntimeError("Say Less is updating. Retry after it restarts.")
+            _desktop_uploads.add(task)
+        try:
+            return fn(*args, **kwargs)
+        finally:
+            with DESKTOP_ACTIVITY_LOCK:
+                _desktop_uploads.discard(task)
+    return tracked
 
 
 def log(msg):
@@ -214,7 +251,7 @@ def b2_env():
 
 def b2_cmd(args, timeout=600):
     proc = subprocess.run(
-        ["/opt/homebrew/bin/b2"] + args,
+        [shutil.which("b2") or "/opt/homebrew/bin/b2"] + args,
         capture_output=True, text=True, timeout=timeout, env=b2_env(),
     )
     if proc.returncode != 0:
@@ -334,6 +371,7 @@ def register_image(path, prompt="", painter=""):
     return entry
 
 
+@track_upload
 def upload_recording(path, source="watcher"):
     path = Path(path)
     if not path.is_file():
@@ -431,6 +469,9 @@ def watcher_loop():
     failures = {}   # name -> (count, retry_after_epoch)
     last_refresh = 0.0
     while True:
+        if DESKTOP_TOKEN and (not CONFIG["watch_enabled"] or DESKTOP_PAUSED):
+            time.sleep(1)
+            continue
         try:
             if WATCH_DIR.is_dir():
                 for p in WATCH_DIR.glob("*.mp4"):
@@ -744,6 +785,22 @@ class Handler(BaseHTTPRequestHandler):
     # Keep-alive: a page that asks for 30 thumbnails reuses one connection instead of opening 30.
     protocol_version = "HTTP/1.1"
 
+    def _desktop_authorized(self):
+        if DESKTOP_TOKEN is None:
+            return True
+        prefix = f"/s/{DESKTOP_TOKEN}"
+        candidate = self.path.split("/", 3)
+        if len(candidate) < 4 or candidate[1] != "s" or not hmac.compare_digest(candidate[2], DESKTOP_TOKEN):
+            self._send(403, {"error": "Studio session expired. Reopen Studio in Say Less."})
+            return False
+        self.path = self.path[len(prefix):]
+        return True
+
+    def end_headers(self):
+        self.send_header("Referrer-Policy", "no-referrer")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        super().end_headers()
+
     def handle(self):
         try:
             super().handle()
@@ -776,10 +833,19 @@ class Handler(BaseHTTPRequestHandler):
         return origin in (f"http://127.0.0.1:{port}", f"http://localhost:{port}")
 
     def do_GET(self):
+        if not self._desktop_authorized():
+            return
         if not self._host_ok():
             return self._send(403, {"error": "bad host"})
         if not self._origin_ok():
             return self._send(403, {"error": "forbidden"})
+        if DESKTOP_TOKEN and self.path == "/desktop-status":
+            studio = studio_instance()
+            with DESKTOP_ACTIVITY_LOCK, studio.lock, studio.titler.lock:
+                busy = any(j["status"] == "running" for j in studio.jobs.values()) or bool(studio.titler.queued)
+            return self._send(200, {"version": DESKTOP_VERSION, "busy": busy or bool(_desktop_uploads)})
+        if DESKTOP_TOKEN and self.path == "/desktop-connections":
+            return self._send(200, desktop_connections())
         if studio_instance().handle(self, "GET", self.path):
             return
         if self.path in ("/health", "/"):
@@ -795,12 +861,58 @@ class Handler(BaseHTTPRequestHandler):
         return self._send(404, {"error": "not found"})
 
     def do_POST(self):
+        global DESKTOP_PAUSED
+        if not self._desktop_authorized():
+            return
         # A web page on another site must not be able to make the bridge upload
         # files or spend model credits. Our CLIs send no Origin; the Studio
         # pages send the bridge's own origin. Anything else is refused.
         self.close_connection = True      # bodies may go unread on a refusal; never reuse this connection
         if not self._host_ok() or not self._origin_ok():
             return self._send(403, {"error": "forbidden"})
+        if DESKTOP_TOKEN and self.path == "/desktop-prepare-update":
+            studio = studio_instance()
+            with DESKTOP_ACTIVITY_LOCK, studio.lock, studio.titler.lock:
+                busy = any(j["status"] == "running" for j in studio.jobs.values()) or bool(_desktop_uploads) or bool(studio.titler.queued)
+                if not busy:
+                    DESKTOP_PAUSED = True
+            return self._send(200, {"busy": busy, "version": DESKTOP_VERSION})
+        if DESKTOP_TOKEN and self.path == "/desktop-resume":
+            DESKTOP_PAUSED = False
+            return self._send(200, {"ok": True})
+        if DESKTOP_PAUSED:
+            return self._send(409, {"error": "Say Less is updating. Try again after it restarts."})
+        if DESKTOP_TOKEN and self.path == "/desktop-connections":
+            try:
+                data = studio_instance()._body_json(self)
+                path = Path(str(data.get("b2_secrets_file", ""))).expanduser().resolve()
+                if not path.is_relative_to(HOME) or path.suffix != ".env":
+                    raise ValueError("Choose a credentials .env file inside your home folder.")
+                bucket = str(data.get("b2_bucket", "")).strip()
+                remote = str(data.get("drive_remote", "")).strip()
+                if bucket and not re.fullmatch(r"[A-Za-z0-9-]{6,63}", bucket):
+                    raise ValueError("Enter a valid B2 bucket name.")
+                if not re.fullmatch(r"[A-Za-z0-9_-]{1,80}", remote):
+                    raise ValueError("Enter your configured Drive remote name.")
+                enabled, drive = data.get("watch_enabled") is True, data.get("drive_enabled") is True
+                ready = desktop_connections()
+                if enabled and (not bucket or not path.is_file() or not ready["cloud_tool"]):
+                    raise ValueError("Connect B2 and choose its credentials file before enabling uploads.")
+                if drive and not ready["drive_tool"]:
+                    raise ValueError("Connect Google Drive before enabling its mirror.")
+                settings = {**CONFIG, "watch_enabled": enabled, "b2_bucket": bucket,
+                            "auto_titles_enabled": data.get("auto_titles_enabled") is True,
+                            "b2_secrets_file": str(path), "drive_enabled": drive, "drive_remote": remote}
+                temp = CONFIG_PATH.with_suffix(".tmp")
+                temp.write_text(json.dumps(settings, indent=2))
+                temp.chmod(0o600)
+                temp.replace(CONFIG_PATH)
+                CONFIG.update(settings)
+                studio_instance().titler.enabled = settings["auto_titles_enabled"]
+                _b2_cache.clear()
+                return self._send(200, desktop_connections())
+            except (ValueError, OSError):
+                return self._send(400, {"error": "Check your bucket, credentials file, and installed connections."})
         if self.path.startswith("/api/") and studio_instance().handle(self, "POST", self.path):
             return
         if "application/json" not in (self.headers.get("Content-Type") or ""):
@@ -878,6 +990,8 @@ class Handler(BaseHTTPRequestHandler):
         return self._send(404, {"error": "not found"})
 
     def do_DELETE(self):
+        if not self._desktop_authorized():
+            return
         self.close_connection = True
         if not self._host_ok() or not self._origin_ok():
             return self._send(403, {"error": "forbidden"})
@@ -910,7 +1024,7 @@ def main():
     if lock is None:
         log("another say-less-bridge is already running; this copy exits")
         sys.exit(0)
-    if CONFIG["watch_enabled"]:
+    if CONFIG["watch_enabled"] or DESKTOP_TOKEN:
         threading.Thread(target=watcher_loop, daemon=True).start()
     candidates = [CONFIG.get("ideas_port", 8810), 8812, 8815, 8821, 8833]
     server = None
@@ -925,6 +1039,7 @@ def main():
     if server is None:
         log(f"FATAL: no port available from {candidates}")
         sys.exit(1)
+    chosen = server.server_address[1]
     (STATE_DIR / "port.txt").write_text(str(chosen))
     threading.Thread(target=lambda: (time.sleep(2), studio_instance().warm()), daemon=True).start()
     log(f"say-less-bridge listening on 127.0.0.1:{chosen} (pid {os.getpid()})")
