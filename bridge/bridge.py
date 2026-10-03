@@ -24,6 +24,7 @@ import subprocess
 import sys
 import threading
 import time
+import urllib.error
 import urllib.request
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -55,7 +56,9 @@ DEFAULT_CONFIG = {
     "delete_local_after_upload": False,
     "watch_enabled": True,
     "watch_interval_seconds": 10,
-    "ideas_provider_chain": ["claude", "agy", "zai_big", "zai_small", "groq"],
+    "ideas_provider_chain": ["zai_small", "agy", "claude", "groq"],
+    "zai_base_url": "https://api.z.ai/api/coding/paas/v4",
+    "zai_timeout_seconds": 120,
     "claude_vision_model": "claude-haiku-4-5-20251001",
     "claude_timeout_seconds": 240,
     "zai_secrets_file": str(SECRETS / "zai.env"),
@@ -549,32 +552,42 @@ def call_claude(image_path, prompt, tail="Answer with ONLY the JSON, no other te
 
 
 def call_zai(image_path, prompt, model_env_key):
+    """GLM through the z.ai CODING PLAN endpoint (flat rate, your plan). GLM-5.3-Flash is natively
+    multimodal and is on the plan; GLM-5.3-FlashX is not yet (the plan answers 1311). The
+    pay-per-token endpoint (/api/paas/v4) needs a balance, so it is not used."""
     env = read_env_file(CONFIG["zai_secrets_file"])
     api_key = env.get("ZAI_API_KEY")
     model = env.get(model_env_key)
     if not api_key or not model:
         raise RuntimeError(f"zai env missing ZAI_API_KEY or {model_env_key}")
+    suffix = Path(image_path).suffix.lower()
+    mime = "image/jpeg" if suffix in (".jpg", ".jpeg") else "image/png"
     b64 = base64.b64encode(Path(image_path).read_bytes()).decode()
     body = {
         "model": model,
         "messages": [{
             "role": "user",
             "content": [
-                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64}"}},
+                {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{b64}"}},
                 {"type": "text", "text": prompt},
             ],
         }],
-        "temperature": 0.8,
-        "max_tokens": 1200,
+        "temperature": 1,
+        "max_tokens": 4000,   # thinking cannot be turned off, so leave room for it
     }
     req = urllib.request.Request(
-        "https://api.z.ai/api/paas/v4/chat/completions",
+        CONFIG["zai_base_url"].rstrip("/") + "/chat/completions",
         data=json.dumps(body).encode(),
         headers={"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"},
     )
-    with urllib.request.urlopen(req, timeout=120) as resp:
-        data = json.loads(resp.read())
-    text = data["choices"][0]["message"]["content"]
+    try:
+        with urllib.request.urlopen(req, timeout=CONFIG["zai_timeout_seconds"]) as resp:
+            data = json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(f"z.ai {e.code}: {e.read()[:160].decode(errors='replace')}")
+    text = (data["choices"][0]["message"].get("content") or "").strip()
+    if not text:
+        raise RuntimeError("z.ai answered with no text")
     return model, text
 
 
