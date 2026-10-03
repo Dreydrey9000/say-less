@@ -1,0 +1,7 @@
+{
+  "productName": "Say Less Dev",
+  "identifier": "com.dreythomas.sayless.dev",
+  "bundle": {
+    "createUpdaterArtifacts": false
+  }
+}

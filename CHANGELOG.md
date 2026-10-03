@@ -2,12 +2,24 @@
 
 ## [Unreleased]
 
+## [0.14.9] - 2026-10-03
+
 ### Added
 
 - Signed updates download automatically in the background. Choose **Restart to update** when ready; active dictation or screen recording blocks that restart. Automatic updates can be turned off, and portable installs keep their manual installer flow.
+- Say Less Studio in the bridge (`/app`): Create (prompt box with @shelves, references, painter picker), Titles (click a title to copy), Videos, Screens and Library, in one fast page that paints from its last snapshot. Four native launcher apps open one view each (`bridge/launcher`).
+- Reference shelves shared with `subpowers --refs`, drag and drop anywhere, kept on this Mac.
+- `bridge/install.sh`, `bridge/tests/`, `scripts/local-build.sh` (`bun run build:local`), `scripts/one-copy.sh`, `scripts/fix-permissions.sh`, `scripts/clear-dock-ghosts.sh`, `docs/LOCAL-BUILDS.md`.
 
 ### Fixed
 
+- Bridge: the LaunchAgent ran as `ProcessType: Background`, which gave the bridge and every image painter it starts the lowest CPU and IO priority. The same Compare all took 348 s through the Studio and 77 s from a terminal; as `Interactive` it takes 66 s. Run `bridge/install.sh` again to pick it up.
+- Bridge: only one copy can run (a lock file); a second launch exits quietly instead of moving to another port. LaunchAgent restarts it only after a crash.
+- Bridge: failed uploads back off (30 s up to 1 h) instead of retrying every 10 seconds; a local recording is deleted only when B2 reports the exact same size.
+- Bridge: B2 links are re-signed in their last day, so the Recordings app never shows an expired link.
+- Bridge: an expired Google Drive login is named in the log and in `/health` with the fix command, and Drive is skipped for an hour instead of failing every upload.
+- Bridge: title ideas read hooks by `client_roster.relationship`, not `is_competitor` (past clients are still our work).
+- Bridge: a web page can no longer make the bridge upload or read files (Origin and content-type checks, folder allow-list).
 - Home usage statistics show readable labels, durations, and the typing-speed estimate instead of missing translation keys. These new strings use English fallback text in all interface languages.
 
 ## [0.14.8] - 2026-10-02
