@@ -74,10 +74,8 @@ class Titler:
         self.path = studio.state / "titles.json"
         self.lock = threading.Lock()
         self.data = {}
-        try:
-            self.data = json.loads(self.path.read_text())
-        except (OSError, ValueError):
-            pass
+        self.loaded = 0
+        self.reload()
         self.q = queue.Queue()
         self.queued = set()
         self.tries = {}
@@ -86,11 +84,24 @@ class Titler:
 
     # ----------------------------------------------------------- lookup
 
+    def reload(self):
+        """Titles may be written by another process (an agent, a script). Pick them up when the file changes."""
+        try:
+            m = self.path.stat().st_mtime_ns
+            if m != self.loaded:
+                data = json.loads(self.path.read_text())
+                with self.lock:
+                    self.data = data
+                self.loaded = m
+        except (OSError, ValueError):
+            pass
+
     @staticmethod
     def key(kind, ident):
         return f"{kind}:{ident}"
 
     def info(self, kind, ident):
+        self.reload()
         with self.lock:
             return self.data.get(self.key(kind, ident))
 
@@ -225,17 +236,21 @@ class Titler:
         if not dur:
             fp = self.s.find_bin("ffprobe")
             if fp:
-                r = self.s.run([fp, "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", src], 60)
                 try:
+                    r = self.s.run([fp, "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", src], 240)
                     dur = float(r.stdout.strip())
-                except ValueError:
-                    dur = 0
+                except (subprocess.TimeoutExpired, ValueError):
+                    dur = 0             # a long file read over the network: sample at fixed marks instead
         marks = [dur * f for f in (0.1, 0.35, 0.6, 0.85)] if dur else [2, 20, 60, 120]
         tiles = []
         for i, t in enumerate(marks):
             out = self.s.thumbs / f"titler-{hashlib.sha1(name.encode()).hexdigest()[:12]}-{i}.jpg"
-            self.s.run([ff, "-y", "-loglevel", "error", "-ss", f"{t:.1f}", "-i", src, "-frames:v", "1",
-                        "-vf", "scale=640:-2", str(out)], 120)
+            try:
+                self.s.run([ff, "-y", "-loglevel", "error", "-ss", f"{t:.1f}", "-i", src, "-frames:v", "1",
+                            "-vf", "scale=640:-2", str(out)], 240)
+            except subprocess.TimeoutExpired:
+                out.unlink(missing_ok=True)
+                continue
             if out.is_file() and out.stat().st_size > 0:
                 tiles.append(out)
         if not tiles:
