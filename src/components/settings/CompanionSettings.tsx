@@ -4,8 +4,8 @@ import { useStudio } from "@/lib/studio";
 import { Dropdown } from "../ui/Dropdown";
 import { SettingContainer } from "../ui/SettingContainer";
 import { ToggleSwitch } from "../ui/ToggleSwitch";
+import { DockLookGallery } from "./DockLookGallery";
 
-const characters = ["orb", "emblem", "buddy", "both", "avatar"] as const;
 /** Looks that draw the silver particles, so the pattern choice matters. */
 const withParticles = ["orb", "emblem", "both"];
 const dockEdges = [
@@ -62,18 +62,10 @@ export function CompanionSettings() {
         title={t("companion.character")}
         description={t("companion.characterDescription")}
         descriptionMode="inline"
+        layout="stacked"
         grouped
       >
-        <Dropdown
-          options={characters.map((value) => ({
-            value,
-            label: t(`companion.characters.${value}`),
-          }))}
-          selectedValue={settings.dock_character}
-          onSelect={(dock_character) =>
-            void save({ ...settings, dock_character })
-          }
-        />
+        <DockLookGallery />
       </SettingContainer>
       <SettingContainer
         title={t("companion.title")}

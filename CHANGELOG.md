@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Dock look is a horizontal gallery of the actual dock previews. Scroll sideways and choose a card; arrow keys also work and your choice is remembered.
+
+### Fixed
+
+- Creating the floating dock on Mac no longer temporarily changes the whole application's activation policy. The hidden, non-focusable panel cannot become the main window.
+
 ## [0.14.10] - 2026-10-03
 
 ### Added

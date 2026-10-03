@@ -6,7 +6,7 @@ use tauri::{AppHandle, Manager};
 #[cfg(target_os = "macos")]
 use tauri_nspanel::{tauri_panel, CollectionBehavior, PanelBuilder, PanelLevel, StyleMask};
 #[cfg(target_os = "macos")]
-tauri_panel! { panel!(SayLessDockPanel { config: { can_become_key_window: false, is_floating_panel: true } }) }
+tauri_panel! { panel!(SayLessDockPanel { config: { can_become_key_window: false, can_become_main_window: false, is_floating_panel: true } }) }
 
 const COMPACT_SIZE: (f64, f64) = (104.0, 104.0);
 const ACTIVE_SIZE: (f64, f64) = (220.0, 104.0);
@@ -111,11 +111,14 @@ pub fn set_visible(app: &AppHandle, visible: bool) -> Result<(), String> {
                     .has_shadow(false)
                     .hides_on_deactivate(false)
                     .transparent(true)
-                    .no_activate(true)
+                    // Build hidden and non-focusable before converting to NSPanel.
+                    // no_activate temporarily switches the whole app to Prohibited,
+                    // which can disrupt visible windows when enabled from Settings.
                     .style_mask(StyleMask::empty().borderless().nonactivating_panel())
                     .with_window(|w| {
                         w.decorations(false)
                             .transparent(true)
+                            .focused(false)
                             .focusable(false)
                             .visible(false)
                     })
