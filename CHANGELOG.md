@@ -13,12 +13,20 @@
 - Studio: the first tab is named Images (the page and its first tab were both called Create). Inside the Say Less window the Studio hides its own logo and the two status dots, and the "browsing settings" notice no longer sits on top of the Studio page.
 - A returning user who has the microphone but is missing only Accessibility lands in the existing browse mode instead of the full-screen setup. Shortcuts stay off until Accessibility is granted.
 
-## [0.14.12] - 2026-10-03
+### Studio integration
+
+This release combines the Studio integration and Luis's dock/voice-action updates.
+The v0.14.12 candidate remained private and was superseded by this release.
 
 - Mac: Studio opens inside the existing Say Less window with Create, Titles, Videos, Screens, and Library. Python and the Studio UI are bundled with the app and update together.
 - Existing companion settings and library indexes are imported once without removing the originals. Studio connections control optional B2 uploads and Drive mirroring.
 - Restart-to-update waits for Studio generation, screenshot capture, metadata jobs, and uploads. New work pauses during installation; failed installs resume it.
 - Windows/Linux explain that integrated Studio currently requires Mac. Painter, vision, and storage connections still require their existing tools/accounts.
+
+### Fixed
+
+- Repeating a Create voice action restores its Studio page after manual navigation, without restarting the runtime or discarding the current page unnecessarily.
+- Engineering: a cancelled build can reuse an empty private draft of the same version. Published or partially built releases cannot be rewritten through this retry path.
 
 ## [0.14.11] - 2026-10-03
 
