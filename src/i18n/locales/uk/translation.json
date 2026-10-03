@@ -967,7 +967,16 @@
     "opened": "Destination opened.",
     "test": "Open now",
     "remove": "Remove action {{cue}}",
-    "empty": "No actions yet. Add your first app or link above."
+    "empty": "No actions yet. Add your first app or link above.",
+    "create": "Create (in Say Less)",
+    "chooseCreateView": "Choose a page",
+    "createViews": {
+      "image": "Make an image",
+      "titles": "Title ideas",
+      "recordings": "Screen videos",
+      "screens": "Read screens",
+      "library": "Library"
+    }
   },
   "import": {
     "eyebrow": "BRING YOUR WORDS WITH YOU",
@@ -1423,6 +1432,27 @@
     "shape": {
       "circle": "Circle",
       "square": "Square"
+    }
+  },
+  "create": {
+    "title": "Create",
+    "frameTitle": "Create: pictures, titles, videos and your library",
+    "captureFailed": "Screen capture did not produce an image. Allow Screen Recording for Say Less in System Settings > Privacy & Security > Screen Recording, then try again.",
+    "actionFailed": "That did not work. Try again.",
+    "setup": {
+      "title": "Create pictures, titles and video notes",
+      "body": "Create runs a small helper on this Mac. One click turns it on, and it starts by itself from then on.",
+      "start": "Turn on Create",
+      "starting": "Turning on...",
+      "retry": "Try again"
+    },
+    "error": {
+      "python_missing": "Create needs Python 3. Install it from python.org, or open Terminal and run: xcode-select --install",
+      "helper_missing": "This copy of Say Less does not include the Create helper. Update Say Less and try again.",
+      "install_timeout": "Turning on Create took too long. Try again.",
+      "helper_did_not_answer": "The helper started but did not answer. Try again in a moment.",
+      "unsupported_platform": "Create works on Mac for now.",
+      "generic": "Create could not start. Try again, or check the helper log in the Say Less data folder."
     }
   }
 }

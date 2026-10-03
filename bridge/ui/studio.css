@@ -1587,3 +1587,11 @@ body.dragging .dropveil {
   font: 600 13px/1.25 var(--font-display);
   color: var(--text-hi);
 }
+
+/* Inside the Say Less app (?embed=1): the app supplies the brand mark and window chrome. */
+html.embed .shell {
+  padding-top: 0;
+}
+html.embed .brand {
+  display: none;
+}

@@ -284,7 +284,8 @@ class Studio:
             items, total = self._library("", "mine", 15)
             recs = self.recordings(light=True)
             return {"refs": self.list_refs(), "recent": items, "recordings": recs[:6], "recording_count": len(recs),
-                    "history": self.title_history()[:3], "drive": self.b.DRIVE}
+                    "history": self.title_history()[:3], "drive": self.b.DRIVE,
+                    "captures_dir": str(self.captures)}
         return self.cached(("boot",), 3.0, build, swr=True)
 
     # --------------------------------------------------------------- jobs
@@ -823,7 +824,7 @@ class Studio:
         route = path[5:]
         if route == "state":
             h._send(200, {"ok": True, "drive": self.b.DRIVE, "port": h.server.server_address[1],
-                          "version": 1})
+                          "version": 1, "captures_dir": str(self.captures)})
         elif route == "boot":
             h._send(200, self.boot())
         elif route == "clients":

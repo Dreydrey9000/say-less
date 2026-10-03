@@ -13,10 +13,12 @@ import {
   WandSparkles,
   Download,
   House,
+  ImagePlus,
   Lightbulb,
 } from "lucide-react";
 import { Home } from "./Home";
 import { Insights } from "./insights/Insights";
+import { CreateStudio } from "./studio-create/CreateStudio";
 import { StudioSettings } from "./settings/StudioSettings";
 import { VoiceActions } from "./settings/VoiceActions";
 import { WisprImport } from "./settings/WisprImport";
@@ -48,6 +50,8 @@ interface SectionConfig {
   icon: React.ComponentType<IconProps>;
   component: React.ComponentType;
   enabled: (settings: any) => boolean;
+  /** The page fills the whole window instead of sitting in the scrolling settings column. */
+  fullBleed?: boolean;
 }
 
 export const SECTIONS_CONFIG = {
@@ -56,6 +60,13 @@ export const SECTIONS_CONFIG = {
     icon: House,
     component: Home,
     enabled: () => true,
+  },
+  create: {
+    labelKey: "create.title",
+    icon: ImagePlus,
+    component: CreateStudio,
+    enabled: () => true,
+    fullBleed: true,
   },
   general: {
     labelKey: "sidebar.general",

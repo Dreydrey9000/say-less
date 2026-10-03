@@ -114,14 +114,23 @@
     });
 
   // ----------------------------------------------------- native shell bridge
+  // Native help, from whichever app holds this page: the Say Less Image
+  // launcher (WebKit message handler) or, when the page sits inside the main
+  // Say Less app (?embed=1), that app through postMessage. In a plain browser
+  // there is none and every call says so.
   const native = (() => {
     const pending = new Map();
     let n = 0;
-    const has = !!(
+    const viaWebKit = !!(
       window.webkit &&
       window.webkit.messageHandlers &&
       window.webkit.messageHandlers.sayless
     );
+    const embedded =
+      !viaWebKit &&
+      window.parent !== window &&
+      /[?&]embed=1/.test(location.search);
+    const has = viaWebKit || embedded;
     window.__saylessNative = (id, res) => {
       const p = pending.get(id);
       if (p) {
@@ -129,26 +138,47 @@
         p(res);
       }
     };
+    // The app answers with { __sayless: 1, reply: true, id, res }. Only its
+    // own window may answer.
+    window.addEventListener("message", (e) => {
+      const d = e.data;
+      if (!embedded || e.source !== window.parent) return;
+      if (
+        d &&
+        d.__sayless === 1 &&
+        d.reply === true &&
+        typeof d.id === "string"
+      )
+        window.__saylessNative(d.id, d.res);
+    });
     function call(action, params) {
       return new Promise((resolve) => {
         if (!has) return resolve({ ok: false, error: "not-in-app" });
         const id = String(++n);
         pending.set(id, resolve);
-        window.webkit.messageHandlers.sayless.postMessage({
-          id,
-          action,
-          ...(params || {}),
-        });
+        if (viaWebKit)
+          window.webkit.messageHandlers.sayless.postMessage({
+            id,
+            action,
+            ...(params || {}),
+          });
+        else
+          window.parent.postMessage(
+            { __sayless: 1, id, action, ...(params || {}) },
+            "*",
+          );
         setTimeout(() => {
           if (pending.has(id)) {
             pending.delete(id);
             resolve({ ok: false, error: "The app did not answer." });
           }
-        }, 30000);
+        }, 130000);
       });
     }
     return { has, call };
   })();
+  // Where screen captures are kept (the app writes them there for us).
+  let capturesDir = (window.__BOOT__ && window.__BOOT__.captures_dir) || null;
 
   let toastTimer = 0;
   function toast(message, kind, onClick) {
@@ -2107,7 +2137,14 @@
       }
     }
     async function capture(mode) {
-      const r = await native.call("capture", { mode });
+      if (!capturesDir) {
+        try {
+          capturesDir = (await api("/api/state")).captures_dir || null;
+        } catch (e) {
+          /* the call below says what is wrong */
+        }
+      }
+      const r = await native.call("capture", { mode, dir: capturesDir });
       if (r.ok) {
         tState.shot = r.path;
         paintShot();

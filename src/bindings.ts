@@ -48,6 +48,49 @@ async testVoiceAction(cue: string) : Promise<Result<null, string>> {
     else return { status: "error", error: e  as any };
 }
 },
+async studioHelperStatus() : Promise<Result<StudioHelperStatus, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("studio_helper_status") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+/**
+ * Install (if needed) and start the helper, then report where it listens.
+ */
+async studioHelperStart() : Promise<Result<StudioHelperStatus, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("studio_helper_start") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+/**
+ * Capture the screen for Titles. The app window hides first so it is not in
+ * the picture, then comes back. Returns the saved file's path.
+ */
+async studioCapture(region: boolean, dir: string) : Promise<Result<string, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("studio_capture", { region, dir }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+/**
+ * Create needs more room than the settings pages. Grow the main window to fit
+ * it when it is smaller; never shrink it, and never go past the screen.
+ */
+async studioFitWindow() : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("studio_fit_window") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
 async startScreenRecording() : Promise<Result<ScreenRecordingStatus, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("start_screen_recording") };
@@ -1572,6 +1615,7 @@ export type StreamTextEvent = { committed: string; tentative: string }
  * Semantic kind of "working" phase, used to localize the spinner label.
  */
 export type StreamWorkKind = "transcribing" | "polishing"
+export type StudioHelperStatus = { running: boolean; port: number; can_start: boolean }
 export type StudioSettings = { accent: string; floating: boolean; actions_enabled: boolean; actions: VoiceAction[]; default_style: WritingStyle; app_styles: AppStyle[]; cleanup_on_dictation: boolean; dock_animation: string; dock_motion: boolean; dock_cycle: boolean; dock_edge: string; dock_compact: boolean; dock_character: string; learn_corrections: boolean; corrections: VoiceSnippet[]; overlay_visual: string; avatar: AvatarSettings; 
 /**
  * "Say less start recording" / "say less stop recording" control the

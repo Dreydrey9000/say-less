@@ -1,5 +1,18 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- **Create** in the sidebar: Make an image (with `@` reference shelves and drag and drop), Title ideas, Screen videos, Read screens and your Library, all inside Say Less. One click turns on the small helper behind it; after that it starts by itself. The helper's files ship inside the app, so nothing else needs installing except Python 3.
+- Voice action type **Create (in Say Less)**: say "Say Less, make an image" (or title ideas, my recordings, read my screens, library) and that page opens in the app, no separate mini app needed.
+- Screen capture for Title ideas is taken by Say Less itself (it already has Screen Recording permission), so the Studio no longer needs its own permission.
+
+### Changed
+
+- The main window passes file drops through to the page, so pictures can be dropped onto Create. Nothing else in the window used the native file-drop events.
+- Opening Create grows the window to fit it when it is smaller. It never shrinks the window.
+
 ## [0.14.11] - 2026-10-03
 
 ### Changed

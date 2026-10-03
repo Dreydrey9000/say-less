@@ -30,6 +30,7 @@ import {
 } from "./components/settings";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Sidebar, SidebarSection, SECTIONS_CONFIG } from "./components/Sidebar";
+import { CreateStudio } from "./components/studio-create/CreateStudio";
 import { NavigateContext } from "./components/navigation";
 import { NAVIGATE_EVENT } from "./lib/navigation";
 import {
@@ -52,8 +53,10 @@ const renderSettingsContent = (
   section: SidebarSection,
   onPreviewOnboarding: (step: OnboardingPreviewStep) => void,
   onNavigate: (section: SidebarSection) => void,
+  createView: string,
 ) => {
   if (section === "home") return <Home onNavigate={onNavigate} />;
+  if (section === "create") return <CreateStudio view={createView} />;
   if (section === "debug") {
     return <DebugSettings onPreviewOnboarding={onPreviewOnboarding} />;
   }
@@ -81,6 +84,8 @@ function App() {
   const setupTotal = askedPermissions ? 3 : 2;
   const setupOffset = askedPermissions ? 1 : 0;
   const [currentSection, setCurrentSection] = useState<SidebarSection>("home");
+  // Which page of Create is open; a spoken "make an image" etc. changes it.
+  const [createView, setCreateView] = useState("image");
   // Each request brings Home forward with the screen recording card in view.
   const [recordingCardRequest, setRecordingCardRequest] = useState(0);
   const showRecordingCard = useCallback(() => {
@@ -208,6 +213,17 @@ function App() {
       void pending.then((fn) => fn());
     };
   }, [showRecordingCard]);
+
+  // A voice action can open Create on one of its pages.
+  useEffect(() => {
+    const pending = listen<string>("open-create", (event) => {
+      setCreateView(event.payload);
+      setCurrentSection("create");
+    });
+    return () => {
+      void pending.then((fn) => fn());
+    };
+  }, []);
 
   // Other parts of the window (e.g. the footer model popover) can ask to open a
   // section without prop drilling.
@@ -425,6 +441,11 @@ function App() {
     setOnboardingStep("try");
   };
 
+  // Some pages (Create) fill the whole window instead of the scrolling column.
+  const fullBleed =
+    "fullBleed" in SECTIONS_CONFIG[currentSection] &&
+    SECTIONS_CONFIG[currentSection].fullBleed === true;
+
   // Rendered once around every step below (including onboarding) so
   // toast.error() calls surface to the user. sonner renders via a portal, so
   // its position in the tree doesn't affect layout. Without this, errors during
@@ -538,26 +559,47 @@ function App() {
           />
           {/* Scrollable content area */}
           <div className="settings-content flex-1 min-w-0 flex flex-col overflow-hidden">
-            <div ref={scrollerRef} className="flex-1 overflow-y-auto">
-              <div className="page-frame flex flex-col items-center gap-4">
-                {settingsOnly ? (
-                  <div
-                    role="status"
-                    className="w-full max-w-3xl rounded-xl border border-mid-gray/30 p-3 text-sm flex flex-wrap items-center gap-3"
-                  >
-                    <p className="flex-1">{t("controls.setupNotice")}</p>
-                    <button
-                      type="button"
-                      className="brand-action rounded-lg px-3 py-2"
-                      onClick={() => setOnboardingStep("accessibility")}
+            <div
+              ref={scrollerRef}
+              className={
+                fullBleed
+                  ? "flex min-h-0 flex-1 flex-col"
+                  : "flex-1 overflow-y-auto"
+              }
+            >
+              <div
+                className={
+                  fullBleed
+                    ? "flex min-h-0 flex-1 flex-col"
+                    : "page-frame flex flex-col items-center gap-4"
+                }
+              >
+                <div
+                  className={
+                    fullBleed
+                      ? "flex flex-col gap-3 px-4 pt-3 empty:hidden"
+                      : "contents"
+                  }
+                >
+                  {settingsOnly ? (
+                    <div
+                      role="status"
+                      className="w-full max-w-3xl rounded-xl border border-mid-gray/30 p-3 text-sm flex flex-wrap items-center gap-3"
                     >
-                      {t("controls.finishSetup")}
-                    </button>
-                  </div>
-                ) : (
-                  <AccessibilityPermissions />
-                )}
-                <SecureInputWarning />
+                      <p className="flex-1">{t("controls.setupNotice")}</p>
+                      <button
+                        type="button"
+                        className="brand-action rounded-lg px-3 py-2"
+                        onClick={() => setOnboardingStep("accessibility")}
+                      >
+                        {t("controls.finishSetup")}
+                      </button>
+                    </div>
+                  ) : (
+                    <AccessibilityPermissions />
+                  )}
+                  <SecureInputWarning />
+                </div>
                 <NavigateContext.Provider value={setCurrentSection}>
                   <div
                     ref={mainRef}
@@ -565,7 +607,11 @@ function App() {
                     role="region"
                     tabIndex={-1}
                     aria-label={t(SECTIONS_CONFIG[currentSection].labelKey)}
-                    className="section-content w-full flex flex-col items-center gap-4"
+                    className={
+                      fullBleed
+                        ? "min-h-0 w-full flex-1"
+                        : "section-content w-full flex flex-col items-center gap-4"
+                    }
                   >
                     {/* One broken screen must not blank the whole window;
                         switching sections resets the boundary. */}
@@ -577,6 +623,7 @@ function App() {
                         currentSection,
                         setOnboardingPreview,
                         setCurrentSection,
+                        createView,
                       )}
                     </ErrorBoundary>
                   </div>

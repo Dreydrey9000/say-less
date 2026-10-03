@@ -21,6 +21,22 @@ proper later.
    (by month), on your clipboard, and in B2 + Drive, registered in
    `state/images.json`.
 
+## Inside the Say Less app (Create)
+
+The sidebar's **Create** page is this helper's web page inside the app window
+(`http://127.0.0.1:8810/app?embed=1`). The app finds the helper, and if it is
+not running it installs and starts its own copy with one click
+(`src-tauri/src/studio_helper.rs`; the files ship in the app as `studio-helper/`,
+and `install.sh` is the script it runs). A helper you already run, for example
+from `bash bridge/install.sh`, is found and used as is.
+
+A web page cannot take a screen capture, so the page asks the app. Inside the
+app the page sends `postMessage({ __sayless: 1, id, action, ... })` and the app
+answers `{ __sayless: 1, reply: true, id, res }`. Actions: `capture`
+(`mode`: `screen` or `region`; `dir`: the helper's `state/captures`), `copy`
+(`text`) and `reveal` (`path`). The app only answers its own frame and only
+writes captures under the helper's `state/captures` folder.
+
 ## Install / update (one command)
 
 ```bash

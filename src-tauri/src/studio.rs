@@ -237,6 +237,10 @@ fn validate(settings: &StudioSettings) -> Result<(), String> {
     }
     Ok(())
 }
+/// The pages inside Create that a voice action may open.
+pub const CREATE_VIEWS: [&str; 5] = ["image", "titles", "recordings", "screens", "library"];
+/// Sent to the app window to open Create on one of those pages.
+pub const OPEN_CREATE_EVENT: &str = "open-create";
 pub fn validate_target(action: &VoiceAction) -> Result<(), String> {
     match action.kind.as_str() {
         "website" => {
@@ -266,6 +270,12 @@ pub fn validate_target(action: &VoiceAction) -> Result<(), String> {
                 .iter()
                 .any(|root| canonical.starts_with(root))
             {
+                return Err("invalid_target".into());
+            }
+        }
+        // Opens one of Create's own pages inside this app; nothing outside it.
+        "create" => {
+            if !CREATE_VIEWS.contains(&action.target.as_str()) {
                 return Err("invalid_target".into());
             }
         }
@@ -371,7 +381,7 @@ pub fn execute_spoken_action(app: &AppHandle, text: &str) -> Result<bool, String
     let Some(action) = matching_action(text, &settings) else {
         return Ok(false);
     };
-    launch(action)?;
+    launch(app, action)?;
     let _ = app.emit("voice-action-result", true);
     Ok(true)
 }
@@ -390,8 +400,14 @@ fn run_recording_cue(
     }
     Ok(true)
 }
-fn launch(action: &VoiceAction) -> Result<(), String> {
+fn launch(app: &AppHandle, action: &VoiceAction) -> Result<(), String> {
     validate_target(action)?;
+    if action.kind == "create" {
+        crate::show_main_window_for(app);
+        return app
+            .emit(OPEN_CREATE_EVENT, action.target.clone())
+            .map_err(|_| "launch_failed".to_string());
+    }
     #[cfg(target_os = "macos")]
     {
         let mut cmd = std::process::Command::new("/usr/bin/open");
@@ -413,13 +429,13 @@ fn launch(action: &VoiceAction) -> Result<(), String> {
 #[tauri::command]
 #[specta::specta]
 pub fn test_voice_action(app: AppHandle, cue: String) -> Result<(), String> {
-    let settings = get_studio_settings(app)?;
+    let settings = get_studio_settings(app.clone())?;
     let action = settings
         .actions
         .iter()
         .find(|a| a.cue == cue)
         .ok_or("not_found")?;
-    launch(action)
+    launch(&app, action)
 }
 
 /// Explicit spoken layout markers, without guessing paragraph boundaries.
@@ -487,6 +503,21 @@ mod tests {
         assert!(matching_action("SAY LESS, open notes!", &s).is_some());
         assert!(matching_action("Please say less open notes", &s).is_none());
         assert!(matching_action("Say less open notes and delete it", &s).is_none());
+    }
+    #[test]
+    fn create_actions_open_only_creates_own_pages() {
+        let action = |target: &str| VoiceAction {
+            cue: "make an image".into(),
+            kind: "create".into(),
+            target: target.into(),
+        };
+        for view in CREATE_VIEWS {
+            assert!(validate_target(&action(view)).is_ok(), "{view}");
+        }
+        assert!(validate_target(&action("")).is_err());
+        assert!(validate_target(&action("../etc/passwd")).is_err());
+        assert!(validate_target(&action("https://example.com")).is_err());
+        assert!(validate_target(&action("Image")).is_err());
     }
     #[test]
     fn recording_cues_win_and_are_reserved() {

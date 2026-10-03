@@ -4,6 +4,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Say Less Studio</title>
+    <script>
+      // Inside the Say Less app the page drops its own brand mark and top
+      // padding; the app already has both.
+      if (/[?&]embed=1/.test(location.search))
+        document.documentElement.classList.add("embed");
+    </script>
     <link rel="stylesheet" href="/app/studio.css" />
   </head>
   <body>

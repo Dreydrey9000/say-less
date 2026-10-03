@@ -27,6 +27,7 @@ mod shortcut;
 mod signal_handle;
 mod snippets;
 mod studio;
+mod studio_helper;
 mod transcription_coordinator;
 mod tray;
 mod tray_i18n;
@@ -688,6 +689,10 @@ pub fn run(cli_args: CliArgs) {
             studio::save_studio_settings,
             studio::list_launchable_apps,
             studio::test_voice_action,
+            studio_helper::studio_helper_status,
+            studio_helper::studio_helper_start,
+            studio_helper::studio_capture,
+            studio_helper::studio_fit_window,
             screen_recorder::start_screen_recording,
             screen_recorder::stop_screen_recording,
             screen_recorder::screen_recording_status,
@@ -1028,6 +1033,10 @@ pub fn run(cli_args: CliArgs) {
                     .min_inner_size(680.0, 570.0)
                     .resizable(true)
                     .maximizable(true)
+                    // Create (the Studio) lets people drop pictures onto the page.
+                    // The page handles drops itself; nothing else in this window
+                    // uses the native file-drop events.
+                    .disable_drag_drop_handler()
                     .visible(false);
 
             if let Some(data_dir) = portable::data_dir() {

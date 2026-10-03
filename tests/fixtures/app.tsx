@@ -36,6 +36,7 @@ let studio = JSON.parse(
   localStorage.getItem("test-studio") || JSON.stringify(defaultStudio),
 );
 let imported = false;
+let helperUp = query.has("helperRunning");
 let learned = query.has("learned")
   ? [{ trigger: "Louise", expansion: "Luis", observations: 1, active: false }]
   : [];
@@ -322,6 +323,25 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
   }
   if (cmd === "list_launchable_apps")
     return ["/System/Applications/Notes.app", "/Applications/Safari.app"];
+  // Create (the Studio helper). ?helperRunning starts with it already on,
+  // ?helperStartFails=<code> makes turning it on fail with that code.
+  if (cmd === "studio_fit_window") return null;
+  if (cmd === "studio_helper_status")
+    return {
+      running: helperUp,
+      port: 8810,
+      can_start: !query.has("helperNoStart"),
+    };
+  if (cmd === "studio_helper_start") {
+    const failure = query.get("helperStartFails");
+    if (failure) throw failure;
+    helperUp = true;
+    return { running: true, port: 8810, can_start: true };
+  }
+  if (cmd === "studio_capture") {
+    if (query.has("captureCancelled")) throw "cancelled";
+    return `${String(payload?.dir)}/capture-1.png`;
+  }
   if (cmd === "test_voice_action") {
     if (query.has("failAction")) throw "launch_failed";
     return null;

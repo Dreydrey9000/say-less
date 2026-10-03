@@ -8,8 +8,10 @@
 set -euo pipefail
 
 SRC="$(cd "$(dirname "$0")" && pwd)"
+# The Say Less app runs this same script to install its own copy (it sets both
+# variables below to its own folder and label); run by hand, the defaults apply.
 RUNTIME="${SAYLESS_BRIDGE_HOME:-$HOME/Desktop/_Code/say-less-bridge}"
-LABEL="com.luis.say-less-bridge"
+LABEL="${SAYLESS_BRIDGE_LABEL:-com.luis.say-less-bridge}"
 PLIST="$HOME/Library/LaunchAgents/$LABEL.plist"
 PY="$(command -v python3)"
 
@@ -25,6 +27,7 @@ cp "$SRC/extras/"* "$RUNTIME/extras/"
 [ -f "$RUNTIME/config.json" ] || cp "$SRC/config.example.json" "$RUNTIME/config.json"
 
 sed -e "s#__BRIDGE_HOME__#$RUNTIME#g" -e "s#__PYTHON__#$PY#g" \
+  -e "s#<string>com.luis.say-less-bridge</string>#<string>$LABEL</string>#" \
   "$SRC/extras/com.luis.say-less-bridge.plist.template" > "$PLIST"
 plutil -lint "$PLIST" >/dev/null
 

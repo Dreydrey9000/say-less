@@ -380,7 +380,16 @@ class FirstScreenIsOneRequest(StudioCase):
         boot = json.loads(raw.replace("<\\/", "</"))
         for key in ("refs", "recent", "recordings", "drive"):
             self.assertIn(key, boot)
-        self.assertEqual(body.count("</script>"), 2, "the script text must not close its own tag")
+        # the embed switch, the boot data and the page script: three, and the page script must not close its own tag
+        self.assertEqual(body.count("</script>"), 3, "the script text must not close its own tag")
+        self.assertIn('classList.add("embed")', body)
+
+    def test_the_app_can_learn_where_captures_are_kept(self):
+        st, state = self.call("GET", "/api/state")
+        self.assertEqual(st, 200)
+        self.assertTrue(state["captures_dir"].endswith("/state/captures"), state["captures_dir"])
+        st, boot = self.call("GET", "/api/boot")
+        self.assertEqual(boot["captures_dir"], state["captures_dir"])
 
 
 class SlowDiskNeverBlocksTheFirstScreen(StudioCase):
