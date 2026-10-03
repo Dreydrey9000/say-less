@@ -56,7 +56,7 @@ DEFAULT_CONFIG = {
     "delete_local_after_upload": False,
     "watch_enabled": True,
     "watch_interval_seconds": 10,
-    "ideas_provider_chain": ["zai_small", "agy", "claude", "groq"],
+    "ideas_provider_chain": ["zai_small", "agy"],
     "zai_base_url": "https://api.z.ai/api/coding/paas/v4",
     "zai_timeout_seconds": 120,
     "claude_vision_model": "claude-haiku-4-5-20251001",
