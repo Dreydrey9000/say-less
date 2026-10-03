@@ -41,6 +41,15 @@ export function isReservedCue(cue: string) {
   return RESERVED_CUES.includes(key);
 }
 
+/** Pages inside Create that a voice action can open (the same list the backend allows). */
+const CREATE_VIEWS = [
+  "image",
+  "titles",
+  "recordings",
+  "screens",
+  "library",
+] as const;
+
 export function VoiceActions() {
   const { t } = useTranslation();
   const { settings, loaded, busy, error, load, save } = useStudio();
@@ -202,11 +211,26 @@ export function VoiceActions() {
           >
             <option value="app">{t("actions.app")}</option>
             <option value="website">{t("actions.website")}</option>
+            <option value="create">{t("actions.create")}</option>
           </select>
         </label>
         <label className="block text-sm">
           {t("actions.target")}
-          {kind === "app" ? (
+          {kind === "create" ? (
+            <select
+              className="studio-select mt-1"
+              aria-label={t("actions.target")}
+              value={target}
+              onChange={(e) => setTarget(e.target.value)}
+            >
+              <option value="">{t("actions.chooseCreateView")}</option>
+              {CREATE_VIEWS.map((v) => (
+                <option key={v} value={v}>
+                  {t(`actions.createViews.${v}`)}
+                </option>
+              ))}
+            </select>
+          ) : kind === "app" ? (
             <select
               className="studio-select mt-1"
               aria-label={t("actions.target")}
@@ -260,7 +284,12 @@ export function VoiceActions() {
             key={a.cue}
           >
             <strong>{t("actions.say", { cue: a.cue })}</strong>
-            <p className="text-sm text-text/70 break-all">{a.target}</p>
+            <p className="text-sm text-text/70 break-all">
+              {a.kind === "create" &&
+              (CREATE_VIEWS as readonly string[]).includes(a.target)
+                ? t(`actions.createViews.${a.target}`)
+                : a.target}
+            </p>
             <div className="flex gap-2">
               <Button
                 variant="secondary"

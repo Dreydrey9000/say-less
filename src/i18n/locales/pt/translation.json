@@ -967,7 +967,16 @@
     "opened": "Destination opened.",
     "test": "Open now",
     "remove": "Remove action {{cue}}",
-    "empty": "No actions yet. Add your first app or link above."
+    "empty": "No actions yet. Add your first app or link above.",
+    "create": "Create (in Say Less)",
+    "chooseCreateView": "Choose a page",
+    "createViews": {
+      "image": "Make an image",
+      "titles": "Title ideas",
+      "recordings": "Screen videos",
+      "screens": "Read screens",
+      "library": "Library"
+    }
   },
   "import": {
     "eyebrow": "BRING YOUR WORDS WITH YOU",

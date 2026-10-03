@@ -32,6 +32,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Sidebar, SidebarSection, SECTIONS_CONFIG } from "./components/Sidebar";
 import { NavigateContext } from "./components/navigation";
 import { NAVIGATE_EVENT } from "./lib/navigation";
+import { requestStudioView } from "./lib/studio-view";
 import {
   OPEN_RECORDING_HOME_EVENT,
   OPEN_RECORDING_SETUP_EVENT,
@@ -209,6 +210,17 @@ function App() {
     };
   }, [showRecordingCard]);
 
+  // A "Create" voice action opens the Studio on the page it names.
+  useEffect(() => {
+    const pending = listen<string>("open-create", (event) => {
+      requestStudioView(event.payload);
+      setCurrentSection("creative");
+    });
+    return () => {
+      void pending.then((fn) => fn());
+    };
+  }, []);
+
   // Other parts of the window (e.g. the footer model popover) can ask to open a
   // section without prop drilling.
   useEffect(() => {
@@ -372,9 +384,21 @@ function App() {
               checkAccessibilityPermission(),
               checkMicrophonePermission(),
             ]);
-            if (!hasAccessibility || !hasMicrophone) {
+            // The microphone is how dictation hears the user, so setup stays
+            // up until that grant exists. "Browse settings first" is still there.
+            if (!hasMicrophone) {
               await revealMainWindowForPermissions();
               setOnboardingStep("accessibility");
+              return;
+            }
+            // Accessibility is only how Say Less types into other apps. The
+            // Studio does not need it. A returning user missing just that
+            // permission is not kept on the setup screen: this is the same
+            // browse mode as "Browse settings first", and it does not start
+            // shortcuts until Accessibility is actually granted.
+            if (!hasAccessibility) {
+              setSettingsOnly(true);
+              setOnboardingStep("done");
               return;
             }
           } catch (e) {

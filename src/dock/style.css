@@ -189,7 +189,8 @@ button:disabled {
   margin: 8px;
 }
 .compact-dock.is-wide {
-  width: 204px;
+  /* One 44px slot per voice action button on the open rail. */
+  width: calc(204px + var(--action-slots, 0) * 44px);
 }
 .compact-dock .compact-center-anchor {
   position: absolute;
@@ -344,7 +345,7 @@ button:disabled {
   z-index: auto;
   display: flex;
   align-items: center;
-  width: 104px;
+  width: calc(104px + var(--action-slots, 0) * 44px);
   height: 52px;
   padding-left: 14px;
   border: 1px solid rgba(255, 255, 255, 0.13);
