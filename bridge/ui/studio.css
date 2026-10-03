@@ -1589,3 +1589,8 @@ body.dragging .dropveil {
   font: 600 13px/1.25 var(--font-display);
   color: var(--text-hi);
 }
+/* In the Say Less window the app supplies the brand mark; the two status dots are for the standalone page. */
+html.in-app .brand,
+html.in-app .rail-foot {
+  display: none;
+}
