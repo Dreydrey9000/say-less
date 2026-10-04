@@ -237,6 +237,8 @@ const ipc: Parameters<typeof mockIPC>[0] = (cmd, payload) => {
       drive_tool: false,
       cloud_credentials: false,
     });
+  // ?pendingStudio=<page>: the app was launched with --open-studio <page>.
+  if (cmd === "take_pending_studio_page") return query.get("pendingStudio");
   if (cmd === "creative_studio_busy") return query.has("studioBusy");
   if (cmd === "creative_studio_session") {
     if (query.has("studioFails")) throw "studio_unavailable";

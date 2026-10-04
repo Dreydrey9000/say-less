@@ -786,6 +786,12 @@ async isPortable() : Promise<boolean> {
 async isUpdateChecksLocked() : Promise<boolean> {
     return await TAURI_INVOKE("is_update_checks_locked");
 },
+/**
+ * Hand the page asked for at launch to the window, once.
+ */
+async takePendingStudioPage() : Promise<string | null> {
+    return await TAURI_INVOKE("take_pending_studio_page");
+},
 async getAppDirPath() : Promise<Result<string, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("get_app_dir_path") };

@@ -210,6 +210,15 @@ function App() {
     };
   }, [showRecordingCard]);
 
+  // `Say Less --open-studio <page>` on a first launch: pick up the page once.
+  useEffect(() => {
+    void commands.takePendingStudioPage().then((page) => {
+      if (!page) return;
+      requestStudioView(page);
+      setCurrentSection("creative");
+    });
+  }, []);
+
   // A "Create" voice action opens the Studio on the page it names.
   useEffect(() => {
     const pending = listen<string>("open-create", (event) => {

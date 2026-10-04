@@ -1,10 +1,17 @@
 # Changelog
 
+## [0.14.15] - 2026-10-04
+
+### Fixed
+
+- `Say Less --open-studio <page>` now also works when Say Less is closed: it starts and opens that page (it was ignored on a first launch). It also brings Say Less to the front instead of only showing the window behind the app you were in.
+- The 0.14.14 notes and changelog gave `open -a "Say Less" --args --open-studio titles`, which macOS ignores for an app that is already running. The command that works is `/Applications/Say Less.app/Contents/MacOS/handy --open-studio titles`.
+
 ## [0.14.14] - 2026-10-04
 
 ### Added
 
-- `Say Less --open-studio <page>` opens the Studio on image, titles, recordings, screens or library, in the running app or starting it. Meant for global hotkeys (Hammerspoon, Raycast, Shortcuts): `open -a "Say Less" --args --open-studio titles`.
+- `Say Less --open-studio <page>` opens the Studio on image, titles, recordings, screens or library, in the running app or starting it. Meant for global hotkeys (Hammerspoon, Raycast, Shortcuts): `/Applications/Say Less.app/Contents/MacOS/handy --open-studio titles`.
 
 ## [0.14.13] - 2026-10-03
 
