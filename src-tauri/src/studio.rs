@@ -400,6 +400,41 @@ fn run_recording_cue(
     }
     Ok(true)
 }
+/// One of the five Studio pages, by name.
+pub fn studio_page(name: &str) -> Option<&'static str> {
+    CREATE_VIEWS.iter().copied().find(|page| *page == name)
+}
+
+/// A Studio page asked for on the command line at first launch. The window
+/// takes it once it is ready to show it (see `take_pending_studio_page`).
+#[derive(Default)]
+pub struct PendingStudioPage(pub std::sync::Mutex<Option<&'static str>>);
+
+/// Hand the page asked for at launch to the window, once.
+#[tauri::command]
+#[specta::specta]
+pub fn take_pending_studio_page(state: tauri::State<'_, PendingStudioPage>) -> Option<String> {
+    state
+        .0
+        .lock()
+        .ok()
+        .and_then(|mut page| page.take())
+        .map(str::to_string)
+}
+
+/// Bring this app to the front. A command-line launch is not a click, so the
+/// window alone does not take the focus from the app the person is in.
+#[cfg(target_os = "macos")]
+fn activate_app(app: &AppHandle) {
+    let _ = app.run_on_main_thread(|| {
+        if let Some(mtm) = objc2::MainThreadMarker::new() {
+            let ns_app = objc2_app_kit::NSApplication::sharedApplication(mtm);
+            #[allow(deprecated)]
+            ns_app.activateIgnoringOtherApps(true);
+        }
+    });
+}
+
 /// The Studio page named by `--open-studio <page>` or `--open-studio=<page>`,
 /// when it is one of the five pages.
 pub fn open_studio_arg(args: &[String]) -> Option<&'static str> {
@@ -411,7 +446,7 @@ pub fn open_studio_arg(args: &[String]) -> Option<&'static str> {
             arg.strip_prefix("--open-studio=")
         };
         if let Some(v) = value {
-            return CREATE_VIEWS.iter().copied().find(|page| *page == v);
+            return studio_page(v);
         }
     }
     None
@@ -420,6 +455,8 @@ pub fn open_studio_arg(args: &[String]) -> Option<&'static str> {
 /// Show the main window on a Studio page (the same effect as a spoken Create action).
 pub fn open_studio(app: &AppHandle, page: &str) -> Result<(), String> {
     crate::show_main_window_for(app);
+    #[cfg(target_os = "macos")]
+    activate_app(app);
     app.emit(OPEN_CREATE_EVENT, page.to_string())
         .map_err(|_| "launch_failed".to_string())
 }
@@ -514,6 +551,22 @@ pub fn format_text(text: &str, style: &WritingStyle) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn studio_page_names_exactly_the_five_pages() {
+        for page in CREATE_VIEWS {
+            assert_eq!(studio_page(page), Some(page));
+        }
+        assert_eq!(studio_page("Titles"), None);
+        assert_eq!(studio_page(""), None);
+    }
+
+    #[test]
+    fn pending_page_is_handed_over_once() {
+        let pending = PendingStudioPage(std::sync::Mutex::new(Some("screens")));
+        assert_eq!(pending.0.lock().unwrap().take(), Some("screens"));
+        assert_eq!(pending.0.lock().unwrap().take(), None);
+    }
 
     #[test]
     fn open_studio_flag_accepts_only_the_five_pages() {

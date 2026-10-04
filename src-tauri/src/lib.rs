@@ -164,8 +164,10 @@ fn apply_startup_activation_policy(app: &mut tauri::App, headless_mode: bool) {
     let cli_args = app.state::<CliArgs>().inner().clone();
     let settings = settings::get_settings(app.handle());
 
-    let should_hide =
-        (settings.start_hidden || cli_args.start_hidden) && !screen_recorder::launched_to_show();
+    // A launch that asks for a Studio page (--open-studio) always shows the window.
+    let should_hide = (settings.start_hidden || cli_args.start_hidden)
+        && !screen_recorder::launched_to_show()
+        && cli_args.open_studio.is_none();
     let tray_available = settings.show_tray_icon && !cli_args.no_tray;
 
     if should_hide && tray_available {
@@ -694,6 +696,7 @@ pub fn run(cli_args: CliArgs) {
             studio::save_studio_settings,
             studio::list_launchable_apps,
             studio::test_voice_action,
+            studio::take_pending_studio_page,
             screen_recorder::start_screen_recording,
             screen_recorder::stop_screen_recording,
             screen_recorder::screen_recording_status,
@@ -978,6 +981,9 @@ pub fn run(cli_args: CliArgs) {
         ))
         .manage(cli_args.clone())
         .manage(creative_studio::StudioRuntime::default())
+        .manage(studio::PendingStudioPage(std::sync::Mutex::new(
+            cli_args.open_studio.as_deref().and_then(studio::studio_page),
+        )))
         .setup(move |app| {
             #[cfg(target_os = "windows")]
             log::info!(
@@ -1137,7 +1143,8 @@ pub fn run(cli_args: CliArgs) {
             // But if permission onboarding is required, always show the window.
             // So does a relaunch from the Reopen Say Less button.
             let should_hide = (settings.start_hidden || cli_args.start_hidden)
-                && !screen_recorder::launched_to_show();
+                && !screen_recorder::launched_to_show()
+                && cli_args.open_studio.is_none();
             let should_force_show = should_force_show_permissions_window(&app_handle);
 
             // If start_hidden but tray is disabled, we must show the window

@@ -25,3 +25,19 @@ test("a spoken Create action opens the Studio on the page it names", async ({
   );
   await expect(page.locator(FRAME)).toHaveAttribute("src", /#\/library$/);
 });
+
+test("launching with --open-studio opens the Studio on that page once", async ({
+  page,
+}) => {
+  await page.goto("/tests/fixtures/app.html?pendingStudio=recordings");
+  await expect(
+    page.getByRole("heading", { name: "Studio", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(FRAME)).toHaveAttribute("src", /#\/recordings$/);
+});
+
+test("a normal launch stays on Home", async ({ page }) => {
+  await page.goto("/tests/fixtures/app.html");
+  await expect(page.getByText("Speak. We'll type.")).toBeVisible();
+  await expect(page.locator(FRAME)).toHaveCount(0);
+});
