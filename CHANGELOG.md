@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `Say Less --open-studio <page>` opens the Studio on image, titles, recordings, screens or library, in the running app or starting it. Meant for global hotkeys (Hammerspoon, Raycast, Shortcuts): `open -a "Say Less" --args --open-studio titles`.
+
 ## [0.14.13] - 2026-10-03
 
 ### Added

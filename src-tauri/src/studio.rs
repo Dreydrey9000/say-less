@@ -400,6 +400,30 @@ fn run_recording_cue(
     }
     Ok(true)
 }
+/// The Studio page named by `--open-studio <page>` or `--open-studio=<page>`,
+/// when it is one of the five pages.
+pub fn open_studio_arg(args: &[String]) -> Option<&'static str> {
+    let mut iter = args.iter();
+    while let Some(arg) = iter.next() {
+        let value = if arg == "--open-studio" {
+            iter.next().map(String::as_str)
+        } else {
+            arg.strip_prefix("--open-studio=")
+        };
+        if let Some(v) = value {
+            return CREATE_VIEWS.iter().copied().find(|page| *page == v);
+        }
+    }
+    None
+}
+
+/// Show the main window on a Studio page (the same effect as a spoken Create action).
+pub fn open_studio(app: &AppHandle, page: &str) -> Result<(), String> {
+    crate::show_main_window_for(app);
+    app.emit(OPEN_CREATE_EVENT, page.to_string())
+        .map_err(|_| "launch_failed".to_string())
+}
+
 fn launch(app: &AppHandle, action: &VoiceAction) -> Result<(), String> {
     validate_target(action)?;
     if action.kind == "create" {
@@ -490,6 +514,28 @@ pub fn format_text(text: &str, style: &WritingStyle) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn open_studio_flag_accepts_only_the_five_pages() {
+        let a = |v: &[&str]| v.iter().map(|s| s.to_string()).collect::<Vec<_>>();
+        assert_eq!(
+            open_studio_arg(&a(&["handy", "--open-studio", "titles"])),
+            Some("titles")
+        );
+        assert_eq!(
+            open_studio_arg(&a(&["handy", "--open-studio=library"])),
+            Some("library")
+        );
+        assert_eq!(
+            open_studio_arg(&a(&["handy", "--open-studio", "../etc"])),
+            None
+        );
+        assert_eq!(open_studio_arg(&a(&["handy", "--open-studio"])), None);
+        assert_eq!(
+            open_studio_arg(&a(&["handy", "--toggle-transcription"])),
+            None
+        );
+    }
     #[test]
     fn actions_require_opt_in_prefix_and_exact_cue() {
         let mut s = StudioSettings::default();

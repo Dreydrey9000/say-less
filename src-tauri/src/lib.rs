@@ -943,6 +943,10 @@ pub fn run(cli_args: CliArgs) {
                 signal_handle::send_transcription_input(app, "transcribe_with_post_process", "CLI");
             } else if args.iter().any(|a| a == "--cancel") {
                 crate::utils::cancel_current_operation(app);
+            } else if let Some(page) = studio::open_studio_arg(&args) {
+                if let Err(error) = studio::open_studio(app, page) {
+                    log::warn!("Cannot open Studio on {page}: {error}");
+                }
             } else {
                 // A second process was launched without remote-control flags
                 // (e.g. the binary run from a shell). On macOS, relaunching the
