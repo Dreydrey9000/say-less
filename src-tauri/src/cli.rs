@@ -24,6 +24,12 @@ pub struct CliArgs {
     #[arg(long)]
     pub cancel: bool,
 
+    /// Open the Studio on a page: image, titles, recordings, screens or
+    /// library (sent to running instance; starts the app if it is closed).
+    /// For global hotkeys, for example `Say Less --open-studio titles`.
+    #[arg(long, value_name = "PAGE")]
+    pub open_studio: Option<String>,
+
     /// Enable debug mode with verbose logging
     #[arg(long)]
     pub debug: bool,
