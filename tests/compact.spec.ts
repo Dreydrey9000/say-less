@@ -1,4 +1,12 @@
 import { test, expect } from "@playwright/test";
+
+test("dock loads a saved language before showing its controls", async ({
+  page,
+}) => {
+  await page.goto("/tests/fixtures/app.html?dock=1&language=es");
+  await expect(page.getByRole("button", { name: "Hablar" })).toBeVisible();
+  await expect(page.locator("html")).toHaveAttribute("lang", "es");
+});
 test.use({ deviceScaleFactor: 2 });
 
 test("dock collapses to a small companion and expands without recording", async ({
