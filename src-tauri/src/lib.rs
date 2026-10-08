@@ -11,6 +11,7 @@ mod clipboard;
 mod commands;
 mod correction_learning;
 mod creative_studio;
+mod dictation_timing;
 mod floating;
 mod helpers;
 mod input;

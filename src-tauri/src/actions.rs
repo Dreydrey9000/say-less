@@ -2,6 +2,7 @@
 use crate::apple_intelligence;
 use crate::audio_feedback::{play_feedback_sound, play_feedback_sound_blocking, SoundType};
 use crate::audio_toolkit::{is_microphone_access_denied, is_no_input_device_error, VadPolicy};
+use crate::dictation_timing::DictationTiming;
 use crate::managers::audio::AudioRecordingManager;
 use crate::managers::history::HistoryManager;
 use crate::managers::model::ModelManager;
@@ -15,7 +16,7 @@ use crate::utils::{
 };
 use crate::TranscriptionCoordinator;
 use ferrous_opencc::{config::BuiltinConfig, OpenCC};
-use log::{debug, error, warn};
+use log::{debug, error, info, warn};
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
 use std::future::Future;
@@ -25,6 +26,15 @@ use tauri::Manager;
 use tauri::{AppHandle, Emitter};
 
 const CANCELLATION_POLL_INTERVAL: Duration = Duration::from_millis(25);
+
+fn log_dictation_stage(timing: DictationTiming, stage: &'static str) {
+    info!(
+        "Dictation timing: id={} stage={} stop_elapsed_ms={}",
+        timing.id,
+        stage,
+        timing.elapsed().as_millis()
+    );
+}
 
 #[derive(Clone, serde::Serialize)]
 struct RecordingErrorEvent {
@@ -667,6 +677,8 @@ impl ShortcutAction for TranscribeAction {
         shortcut::unregister_cancel_shortcut(app);
 
         let stop_time = Instant::now();
+        let timing = DictationTiming::new(stop_time);
+        log_dictation_stage(timing, "stop_requested");
         debug!("TranscribeAction::stop called for binding: {}", binding_id);
 
         let ah = app.clone();
@@ -706,6 +718,7 @@ impl ShortcutAction for TranscribeAction {
 
         tauri::async_runtime::spawn(async move {
             let _guard = FinishGuard(ah.clone());
+            log_dictation_stage(timing, "worker_started");
             debug!(
                 "Starting async transcription task for binding: {}",
                 binding_id
@@ -713,6 +726,7 @@ impl ShortcutAction for TranscribeAction {
 
             let stop_recording_time = Instant::now();
             if let Some(samples) = rm.stop_recording(&binding_id, cancel_generation) {
+                log_dictation_stage(timing, "audio_stopped");
                 debug!(
                     "Recording stopped and samples retrieved in {:?}, sample count: {}",
                     stop_recording_time.elapsed(),
@@ -720,6 +734,7 @@ impl ShortcutAction for TranscribeAction {
                 );
 
                 if rm.was_cancelled_since(cancel_generation) {
+                    log_dictation_stage(timing, "cancelled");
                     debug!("Transcription operation cancelled after recording stop");
                     tm.cancel_stream();
                     utils::hide_recording_overlay(&ah);
@@ -728,6 +743,7 @@ impl ShortcutAction for TranscribeAction {
                 }
 
                 if samples.is_empty() {
+                    log_dictation_stage(timing, "no_audio");
                     debug!("Recording produced no audio samples; skipping persistence");
                     // Tear down any streaming worker so its channel doesn't leak
                     // and block the next start_stream.
@@ -749,19 +765,34 @@ impl ShortcutAction for TranscribeAction {
                     // running, finalize it and use its text (all audio was already
                     // fed to the stream); otherwise batch-transcribe the samples.
                     let transcription_time = Instant::now();
-                    let transcription_result = match tm.finalize_stream() {
+                    log_dictation_stage(timing, "finalize_started");
+                    let finalized = tm.finalize_stream();
+                    log_dictation_stage(timing, "finalize_returned");
+                    let transcription_result = match finalized {
                         // A finalized stream with usable text wins. An empty result
                         // (no active stream, produced nothing, or a finalize error
                         // after the engine was returned) falls back to a full batch
                         // transcription of the same audio. A finalize timeout is
                         // surfaced instead — the worker may still hold the engine,
                         // so a batch fallback would contend with it.
-                        Ok(Some(text)) if !text.trim().is_empty() => Ok(text),
-                        Ok(_) => tm.transcribe(samples),
-                        Err(err) => Err(err),
+                        Ok(Some(text)) if !text.trim().is_empty() => {
+                            log_dictation_stage(timing, "stream_selected");
+                            Ok(text)
+                        }
+                        Ok(_) => {
+                            log_dictation_stage(timing, "batch_started");
+                            let result = tm.transcribe(samples);
+                            log_dictation_stage(timing, "batch_returned");
+                            result
+                        }
+                        Err(err) => {
+                            log_dictation_stage(timing, "finalize_failed");
+                            Err(err)
+                        }
                     };
 
                     // Await WAV save and verify
+                    log_dictation_stage(timing, "wav_wait_started");
                     let wav_saved = match wav_handle.await {
                         Ok(Ok(())) => {
                             match crate::audio_toolkit::verify_wav_file(
@@ -785,7 +816,10 @@ impl ShortcutAction for TranscribeAction {
                         }
                     };
 
+                    log_dictation_stage(timing, "wav_wait_finished");
+
                     if rm.was_cancelled_since(cancel_generation) {
+                        log_dictation_stage(timing, "cancelled");
                         debug!("Transcription operation cancelled before output handling");
                         utils::hide_recording_overlay(&ah);
                         set_tray_state(&ah, TrayIconState::Idle);
@@ -811,6 +845,7 @@ impl ShortcutAction for TranscribeAction {
                                 }
                                 let outcome = crate::voice_command::run(&ah, &transcription).await;
                                 if rm.was_cancelled_since(cancel_generation) {
+                                    log_dictation_stage(timing, "cancelled");
                                     debug!("Voice command cancelled before preview");
                                     utils::hide_recording_overlay(&ah);
                                     set_tray_state(&ah, TrayIconState::Idle);
@@ -830,6 +865,7 @@ impl ShortcutAction for TranscribeAction {
                                 utils::hide_recording_overlay(&ah);
                                 set_tray_state(&ah, TrayIconState::Idle);
                                 crate::voice_command::present(&ah, outcome);
+                                log_dictation_stage(timing, "command_finished");
                                 return;
                             }
 
@@ -840,19 +876,23 @@ impl ShortcutAction for TranscribeAction {
                                     show_processing_overlay(&ah);
                                 }
                             }
+                            log_dictation_stage(timing, "cleanup_started");
                             let Some(processed) = complete_unless_cancelled(
                                 process_transcription_output(&ah, &transcription, post_process),
                                 || rm.was_cancelled_since(cancel_generation),
                             )
                             .await
                             else {
+                                log_dictation_stage(timing, "cleanup_cancelled");
                                 debug!("Transcription operation cancelled during output handling");
                                 utils::hide_recording_overlay(&ah);
                                 set_tray_state(&ah, TrayIconState::Idle);
                                 return;
                             };
+                            log_dictation_stage(timing, "cleanup_finished");
 
                             if rm.was_cancelled_since(cancel_generation) {
+                                log_dictation_stage(timing, "cancelled");
                                 debug!("Transcription operation cancelled before paste");
                                 utils::hide_recording_overlay(&ah);
                                 set_tray_state(&ah, TrayIconState::Idle);
@@ -860,6 +900,7 @@ impl ShortcutAction for TranscribeAction {
                             }
 
                             let spoken_action_text = transcription.clone();
+                            log_dictation_stage(timing, "history_started");
                             // Save to history if WAV was saved
                             if wav_saved {
                                 if let Err(err) = hm.save_entry(
@@ -873,7 +914,10 @@ impl ShortcutAction for TranscribeAction {
                                 }
                             }
 
+                            log_dictation_stage(timing, "history_finished");
+
                             if processed.final_text.is_empty() {
+                                log_dictation_stage(timing, "empty_output");
                                 utils::hide_recording_overlay(&ah);
                                 set_tray_state(&ah, TrayIconState::Idle);
                             } else {
@@ -881,8 +925,11 @@ impl ShortcutAction for TranscribeAction {
                                 let paste_time = Instant::now();
                                 let final_text = processed.final_text;
                                 let rm_for_paste = Arc::clone(&rm);
+                                log_dictation_stage(timing, "paste_queued");
                                 ah.run_on_main_thread(move || {
+                                    log_dictation_stage(timing, "paste_callback_started");
                                     if rm_for_paste.was_cancelled_since(cancel_generation) {
+                                        log_dictation_stage(timing, "cancelled");
                                         debug!("Transcription operation cancelled before paste");
                                         utils::hide_recording_overlay(&ah_clone);
                                         set_tray_state(&ah_clone, TrayIconState::Idle);
@@ -894,11 +941,13 @@ impl ShortcutAction for TranscribeAction {
                                         &spoken_action_text,
                                     ) {
                                         Ok(true) => {
+                                            log_dictation_stage(timing, "spoken_action_handled");
                                             utils::hide_recording_overlay(&ah_clone);
                                             set_tray_state(&ah_clone, TrayIconState::Idle);
                                             return;
                                         }
                                         Err(_) => {
+                                            log_dictation_stage(timing, "spoken_action_failed");
                                             let _ = ah_clone.emit("voice-action-result", false);
                                             utils::hide_recording_overlay(&ah_clone);
                                             set_tray_state(&ah_clone, TrayIconState::Idle);
@@ -906,12 +955,17 @@ impl ShortcutAction for TranscribeAction {
                                         }
                                         Ok(false) => {}
                                     }
+                                    log_dictation_stage(timing, "paste_started");
                                     match utils::paste(final_text, ah_clone.clone()) {
-                                        Ok(()) => debug!(
-                                            "Text pasted successfully in {:?}",
-                                            paste_time.elapsed()
-                                        ),
+                                        Ok(()) => {
+                                            log_dictation_stage(timing, "paste_succeeded");
+                                            debug!(
+                                                "Text pasted successfully in {:?}",
+                                                paste_time.elapsed()
+                                            );
+                                        }
                                         Err(e) => {
+                                            log_dictation_stage(timing, "paste_failed");
                                             error!("Failed to paste transcription: {}", e);
                                             let _ = ah_clone.emit("paste-error", ());
                                         }
@@ -920,6 +974,7 @@ impl ShortcutAction for TranscribeAction {
                                     set_tray_state(&ah_clone, TrayIconState::Idle);
                                 })
                                 .unwrap_or_else(|e| {
+                                    log_dictation_stage(timing, "paste_dispatch_failed");
                                     error!("Failed to run paste on main thread: {:?}", e);
                                     utils::hide_recording_overlay(&ah);
                                     set_tray_state(&ah, TrayIconState::Idle);
@@ -928,6 +983,7 @@ impl ShortcutAction for TranscribeAction {
                         }
                         Err(err) => {
                             if rm.was_cancelled_since(cancel_generation) {
+                                log_dictation_stage(timing, "cancelled");
                                 debug!(
                                     "Transcription operation cancelled after transcription error"
                                 );
@@ -936,6 +992,7 @@ impl ShortcutAction for TranscribeAction {
                                 return;
                             }
 
+                            log_dictation_stage(timing, "transcription_failed");
                             error!("Transcription failed: {}", err);
                             // Surface the failure to the UI (toast). The full
                             // message is also in handy.log via the line above.
@@ -958,6 +1015,7 @@ impl ShortcutAction for TranscribeAction {
                     }
                 }
             } else {
+                log_dictation_stage(timing, "no_audio");
                 debug!("No samples retrieved from recording stop");
                 // Tear down any streaming worker so its channel doesn't leak.
                 tm.cancel_stream();
@@ -967,7 +1025,7 @@ impl ShortcutAction for TranscribeAction {
         });
 
         debug!(
-            "TranscribeAction::stop completed in {:?}",
+            "TranscribeAction::stop dispatched in {:?}",
             stop_time.elapsed()
         );
     }

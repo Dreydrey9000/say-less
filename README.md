@@ -65,6 +65,8 @@ bun run tauri build    # make an installer for this OS
 
 [Localization load flow](docs/diagrams/localization.mmd) · [QuickSilver startup measurement](docs/performance/quicksilver-locales.md)
 
+[Dictation latency diagnostics](docs/performance/dictation-timing.md) explains the native stop-to-paste stage timings and their limits.
+
 ## Website and releases
 
 ```mermaid
