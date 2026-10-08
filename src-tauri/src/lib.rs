@@ -28,6 +28,7 @@ mod settings;
 mod shortcut;
 mod signal_handle;
 mod snippets;
+mod stream_replay;
 mod studio;
 mod transcription_coordinator;
 mod tray;
@@ -540,6 +541,14 @@ fn run_headless_transcription(app: &AppHandle, args: &CliArgs) -> i32 {
                 );
                 return 2;
             }
+            if args.stream_replay {
+                if let Err(message) =
+                    stream_replay::validate_input(reader.duration() as usize, args.repeat)
+                {
+                    eprintln!("error: {message}");
+                    return 2;
+                }
+            }
         }
         Err(e) => {
             eprintln!("error: cannot open {}: {}", wav.display(), e);
@@ -577,6 +586,9 @@ fn run_headless_transcription(app: &AppHandle, args: &CliArgs) -> i32 {
     };
 
     // Cold load (timed).
+    if args.stream_replay {
+        eprintln!("stream_replay stage=load_started");
+    }
     let load_start = Instant::now();
     if let Err(e) = tm.load_model_with_device(&model_id, device_index) {
         eprintln!("error: load_model('{}') failed: {}", model_id, e);
@@ -584,6 +596,58 @@ fn run_headless_transcription(app: &AppHandle, args: &CliArgs) -> i32 {
     }
     let load_ms = load_start.elapsed().as_millis() as u64;
     let bound_backend = tm.current_backend();
+
+    if args.stream_replay {
+        eprintln!("stream_replay stage=load_finished");
+        eprintln!("stream_replay stage=feed_started");
+        let replay_start = Instant::now();
+        tm.start_stream();
+        let router = tm.stream_router();
+        let mut stream_observed = false;
+        let frames = stream_replay::feed_paced(
+            &samples,
+            |frame| {
+                router.feed(frame);
+                stream_observed |= tm.is_streaming();
+            },
+            |deadline| {
+                if let Some(remaining) = deadline.checked_sub(replay_start.elapsed()) {
+                    std::thread::sleep(remaining);
+                }
+            },
+        );
+        let feed_ms = replay_start.elapsed().as_millis();
+        eprintln!("stream_replay stage=finalize_started");
+        let finalize_start = Instant::now();
+        let outcome = stream_replay::ReplayOutcome::from_result(tm.finalize_stream());
+        let finalize_ms = finalize_start.elapsed().as_millis();
+        let replay_ms = replay_start.elapsed().as_millis();
+        eprintln!("stream_replay stage=finished outcome={}", outcome.label());
+        if args.json {
+            println!(
+                "{}",
+                serde_json::json!({
+                    "mode": "stream_replay", "outcome": outcome.label(),
+                    "model": model_id, "requested_device": requested_device,
+                    "bound_backend": bound_backend, "audio_secs": audio_secs,
+                    "load_ms": load_ms, "feed_ms": feed_ms, "finalize_ms": finalize_ms,
+                    "replay_ms": replay_ms, "frame_count": frames,
+                    "stream_observed": stream_observed, "text": outcome.text(),
+                })
+            );
+        } else {
+            println!(
+                "stream_replay outcome={} load={}ms feed={}ms finalize={}ms total={}ms",
+                outcome.label(),
+                load_ms,
+                feed_ms,
+                finalize_ms,
+                replay_ms
+            );
+            println!("text: {}", outcome.text());
+        }
+        return outcome.exit_code();
+    }
 
     let runs = args.repeat.unwrap_or(1).max(1);
     let mut times_ms: Vec<u64> = Vec::new();

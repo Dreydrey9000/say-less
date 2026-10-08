@@ -1,5 +1,21 @@
 # Dictation latency diagnostics
 
+## Offline streaming replay
+
+A candidate containing this diagnostic supports:
+
+```sh
+/path/to/Say\ Less.app/Contents/MacOS/handy --transcribe-file synthetic.wav --stream-replay --repeat 1 --json
+```
+
+The WAV must be nonempty16kHz mono signed16-bit PCM and at most10seconds. Only one run is accepted. The replay uses the real `start_stream` → `StreamRouter::feed` → `finalize_stream` path, feeding20ms chunks at cumulative monotonic deadlines. It does not create a microphone recorder, save history, apply optional Apple Intelligence/provider cleanup, paste text, or change retention. It never falls back to batch when a stream is unavailable.
+
+Stdout JSON has `mode=stream_replay`, `outcome` (`complete`, `no_stream`, `empty`, or `error`), backend, load time, feed duration, finalization duration after the audio deadline, total replay duration, frame count, `stream_observed`, and output text. `stream_observed` samples activity during feeding; a short stream can complete without being observed at those sampling points. A nonempty finalized result is required for exit0; other stream outcomes return1 and invalid input returns2. Content-free stage markers go to stderr. A valid comparison uses the same candidate executable and fixture for batch and replay.
+
+Feed duration includes deliberate real-time pacing. Finalization includes the worker reply, text filtering and any configured immediate unload; it is not pure model-compute time. The existing30-second reply timeout remains unchanged. Run under a separate whole-process timeout and memory-pressure guard; replay does not add an internal global deadline. CLI flags are diagnostic, not a production release or proof of end-to-end speed.
+
+## Native interaction trace
+
 The [dictation architecture](../diagrams/dictation.mmd) shows the actual local model, optional cleanup, and paste boundaries. Stage timings follow that existing flow; they do not change it or claim a speedup.
 
 At INFO log level, normal dictation emits `Dictation timing: id=… stage=… stop_elapsed_ms=…`. An ID identifies one stop operation within a process. Values are cumulative monotonic milliseconds from the stop request; subtract consecutive values with the same ID for a stage duration. The shared clock survives the async worker and main-thread callback, so paste completion includes dispatch and queue time. No audio, transcript, target application, provider input, or settings are included in these new lines.
