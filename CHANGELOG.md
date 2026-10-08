@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Diagnostics
+
+- Add content-free dictation stage timings, including cleanup and the main-thread paste queue, so support can distinguish model work from output delays. The stop-handler timing is now labeled as dispatch, not completion.
+- Add bounded `--stream-replay` diagnostics for synthetic WAVs through the real streaming manager, with explicit outcomes and no batch fallback.
+
 ## [0.14.15] - 2026-10-04
 
 ### Fixed

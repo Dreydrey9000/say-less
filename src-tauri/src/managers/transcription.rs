@@ -436,8 +436,8 @@ impl TranscriptionManager {
         );
 
         let unload_duration = unload_start.elapsed();
-        debug!(
-            "Model unloaded manually (took {}ms)",
+        info!(
+            "Model unload completed (took {}ms)",
             unload_duration.as_millis()
         );
         Ok(())

@@ -1,0 +1,18 @@
+flowchart TD
+    WAV[Explicit mono 16 kHz WAV] --> Bounds[Validate nonempty, at most 10 seconds, repeat 1]
+    Bounds --> Load[Load selected local model]
+    Load --> Start[start_stream opens FIFO route]
+    Start --> Feed[Feed 320-sample frames with cumulative 20 ms pacing]
+    Feed --> Worker[Existing streaming worker and engine]
+    Feed --> Deadline[Wait until final audio deadline]
+    Deadline --> Finalize[finalize_stream: existing reply timeout and unload policy]
+    Worker --> Finalize
+    Finalize --> Outcome{Finalized result}
+    Outcome -->|Nonempty text| Complete[complete: exit 0]
+    Outcome -->|None, empty, or error| Failed[Distinct outcome: exit 1, no batch fallback]
+    Complete --> JSON[JSON text and load/feed/finalize timings]
+    Failed --> JSON
+    Bounds -->|Invalid| Invalid[Exit 2 before model load]
+    Guard[External pressure guard and whole-process deadline] -. supervises .-> Load
+    Guard -. supervises .-> Finalize
+    Scope[Diagnostic only: no microphone, cleanup, history, or paste]

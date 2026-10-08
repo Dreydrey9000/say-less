@@ -552,7 +552,8 @@ jobs:
           releaseName: ${{ inputs.release-id && format('v{0}', steps.get-version.outputs.version) || '' }}
           releaseId: ${{ inputs.release-id }}
           assetNamePattern: ${{ steps.patch-release-name.outputs.platform }}
-          args: ${{ inputs.build-args }}
+          # Test artifacts have no updater key; keep signed release configuration intact.
+          args: ${{ inputs.build-args }} ${{ !inputs.sign-binaries && '--config src-tauri/tauri.test-build.conf.json' || '' }}
 
       - name: Build with Tauri
         if: ${{ !contains(inputs.platform, 'macos') || env.HAS_APPLE_CERT == 'true' }}
@@ -586,7 +587,7 @@ jobs:
           releaseName: ${{ inputs.release-id && format('v{0}', steps.get-version.outputs.version) || '' }}
           releaseId: ${{ inputs.release-id }}
           assetNamePattern: ${{ steps.patch-release-name.outputs.platform }}
-          args: ${{ inputs.build-args }}
+          args: ${{ inputs.build-args }} ${{ !inputs.sign-binaries && '--config src-tauri/tauri.test-build.conf.json' || '' }}
 
       # tauri-action uploads release assets before returning. All AppImage
       # filtering therefore happens inside linuxdeploy above; this verifies the

@@ -40,6 +40,11 @@ pub struct CliArgs {
     #[arg(short = 'f', long, value_name = "WAV")]
     pub transcribe_file: Option<PathBuf>,
 
+    /// Replay a nonempty WAV of at most 10 seconds through the real stream,
+    /// paced in 20 ms chunks. One run only; never falls back to batch.
+    #[arg(long, requires = "transcribe_file", conflicts_with_all = ["list_models", "list_devices", "mcp"])]
+    pub stream_replay: bool,
+
     /// Model id to load for --transcribe-file (default: the selected model).
     #[arg(long)]
     pub model: Option<String>,
@@ -75,4 +80,34 @@ pub struct CliArgs {
     /// History database for --mcp (default: the app's own history.db).
     #[arg(long, value_name = "PATH")]
     pub history_db: Option<PathBuf>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn replay_requires_file_and_cannot_be_a_listing_command() {
+        assert!(CliArgs::try_parse_from(["handy", "--stream-replay"]).is_err());
+        assert!(CliArgs::try_parse_from([
+            "handy",
+            "--stream-replay",
+            "--transcribe-file",
+            "fixture.wav",
+            "--list-devices"
+        ])
+        .is_err());
+        let args = CliArgs::try_parse_from([
+            "handy",
+            "--stream-replay",
+            "--transcribe-file",
+            "fixture.wav",
+            "--repeat",
+            "1",
+            "--json",
+        ])
+        .unwrap();
+        assert!(args.stream_replay);
+        assert_eq!(args.repeat, Some(1));
+    }
 }
