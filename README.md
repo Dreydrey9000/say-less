@@ -65,7 +65,7 @@ bun run tauri build    # make an installer for this OS
 
 [Localization load flow](docs/diagrams/localization.mmd) · [QuickSilver startup measurement](docs/performance/quicksilver-locales.md)
 
-[Dictation latency diagnostics](docs/performance/dictation-timing.md) explains the native stop-to-paste stage timings and their limits.
+[Dictation latency diagnostics](docs/performance/dictation-timing.md) explains the native stop-to-paste stage timings and their limits. The [bounded WAV streaming replay](docs/diagrams/stream-replay.mmd) exercises the real streaming worker without microphone capture or paste.
 
 ## Website and releases
 
