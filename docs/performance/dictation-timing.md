@@ -20,18 +20,18 @@ The [dictation architecture](../diagrams/dictation.mmd) shows the actual local m
 
 At INFO log level, normal dictation emits `Dictation timing: id=… stage=… stop_elapsed_ms=…`. An ID identifies one stop operation within a process. Values are cumulative monotonic milliseconds from the stop request; subtract consecutive values with the same ID for a stage duration. The shared clock survives the async worker and main-thread callback, so paste completion includes dispatch and queue time. No audio, transcript, target application, provider input, or settings are included in these new lines.
 
-| Boundaries | What is included |
-| --- | --- |
-| `stop_requested` → `worker_started` | Synchronous stop setup and async scheduling |
-| `worker_started` → `audio_stopped` | Recorder stop and sample retrieval |
-| `finalize_started` → `finalize_returned` | Streaming reply, text filtering and configured immediate unload |
-| `batch_started` → `batch_returned` | Fallback batch transcription and configured immediate unload |
-| `wav_wait_started` → `wav_wait_finished` | Remaining concurrent WAV-save wait and verification |
-| `cleanup_started` → `cleanup_finished` | Output handling, including configured optional cleanup |
-| `history_started` → `history_finished` | History persistence, when audio was saved |
-| `paste_queued` → `paste_callback_started` | Main-thread queue wait |
-| `paste_callback_started` → `paste_started` | Cancellation and spoken-action checks |
-| `paste_started` → `paste_succeeded` / `paste_failed` | Paste operation |
+| Boundaries                                           | What is included                                                |
+| ---------------------------------------------------- | --------------------------------------------------------------- |
+| `stop_requested` → `worker_started`                  | Synchronous stop setup and async scheduling                     |
+| `worker_started` → `audio_stopped`                   | Recorder stop and sample retrieval                              |
+| `finalize_started` → `finalize_returned`             | Streaming reply, text filtering and configured immediate unload |
+| `batch_started` → `batch_returned`                   | Fallback batch transcription and configured immediate unload    |
+| `wav_wait_started` → `wav_wait_finished`             | Remaining concurrent WAV-save wait and verification             |
+| `cleanup_started` → `cleanup_finished`               | Output handling, including configured optional cleanup          |
+| `history_started` → `history_finished`               | History persistence, when audio was saved                       |
+| `paste_queued` → `paste_callback_started`            | Main-thread queue wait                                          |
+| `paste_callback_started` → `paste_started`           | Cancellation and spoken-action checks                           |
+| `paste_started` → `paste_succeeded` / `paste_failed` | Paste operation                                                 |
 
 `stream_selected` identifies a usable stream; `batch_started` identifies fallback. Terminal alternatives include `no_audio`, `cancelled`, `cleanup_cancelled`, `empty_output`, `transcription_failed`, `spoken_action_handled`, `spoken_action_failed`, `command_finished`, and `paste_dispatch_failed`. Those paths intentionally do not emit `paste_succeeded`. A process crash can leave an incomplete sequence; missing completion is not proof of a stall. Voice-command preview and later user acceptance are separate from normal dictation paste.
 
